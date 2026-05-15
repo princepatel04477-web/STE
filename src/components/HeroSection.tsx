@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { PhoneCall, MoveRight } from 'lucide-react';
+import { PhoneCall, MoveRight, Clock } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,6 +13,36 @@ export default function HeroSection() {
   const textRef = useRef<HTMLHeadingElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const midgroundRef = useRef<HTMLDivElement>(null);
+
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  useEffect(() => {
+    const targetDate = new Date("2026-09-12T00:00:00").getTime();
+
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      if (distance < 0) {
+        clearInterval(interval);
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000)
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || !textRef.current || !bgRef.current || !midgroundRef.current) return;
@@ -40,8 +70,8 @@ export default function HeroSection() {
 
       {/* Background Plane - Sky and Distant Environment */}
       <div ref={bgRef} className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-expo-midnight/80 via-transparent to-transparent z-10" />
-        <div className="absolute inset-0 bg-[url('/assets/ste_luxury_hero_613dfd3b.jpg')] bg-cover bg-top opacity-30 mix-blend-screen" />
+        <div className="absolute inset-0 bg-gradient-to-b from-expo-midnight/90 via-expo-midnight/50 to-transparent z-10" />
+        <div className="absolute inset-0 bg-[url('/assets/STE.jpg')] bg-cover bg-center opacity-40 mix-blend-screen" />
         {/* Soft volumetric glow */}
         <div className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[80vw] h-[40vh] bg-expo-copper/20 blur-[100px] rounded-full mix-blend-screen pointer-events-none" />
       </div>
@@ -77,7 +107,10 @@ export default function HeroSection() {
         </nav>
 
         <div>
-          <button className="group relative px-6 py-3 rounded-full border border-expo-gold/50 overflow-hidden transition-all duration-500 ease-luxury hover:border-expo-gold hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(214,160,102,0.3)]">
+          <button
+            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            className="group relative px-6 py-3 rounded-full border border-expo-gold/50 overflow-hidden transition-all duration-500 ease-luxury hover:border-expo-gold hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(214,160,102,0.3)]"
+          >
             <div className="absolute inset-0 bg-expo-gold translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-luxury" />
             <span className="relative z-10 text-xs uppercase tracking-widest text-expo-gold group-hover:text-expo-midnight font-bold transition-colors duration-500">Book Stall</span>
           </button>
@@ -94,6 +127,34 @@ export default function HeroSection() {
           </span>
         </h1>
         <h2 className="font-display text-3xl md:text-5xl tracking-widest text-white">OPPORTUNITY</h2>
+      </div>
+
+      {/* Countdown Timer Component */}
+      <div className="relative z-40 mt-6 w-full flex justify-center">
+        <div className="flex items-center gap-6 glass-panel px-8 py-4 rounded-full border-expo-gold/20 shadow-[0_0_15px_rgba(214,160,102,0.1)] group">
+          <Clock className="w-5 h-5 text-expo-gold animate-pulse" />
+          <div className="flex items-center gap-4 text-center">
+            <div className="flex flex-col min-w-[3rem]">
+              <span className="font-display text-2xl text-expo-warm leading-none tracking-wider">{String(timeLeft.days).padStart(2, '0')}</span>
+              <span className="text-[10px] uppercase tracking-widest text-expo-gold/70 mt-1">Days</span>
+            </div>
+            <span className="text-xl text-expo-border pb-3">:</span>
+            <div className="flex flex-col min-w-[3rem]">
+              <span className="font-display text-2xl text-expo-warm leading-none tracking-wider">{String(timeLeft.hours).padStart(2, '0')}</span>
+              <span className="text-[10px] uppercase tracking-widest text-expo-gold/70 mt-1">Hrs</span>
+            </div>
+            <span className="text-xl text-expo-border pb-3">:</span>
+            <div className="flex flex-col min-w-[3rem]">
+              <span className="font-display text-2xl text-expo-warm leading-none tracking-wider">{String(timeLeft.minutes).padStart(2, '0')}</span>
+              <span className="text-[10px] uppercase tracking-widest text-expo-gold/70 mt-1">Min</span>
+            </div>
+            <span className="text-xl text-expo-border pb-3">:</span>
+            <div className="flex flex-col min-w-[3rem]">
+              <span className="font-display text-2xl text-expo-gold leading-none tracking-wider">{String(timeLeft.seconds).padStart(2, '0')}</span>
+              <span className="text-[10px] uppercase tracking-widest text-expo-gold/70 mt-1">Sec</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Floating Stats Glass Panel */}
@@ -146,27 +207,30 @@ export default function HeroSection() {
         {/* We use the provided architecture image, masking it so it overlays the text */}
         <div className="relative w-full h-full">
            <Image
-             src="/assets/ste_luxury_hero_613dfd3b.jpg"
+             src="/assets/STE.jpg"
              alt="Architecture"
              fill
              className="object-cover object-bottom"
              style={{
-               maskImage: 'linear-gradient(to bottom, transparent 0%, black 30%, black 100%)',
-               WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 30%, black 100%)'
+               maskImage: 'linear-gradient(to bottom, transparent 0%, black 40%, black 100%)',
+               WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 40%, black 100%)'
              }}
              priority
            />
            {/* Ground reflections overlay */}
-           <div className="absolute bottom-0 left-0 w-full h-[30%] bg-gradient-to-t from-expo-midnight to-transparent" />
+           <div className="absolute bottom-0 left-0 w-full h-[40%] bg-gradient-to-t from-expo-midnight to-transparent" />
         </div>
       </div>
 
       {/* Hero CTA Zone & Event Info - Z-Index Layer 30 (Above Architecture) */}
-      <div className="absolute bottom-10 left-0 w-full z-30 flex flex-col items-center gap-6 px-4">
+      <div className="absolute bottom-10 left-0 w-full z-30 flex flex-col items-center gap-6 px-4 pointer-events-auto">
 
         {/* CTA Bar */}
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 bg-expo-black/40 backdrop-blur-md p-2 rounded-full border border-expo-border">
-          <button className="group relative flex items-center gap-3 px-8 py-4 rounded-full bg-gold-gradient overflow-hidden hover:scale-[1.02] transition-transform duration-500 ease-luxury shadow-[0_0_20px_rgba(214,160,102,0.2)]">
+          <button
+            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            className="group relative flex items-center gap-3 px-8 py-4 rounded-full bg-gold-gradient overflow-hidden hover:scale-[1.02] transition-transform duration-500 ease-luxury shadow-[0_0_20px_rgba(214,160,102,0.2)]"
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             <span className="relative z-10 text-sm font-bold uppercase tracking-widest text-expo-midnight">Book Your Stall Now</span>
             <MoveRight className="relative z-10 w-4 h-4 text-expo-midnight group-hover:translate-x-1 transition-transform" />
