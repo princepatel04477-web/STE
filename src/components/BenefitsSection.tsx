@@ -64,16 +64,10 @@ export default function BenefitsSection() {
                 transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 className="group relative h-full"
               >
-                {/* Glowing border effect container */}
-                <div className="absolute inset-0 bg-gradient-to-br from-expo-border to-transparent rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+                {/* Smooth border glow effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-expo-gold/0 via-expo-gold/0 to-expo-gold/0 group-hover:from-expo-gold/20 group-hover:via-expo-gold/10 group-hover:to-expo-gold/0 transition-all duration-700 ease-luxury opacity-0 group-hover:opacity-100" />
 
-                {/* Animated border tracing line */}
-                <div className="absolute top-0 left-0 w-0 h-[1px] bg-expo-gold group-hover:w-full transition-all duration-1000 ease-luxury" />
-                <div className="absolute top-0 right-0 w-[1px] h-0 bg-expo-gold group-hover:h-full transition-all duration-1000 delay-100 ease-luxury" />
-                <div className="absolute bottom-0 right-0 w-0 h-[1px] bg-expo-gold group-hover:w-full transition-all duration-1000 delay-200 ease-luxury" />
-                <div className="absolute bottom-0 left-0 w-[1px] h-0 bg-expo-gold group-hover:h-full transition-all duration-1000 delay-300 ease-luxury" />
-
-                <div className="relative h-full glass-panel rounded-2xl p-8 md:p-12 flex flex-col justify-between overflow-hidden bg-expo-black/40 group-hover:-translate-y-2 transition-transform duration-500 ease-luxury group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
+                <div className="relative h-full glass-panel border border-transparent rounded-2xl p-8 md:p-12 flex flex-col justify-between overflow-hidden bg-expo-black/40 group-hover:-translate-y-2 transition-transform duration-500 ease-luxury group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
 
                   {/* Subtle moving reflection */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-luxury pointer-events-none" />

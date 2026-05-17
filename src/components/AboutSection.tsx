@@ -35,6 +35,26 @@ const timelineNodes = [
 export default function AboutSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Framer Motion variants
+  const fadeUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+    }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
   return (
     <section id="about" ref={containerRef} className="relative w-full bg-expo-midnight py-32 px-6 overflow-hidden">
 
@@ -104,6 +124,7 @@ export default function AboutSection() {
                          src={node.image}
                          alt={node.title}
                          fill
+                         sizes="(min-width: 1024px) 45vw, 90vw"
                          className="object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-luxury mix-blend-luminosity group-hover:mix-blend-normal"
                        />
                        <div className="absolute inset-0 bg-gradient-to-t from-expo-midnight to-transparent opacity-80" />

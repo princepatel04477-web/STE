@@ -52,6 +52,7 @@ export default function CategoriesSection() {
                 src="/assets/ste_luxury_hero_613dfd3b.jpg"
                 alt={cat.name}
                 fill
+                sizes="(min-width: 768px) 25vw, 100vw"
                 className="object-cover opacity-40 group-hover:opacity-70 transition-all duration-1000 ease-luxury group-hover:scale-110 mix-blend-luminosity"
               />
 

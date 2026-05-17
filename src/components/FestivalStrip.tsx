@@ -11,6 +11,7 @@ const festivals = [
   "Chhath Puja",
   "Wedding Season"
 ];
+const reversedFestivals = [...festivals].reverse();
 
 export default function FestivalStrip() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +66,7 @@ export default function FestivalStrip() {
 
           {/* Bottom Row - Moving Right */}
           <motion.div style={{ x: xRight }} className="flex gap-6 w-max whitespace-nowrap pl-20 md:pl-64">
-            {festivals.reverse().concat(festivals).map((festival, index) => (
+            {reversedFestivals.concat(reversedFestivals).map((festival, index) => (
               <div
                 key={`bottom-${index}`}
                 className="glass-panel px-8 py-4 rounded-full border border-expo-border/40 hover:border-expo-gold/50 hover:bg-expo-midnight transition-colors duration-500 cursor-default group"

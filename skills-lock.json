@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "anime.js Best Practices": {
+      "source": "davidosemwegie/animejs-best-practices",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "e5c17adcf505e6918a0a057735fe61dbfbcd6a4a02cada02ba1c7f1420736f63"
+    },
+    "interaction-design": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": "plugins/ui-design/skills/interaction-design/SKILL.md",
+      "computedHash": "1fac9a5aff8463e98b935a0a1b48452d71afcfa50a3bc4b7af9510bfdd8a1731"
+    },
+    "mastering-animate-presence": {
+      "source": "raphaelsalaja/skill",
+      "sourceType": "github",
+      "skillPath": "skills/mastering-animate-presence/SKILL.md",
+      "computedHash": "ec89348f9dd39e1447b40346e99193ca2ba276277152efbe03d6eb6104e28115"
+    }
+  }
+}

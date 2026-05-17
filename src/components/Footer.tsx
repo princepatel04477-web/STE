@@ -10,7 +10,7 @@ export default function Footer() {
 
           {/* Brand Col */}
           <div className="col-span-1 md:col-span-1 flex flex-col items-start">
-            <Image src="/assets/STE LOGO.jpg" alt="STE Logo" width={100} height={50} className="object-contain mb-6 opacity-90" />
+            <Image src="/assets/STE LOGO.jpg" alt="STE Logo" width={100} height={85} className="mb-6 h-auto object-contain opacity-90" />
             <p className="text-sm text-expo-warm/50 font-sans mb-6">
               The official digital identity of India&apos;s largest textile sourcing ecosystem. A hyper-premium B2B exhibition.
             </p>
