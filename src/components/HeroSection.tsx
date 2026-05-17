@@ -33,11 +33,10 @@ function getCountdownTime(): CountdownTime {
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
-  const [countdown, setCountdown] = useState<CountdownTime | null>(null);
+  const [countdown, setCountdown] = useState<CountdownTime>(getCountdownTime);
   const [morphIndex, setMorphIndex] = useState(0);
 
   useEffect(() => {
-    setCountdown(getCountdownTime());
     const intervalId = window.setInterval(() => {
       setCountdown(getCountdownTime());
     }, 1000);
@@ -243,7 +242,7 @@ export default function HeroSection() {
               ].map(([label, value]) => (
                 <div key={label} className="flex min-w-0 flex-col items-center justify-center px-2">
                   <span className="font-display text-2xl sm:text-4xl md:text-5xl leading-none text-expo-gold tabular-nums">
-                    {value ?? '--'}
+                    {value}
                   </span>
                   <span className="mt-2 text-[10px] sm:text-xs uppercase tracking-[0.25em] text-expo-warm/55">
                     {label}
