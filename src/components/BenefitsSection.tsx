@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { waapi } from 'animejs';
 import { Globe, Users, CalendarDays, TrendingUp } from 'lucide-react';
 
 const benefits = [
@@ -27,8 +29,46 @@ const benefits = [
 ];
 
 export default function BenefitsSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const heading = containerRef.current.querySelector(".benefits-heading");
+      const cards = containerRef.current.querySelectorAll(".benefit-card");
+      
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              if (heading) {
+                waapi.animate(heading as any, {
+                  opacity: [0, 1],
+                  translate: ["0 20px", "0 0px"],
+                  duration: 600,
+                  ease: "outExpo"
+                });
+              }
+              waapi.animate(Array.from(cards) as any, {
+                opacity: [0, 1],
+                translate: ["0 30px", "0 0px"],
+                delay: (el, i) => 150 + i * 100,
+                duration: 800,
+                ease: "outExpo"
+              });
+              observer.disconnect();
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      observer.observe(containerRef.current);
+      return () => observer.disconnect();
+    }
+  }, []);
+
   return (
-    <section id="benefits" className="relative w-full bg-expo-midnight py-32 px-6">
+    <section id="benefits" className="relative w-full bg-expo-midnight py-32 px-6 overflow-hidden">
 
       {/* Background Environment */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -36,18 +76,13 @@ export default function BenefitsSection() {
          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-expo-copper/5 via-expo-midnight to-expo-midnight opacity-70 pointer-events-none" />
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-20">
+      <div className="max-w-7xl mx-auto relative z-20" ref={containerRef}>
 
         {/* Heading */}
-        <div className="flex flex-col items-center mb-20 text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-display text-4xl md:text-6xl tracking-widest text-expo-warm mb-6"
-          >
+        <div className="flex flex-col items-center mb-20 text-center benefits-heading opacity-0">
+          <h2 className="font-display text-4xl md:text-6xl tracking-widest text-expo-warm mb-6">
             WHY EXHIBIT AT SURAT
-          </motion.h2>
+          </h2>
           <div className="w-24 h-[1px] bg-expo-gold/50" />
         </div>
 
@@ -56,13 +91,9 @@ export default function BenefitsSection() {
           {benefits.map((benefit, index) => {
             const Icon = benefit.icon;
             return (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="group relative h-full"
+                className="benefit-card opacity-0 group relative h-full"
               >
                 {/* Smooth border glow effect */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-expo-gold/0 via-expo-gold/0 to-expo-gold/0 group-hover:from-expo-gold/20 group-hover:via-expo-gold/10 group-hover:to-expo-gold/0 transition-all duration-700 ease-luxury opacity-0 group-hover:opacity-100" />
@@ -88,7 +119,7 @@ export default function BenefitsSection() {
                   </div>
 
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

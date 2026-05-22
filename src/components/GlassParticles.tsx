@@ -24,6 +24,13 @@ function seededRandom(seed: number): number {
 }
 
 export function GlassParticles({ count = 20, className = "" }: GlassParticlesProps) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+
   const particles: Particle[] = React.useMemo(() => {
     return Array.from({ length: count }, (_, i) => ({
       id: i,
@@ -35,6 +42,10 @@ export function GlassParticles({ count = 20, className = "" }: GlassParticlesPro
       opacity: seededRandom((i + 1) * 37) * 0.3 + 0.1,
     }));
   }, [count]);
+
+  if (!mounted) {
+    return <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`} />;
+  }
 
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>

@@ -1,0 +1,209 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { waapi, splitText, stagger } from "animejs";
+
+const PORTRAITS = [
+  {
+    title: "Imperial Sarees",
+    desc: "Intricately detailed metallic weaves of heavy royal silks.",
+    img: "/assets/images/editorial-queen.png",
+    subtitle: "Heritage Couture",
+    coords: "01 / COUTURE",
+  },
+  {
+    title: "Trio of Silk Craft",
+    desc: "A breathtaking display of detailed ethnic prints and drapes.",
+    img: "/assets/images/editorial-trio.png",
+    subtitle: "Bridal Assembly",
+    coords: "02 / ANCESTRAL",
+  },
+  {
+    title: "Chiaroscuro Silhouette",
+    desc: "A dramatic composition highlighting intricate embroidery.",
+    img: "/assets/images/editorial-dark.png",
+    subtitle: "Dramatic Silhouette",
+    coords: "03 / EMBELLISH",
+  },
+  {
+    title: "Modern Ethnic Weave",
+    desc: "Merging heritage looms with contemporary Western draping.",
+    img: "/assets/images/editorial-portrait1.png",
+    subtitle: "Contemporary Indo-Western",
+    coords: "04 / SYNTHESIS",
+  },
+  {
+    title: "Timeless Craftsmanship",
+    desc: "Premium sarees engineered for elite global luxury boutique showcases.",
+    img: "/assets/images/editorial-portrait2.png",
+    subtitle: "Premium Banarasi Prints",
+    coords: "05 / LEGACY",
+  },
+];
+
+export default function FashionEditorial() {
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const headlineRef = useRef<HTMLHeadingElement | null>(null);
+
+  useEffect(() => {
+    // Reveal main headline
+    if (headlineRef.current) {
+      const split = splitText(headlineRef.current, {
+        chars: true,
+        accessible: true,
+      });
+
+      waapi.animate(split.chars, {
+        translateY: [30, 0],
+        opacity: [0, 1],
+        duration: 1000,
+        delay: stagger(30, { start: 200 }),
+        ease: "outExpo",
+      });
+    }
+
+    // Scroll trigger indicator for horizontal scroll containers
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      // Check screen width (apply side scroll only on desktop)
+      if (window.innerWidth < 1024) return;
+
+      const isAtEnd =
+        scrollContainer.scrollLeft + scrollContainer.clientWidth >=
+        scrollContainer.scrollWidth - 5;
+      const isAtStart = scrollContainer.scrollLeft <= 5;
+
+      // If user is scrolling vertically but inside editorial, translate it to horizontal
+      if ((e.deltaY > 0 && !isAtEnd) || (e.deltaY < 0 && !isAtStart)) {
+        e.preventDefault();
+        scrollContainer.scrollLeft += e.deltaY * 0.85;
+      }
+    };
+
+    // Attach wheel listener to horizontal box
+    scrollContainer.addEventListener("wheel", handleWheel, { passive: false });
+
+    // Animate items on viewport entry
+    const cards = scrollContainer.querySelectorAll(".editorial-card");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            waapi.animate(Array.from(cards) as any, {
+              opacity: [0, 1],
+              translateX: [50, 0],
+              duration: 1200,
+              delay: (el, i) => i * 150,
+              ease: "outExpo",
+            });
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(scrollContainer);
+
+    return () => {
+      scrollContainer.removeEventListener("wheel", handleWheel);
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <section
+      id="fashion-editorial"
+      className="relative w-full py-24 sm:py-32 bg-[#050505] overflow-hidden"
+    >
+      {/* Dynamic Backplate video */}
+      <div className="absolute inset-0 w-full h-full select-none pointer-events-none z-0">
+        <video
+          className="w-full h-full object-cover filter brightness-[0.2] contrast-[1.1] opacity-75"
+          autoPlay
+          muted
+          loop
+          playsInline
+          src="/assets/video/editorial.mp4"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/20 to-[#050505] z-10" />
+        <div className="noise-overlay z-20" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24">
+        {/* Section Header */}
+        <div className="max-w-4xl mb-16 sm:mb-24">
+          <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+            05 • LUXURY EDITORIAL
+          </span>
+          <h2
+            ref={headlineRef}
+            className="font-serif text-3xl sm:text-5xl md:text-7xl tracking-tight text-white leading-[1.1]"
+          >
+            The Luxury Sensation: <br />
+            <span className="text-metallic font-light italic">Heritage Couture</span>
+          </h2>
+          <p className="font-sans text-sm sm:text-base text-expo-warm/60 max-w-xl leading-relaxed mt-6">
+            A premium visual testament to textile craftsmanship. Explore high-definition editorial showcases featuring elite ethnic draping and luxurious embroideries.
+          </p>
+        </div>
+      </div>
+
+      {/* Horizontal Couture Portrait Showcase */}
+      <div
+        ref={scrollContainerRef}
+        className="relative z-10 flex gap-8 overflow-x-auto lg:overflow-hidden scrollbar-none px-6 sm:px-12 lg:px-24 py-4 w-full"
+        style={{ scrollBehavior: "smooth" }}
+      >
+        <div className="flex gap-8 pr-12 min-w-max">
+          {PORTRAITS.map((p, idx) => (
+            <div
+              key={idx}
+              className="editorial-card opacity-0 translate-x-[50px] w-[80vw] sm:w-[50vw] lg:w-[35vw] flex flex-col group"
+              data-cursor="explore"
+            >
+              {/* Image box */}
+              <div className="relative w-full aspect-[3/4] overflow-hidden border border-white/10 rounded-sm bg-neutral-900 shadow-2xl">
+                <div
+                  className="absolute inset-0 bg-cover bg-center filter brightness-[0.7] group-hover:brightness-[0.9] group-hover:scale-[1.04] transition-all duration-[900ms] luxury"
+                  style={{ backgroundImage: `url('${p.img}')` }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-60 z-10 pointer-events-none" />
+                <div className="noise-overlay" />
+
+                {/* Section tags */}
+                <div className="absolute top-4 left-4 z-20 flex flex-col">
+                  <span className="font-sans text-[8px] font-bold tracking-[2px] text-expo-gold uppercase bg-black/60 px-2.5 py-1 border border-white/5 rounded-sm">
+                    {p.coords}
+                  </span>
+                </div>
+              </div>
+
+              {/* Description tags */}
+              <div className="mt-6 flex flex-col">
+                <span className="font-sans text-[10px] tracking-[3px] text-expo-gold uppercase block mb-1">
+                  {p.subtitle}
+                </span>
+                <h3 className="font-serif text-lg sm:text-2xl text-white tracking-wide group-hover:text-expo-gold transition-colors duration-500">
+                  {p.title}
+                </h3>
+                <p className="font-sans text-xs text-expo-warm/50 leading-relaxed mt-2 max-w-sm">
+                  {p.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Horizontal scroll advice overlay for desktop */}
+      <div className="hidden lg:flex justify-end max-w-7xl mx-auto px-24 mt-8 pointer-events-none">
+        <span className="font-sans text-[9px] tracking-[3px] text-expo-warm/30 uppercase animate-pulse">
+          Use Mouse Wheel to Scroll Horizontally →
+        </span>
+      </div>
+    </section>
+  );
+}

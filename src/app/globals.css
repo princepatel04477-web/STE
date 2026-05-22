@@ -14,11 +14,16 @@
   --glass-shadow: rgba(0, 0, 0, 0.3);
 }
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-inter), sans-serif;
-  overflow-x: hidden;
   background-color: #050505;
 }
 
@@ -32,6 +37,16 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    padding-right: 0.15em !important;
+  }
+
+  .text-metallic * {
+    background: inherit !important;
+    background-clip: text !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    padding-right: 0.15em !important;
+    margin-right: -0.05em !important;
   }
 
   /* Enhanced Glassmorphism Utilities */
@@ -260,4 +275,110 @@ html.lenis, html.lenis body {
 
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* --- Premium STE Redesign Custom Utilities --- */
+
+/* Mesh Gradients */
+.bg-mesh-dark {
+  background-color: #050505;
+  background-image: 
+    radial-gradient(at 10% 20%, rgba(214, 160, 102, 0.08) 0px, transparent 50%),
+    radial-gradient(at 90% 10%, rgba(184, 115, 51, 0.08) 0px, transparent 50%),
+    radial-gradient(at 50% 80%, rgba(214, 160, 102, 0.05) 0px, transparent 50%),
+    radial-gradient(at 80% 90%, rgba(255, 255, 255, 0.02) 0px, transparent 50%);
+}
+
+/* Grid overlay pattern */
+.grid-overlay-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+}
+
+/* Noise overlay texture */
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.02;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3联%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Infinite Marquee Loop */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* Animated Spotlight Spot */
+@keyframes spotlightMove {
+  0%, 100% { transform: translate(-50%, -50%) translate(-20%, -20%) scale(1); }
+  50% { transform: translate(-50%, -50%) translate(20%, 20%) scale(1.15); }
+}
+
+.spotlight-glowing {
+  position: absolute;
+  background: radial-gradient(circle, rgba(214, 160, 102, 0.15) 0%, transparent 65%);
+  filter: blur(100px);
+  animation: spotlightMove 20s ease-in-out infinite;
+}
+
+/* Text reveal mask */
+.text-mask-reveal {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated border glow cards */
+.border-glow-card {
+  position: relative;
+  border-radius: 1rem;
+  background: rgba(11, 11, 11, 0.7);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.5s ease;
+}
+
+.border-glow-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02) 50%, rgba(214, 160, 102, 0.2));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.border-glow-card:hover::before {
+  background: linear-gradient(135deg, rgba(214, 160, 102, 0.6), rgba(184, 115, 51, 0.4) 50%, rgba(255, 255, 255, 0.2));
+}
+
+/* Scrolling dot indicator */
+@keyframes scrollPulse {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(16px); opacity: 0; }
+}
+
+.scroll-indicator-dot {
+  animation: scrollPulse 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }

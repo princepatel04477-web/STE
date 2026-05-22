@@ -1,0 +1,147 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { waapi } from "animejs";
+
+const sponsors = [
+  {
+    name: "Apex Machinery",
+    logo: (
+      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 10L35 40H5L20 10Z" fill="currentColor" className="text-expo-gold" />
+        <text x="50" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="18" fontWeight="bold" letterSpacing="0.2em" fill="currentColor">APEX</text>
+        <text x="50" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.1em" fill="currentColor" opacity="0.6">MACHINERY</text>
+      </svg>
+    )
+  },
+  {
+    name: "Global Threads",
+    logo: (
+      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="25" cy="25" r="15" stroke="currentColor" strokeWidth="3" className="text-expo-gold" />
+        <circle cx="25" cy="25" r="8" fill="currentColor" className="text-expo-gold" />
+        <text x="55" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="16" fontWeight="bold" letterSpacing="0.15em" fill="currentColor">GLOBAL</text>
+        <text x="55" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.2em" fill="currentColor" opacity="0.6">THREADS</text>
+      </svg>
+    )
+  },
+  {
+    name: "Silk Road Exports",
+    logo: (
+      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 25C15 15, 25 15, 30 25C35 35, 45 35, 50 25" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="text-expo-gold" />
+        <text x="65" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="16" fontWeight="bold" letterSpacing="0.15em" fill="currentColor">SILKROAD</text>
+        <text x="65" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.15em" fill="currentColor" opacity="0.6">EXPORTS GROUP</text>
+      </svg>
+    )
+  },
+  {
+    name: "Tex-Tech Solutions",
+    logo: (
+      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="10" width="30" height="30" rx="3" stroke="currentColor" strokeWidth="2.5" className="text-expo-gold" />
+        <line x1="12" y1="20" x2="28" y2="20" stroke="currentColor" strokeWidth="2" className="text-expo-gold" />
+        <line x1="12" y1="30" x2="24" y2="30" stroke="currentColor" strokeWidth="2" className="text-expo-gold" />
+        <text x="50" y="30" fontFamily="var(--font-oswald), sans-serif" fontSize="17" fontWeight="bold" letterSpacing="0.2em" fill="currentColor">TEX-TECH</text>
+        <text x="50" y="42" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.1em" fill="currentColor" opacity="0.6">DIGITAL SOLUTIONS</text>
+      </svg>
+    )
+  },
+  {
+    name: "Surat Weavers",
+    logo: (
+      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="10" width="20" height="30" rx="2" stroke="currentColor" strokeWidth="2" className="text-expo-gold" />
+        <rect x="15" y="15" width="20" height="30" rx="2" stroke="currentColor" strokeWidth="2" className="text-expo-gold" opacity="0.5" />
+        <text x="50" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="16" fontWeight="bold" letterSpacing="0.15em" fill="currentColor">SURAT</text>
+        <text x="50" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.2em" fill="currentColor" opacity="0.6">WEAVERS ALLIANCE</text>
+      </svg>
+    )
+  },
+  {
+    name: "Eco-Dye Innovations",
+    logo: (
+      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 8C12 18, 10 25, 20 40C30 25, 28 18, 20 8Z" fill="currentColor" className="text-expo-gold" />
+        <text x="45" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="16" fontWeight="bold" letterSpacing="0.15em" fill="currentColor">ECO-DYE</text>
+        <text x="45" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.15em" fill="currentColor" opacity="0.6">INNOVATIONS</text>
+      </svg>
+    )
+  }
+];
+
+const doubleSponsors = [...sponsors, ...sponsors, ...sponsors]; // Create a long marquee strip
+
+export default function SponsorSection() {
+  const titleRef = useRef<HTMLDivElement>(null);
+
+  // Trigger reveal animation for section title
+  useEffect(() => {
+    if (titleRef.current) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            waapi.animate(titleRef.current as HTMLElement, {
+              opacity: [0, 1],
+              translate: ["0 20px", "0 0px"],
+              duration: 800,
+              ease: "outExpo"
+            });
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      observer.observe(titleRef.current);
+      return () => observer.disconnect();
+    }
+  }, []);
+
+  return (
+    <section className="relative w-full py-24 bg-expo-midnight overflow-hidden border-t border-expo-border/30">
+      
+      {/* Background visual detail */}
+      <div className="absolute inset-0 z-0 bg-mesh-dark opacity-40 pointer-events-none" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
+        
+        {/* Title */}
+        <div ref={titleRef} className="opacity-0 flex flex-col items-center mb-16 text-center">
+          <span className="text-xs uppercase tracking-[0.25em] text-expo-gold font-medium mb-2">Our Alliance</span>
+          <h3 className="font-display text-2xl md:text-3xl tracking-widest text-expo-warm">
+            TRUSTED BY INDUSTRY LEADERS
+          </h3>
+          <div className="mt-3 w-12 h-[1px] bg-expo-gold/50" />
+        </div>
+
+        {/* Marquee Wrapper */}
+        <div className="relative w-full overflow-hidden py-4 mask-marquee">
+          {/* Subtle side fading overlays for premium blending */}
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-expo-midnight to-transparent z-20 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-expo-midnight to-transparent z-20 pointer-events-none" />
+
+          {/* Marquee Loop */}
+          <div className="marquee-track gap-12 sm:gap-16">
+            {doubleSponsors.map((sponsor, idx) => (
+              <div
+                key={`${sponsor.name}-${idx}`}
+                className="flex items-center justify-center px-8 py-4 rounded-xl border border-expo-border/30 bg-expo-black/40 text-expo-warm/40 hover:text-expo-gold hover:border-expo-gold/45 hover:shadow-[0_0_20px_rgba(214,160,102,0.12)] transition-all duration-500 hover:scale-105 cursor-pointer filter grayscale hover:grayscale-0"
+              >
+                {sponsor.logo}
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      <style jsx global>{`
+        .mask-marquee {
+          -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+      `}</style>
+    </section>
+  );
+}
