@@ -11,10 +11,13 @@ import FabricInMotion from "@/components/FabricInMotion";
 import ExhibitionExperience from "@/components/ExhibitionExperience";
 import FashionEditorial from "@/components/FashionEditorial";
 import FutureOfCommerce from "@/components/FutureOfCommerce";
+import BilingualSection from "@/components/BilingualSection";
+import TrustSection from "@/components/TrustSection";
 import PremiumTransitions from "@/components/PremiumTransitions";
 import FestivalSeason from "@/components/FestivalSeason";
 import CountdownSection from "@/components/CountdownSection";
 import FinalCTA from "@/components/FinalCTA";
+import MobileStickyCTA from "@/components/MobileStickyCTA";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -107,6 +110,14 @@ export default function Home() {
         <FutureOfCommerce /> {/* Section 6 */}
       </div>
 
+      <div id="bilingual-benefits">
+        <BilingualSection />
+      </div>
+
+      <div id="trust-social">
+        <TrustSection />
+      </div>
+
       <div id="countdown-section">
         <CountdownSection />
       </div>
@@ -117,6 +128,9 @@ export default function Home() {
 
       {/* 5. Elegant Editorial Footer */}
       <Footer />
+
+      {/* 6. Sticky Bottom B2B Action Bar */}
+      <MobileStickyCTA />
 
     </main>
   );

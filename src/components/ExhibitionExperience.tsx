@@ -41,7 +41,7 @@ export default function ExhibitionExperience() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            waapi.animate(Array.from(listItems) as any, {
+            waapi.animate(Array.from(listItems) as unknown as HTMLElement[], {
               opacity: [0, 1],
               translateX: [-30, 0],
               duration: 800,

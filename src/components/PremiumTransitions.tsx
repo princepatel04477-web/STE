@@ -18,7 +18,7 @@ export default function PremiumTransitions({ mode }: TransitionProps) {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            waapi.animate(text as any, {
+            waapi.animate(text as HTMLElement, {
               opacity: [0, 0.45],
               letterSpacing: ["4px", "8px"],
               duration: 1500,

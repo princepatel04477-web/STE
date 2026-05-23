@@ -7,6 +7,9 @@ export default function CinematicHero() {
   const headlineRef2 = useRef<HTMLHeadingElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+
+  const [isMounted, setIsMounted] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -15,12 +18,16 @@ export default function CinematicHero() {
   });
 
   useEffect(() => {
-    const targetDate = new Date("2026-09-12T09:00:00");
+    setTimeout(() => {
+      setIsMounted(true);
+    }, 0);
+    const targetDate = new Date("2026-09-12T10:00:00+05:30");
     const updateCountdown = () => {
       const now = new Date();
       const difference = targetDate.getTime() - now.getTime();
       
       if (difference <= 0) {
+        setIsExpired(true);
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         return;
       }
@@ -147,7 +154,7 @@ export default function CinematicHero() {
       <div className="relative z-30 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 flex flex-col justify-center items-center text-center select-text">
         {/* Pre-Header B2B Tagline */}
         <span className="text-[10px] sm:text-xs font-bold tracking-[6px] text-expo-gold uppercase mb-6 bg-expo-gold/5 border border-expo-gold/15 px-5 py-2 rounded-full backdrop-blur-md glow-soft animate-pulse">
-          12-13 September 2026 • SIECC, Sarsana Dome, Surat
+          September 12-13, 2026 • SIECC, Sarsana Dome, Surat
         </span>
 
         {/* Major Editorial Headline */}
@@ -155,67 +162,110 @@ export default function CinematicHero() {
           ref={headlineRef1}
           className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-[-0.02em] sm:tracking-[-0.035em] text-white mb-4 leading-[0.92] sm:leading-[0.9] lg:leading-[0.85] uppercase max-w-4xl"
         >
-          Surat’s Biggest <br className="hidden sm:inline" />
+          Surat&apos;s Biggest <br className="hidden sm:inline" />
           <span className="text-metallic font-light italic normal-case block sm:inline mt-2 sm:mt-0 mr-2 sm:mr-2 pr-3">Textile B2B</span> Opportunity
         </h1>
 
         {/* Modernist Thin Subhead */}
-        <h2
-          ref={headlineRef2}
-          className="font-sans text-base sm:text-xl md:text-2xl text-expo-warm/80 font-light tracking-[2px] max-w-3xl leading-relaxed mt-1"
-        >
-          Organized By STE • Supported By AKAS
-        </h2>
+        <div ref={headlineRef2} className="flex flex-col gap-2 max-w-3xl mt-2">
+          <h2 className="font-sans text-base sm:text-lg md:text-xl text-expo-gold font-light tracking-[2px] leading-relaxed">
+            {"India's"} Ethnic Fashion Sourcing Event — Direct Manufacturer to Buyer Platform.
+          </h2>
+          <p className="font-sans text-xs sm:text-sm text-expo-warm/75 tracking-[1px] font-light">
+            650+ Stalls · 8000+ Verified Buyers · SIECC Sarsana Dome, Surat · September 2026
+          </p>
+          <span className="text-[9px] tracking-[2.5px] uppercase text-expo-warm/50 mt-1 block">
+            Organized By STE • Supported By AKAS
+          </span>
+        </div>
 
         {/* Cinematic Live Countdown Timer */}
         <div className="mt-6 flex justify-center items-center gap-4 sm:gap-6 bg-expo-midnight/50 backdrop-blur-xl border border-expo-gold/20 p-4 sm:p-6 rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.15)] glow-soft max-w-md w-full relative">
           <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
-          <div className="text-center min-w-[50px] sm:min-w-[65px]">
-            <span className="block font-serif text-2xl sm:text-4xl font-light text-expo-gold leading-none tracking-normal drop-shadow-[0_0_10px_rgba(214,160,102,0.4)]">
-              {String(timeLeft.days).padStart(2, "0")}
-            </span>
-            <span className="text-[8px] uppercase tracking-widest text-expo-warm/50 block mt-2">Days</span>
-          </div>
-          <div className="text-expo-gold/40 text-xl font-light -translate-y-2 select-none sm:text-2xl">:</div>
-          <div className="text-center min-w-[50px] sm:min-w-[65px]">
-            <span className="block font-serif text-2xl sm:text-4xl font-light text-expo-gold leading-none tracking-normal drop-shadow-[0_0_10px_rgba(214,160,102,0.4)]">
-              {String(timeLeft.hours).padStart(2, "0")}
-            </span>
-            <span className="text-[8px] uppercase tracking-widest text-expo-warm/50 block mt-2">Hours</span>
-          </div>
-          <div className="text-expo-gold/40 text-xl font-light -translate-y-2 select-none sm:text-2xl">:</div>
-          <div className="text-center min-w-[50px] sm:min-w-[65px]">
-            <span className="block font-serif text-2xl sm:text-4xl font-light text-expo-gold leading-none tracking-normal drop-shadow-[0_0_10px_rgba(214,160,102,0.4)]">
-              {String(timeLeft.minutes).padStart(2, "0")}
-            </span>
-            <span className="text-[8px] uppercase tracking-widest text-expo-warm/50 block mt-2">Mins</span>
-          </div>
-          <div className="text-expo-gold/40 text-xl font-light -translate-y-2 select-none sm:text-2xl">:</div>
-          <div className="text-center min-w-[50px] sm:min-w-[65px]">
-            <span className="block font-serif text-2xl sm:text-4xl font-light text-expo-gold leading-none tracking-normal drop-shadow-[0_0_10px_rgba(214,160,102,0.4)]">
-              {String(timeLeft.seconds).padStart(2, "0")}
-            </span>
-            <span className="text-[8px] uppercase tracking-widest text-expo-warm/50 block mt-2">Secs</span>
-          </div>
+          {!isMounted ? (
+            <div className="w-full text-center py-1">
+              <span className="font-serif text-base sm:text-lg tracking-[3px] text-expo-gold uppercase">
+                September 12-13, 2026
+              </span>
+            </div>
+          ) : isExpired ? (
+            <div className="w-full text-center py-1">
+              <span className="font-serif text-base sm:text-lg tracking-[3px] text-expo-gold uppercase animate-pulse">
+                EVENT IN PROGRESS
+              </span>
+            </div>
+          ) : (
+            <>
+              <div className="text-center min-w-[50px] sm:min-w-[65px]">
+                <span className="block font-serif text-2xl sm:text-4xl font-light text-expo-gold leading-none tracking-normal drop-shadow-[0_0_10px_rgba(214,160,102,0.4)]">
+                  {String(timeLeft.days).padStart(2, "0")}
+                </span>
+                <span className="text-[8px] uppercase tracking-widest text-expo-warm/50 block mt-2">Days</span>
+              </div>
+              <div className="text-expo-gold/40 text-xl font-light -translate-y-2 select-none sm:text-2xl">:</div>
+              <div className="text-center min-w-[50px] sm:min-w-[65px]">
+                <span className="block font-serif text-2xl sm:text-4xl font-light text-expo-gold leading-none tracking-normal drop-shadow-[0_0_10px_rgba(214,160,102,0.4)]">
+                  {String(timeLeft.hours).padStart(2, "0")}
+                </span>
+                <span className="text-[8px] uppercase tracking-widest text-expo-warm/50 block mt-2">Hours</span>
+              </div>
+              <div className="text-expo-gold/40 text-xl font-light -translate-y-2 select-none sm:text-2xl">:</div>
+              <div className="text-center min-w-[50px] sm:min-w-[65px]">
+                <span className="block font-serif text-2xl sm:text-4xl font-light text-expo-gold leading-none tracking-normal drop-shadow-[0_0_10px_rgba(214,160,102,0.4)]">
+                  {String(timeLeft.minutes).padStart(2, "0")}
+                </span>
+                <span className="text-[8px] uppercase tracking-widest text-expo-warm/50 block mt-2">Mins</span>
+              </div>
+              <div className="text-expo-gold/40 text-xl font-light -translate-y-2 select-none sm:text-2xl">:</div>
+              <div className="text-center min-w-[50px] sm:min-w-[65px]">
+                <span className="block font-serif text-2xl sm:text-4xl font-light text-expo-gold leading-none tracking-normal drop-shadow-[0_0_10px_rgba(214,160,102,0.4)]">
+                  {String(timeLeft.seconds).padStart(2, "0")}
+                </span>
+                <span className="text-[8px] uppercase tracking-widest text-expo-warm/50 block mt-2">Secs</span>
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Call to Actions (Interactive with Cursor overlays) */}
-        <div className="flex flex-col sm:flex-row items-center gap-6 mt-8 z-40">
+        {/* Call to Actions (Interactive 3-CTA Cluster) */}
+        <div className="grid grid-cols-2 sm:flex sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-8 z-40 w-full max-w-lg sm:max-w-none">
+          {/* WhatsApp CTA */}
           <a
-            href="#final-cta"
-            className="group relative px-8 py-4 bg-gold-gradient rounded-sm text-expo-midnight font-bold font-sans text-sm tracking-[2px] uppercase overflow-hidden shadow-lg hover:shadow-expo-glow transition-all duration-500"
+            href="https://wa.me/919950787787?text=I want to book a stall at STE 2026"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative col-span-2 sm:col-span-auto px-4 py-3.5 sm:px-6 sm:py-4 bg-gold-gradient rounded-sm text-expo-midnight font-bold font-sans text-[11px] sm:text-xs tracking-[1.5px] uppercase overflow-hidden shadow-lg hover:shadow-expo-glow transition-all duration-500 flex items-center justify-center gap-1.5"
             data-cursor="explore"
           >
-            <span className="relative z-10">BOOK YOUR STALL NOW</span>
-            <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 luxury" />
+            <span className="relative z-10 flex items-center gap-1.5 justify-center w-full">
+              📲 WhatsApp Book
+            </span>
+            <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-luxury" />
           </a>
+
+          {/* Download Stall Brochure */}
           <a
-            href="tel:9950787787"
-            className="group relative px-8 py-4 bg-transparent border border-expo-gold/40 rounded-sm text-expo-gold font-sans text-sm tracking-[2px] uppercase overflow-hidden hover:border-expo-gold transition-colors duration-500"
+            href="/brochure.jpeg"
+            download="brochure.jpeg"
+            className="group relative px-4 py-3.5 sm:px-6 sm:py-4 bg-transparent border border-expo-gold/40 rounded-sm text-expo-gold font-sans text-[11px] sm:text-xs tracking-[1.5px] uppercase overflow-hidden hover:border-expo-gold transition-colors duration-500 flex items-center justify-center gap-1.5"
             data-cursor="click"
           >
-            <span className="relative z-10">CALL: 9950787787</span>
-            <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 luxury" />
+            <span className="relative z-10 flex items-center gap-1.5 justify-center w-full">
+              📄 Brochure
+            </span>
+            <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-luxury" />
+          </a>
+
+          {/* Buyer Registration */}
+          <a
+            href="#final-cta"
+            className="group relative px-4 py-3.5 sm:px-6 sm:py-4 bg-[#B87333]/25 border border-[#B87333]/50 rounded-sm text-[#F0C48A] font-sans text-[11px] sm:text-xs tracking-[1.5px] uppercase overflow-hidden hover:border-expo-gold hover:text-white transition-colors duration-500 flex items-center justify-center gap-1.5"
+            data-cursor="click"
+          >
+            <span className="relative z-10 flex items-center gap-1.5 justify-center w-full">
+              🎫 Register
+            </span>
+            <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-luxury" />
           </a>
         </div>
       </div>

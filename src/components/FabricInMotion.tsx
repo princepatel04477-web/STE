@@ -70,7 +70,7 @@ const GALLERY_ITEMS = [
   {
     title: "Festive Editorial Sarees",
     category: "Sarees",
-    img: "/assets/images/saree2.jpg",
+    img: "/assets/images/festive_editorial_saree.png",
     aspect: "aspect-[4/3]",
     bgPosition: "bg-center",
     desc: "Exclusive designer collection showcasing rich zari borders and luxurious drapes.",
@@ -90,7 +90,7 @@ export default function FabricInMotion() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            waapi.animate(Array.from(cards) as any, {
+            waapi.animate(Array.from(cards) as unknown as HTMLElement[], {
               opacity: [0, 1],
               translateY: [40, 0],
               duration: 1000,
@@ -135,7 +135,7 @@ export default function FabricInMotion() {
             </h2>
           </div>
           <p className="font-sans text-sm sm:text-base text-expo-warm/60 max-w-sm leading-relaxed">
-            Witness the elegant flow of haute couture. A tactile journey through India's premier B2B sourcing catalog, from bridal elegance to western prints.
+            Witness the elegant flow of haute couture. A tactile journey through India&apos;s premier B2B sourcing catalog, from bridal elegance to western prints.
           </p>
         </div>
 

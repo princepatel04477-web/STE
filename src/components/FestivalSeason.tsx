@@ -23,7 +23,7 @@ export default function FestivalSeason() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            waapi.animate(Array.from(cards) as any, {
+            waapi.animate(Array.from(cards) as unknown as HTMLElement[], {
               opacity: [0, 1],
               translateY: [30, 0],
               duration: 800,
@@ -66,7 +66,7 @@ export default function FestivalSeason() {
             <span className="text-metallic font-light italic">Seasonal Business Opportunity</span>
           </h2>
           <p className="font-sans text-sm sm:text-base text-expo-warm/60 leading-relaxed mt-6 max-w-xl">
-            Surat is the manufacturing engine driving India's multi-billion dollar festival seasons. Sourcing at STE in September enables direct manufacturer inventory access right before peak shopping timelines.
+            Surat is the manufacturing engine driving India&apos;s multi-billion dollar festival seasons. Sourcing at STE in September enables direct manufacturer inventory access right before peak shopping timelines.
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default function FestivalSeason() {
                 </span>
                 <h3 className="font-serif text-lg sm:text-xl text-white font-medium">Loom Demand Peak</h3>
                 <p className="font-sans text-[10px] text-expo-warm/60 mt-1 leading-relaxed">
-                  Surat's weaving clusters project a 400% average manufacturing surge leading up to the Diwali and Wedding season.
+                  Surat&apos;s weaving clusters project a 400% average manufacturing surge leading up to the Diwali and Wedding season.
                 </p>
               </div>
             </div>

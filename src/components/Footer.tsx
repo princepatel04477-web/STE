@@ -47,14 +47,21 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer ref={footerRef} className="w-full bg-[#050505] pt-28 pb-8 px-6 border-t border-expo-border/30 relative z-10">
+    <footer ref={footerRef} className="w-full bg-[#050505] pt-28 pb-24 md:pb-8 px-6 border-t border-expo-border/30 relative z-10">
       <div className="max-w-7xl mx-auto flex flex-col">
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-20">
 
           {/* Brand Col */}
           <div className="footer-col opacity-0 col-span-1 md:col-span-1 flex flex-col items-start">
-            <Image src="/assets/logo_STE.png" alt="STE Logo" width={100} height={85} className="mb-6 h-auto object-contain opacity-90" />
+            <Image 
+              src="/assets/logo_STE.png" 
+              alt="STE Logo" 
+              width={100} 
+              height={85} 
+              sizes="100px"
+              className="mb-6 h-auto object-contain opacity-90" 
+            />
             <p className="text-xs text-expo-warm/50 font-sans leading-relaxed mb-6">
               The official digital identity of India&apos;s largest textile sourcing ecosystem. A hyper-premium B2B exhibition showcase.
             </p>
@@ -133,8 +140,8 @@ export default function Footer() {
         <div className="footer-bottom opacity-0 flex flex-col md:flex-row items-center justify-between text-[10px] text-expo-warm/40 font-sans tracking-widest uppercase">
           <p>© {new Date().getFullYear()} Surat Textile Exhibition. All Rights Reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
-            <a href="#" className="hover:text-expo-warm transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-expo-warm transition-colors">Terms of Service</a>
+            <a href="/privacy-policy" className="hover:text-expo-warm transition-colors">Privacy Policy</a>
+            <a href="/terms-of-service" className="hover:text-expo-warm transition-colors">Terms of Service</a>
           </div>
         </div>
 

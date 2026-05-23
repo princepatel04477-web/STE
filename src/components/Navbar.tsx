@@ -65,38 +65,42 @@ export default function Navbar() {
     >
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between relative w-full">
         
-        {/* Left Column: Logo and supported-by banner */}
+        {/* Left Column: STE & AKAS Branding Logos */}
         <div className="flex items-center z-10 select-none">
-          <a href="#home" className="flex items-center gap-3.5 group">
-            <div className="relative w-20 h-14 sm:w-24 sm:h-[72px] overflow-hidden">
+          <a href="#home" className="flex items-center gap-2 sm:gap-3 group">
+            {/* STE Logo */}
+            <div className="relative w-16 h-11 sm:w-20 sm:h-14 overflow-hidden">
               <Image
                 src="/assets/logo_STE.png"
                 alt="STE Logo"
                 fill
                 priority
+                sizes="100px"
                 className="object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </div>
-            <div className="hidden sm:flex flex-col select-none mr-2 xl:mr-3">
-              <span className="text-[9px] uppercase tracking-[0.2em] text-expo-warm/55 leading-tight font-semibold">Surat Textile</span>
-              <span className="text-sm sm:text-base font-display tracking-widest text-expo-gold font-black leading-none">EXHIBITION</span>
-            </div>
-          </a>
-          
-          <div className="hidden xl:block h-8 w-[1px] bg-expo-border/30 mx-4" />
-          
-          <div className="hidden xl:flex flex-col items-center justify-center select-none">
-            <div className="relative w-24 h-14 overflow-hidden">
+
+            {/* Premium Divider */}
+            <div className="h-6 sm:h-8 w-px bg-white/10 mx-1 sm:mx-1.5" />
+
+            {/* AKAS Circular Logo */}
+            <div className="relative w-14 h-14 sm:w-18 sm:h-18 overflow-hidden rounded-full bg-white flex items-center justify-center border border-white/10 shadow-md group-hover:border-expo-gold/40 transition-all duration-300">
               <Image
-                src="/assets/logo_AKAS.png"
+                src="/assets/AKAS_1.png"
                 alt="AKAS Logo"
                 fill
                 priority
-                className="object-contain"
+                sizes="100px"
+                className="object-contain scale-[1.35] transition-transform duration-500 group-hover:scale-[1.42]"
               />
             </div>
-            <span className="text-[9px] uppercase tracking-[0.15em] text-expo-warm/40 font-bold leading-none mt-1">Supported By</span>
-          </div>
+
+            {/* Brand Text */}
+            <div className="hidden sm:flex flex-col select-none ml-2">
+              <span className="text-[8px] uppercase tracking-[0.2em] text-expo-warm/55 leading-tight font-semibold">Surat Textile</span>
+              <span className="text-xs sm:text-sm font-display tracking-widest text-expo-gold font-black leading-none">EXHIBITION</span>
+            </div>
+          </a>
         </div>
 
         {/* Center Column: Desktop Navigation Links (Absolutely Centered & Spacious starting at XL) */}

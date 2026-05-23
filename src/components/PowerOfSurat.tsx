@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { waapi, animate } from "animejs";
+import { animate } from "animejs";
 
 const STATS_DATA = [
   { value: 650, suffix: "+", label: "EXHIBITOR STALLS", sub: "Surat's leading manufacturers showcasing premium catalogs" },
   { value: 8000, suffix: "+", label: "VERIFIED B2B BUYERS", sub: "Retailers, wholesalers, boutique owners & chain stores" },
-  { value: 28, suffix: "+ States", label: "PAN INDIA REACH", sub: "Connecting sourcing hubs from across the nation" },
+  { value: 0, suffix: "", label: "PAN INDIA REACH", sub: "Connecting sourcing hubs from across the nation" },
   { value: 100, suffix: "%", label: "WHOLESALE BUSINESS FOCUS", sub: "Direct manufacturer pricing & high margin inventory sourcing" },
 ];
 
@@ -14,18 +14,21 @@ export default function PowerOfSurat() {
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [counts, setCounts] = useState(STATS_DATA.map(() => 0));
+  const [isAnimated, setIsAnimated] = useState(false);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    // 1. In-Viewport Observer for number increments
+    // 1. In-Viewport Observer for number increments (30% threshold)
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !hasAnimated.current) {
             hasAnimated.current = true;
+            setIsAnimated(true);
 
             // Trigger Anime.js number animations
             STATS_DATA.forEach((stat, idx) => {
+              if (idx === 2) return; // Keep PAN India static
               const counterObj = { val: 0 };
               animate(counterObj, {
                 val: stat.value,
@@ -43,7 +46,7 @@ export default function PowerOfSurat() {
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.3 }
     );
 
     if (sectionRef.current) {
@@ -94,8 +97,16 @@ export default function PowerOfSurat() {
               >
                 <div>
                   <span className="font-display text-3xl sm:text-4xl text-white tracking-wide font-bold">
-                    {counts[i].toLocaleString()}
-                    <span className="text-expo-gold">{stat.suffix}</span>
+                    {i === 2 ? (
+                      <>
+                        PAN <span className="text-expo-gold">India</span>
+                      </>
+                    ) : (
+                      <>
+                        {isAnimated ? counts[i].toLocaleString() : stat.value.toLocaleString()}
+                        <span className="text-expo-gold">{stat.suffix}</span>
+                      </>
+                    )}
                   </span>
                   <h3 className="font-sans text-sm font-semibold tracking-[1px] text-expo-warm uppercase mt-4">
                     {stat.label}

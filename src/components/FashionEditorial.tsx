@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { waapi, splitText, stagger } from "animejs";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const PORTRAITS = [
   {
@@ -91,7 +92,7 @@ export default function FashionEditorial() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            waapi.animate(Array.from(cards) as any, {
+            waapi.animate(Array.from(cards) as unknown as HTMLElement[], {
               opacity: [0, 1],
               translateX: [50, 0],
               duration: 1200,
@@ -112,6 +113,83 @@ export default function FashionEditorial() {
       observer.disconnect();
     };
   }, []);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+
+  // Scroll to a specific slide helper
+  const scrollToSlide = (index: number) => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+    
+    const cards = scrollContainer.querySelectorAll(".editorial-card");
+    if (cards.length === 0) return;
+    
+    const cardWidth = (cards[0] as HTMLElement).offsetWidth + 32; // card width + gap-8 (32px)
+    scrollContainer.scrollTo({
+      left: index * cardWidth,
+      behavior: "smooth"
+    });
+    setActiveIndex(index);
+  };
+
+  const handlePrev = () => {
+    const prevIndex = activeIndex === 0 ? PORTRAITS.length - 1 : activeIndex - 1;
+    scrollToSlide(prevIndex);
+  };
+
+  const handleNext = () => {
+    const nextIndex = activeIndex === PORTRAITS.length - 1 ? 0 : activeIndex + 1;
+    scrollToSlide(nextIndex);
+  };
+
+  // Sync activeIndex on manual scrolls/swipes
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      const cards = scrollContainer.querySelectorAll(".editorial-card");
+      if (cards.length === 0) return;
+      
+      const cardWidth = (cards[0] as HTMLElement).offsetWidth + 32;
+      const currentScrollIndex = Math.round(scrollContainer.scrollLeft / cardWidth);
+      if (currentScrollIndex >= 0 && currentScrollIndex < PORTRAITS.length) {
+        setActiveIndex(currentScrollIndex);
+      }
+    };
+
+    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
+    return () => scrollContainer.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Automatic scrolling loop
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer || isHovering) return;
+
+    const interval = setInterval(() => {
+      const cards = scrollContainer.querySelectorAll(".editorial-card");
+      if (cards.length === 0) return;
+      
+      const cardWidth = (cards[0] as HTMLElement).offsetWidth + 32;
+      const currentScrollIndex = Math.round(scrollContainer.scrollLeft / cardWidth);
+      let nextIndex = currentScrollIndex + 1;
+      
+      if (nextIndex >= PORTRAITS.length) {
+        nextIndex = 0;
+      }
+      
+      scrollContainer.scrollTo({
+        left: nextIndex * cardWidth,
+        behavior: "smooth"
+      });
+      
+      setActiveIndex(nextIndex);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isHovering]);
 
   return (
     <section
@@ -154,14 +232,16 @@ export default function FashionEditorial() {
       {/* Horizontal Couture Portrait Showcase */}
       <div
         ref={scrollContainerRef}
-        className="relative z-10 flex gap-8 overflow-x-auto lg:overflow-hidden scrollbar-none px-6 sm:px-12 lg:px-24 py-4 w-full"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        className="relative z-10 flex gap-8 overflow-x-auto lg:overflow-hidden scrollbar-none px-6 sm:px-12 lg:px-24 py-4 w-full snap-x snap-mandatory"
         style={{ scrollBehavior: "smooth" }}
       >
         <div className="flex gap-8 pr-12 min-w-max">
           {PORTRAITS.map((p, idx) => (
             <div
               key={idx}
-              className="editorial-card opacity-0 translate-x-[50px] w-[80vw] sm:w-[50vw] lg:w-[35vw] flex flex-col group"
+              className="editorial-card opacity-0 translate-x-[50px] w-[80vw] sm:w-[50vw] lg:w-[35vw] flex flex-col group snap-center"
               data-cursor="explore"
             >
               {/* Image box */}
@@ -198,10 +278,58 @@ export default function FashionEditorial() {
         </div>
       </div>
 
+      {/* Left/Right Premium Navigation Buttons */}
+      <div className="absolute top-[60%] -translate-y-1/2 left-4 sm:left-8 z-30 hidden sm:block">
+        <button
+          onClick={handlePrev}
+          className="w-12 h-12 rounded-full border border-expo-gold/20 bg-[#050505]/75 hover:bg-expo-gold hover:text-expo-midnight hover:border-expo-gold text-expo-gold hover:shadow-expo-glow transition-all duration-300 flex items-center justify-center backdrop-blur-md"
+          aria-label="Previous Slide"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div className="absolute top-[60%] -translate-y-1/2 right-4 sm:right-8 z-30 hidden sm:block">
+        <button
+          onClick={handleNext}
+          className="w-12 h-12 rounded-full border border-expo-gold/20 bg-[#050505]/75 hover:bg-expo-gold hover:text-expo-midnight hover:border-expo-gold text-expo-gold hover:shadow-expo-glow transition-all duration-300 flex items-center justify-center backdrop-blur-md"
+          aria-label="Next Slide"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Premium Pagination Indicator Dots */}
+      <div className="flex justify-center items-center gap-2 mt-6 z-30 relative">
+        {PORTRAITS.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => scrollToSlide(idx)}
+            className={`transition-all duration-500 rounded-full h-1.5 ${
+              activeIndex === idx 
+                ? "w-8 bg-expo-gold shadow-[0_0_10px_rgba(214,160,102,0.6)]" 
+                : "w-2 bg-expo-warm/30 hover:bg-expo-warm/60"
+            }`}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
+
       {/* Horizontal scroll advice overlay for desktop */}
       <div className="hidden lg:flex justify-end max-w-7xl mx-auto px-24 mt-8 pointer-events-none">
         <span className="font-sans text-[9px] tracking-[3px] text-expo-warm/30 uppercase animate-pulse">
-          Use Mouse Wheel to Scroll Horizontally →
+          Use Navigation Buttons or Mouse Wheel to Explore →
+        </span>
+      </div>
+
+      {/* Mobile Swipe Indicator */}
+      <div className="lg:hidden flex justify-center items-center gap-2 mt-6 pointer-events-none">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-expo-gold opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-expo-gold"></span>
+        </span>
+        <span className="font-sans text-[9px] tracking-[3px] text-expo-gold uppercase animate-pulse">
+          Swipe to View More
         </span>
       </div>
     </section>

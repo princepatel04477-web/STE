@@ -33,7 +33,7 @@ export default function FutureOfCommerce() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            waapi.animate(Array.from(panels) as any, {
+            waapi.animate(Array.from(panels) as unknown as HTMLElement[], {
               opacity: [0, 1],
               scale: [0.97, 1],
               translateY: [25, 0],
@@ -77,7 +77,7 @@ export default function FutureOfCommerce() {
             <span className="text-metallic font-light italic">B2B Business Benefits</span>
           </h2>
           <p className="font-sans text-sm sm:text-base text-expo-warm/60 leading-relaxed mt-6 max-w-xl">
-            Surat Textile Exhibition provides the ultimate commerce ecosystem. Connect directly with India's largest manufacturers, optimize your inventory margins, and establish direct-to-mill trade channels.
+            Surat Textile Exhibition provides the ultimate commerce ecosystem. Connect directly with India&apos;s largest manufacturers, optimize your inventory margins, and establish direct-to-mill trade channels.
           </p>
         </div>
 
