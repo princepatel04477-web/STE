@@ -1,0 +1,14 @@
+# Ignore large backup and source directories
+/STE_2
+/STE_Content
+/.idea
+/.claude
+/.claude-flow
+/.tmp
+/.agents
+
+# Ignore root-level assets and database files not in public/
+/*.mp4
+/*.png
+/*.jpeg
+/*.db

@@ -19,9 +19,17 @@ import CountdownSection from "@/components/CountdownSection";
 import FinalCTA from "@/components/FinalCTA";
 import MobileStickyCTA from "@/components/MobileStickyCTA";
 import Footer from "@/components/Footer";
+import BrochureModal from "@/components/BrochureModal";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
+  const [isBrochureOpen, setIsBrochureOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpen = () => setIsBrochureOpen(true);
+    window.addEventListener("open-brochure", handleOpen);
+    return () => window.removeEventListener("open-brochure", handleOpen);
+  }, []);
 
   useEffect(() => {
     // Hide preloader after a short cinematic reveal interval (2.2 seconds)
@@ -131,6 +139,9 @@ export default function Home() {
 
       {/* 6. Sticky Bottom B2B Action Bar */}
       <MobileStickyCTA />
+
+      {/* 7. Immersive Premium Brochure Modal */}
+      <BrochureModal isOpen={isBrochureOpen} onClose={() => setIsBrochureOpen(false)} />
 
     </main>
   );

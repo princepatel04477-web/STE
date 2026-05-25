@@ -72,7 +72,7 @@ export default function FutureOfCommerce() {
           <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             06 • WHOLESALE SOURCING PORTAL
           </span>
-          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-white leading-tight">
+          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight">
             Connecting Sourcing and <br />
             <span className="text-metallic font-light italic">B2B Business Benefits</span>
           </h2>

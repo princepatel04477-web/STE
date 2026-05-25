@@ -51,10 +51,10 @@ export default function BilingualSection() {
         
         {/* Header */}
         <div className="max-w-3xl mb-16 sm:mb-24">
-          <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-[#FF9933] uppercase mb-4 block">
-            06 • BILINGUAL SOURCING BENEFITS • व्यापारिक लाभ
+          <span className="text-[10px] sm:text-xs font-bold tracking-[4px] text-[#FF9933] uppercase mb-4 block">
+            06 • BILINGUAL SOURCING BENEFITS • <span className="text-hindi text-[9px] lowercase tracking-normal font-semibold">व्यापारिक लाभ</span>
           </span>
-          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-white leading-tight">
+          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight">
             Connecting Weavers & <br />
             <span className="text-metallic font-light italic text-[#FFBF80]">PAN-India Buyers</span>
           </h2>
@@ -72,7 +72,7 @@ export default function BilingualSection() {
               {/* Badge */}
               <div className="flex items-center justify-between mb-8">
                 <span className="text-[9px] tracking-[2.5px] text-[#FF9933] border border-[#FF9933]/30 px-3 py-1 rounded-full uppercase font-bold bg-[#FF9933]/5">
-                  SELLERS • उत्पादक निर्माता
+                  SELLERS • <span className="text-hindi text-[8px] tracking-normal font-medium">उत्पादक निर्माता</span>
                 </span>
                 <span className="text-2xl">🏭</span>
               </div>
@@ -80,31 +80,37 @@ export default function BilingualSection() {
               <h3 className="font-serif text-2xl sm:text-3xl text-white mb-2">
                 For Surat Manufacturers
               </h3>
-              <h4 className="font-sans text-base text-[#FFBF80] font-semibold mb-6">
+              <h4 className="font-sans text-hindi text-sm sm:text-[15px] text-[#FFBF80] font-semibold mb-6">
                 सूरत के कपड़ा निर्माताओं और बुनकरों के लिए
               </h4>
 
               {/* Bullet Points */}
-              <ul className="flex flex-col gap-5 text-xs sm:text-sm text-expo-warm/75">
+              <ul className="flex flex-col gap-6 text-xs sm:text-sm text-expo-warm/75">
                 <li className="flex items-start gap-3">
                   <span className="text-[#FF9933] mt-0.5">✦</span>
                   <div>
                     <strong className="text-white">Direct Retail Pipeline:</strong> Sell whole production lots directly to boutique owners and massive multi-state wholesalers, completely bypassing agents.
-                    <span className="block text-[11px] text-expo-warm/50 mt-1">दलालों और एजेंटों के बिना सीधे रिटेलर्स और बड़े थोक खरीदारों को अपनी पूरी उत्पादन क्षमता बेचें।</span>
+                    <span className="block text-hindi text-[10px] sm:text-[11px] text-expo-warm/50 mt-1.5 leading-loose">
+                      दलालों और एजेंटों के बिना सीधे रिटेलर्स और बड़े थोक खरीदारों को अपनी पूरी उत्पादन क्षमता बेचें।
+                    </span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#FF9933] mt-0.5">✦</span>
                   <div>
                     <strong className="text-white">Pan-India Expansion:</strong> Expand your commercial customer reach to buyers from Karnataka, Tamil Nadu, Delhi, Bihar, and Northeast India.
-                    <span className="block text-[11px] text-expo-warm/50 mt-1">दक्षिण भारत, दिल्ली, बिहार और पूर्वोत्तर राज्यों से आने वाले ग्राहकों से जुड़ें और व्यापार बढ़ाएं।</span>
+                    <span className="block text-hindi text-[10px] sm:text-[11px] text-expo-warm/50 mt-1.5 leading-loose">
+                      दक्षिण भारत, दिल्ली, बिहार और पूर्वोत्तर राज्यों से आने वाले ग्राहकों से जुड़ें और व्यापार बढ़ाएं।
+                    </span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#FF9933] mt-0.5">✦</span>
                   <div>
                     <strong className="text-white">Direct Advanced Bookings:</strong> Secure direct advance orders for the upcoming wedding and festival seasons.
-                    <span className="block text-[11px] text-expo-warm/50 mt-1">आने वाले त्योहारों और शादी के सीजन के लिए सीधे एडवांस ऑर्डर प्राप्त करें।</span>
+                    <span className="block text-hindi text-[10px] sm:text-[11px] text-expo-warm/50 mt-1.5 leading-loose">
+                      आने वाले त्योहारों और शादी के सीजन के लिए सीधे एडवांस ऑर्डर प्राप्त करें।
+                    </span>
                   </div>
                 </li>
               </ul>
@@ -115,7 +121,7 @@ export default function BilingualSection() {
                 href="#final-cta"
                 className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[2px] text-[#FFBF80] hover:text-[#FF9933] transition-colors duration-300"
               >
-                Book Manufacturer Stall • स्टॉल बुक करें ➔
+                Book Manufacturer Stall • <span className="text-hindi text-[10px] tracking-normal font-semibold lowercase">स्टॉल बुक करें</span> ➔
               </a>
             </div>
           </div>
@@ -126,7 +132,7 @@ export default function BilingualSection() {
               {/* Badge */}
               <div className="flex items-center justify-between mb-8">
                 <span className="text-[9px] tracking-[2.5px] text-[#FFBF80] border border-[#FFBF80]/30 px-3 py-1 rounded-full uppercase font-bold bg-[#FFBF80]/5">
-                  BUYERS • थोक व्यापारी / रिटेलर
+                  BUYERS • <span className="text-hindi text-[8px] tracking-normal font-medium">थोक व्यापारी / रिटेलर</span>
                 </span>
                 <span className="text-2xl">🛍️</span>
               </div>
@@ -134,31 +140,37 @@ export default function BilingualSection() {
               <h3 className="font-serif text-2xl sm:text-3xl text-white mb-2">
                 For PAN-India Buyers
               </h3>
-              <h4 className="font-sans text-base text-[#FFBF80] font-semibold mb-6">
+              <h4 className="font-sans text-hindi text-sm sm:text-[15px] text-[#FFBF80] font-semibold mb-6">
                 भारत भर के थोक और खुदरा व्यापारियों के लिए
               </h4>
 
               {/* Bullet Points */}
-              <ul className="flex flex-col gap-5 text-xs sm:text-sm text-expo-warm/75">
+              <ul className="flex flex-col gap-6 text-xs sm:text-sm text-expo-warm/75">
                 <li className="flex items-start gap-3">
                   <span className="text-[#FFBF80] mt-0.5">✦</span>
                   <div>
                     <strong className="text-white">Zero Broker Markup:</strong> Procure premium sarees, kurtis, salwar suits, and ethnic wear directly from looms at primary manufacturer pricing.
-                    <span className="block text-[11px] text-expo-warm/50 mt-1">सीधे बुनकरों और कारखानों से साड़ी, कुर्ती और सलवार सूट खरीदें और दलालों के कमीशन की बचत करें।</span>
+                    <span className="block text-hindi text-[10px] sm:text-[11px] text-expo-warm/50 mt-1.5 leading-loose">
+                      सीधे बुनकरों और कारखानों से साड़ी, कुर्ती और सलवार सूट खरीदें और दलालों के कमीशन की बचत करें।
+                    </span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#FFBF80] mt-0.5">✦</span>
                   <div>
                     <strong className="text-white">Curated Festival Catalogs:</strong> Access thousands of brand new luxury catalogs prepared specifically for the upcoming wedding/festival seasons.
-                    <span className="block text-[11px] text-expo-warm/50 mt-1">आने वाले शादी और त्योहारों के सीजन के लिए नए एक्सक्लूसिव कैटलॉग का स्टॉक एक ही जगह देखें।</span>
+                    <span className="block text-hindi text-[10px] sm:text-[11px] text-expo-warm/50 mt-1.5 leading-loose">
+                      आने वाले शादी और त्योहारों के सीजन के लिए नए एक्सक्लूसिव कैटलॉग का स्टॉक एक ही जगह देखें।
+                    </span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-[#FFBF80] mt-0.5">✦</span>
                   <div>
                     <strong className="text-white">Verified Sourcing Security:</strong> Every exhibitor is verified by the STE board, guaranteeing premium quality control and timely shipping.
-                    <span className="block text-[11px] text-expo-warm/50 mt-1">STE बोर्ड द्वारा सत्यापित विक्रेताओं से ही डील करें, जो सुरक्षित लेनदेन और सही समय पर डिलीवरी सुनिश्चित करते हैं।</span>
+                    <span className="block text-hindi text-[10px] sm:text-[11px] text-expo-warm/50 mt-1.5 leading-loose">
+                      STE बोर्ड द्वारा सत्यापित विक्रेताओं से ही डील करें, जो सुरक्षित लेनदेन और सही समय पर डिलीवरी सुनिश्चित करते हैं।
+                    </span>
                   </div>
                 </li>
               </ul>
@@ -169,7 +181,7 @@ export default function BilingualSection() {
                 href="#final-cta"
                 className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[2px] text-[#FFBF80] hover:text-[#FF9933] transition-colors duration-300"
               >
-                Register as B2B Buyer • बायर रजिस्ट्रेशन ➔
+                Register as B2B Buyer • <span className="text-hindi text-[10px] tracking-normal font-semibold lowercase">बायर रजिस्ट्रेशन</span> ➔
               </a>
             </div>
           </div>

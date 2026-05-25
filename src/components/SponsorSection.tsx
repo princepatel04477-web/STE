@@ -126,7 +126,7 @@ export default function SponsorSection() {
             {doubleSponsors.map((sponsor, idx) => (
               <div
                 key={`${sponsor.name}-${idx}`}
-                className="flex items-center justify-center px-8 py-4 rounded-xl border border-expo-border/30 bg-expo-black/40 text-expo-warm/40 hover:text-expo-gold hover:border-expo-gold/45 hover:shadow-[0_0_20px_rgba(214,160,102,0.12)] transition-all duration-500 hover:scale-105 cursor-pointer filter grayscale hover:grayscale-0"
+                className="floating-logo-item flex items-center justify-center px-8 py-4 rounded-xl border border-white/5 bg-[#0a0a0a]/50 text-expo-warm/40 hover:text-expo-gold hover:border-expo-gold/40 hover:shadow-[0_0_30px_rgba(214,160,102,0.25)] transition-all duration-700 ease-luxury cursor-pointer filter grayscale-[100%] brightness-[160%] opacity-[70%] hover:grayscale-0 hover:brightness-[100%] hover:opacity-100"
               >
                 {sponsor.logo}
               </div>
@@ -140,6 +140,27 @@ export default function SponsorSection() {
         .mask-marquee {
           -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
           mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+        @keyframes floatingLogo {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        .floating-logo-item {
+          animation: floatingLogo 4.2s ease-in-out infinite;
+          transform: translate3d(0, 0, 0);
+          will-change: transform;
+        }
+        .floating-logo-item:nth-child(2n) {
+          animation-delay: 0.8s;
+          animation-duration: 4.8s;
+        }
+        .floating-logo-item:nth-child(3n) {
+          animation-delay: 1.6s;
+          animation-duration: 5.4s;
+        }
+        .floating-logo-item:nth-child(4n) {
+          animation-delay: 2.4s;
+          animation-duration: 3.9s;
         }
       `}</style>
     </section>

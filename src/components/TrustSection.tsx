@@ -30,6 +30,80 @@ const TESTIMONIALS = [
   }
 ];
 
+function AnimatedCounter({ value, duration = 1500 }: { value: string; duration?: number }) {
+  const [displayValue, setDisplayValue] = useState("0");
+  const elementRef = useRef<HTMLSpanElement | null>(null);
+  const animatedRef = useRef(false);
+
+  useEffect(() => {
+    if (!elementRef.current || animatedRef.current) return;
+
+    const startCounting = () => {
+      const numMatch = value.match(/([^\d]*)([\d,.]+)([^\d]*)/);
+      if (!numMatch) {
+        setDisplayValue(value);
+        return;
+      }
+
+      const prefix = numMatch[1] || "";
+      const rawNumberStr = numMatch[2] || "";
+      const suffix = numMatch[3] || "";
+      const hasCommas = rawNumberStr.includes(",");
+      const finalNumber = parseFloat(rawNumberStr.replace(/,/g, ""));
+
+      if (isNaN(finalNumber)) {
+        setDisplayValue(value);
+        return;
+      }
+
+      const startTime = performance.now();
+
+      const animate = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const easeProgress = progress * (2 - progress);
+        const currentVal = Math.floor(easeProgress * finalNumber);
+        
+        let formattedNumber = "";
+        if (hasCommas) {
+          formattedNumber = currentVal.toLocaleString("en-IN");
+        } else {
+          formattedNumber = currentVal.toString();
+        }
+
+        setDisplayValue(`${prefix}${formattedNumber}${suffix}`);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setDisplayValue(value);
+        }
+      };
+
+      requestAnimationFrame(animate);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !animatedRef.current) {
+            animatedRef.current = true;
+            startCounting();
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(elementRef.current);
+    return () => observer.disconnect();
+  }, [value, duration]);
+
+  return <span ref={elementRef}>{displayValue}</span>;
+}
+
 const PREVIOUS_EVENTS = [
   { year: "2025", visitors: "6,500+", transactions: "₹45 Cr+", stalls: "450+" },
   { year: "2024", visitors: "5,200+", transactions: "₹32 Cr+", stalls: "320+" },
@@ -86,7 +160,7 @@ export default function TrustSection() {
           <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             05 • TRUST, EXPERIENCE & SOCIAL PROOF
           </span>
-          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-white leading-tight">
+          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight">
             Ecosystem Built on <br />
             <span className="text-metallic font-light italic">Industrial Credibility</span>
           </h2>
@@ -140,16 +214,22 @@ export default function TrustSection() {
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     <div>
                       <span className="text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">Wholesalers:</span>
-                      <span className="text-white text-sm font-bold">{item.visitors}</span>
+                      <span className="text-white text-sm font-bold">
+                        <AnimatedCounter value={item.visitors} />
+                      </span>
                     </div>
                     <div>
                       <span className="text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">Stalls Booked:</span>
-                      <span className="text-white text-sm font-bold">{item.stalls}</span>
+                      <span className="text-white text-sm font-bold">
+                        <AnimatedCounter value={item.stalls} />
+                      </span>
                     </div>
                   </div>
                   <div className="mt-3 border-t border-white/5 pt-2">
                     <span className="text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">Trade Volume:</span>
-                    <span className="text-expo-gold text-sm font-extrabold">{item.transactions}</span>
+                    <span className="text-expo-gold text-sm font-extrabold">
+                      <AnimatedCounter value={item.transactions} />
+                    </span>
                   </div>
                 </div>
               ))}

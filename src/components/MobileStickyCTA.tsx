@@ -5,6 +5,11 @@ import { useEffect, useState } from "react";
 export default function MobileStickyCTA() {
   const [isVisible, setIsVisible] = useState(false);
 
+  const handleViewBrochure = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent("open-brochure"));
+  };
+
   useEffect(() => {
     // Show only after scrolling down 300px to avoid cluttering initial loading hero
     const handleScroll = () => {
@@ -44,15 +49,14 @@ export default function MobileStickyCTA() {
           <span className="text-[9px] uppercase tracking-[1px] font-sans font-bold mt-1 text-[#FFBF80]">WhatsApp</span>
         </a>
 
-        {/* 3. Brochure Download */}
-        <a
-          href="/brochure.jpeg"
-          download="brochure.jpeg"
-          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300"
+        {/* 3. Brochure View Modal */}
+        <button
+          onClick={handleViewBrochure}
+          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300 w-full"
         >
           <span className="text-lg">📄</span>
           <span className="text-[9px] uppercase tracking-[1px] font-sans font-bold mt-1">Brochure</span>
-        </a>
+        </button>
 
         {/* 4. Scroll to Register Form */}
         <a

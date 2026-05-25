@@ -230,51 +230,63 @@ export default function FashionEditorial() {
       </div>
 
       {/* Horizontal Couture Portrait Showcase */}
-      <div
-        ref={scrollContainerRef}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-        className="relative z-10 flex gap-8 overflow-x-auto lg:overflow-hidden scrollbar-none px-6 sm:px-12 lg:px-24 py-4 w-full snap-x snap-mandatory"
-        style={{ scrollBehavior: "smooth" }}
-      >
-        <div className="flex gap-8 pr-12 min-w-max">
-          {PORTRAITS.map((p, idx) => (
-            <div
-              key={idx}
-              className="editorial-card opacity-0 translate-x-[50px] w-[80vw] sm:w-[50vw] lg:w-[35vw] flex flex-col group snap-center"
-              data-cursor="explore"
-            >
-              {/* Image box */}
-              <div className="relative w-full aspect-[3/4] overflow-hidden border border-white/10 rounded-sm bg-neutral-900 shadow-2xl">
+      <div className="relative w-full z-10">
+        {/* Left & Right Edge Fade Gradients */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" />
+
+        <div
+          ref={scrollContainerRef}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+          className="horizontal-scroll-premium scrollbar-none px-6 sm:px-12 lg:px-24 py-6 w-full"
+        >
+          <div className="flex gap-8 pr-24 min-w-max">
+            {PORTRAITS.map((p, idx) => {
+              const isSelfActive = activeIndex === idx;
+              return (
                 <div
-                  className="absolute inset-0 bg-cover bg-center filter brightness-[0.7] group-hover:brightness-[0.9] group-hover:scale-[1.04] transition-all duration-[900ms] luxury"
-                  style={{ backgroundImage: `url('${p.img}')` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-60 z-10 pointer-events-none" />
-                <div className="noise-overlay" />
+                  key={idx}
+                  className={`editorial-card scroll-snap-card opacity-0 translate-x-[50px] w-[80vw] sm:w-[50vw] lg:w-[32vw] flex flex-col group transition-all duration-700 ease-luxury ${
+                    isSelfActive 
+                      ? "scale-100 opacity-100 filter blur-0" 
+                      : "scale-[0.96] opacity-45 filter blur-[0.8px]"
+                  }`}
+                  data-cursor="explore"
+                >
+                  {/* Image box */}
+                  <div className="relative w-full aspect-[3/4] overflow-hidden border border-white/10 rounded-sm bg-neutral-900 shadow-2xl">
+                    <div
+                      className="absolute inset-0 bg-cover bg-center filter brightness-[0.7] group-hover:brightness-[0.9] group-hover:scale-[1.04] transition-all duration-[900ms] luxury"
+                      style={{ backgroundImage: `url('${p.img}')` }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-60 z-10 pointer-events-none" />
+                    <div className="noise-overlay" />
 
-                {/* Section tags */}
-                <div className="absolute top-4 left-4 z-20 flex flex-col">
-                  <span className="font-sans text-[8px] font-bold tracking-[2px] text-expo-gold uppercase bg-black/60 px-2.5 py-1 border border-white/5 rounded-sm">
-                    {p.coords}
-                  </span>
+                    {/* Section tags */}
+                    <div className="absolute top-4 left-4 z-20 flex flex-col">
+                      <span className="font-sans text-[8px] font-bold tracking-[2px] text-expo-gold bg-black/60 px-2.5 py-1 border border-white/5 rounded-sm">
+                        {p.coords}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Description tags */}
+                  <div className="mt-6 flex flex-col">
+                    <span className="font-sans text-[10px] tracking-[3px] text-expo-gold uppercase block mb-1">
+                      {p.subtitle}
+                    </span>
+                    <h3 className="font-serif text-lg sm:text-2xl text-white tracking-wide group-hover:text-expo-gold transition-colors duration-500">
+                      {p.title}
+                    </h3>
+                    <p className="font-sans text-xs text-expo-warm/50 leading-relaxed mt-2 max-w-sm">
+                      {p.desc}
+                    </p>
+                  </div>
                 </div>
-              </div>
-
-              {/* Description tags */}
-              <div className="mt-6 flex flex-col">
-                <span className="font-sans text-[10px] tracking-[3px] text-expo-gold uppercase block mb-1">
-                  {p.subtitle}
-                </span>
-                <h3 className="font-serif text-lg sm:text-2xl text-white tracking-wide group-hover:text-expo-gold transition-colors duration-500">
-                  {p.title}
-                </h3>
-                <p className="font-sans text-xs text-expo-warm/50 leading-relaxed mt-2 max-w-sm">
-                  {p.desc}
-                </p>
-              </div>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
       </div>
 

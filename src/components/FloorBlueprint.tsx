@@ -7,6 +7,11 @@ export default function FloorBlueprint() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [activeZone, setActiveZone] = useState<string | null>(null);
 
+  const handleViewBrochure = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent("open-brochure"));
+  };
+
   useEffect(() => {
     if (containerRef.current) {
       const observer = new IntersectionObserver(
@@ -75,7 +80,7 @@ export default function FloorBlueprint() {
           <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             04 • INTERACTIVE EXHIBITION FLOOR PLAN
           </span>
-          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-white leading-tight">
+          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight">
             Technical Floor Plan & <br />
             <span className="text-metallic font-light italic">Pavilion Space</span>
           </h2>
@@ -278,13 +283,12 @@ export default function FloorBlueprint() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <a
-                  href="/brochure.jpeg"
-                  download="brochure.jpeg"
+                <button
+                  onClick={handleViewBrochure}
                   className="w-full py-3.5 bg-gold-gradient rounded-sm text-expo-midnight font-sans font-bold text-center text-xs tracking-[3px] uppercase shadow-lg hover:shadow-expo-glow transition-all duration-500 hover:brightness-105"
                 >
-                  📥 Get Brochure (840 KB)
-                </a>
+                  📄 View Stall Brochure
+                </button>
                 
                 <span className="text-[9px] text-center uppercase tracking-[1.5px] text-expo-warm/40 font-semibold block">
                   Includes comprehensive participant checklist

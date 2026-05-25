@@ -112,49 +112,59 @@ export default function GallerySection() {
           </p>
         </div>
 
-        {/* Masonry Columns Layout */}
-        <div 
-          ref={containerRef} 
-          className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6"
-        >
-          {galleryData.map((img) => (
-            <div
-              key={img.id}
-              onClick={() => setSelectedImg(img)}
-              className={`gallery-item opacity-0 group relative overflow-hidden rounded-xl border border-expo-border/50 bg-expo-midnight cursor-pointer transition-all duration-700 hover:border-expo-gold/40 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)] ${img.aspect} break-inside-avoid`}
-            >
-              {/* Image Component */}
-              <div className="relative w-full h-full">
-                <Image
-                  src={img.src}
-                  alt={img.title}
-                  fill
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-all duration-1000 ease-luxury group-hover:scale-105 filter brightness-[0.8] group-hover:brightness-100"
-                />
-              </div>
+        {/* Masonry Columns Layout / Mobile Snap Scroll */}
+        <div className="relative w-full">
+          {/* Edge Fade Gradients on Mobile */}
+          <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none sm:hidden" />
+          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none sm:hidden" />
 
-              {/* Hover Dark Overlay and Details */}
-              <div className="absolute inset-0 bg-gradient-to-t from-expo-midnight via-expo-midnight/40 to-transparent opacity-0 group-hover:opacity-95 transition-opacity duration-500 flex flex-col justify-end p-6 select-none">
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-widest text-expo-gold font-semibold mb-1">
-                      {img.category}
-                    </span>
-                    <h4 className="font-display text-lg tracking-wide text-expo-warm transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 ease-luxury">
-                      {img.title}
-                    </h4>
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-expo-gold flex items-center justify-center text-expo-midnight transform scale-0 group-hover:scale-100 transition-transform duration-500 ease-luxury">
-                    <Eye className="w-5 h-5" />
+          <div 
+            ref={containerRef} 
+            className="flex gap-6 overflow-x-auto sm:block sm:columns-2 lg:columns-3 sm:space-y-6 gap-y-0 sm:gap-6 snap-x snap-mandatory scrollbar-none pb-6 sm:pb-0 w-full"
+            style={{
+              overscrollBehaviorX: "contain",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {galleryData.map((img) => (
+              <div
+                key={img.id}
+                onClick={() => setSelectedImg(img)}
+                className={`gallery-item scroll-snap-card opacity-0 flex-shrink-0 w-[78vw] sm:w-auto snap-start sm:snap-none group relative overflow-hidden rounded-xl border border-expo-border/50 bg-expo-midnight cursor-pointer transition-all duration-700 hover:border-expo-gold/40 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)] ${img.aspect} break-inside-avoid sm:mb-6`}
+              >
+                {/* Image Component */}
+                <div className="relative w-full h-full">
+                  <Image
+                    src={img.src}
+                    alt={img.title}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover transition-all duration-1000 ease-luxury group-hover:scale-105 filter brightness-[0.8] group-hover:brightness-100"
+                  />
+                </div>
+
+                {/* Hover Dark Overlay and Details */}
+                <div className="absolute inset-0 bg-gradient-to-t from-expo-midnight via-expo-midnight/40 to-transparent opacity-0 group-hover:opacity-95 transition-opacity duration-500 flex flex-col justify-end p-6 select-none">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase tracking-widest text-expo-gold font-semibold mb-1">
+                        {img.category}
+                      </span>
+                      <h4 className="font-display text-lg tracking-wide text-expo-warm transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 ease-luxury">
+                        {img.title}
+                      </h4>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-expo-gold flex items-center justify-center text-expo-midnight transform scale-0 group-hover:scale-100 transition-transform duration-500 ease-luxury">
+                      <Eye className="w-5 h-5" />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Grid outline highlights */}
-              <div className="absolute inset-0 border border-transparent group-hover:border-expo-gold/20 rounded-xl pointer-events-none transition-all duration-500" />
-            </div>
-          ))}
+                {/* Grid outline highlights */}
+                <div className="absolute inset-0 border border-transparent group-hover:border-expo-gold/20 rounded-xl pointer-events-none transition-all duration-500" />
+              </div>
+            ))}
+          </div>
         </div>
 
       </div>

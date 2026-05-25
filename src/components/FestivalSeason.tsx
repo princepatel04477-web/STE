@@ -61,7 +61,7 @@ export default function FestivalSeason() {
           <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             04 • THE FESTIVAL IMPERATIVE
           </span>
-          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-white leading-tight">
+          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight">
             Cinematic Festival Demand & <br />
             <span className="text-metallic font-light italic">Seasonal Business Opportunity</span>
           </h2>

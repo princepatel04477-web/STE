@@ -74,7 +74,7 @@ export default function PowerOfSurat() {
           <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             01 • INDUSTRIAL SUPREMACY
           </span>
-          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-white leading-tight">
+          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-widest text-white leading-tight">
             The Monumental Scale of <br />
             <span className="text-metallic font-light italic">Global Commerce</span>
           </h2>

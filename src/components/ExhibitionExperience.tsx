@@ -89,7 +89,7 @@ export default function ExhibitionExperience() {
           <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             03 • THE EXHIBITION VENUE
           </span>
-          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-white leading-tight">
+          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight">
             SIECC, Sarsana Dome <br />
             <span className="text-metallic font-light italic">Surat’s Sourcing Epicenter</span>
           </h2>

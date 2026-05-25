@@ -89,7 +89,7 @@ export default function CountdownSection() {
         <span className="text-[10px] sm:text-xs font-bold tracking-[6px] text-expo-gold uppercase mb-4 block">
           SECURE YOUR COMMERCIAL STALL
         </span>
-        <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-tight text-white mb-6 leading-tight max-w-4xl">
+        <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white mb-6 leading-tight max-w-4xl">
           The Sourcing Event <br />
           <span className="text-metallic font-light italic">Commences In</span>
         </h2>

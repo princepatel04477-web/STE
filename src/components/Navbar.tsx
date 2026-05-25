@@ -16,6 +16,7 @@ const navItems = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("#home");
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,6 +30,29 @@ export default function Navbar() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // IntersectionObserver to trace active segment across landing sections
+  useEffect(() => {
+    const sections = ["home", "fabric-in-motion", "exhibition-experience", "fashion-editorial", "future-of-commerce"];
+    const elements = sections.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(`#${entry.target.id}`);
+          }
+        });
+      },
+      {
+        rootMargin: "-25% 0px -55% 0px",
+        threshold: 0.1
+      }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
   // Handle mobile menu slide & stagger animate on open
@@ -59,7 +83,7 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-[#050505]/85 backdrop-blur-md border-b border-white/[0.06] shadow-[0_10px_30px_rgba(0,0,0,0.5)] py-4"
+          ? "bg-[#050505]/75 backdrop-blur-xl border-b border-white/[0.04] shadow-[0_10px_30px_rgba(0,0,0,0.6)] py-3.5"
           : "bg-transparent py-6"
       }`}
     >
@@ -105,16 +129,23 @@ export default function Navbar() {
 
         {/* Center Column: Desktop Navigation Links (Absolutely Centered & Spacious starting at XL) */}
         <nav className="hidden xl:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-6 xl:gap-8 text-[10px] xl:text-[11px] uppercase tracking-[0.12em] font-medium select-none">
-          {navItems.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="group relative py-2.5 text-expo-warm/60 hover:text-expo-warm transition-colors duration-300"
-            >
-              <span>{item.name}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-expo-gold transition-all duration-300 ease-out group-hover:w-full" />
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const isActive = activeSection === item.href;
+            return (
+              <a
+                key={item.name}
+                href={item.href}
+                className={`group relative py-2.5 transition-colors duration-300 ${
+                  isActive ? "text-expo-gold font-bold" : "text-expo-warm/60 hover:text-expo-warm"
+                }`}
+              >
+                <span>{item.name}</span>
+                <span className={`absolute bottom-0 left-0 h-[1.5px] bg-expo-gold transition-all duration-300 ease-out ${
+                  isActive ? "w-full" : "w-0 group-hover:w-full"
+                }`} />
+              </a>
+            );
+          })}
         </nav>
 
         {/* Right Column: Action Button, Call Support & Mobile Toggle */}
@@ -158,16 +189,21 @@ export default function Navbar() {
           className="xl:hidden absolute top-full left-0 w-full bg-[#050505]/95 backdrop-blur-xl border-b border-white/[0.06] py-8 px-6 flex flex-col gap-6 shadow-2xl animate-fade-in"
         >
           <nav className="flex flex-col gap-4">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                onClick={() => setIsMobileOpen(false)}
-                className="mobile-nav-item opacity-0 text-lg uppercase tracking-widest text-expo-warm hover:text-expo-gold transition-colors py-2 border-b border-expo-border/20"
-              >
-                {item.name}
-              </a>
-            ))}
+            {navItems.map((item) => {
+              const isActive = activeSection === item.href;
+              return (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsMobileOpen(false)}
+                  className={`mobile-nav-item opacity-0 text-lg uppercase tracking-widest transition-colors py-2 border-b border-expo-border/20 ${
+                    isActive ? "text-expo-gold font-bold" : "text-expo-warm hover:text-expo-gold"
+                  }`}
+                >
+                  {item.name}
+                </a>
+              );
+            })}
           </nav>
 
           <div className="mobile-nav-item opacity-0 flex flex-col gap-4 mt-2">

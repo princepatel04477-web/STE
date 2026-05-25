@@ -382,3 +382,57 @@ html.lenis, html.lenis body {
 .scroll-indicator-dot {
   animation: scrollPulse 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
+
+/* Premium Hindi Typography Utilities */
+.text-hindi {
+  line-height: 1.85 !important;
+  letter-spacing: 0.02em !important;
+  word-spacing: 0.04em !important;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reduced Devanagari heading sizes relative to English counterparts to balance visual weight */
+.h1-hindi, h1.text-hindi {
+  font-size: calc(100% - 2px) !important;
+}
+.h2-hindi, h2.text-hindi {
+  font-size: calc(100% - 2px) !important;
+}
+.h3-hindi, h3.text-hindi {
+  font-size: calc(100% - 2px) !important;
+}
+.h4-hindi, h4.text-hindi {
+  font-size: calc(100% - 2px) !important;
+}
+
+/* Premium Horizontal Scrolling Container */
+.horizontal-scroll-premium {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-x: contain !important;
+  scroll-behavior: smooth !important;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.horizontal-scroll-premium::-webkit-scrollbar {
+  display: none !important; /* Hide scrollbars */
+}
+
+/* Premium Scroll Snap Child Card */
+.scroll-snap-card {
+  scroll-snap-align: start !important;
+  flex-shrink: 0 !important;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+/* Luxury cubic-bezier easing transition curve */
+.ease-luxury {
+  transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1) !important;
+}

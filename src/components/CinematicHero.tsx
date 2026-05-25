@@ -10,6 +10,11 @@ export default function CinematicHero() {
 
   const [isMounted, setIsMounted] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
+
+  const handleViewBrochure = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent("open-brochure"));
+  };
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -243,18 +248,17 @@ export default function CinematicHero() {
             <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-luxury" />
           </a>
 
-          {/* Download Stall Brochure */}
-          <a
-            href="/brochure.jpeg"
-            download="brochure.jpeg"
-            className="group relative px-4 py-3.5 sm:px-6 sm:py-4 bg-transparent border border-expo-gold/40 rounded-sm text-expo-gold font-sans text-[11px] sm:text-xs tracking-[1.5px] uppercase overflow-hidden hover:border-expo-gold transition-colors duration-500 flex items-center justify-center gap-1.5"
+          {/* View Stall Brochure in Modal */}
+          <button
+            onClick={handleViewBrochure}
+            className="group relative px-4 py-3.5 sm:px-6 sm:py-4 bg-transparent border border-expo-gold/40 rounded-sm text-expo-gold font-sans text-[11px] sm:text-xs tracking-[1.5px] uppercase overflow-hidden hover:border-expo-gold transition-colors duration-500 flex items-center justify-center gap-1.5 w-full sm:w-auto"
             data-cursor="click"
           >
             <span className="relative z-10 flex items-center gap-1.5 justify-center w-full">
               📄 Brochure
             </span>
             <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-luxury" />
-          </a>
+          </button>
 
           {/* Buyer Registration */}
           <a
