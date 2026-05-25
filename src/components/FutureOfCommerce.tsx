@@ -145,7 +145,7 @@ export default function FutureOfCommerce() {
               style={{
                 backgroundImage: `linear-gradient(rgba(5, 5, 5, 0.75), rgba(5, 5, 5, 0.75)), url('/assets/images/b2b-networking1.png')`,
                 backgroundSize: "cover",
-                backgroundPosition: "center",
+                backgroundPosition: "center 22%",
                 backgroundRepeat: "no-repeat",
               }}
               data-cursor="view"
@@ -175,7 +175,7 @@ export default function FutureOfCommerce() {
               style={{
                 backgroundImage: `linear-gradient(rgba(5, 5, 5, 0.7), rgba(5, 5, 5, 0.7)), url('/assets/images/b2b-networking3.png')`,
                 backgroundSize: "cover",
-                backgroundPosition: "center",
+                backgroundPosition: "center 18%",
               }}
               data-cursor="view"
             >

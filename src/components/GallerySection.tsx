@@ -12,50 +12,57 @@ interface GalleryImage {
   title: string;
   category: string;
   aspect: string;
+  position?: string;
 }
 
 const galleryData: GalleryImage[] = [
   {
     id: 1,
-    src: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=800&auto=format&fit=crop",
+    src: "/assets/images/saree1.png",
     title: "Traditional Saree Pavilion",
     category: "Sarees",
-    aspect: "aspect-[4/3]"
+    aspect: "aspect-[4/3]",
+    position: "object-[center_15%]"
   },
   {
     id: 2,
-    src: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop",
+    src: "/assets/images/lehenga.png",
     title: "Luxury Lehenga Exhibition",
     category: "Lehenga",
-    aspect: "aspect-[3/4]"
+    aspect: "aspect-[3/4]",
+    position: "object-[center_22%]"
   },
   {
     id: 3,
-    src: "https://images.unsplash.com/photo-1609357518652-6cf0416f0cbe?q=80&w=800&auto=format&fit=crop",
+    src: "/assets/images/kurti.png",
     title: "Designer Kurti Showcase",
     category: "Kurti",
-    aspect: "aspect-[1/1]"
+    aspect: "aspect-[1/1]",
+    position: "object-[center_12%]"
   },
   {
     id: 4,
-    src: "https://images.unsplash.com/photo-1594552072648-b4004a7a598f?q=80&w=800&auto=format&fit=crop",
+    src: "/assets/images/fabric-closeup.png",
     title: "Exquisite Bridal Fabrics",
     category: "Wedding Market",
-    aspect: "aspect-[3/4]"
+    aspect: "aspect-[3/4]",
+    position: "object-[center_40%]"
   },
   {
     id: 5,
-    src: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800&auto=format&fit=crop",
+    src: "/assets/images/b2b-boardroom.png",
     title: "Corporate B2B Buyer Meet",
     category: "Networking",
-    aspect: "aspect-[4/3]"
+    aspect: "aspect-[4/3]",
+    position: "object-[center_18%]"
   },
   {
     id: 6,
-    src: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=800&auto=format&fit=crop",
+    src: "/assets/images/sherwani.png",
     title: "Men's Sherwani & Ethnic Sourcing",
     category: "Sherwani",
-    aspect: "aspect-[1/1]"
+    aspect: "aspect-[1/1]",
+    position: "object-[center_15%]"
   }
 ];
 
@@ -139,7 +146,7 @@ export default function GallerySection() {
                     alt={img.title}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition-all duration-1000 ease-luxury group-hover:scale-105 filter brightness-[0.8] group-hover:brightness-100"
+                    className={`object-cover ${img.position || "object-center"} transition-all duration-1000 ease-luxury group-hover:scale-105 filter brightness-[0.8] group-hover:brightness-100`}
                   />
                 </div>
 

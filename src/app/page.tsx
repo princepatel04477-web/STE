@@ -6,16 +6,20 @@ import { waapi } from "animejs";
 import Navbar from "@/components/Navbar";
 import CinematicCursor from "@/components/CinematicCursor";
 import CinematicHero from "@/components/CinematicHero";
+import CollaborationSection from "@/components/CollaborationSection";
 import PowerOfSurat from "@/components/PowerOfSurat";
+import BusinessEcosystem from "@/components/BusinessEcosystem";
 import FabricInMotion from "@/components/FabricInMotion";
 import ExhibitionExperience from "@/components/ExhibitionExperience";
 import FashionEditorial from "@/components/FashionEditorial";
 import FutureOfCommerce from "@/components/FutureOfCommerce";
 import BilingualSection from "@/components/BilingualSection";
 import TrustSection from "@/components/TrustSection";
+import SponsorSection from "@/components/SponsorSection";
 import PremiumTransitions from "@/components/PremiumTransitions";
 import FestivalSeason from "@/components/FestivalSeason";
 import CountdownSection from "@/components/CountdownSection";
+import BuyerRegistration from "@/components/BuyerRegistration";
 import FinalCTA from "@/components/FinalCTA";
 import MobileStickyCTA from "@/components/MobileStickyCTA";
 import Footer from "@/components/Footer";
@@ -92,8 +96,16 @@ export default function Home() {
 
       <PremiumTransitions mode="gold-tunnel" /> {/* Section 8 - Transition A */}
 
+      <div id="collaboration">
+        <CollaborationSection />
+      </div>
+
       <div id="power-of-surat">
         <PowerOfSurat /> {/* Section 2 */}
+      </div>
+
+      <div id="business-ecosystem">
+        <BusinessEcosystem />
       </div>
 
       <div id="fabric-in-motion">
@@ -126,8 +138,16 @@ export default function Home() {
         <TrustSection />
       </div>
 
+      <div id="media-wall">
+        <SponsorSection />
+      </div>
+
       <div id="countdown-section">
         <CountdownSection />
+      </div>
+
+      <div id="buyer-registration">
+        <BuyerRegistration />
       </div>
 
       <div id="final-cta">

@@ -10,6 +10,7 @@ export default function CinematicHero() {
 
   const [isMounted, setIsMounted] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
+  const [stats, setStats] = useState({ exhibitors: 0, buyers: 0, nations: 0, area: 0 });
 
   const handleViewBrochure = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -104,6 +105,38 @@ export default function CinematicHero() {
     };
   }, []);
 
+  useEffect(() => {
+    if (isMounted) {
+      const endExhibitors = 650;
+      const endBuyers = 8000;
+      const endNations = 24;
+      const endArea = 40000;
+      
+      const duration = 2000; // ms
+      const stepTime = 30;
+      const steps = duration / stepTime;
+      
+      let currentStep = 0;
+      
+      const timer = setInterval(() => {
+        currentStep++;
+        setStats({
+          exhibitors: Math.min(endExhibitors, Math.floor((endExhibitors / steps) * currentStep)),
+          buyers: Math.min(endBuyers, Math.floor((endBuyers / steps) * currentStep)),
+          nations: Math.min(endNations, Math.floor((endNations / steps) * currentStep)),
+          area: Math.min(endArea, Math.floor((endArea / steps) * currentStep))
+        });
+        
+        if (currentStep >= steps) {
+          setStats({ exhibitors: endExhibitors, buyers: endBuyers, nations: endNations, area: endArea });
+          clearInterval(timer);
+        }
+      }, stepTime);
+      
+      return () => clearInterval(timer);
+    }
+  }, [isMounted]);
+
   return (
     <section
       ref={containerRef}
@@ -138,14 +171,14 @@ export default function CinematicHero() {
 
         {/* Surreal floating figure layer */}
         <div
-          className="parallax-layer absolute right-[8%] top-[18%] w-[28vw] h-[28vw] max-w-[320px] max-h-[320px] bg-contain bg-no-repeat bg-center opacity-[0.25] mix-blend-screen"
+          className="parallax-layer absolute right-[2%] sm:right-[8%] top-[25%] sm:top-[18%] w-[45vw] h-[45vw] sm:w-[28vw] sm:h-[28vw] max-w-[320px] max-h-[320px] bg-contain bg-no-repeat bg-center opacity-[0.15] sm:opacity-[0.25] mix-blend-screen"
           style={{ backgroundImage: `url('/assets/images/floating-person.png')` }}
           data-speed="0.45"
         />
 
         {/* Undulating golden fabric highlights */}
         <div
-          className="parallax-layer absolute left-[-5%] bottom-[-5%] w-[45vw] h-[35vw] max-w-[500px] max-h-[400px] bg-contain bg-no-repeat bg-bottom bg-left opacity-[0.18] mix-blend-color-dodge scale-[1.2]"
+          className="parallax-layer absolute left-[-10%] sm:left-[-5%] bottom-[-10%] sm:bottom-[-5%] w-[60vw] h-[50vw] sm:w-[45vw] sm:h-[35vw] max-w-[500px] max-h-[400px] bg-contain bg-no-repeat bg-bottom bg-left opacity-[0.12] sm:opacity-[0.18] mix-blend-color-dodge scale-[1.1] sm:scale-[1.2]"
           style={{ backgroundImage: `url('/assets/images/golden-fabric.png')` }}
           data-speed="-0.3"
         />
@@ -167,14 +200,14 @@ export default function CinematicHero() {
           ref={headlineRef1}
           className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-[-0.02em] sm:tracking-[-0.035em] text-white mb-4 leading-[0.92] sm:leading-[0.9] lg:leading-[0.85] uppercase max-w-4xl"
         >
-          Surat&apos;s Biggest <br className="hidden sm:inline" />
+          India&apos;s Biggest <br className="hidden sm:inline" />
           <span className="text-metallic font-light italic normal-case block sm:inline mt-2 sm:mt-0 mr-2 sm:mr-2 pr-3">Textile B2B</span> Opportunity
         </h1>
 
         {/* Modernist Thin Subhead */}
         <div ref={headlineRef2} className="flex flex-col gap-2 max-w-3xl mt-2">
           <h2 className="font-sans text-base sm:text-lg md:text-xl text-expo-gold font-light tracking-[2px] leading-relaxed">
-            {"India's"} Ethnic Fashion Sourcing Event — Direct Manufacturer to Buyer Platform.
+            Where Manufacturers, Wholesalers, Exporters & Buyers Connect
           </h2>
           <p className="font-sans text-xs sm:text-sm text-expo-warm/75 tracking-[1px] font-light">
             650+ Stalls · 8000+ Verified Buyers · SIECC Sarsana Dome, Surat · September 2026
@@ -233,17 +266,15 @@ export default function CinematicHero() {
         </div>
 
         {/* Call to Actions (Interactive 3-CTA Cluster) */}
-        <div className="grid grid-cols-2 sm:flex sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-8 z-40 w-full max-w-lg sm:max-w-none">
-          {/* WhatsApp CTA */}
+        <div className="grid grid-cols-1 sm:flex sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-8 z-40 w-full max-w-lg sm:max-w-none px-4 sm:px-0">
+          {/* Book Stall CTA */}
           <a
-            href="https://wa.me/919950787787?text=I want to book a stall at STE 2026"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative col-span-2 sm:col-span-auto px-4 py-3.5 sm:px-6 sm:py-4 bg-gold-gradient rounded-sm text-expo-midnight font-bold font-sans text-[11px] sm:text-xs tracking-[1.5px] uppercase overflow-hidden shadow-lg hover:shadow-expo-glow transition-all duration-500 flex items-center justify-center gap-1.5"
+            href="#final-cta"
+            className="group relative px-6 py-4 bg-gold-gradient rounded-sm text-expo-midnight font-bold font-sans text-xs tracking-[1.5px] uppercase overflow-hidden shadow-lg hover:shadow-expo-glow transition-all duration-500 flex items-center justify-center gap-1.5 w-full sm:w-auto"
             data-cursor="explore"
           >
-            <span className="relative z-10 flex items-center gap-1.5 justify-center w-full">
-              📲 WhatsApp Book
+            <span className="relative z-10 flex items-center gap-1.5 justify-center">
+              Book Exhibition Stall
             </span>
             <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-luxury" />
           </a>
@@ -251,26 +282,45 @@ export default function CinematicHero() {
           {/* View Stall Brochure in Modal */}
           <button
             onClick={handleViewBrochure}
-            className="group relative px-4 py-3.5 sm:px-6 sm:py-4 bg-transparent border border-expo-gold/40 rounded-sm text-expo-gold font-sans text-[11px] sm:text-xs tracking-[1.5px] uppercase overflow-hidden hover:border-expo-gold transition-colors duration-500 flex items-center justify-center gap-1.5 w-full sm:w-auto"
+            className="group relative px-6 py-4 bg-transparent border border-expo-gold/45 rounded-sm text-expo-gold font-sans text-xs tracking-[1.5px] uppercase overflow-hidden hover:border-expo-gold transition-colors duration-500 flex items-center justify-center gap-1.5 w-full sm:w-auto"
             data-cursor="click"
           >
-            <span className="relative z-10 flex items-center gap-1.5 justify-center w-full">
-              📄 Brochure
+            <span className="relative z-10 flex items-center gap-1.5 justify-center">
+              Download Brochure
             </span>
             <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-luxury" />
           </button>
 
           {/* Buyer Registration */}
           <a
-            href="#final-cta"
-            className="group relative px-4 py-3.5 sm:px-6 sm:py-4 bg-[#B87333]/25 border border-[#B87333]/50 rounded-sm text-[#F0C48A] font-sans text-[11px] sm:text-xs tracking-[1.5px] uppercase overflow-hidden hover:border-expo-gold hover:text-white transition-colors duration-500 flex items-center justify-center gap-1.5"
+            href="#buyer-registration"
+            className="group relative px-6 py-4 bg-[#B87333]/20 border border-[#B87333]/50 rounded-sm text-[#F0C48A] hover:text-white font-sans text-xs tracking-[1.5px] uppercase overflow-hidden hover:border-expo-gold transition-colors duration-500 flex items-center justify-center gap-1.5 w-full sm:w-auto"
             data-cursor="click"
           >
-            <span className="relative z-10 flex items-center gap-1.5 justify-center w-full">
-              🎫 Register
+            <span className="relative z-10 flex items-center gap-1.5 justify-center">
+              Register as Buyer
             </span>
             <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-luxury" />
           </a>
+        </div>
+
+        {/* Animated Statistics Counter Strip */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 mt-12 bg-black/45 border border-white/5 p-6 rounded-xl backdrop-blur-md max-w-4xl w-full z-40">
+          {[
+            { value: stats.exhibitors, suffix: "+", label: "Premium Exhibitors" },
+            { value: stats.buyers, suffix: "+", label: "Sourcing Buyers" },
+            { value: stats.nations, suffix: "+", label: "Sourcing Nations" },
+            { value: Math.round(stats.area / 1000), suffix: "K+", label: "Sq. Ft. Exhibition Area" }
+          ].map((stat, i) => (
+            <div key={i} className="text-center">
+              <span className="block font-serif text-2xl sm:text-4xl text-white font-light drop-shadow-[0_0_10px_rgba(214,160,102,0.25)]">
+                {stat.value.toLocaleString()}{stat.suffix}
+              </span>
+              <span className="text-[9px] uppercase tracking-[1.5px] text-expo-warm/50 block mt-2 font-sans font-semibold">
+                {stat.label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 

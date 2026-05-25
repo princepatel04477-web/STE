@@ -10,6 +10,7 @@ interface Category {
   colSpan: string;
   rowSpan: string;
   image: string;
+  position?: string;
 }
 
 const categoriesData: Category[] = [
@@ -17,49 +18,57 @@ const categoriesData: Category[] = [
     name: "Sarees",
     colSpan: "md:col-span-2",
     rowSpan: "md:row-span-2",
-    image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/images/saree2.jpg",
+    position: "object-[center_15%]"
   },
   {
     name: "Lehenga Choli",
     colSpan: "md:col-span-1",
     rowSpan: "md:row-span-1",
-    image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/images/lehenga.png",
+    position: "object-[center_22%]"
   },
   {
     name: "Kurti",
     colSpan: "md:col-span-1",
     rowSpan: "md:row-span-1",
-    image: "https://images.unsplash.com/photo-1609357518652-6cf0416f0cbe?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/images/kurti.png",
+    position: "object-[center_12%]"
   },
   {
     name: "Salwar Suit",
     colSpan: "md:col-span-1",
     rowSpan: "md:row-span-2",
-    image: "https://images.unsplash.com/photo-1631857455684-a54a2f03665f?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/images/salwar-suit.png",
+    position: "object-[center_18%]"
   },
   {
     name: "Readymade",
     colSpan: "md:col-span-1",
     rowSpan: "md:row-span-1",
-    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/images/festive_editorial_saree.png",
+    position: "object-[center_20%]"
   },
   {
     name: "Value Added Fabrics",
     colSpan: "md:col-span-2",
     rowSpan: "md:row-span-1",
-    image: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/images/fabric-closeup.png",
+    position: "object-[center_40%]"
   },
   {
     name: "Kids Wear",
     colSpan: "md:col-span-1",
     rowSpan: "md:row-span-1",
-    image: "https://images.unsplash.com/photo-1519457431-44ccd64a579b?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/images/kids-wear.png",
+    position: "object-[center_20%]"
   },
   {
     name: "Sherwani & Men's Ethnic Wear",
     colSpan: "md:col-span-3",
     rowSpan: "md:row-span-1",
-    image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=800&auto=format&fit=crop"
+    image: "/assets/images/sherwani.png",
+    position: "object-[center_15%]"
   }
 ];
 
@@ -152,7 +161,7 @@ export default function CategoriesSection() {
                   alt={cat.name}
                   fill
                   sizes="(min-width: 768px) 30vw, 90vw"
-                  className="object-cover opacity-40 group-hover:opacity-75 transition-all duration-1000 ease-luxury group-hover:scale-105 filter brightness-[0.8] group-hover:brightness-95"
+                  className={`object-cover ${cat.position || "object-center"} opacity-40 group-hover:opacity-75 transition-all duration-1000 ease-luxury group-hover:scale-105 filter brightness-[0.8] group-hover:brightness-95`}
                 />
               </div>
 

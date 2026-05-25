@@ -11,6 +11,7 @@ const PORTRAITS = [
     img: "/assets/images/editorial-queen.png",
     subtitle: "Heritage Couture",
     coords: "01 / COUTURE",
+    bgPosition: "bg-[position:center_12%] sm:bg-[position:center_15%]",
   },
   {
     title: "Trio of Silk Craft",
@@ -18,6 +19,7 @@ const PORTRAITS = [
     img: "/assets/images/editorial-trio.png",
     subtitle: "Bridal Assembly",
     coords: "02 / ANCESTRAL",
+    bgPosition: "bg-[position:center_18%] sm:bg-[position:center_20%]",
   },
   {
     title: "Chiaroscuro Silhouette",
@@ -25,6 +27,7 @@ const PORTRAITS = [
     img: "/assets/images/editorial-dark.png",
     subtitle: "Dramatic Silhouette",
     coords: "03 / EMBELLISH",
+    bgPosition: "bg-[position:center_14%] sm:bg-[position:center_18%]",
   },
   {
     title: "Modern Ethnic Weave",
@@ -32,6 +35,7 @@ const PORTRAITS = [
     img: "/assets/images/editorial-portrait1.png",
     subtitle: "Contemporary Indo-Western",
     coords: "04 / SYNTHESIS",
+    bgPosition: "bg-[position:center_12%] sm:bg-[position:center_15%]",
   },
   {
     title: "Timeless Craftsmanship",
@@ -39,6 +43,7 @@ const PORTRAITS = [
     img: "/assets/images/editorial-portrait2.png",
     subtitle: "Premium Banarasi Prints",
     coords: "05 / LEGACY",
+    bgPosition: "bg-[position:center_16%] sm:bg-[position:center_20%]",
   },
 ];
 
@@ -255,9 +260,9 @@ export default function FashionEditorial() {
                   data-cursor="explore"
                 >
                   {/* Image box */}
-                  <div className="relative w-full aspect-[3/4] overflow-hidden border border-white/10 rounded-sm bg-neutral-900 shadow-2xl">
+                  <div className="relative w-full aspect-[4/5] overflow-hidden border border-white/10 rounded-sm bg-neutral-900 shadow-2xl">
                     <div
-                      className="absolute inset-0 bg-cover bg-center filter brightness-[0.7] group-hover:brightness-[0.9] group-hover:scale-[1.04] transition-all duration-[900ms] luxury"
+                      className={`absolute inset-0 bg-cover ${p.bgPosition || "bg-center"} filter brightness-[0.7] group-hover:brightness-[0.9] group-hover:scale-[1.04] transition-all duration-[900ms] luxury`}
                       style={{ backgroundImage: `url('${p.img}')` }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-60 z-10 pointer-events-none" />

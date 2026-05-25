@@ -248,12 +248,12 @@ export default function FinalCTA() {
         />
         {/* Saree stall panel */}
         <div
-          className="absolute right-[5%] top-[25%] w-[15vw] h-[20vw] bg-cover bg-center border border-white/5 rounded-sm opacity-[0.08] hidden lg:block"
+          className="absolute right-[5%] top-[25%] w-[15vw] h-[20vw] bg-cover bg-[position:center_20%] border border-white/5 rounded-sm opacity-[0.08] hidden lg:block"
           style={{ backgroundImage: `url('/assets/images/expo-stall.png')` }}
         />
         {/* Couture queen panel */}
         <div
-          className="absolute left-[8%] bottom-[15%] w-[15vw] h-[20vw] bg-cover bg-center border border-white/5 rounded-sm opacity-[0.08] hidden lg:block"
+          className="absolute left-[8%] bottom-[15%] w-[15vw] h-[20vw] bg-cover bg-[position:center_15%] border border-white/5 rounded-sm opacity-[0.08] hidden lg:block"
           style={{ backgroundImage: `url('/assets/images/editorial-queen.png')` }}
         />
         {/* Line graph panel */}
