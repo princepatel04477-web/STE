@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 
+const SUPPORT_PHONE = "+919950787787";
+const SUPPORT_DISPLAY = "+91 99507 87787";
+
 export default function PrivacyPolicy() {
   return (
     <main className="min-h-screen bg-[#050505] text-expo-warm selection:bg-expo-gold/30 antialiased relative overflow-hidden py-24 sm:py-32">
@@ -90,7 +93,15 @@ export default function PrivacyPolicy() {
             <div className="bg-white/5 border border-white/10 rounded-lg p-6 font-sans text-sm text-expo-warm/80 space-y-2 max-w-md">
               <p className="font-semibold text-white">AKAS Group (STE Organizers)</p>
               <p>Email: compliance@akasgroup.in</p>
-              <p>Hotline: +91 99507 87787</p>
+              <p>
+                Hotline:{" "}
+                <a
+                  href={`tel:${SUPPORT_PHONE}`}
+                  className="text-expo-gold hover:text-white transition-colors"
+                >
+                  {SUPPORT_DISPLAY}
+                </a>
+              </p>
               <p>Address: Surat International Exhibition and Convention Centre (SIECC), Sarsana, Surat, Gujarat - 395007</p>
             </div>
           </section>

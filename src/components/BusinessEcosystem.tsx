@@ -24,7 +24,7 @@ const ECOSYSTEM_NODES = [
     title: "Exporters",
     sub: "Global Supply Networks",
     desc: "Ship Surat's world-class fabrics, value-added garments, and ethnic drapes to wholesale trade channels globally.",
-    stats: "24+ Sourcing Nations"
+    stats: "28+ States Represented"
   },
   {
     icon: <Send className="w-6 h-6 text-expo-gold" />,

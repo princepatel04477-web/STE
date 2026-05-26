@@ -7,6 +7,8 @@ import { GlassParticles } from "@/components/GlassParticles";
 
 const eventStartTime = new Date("2026-09-12T00:00:00+05:30").getTime();
 const morphWords = ["TEXTILE B2B", "SOURCING", "BUSINESS"];
+const SUPPORT_PHONE = "+919950787787";
+const SUPPORT_DISPLAY = "+91 99507 87787";
 
 type CountdownTime = {
   days: string;
@@ -213,7 +215,12 @@ export default function HeroSection() {
             </div>
             <div className="flex flex-col text-left">
               <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-expo-warm/50">Call for Stall Booking</span>
-              <span className="text-sm sm:text-base font-display tracking-wider text-expo-gold font-bold">9950787787</span>
+              <a
+                href={`tel:${SUPPORT_PHONE}`}
+                className="text-sm sm:text-base font-display tracking-wider text-expo-gold font-bold hover:text-expo-gold/80 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+              >
+                {SUPPORT_DISPLAY}
+              </a>
             </div>
           </div>
 

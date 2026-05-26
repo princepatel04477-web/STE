@@ -109,8 +109,9 @@ export default function FestivalSeason() {
               className="relative w-full aspect-[4/3] border border-white/10 rounded-sm overflow-hidden p-6 flex flex-col justify-between bg-[#050505]"
               style={{
                 backgroundImage: `linear-gradient(rgba(5, 5, 5, 0.65), rgba(5, 5, 5, 0.65)), url('/assets/images/golden-fabric.png')`,
-                backgroundSize: "cover",
+                backgroundSize: "contain",
                 backgroundPosition: "center 30%",
+                backgroundRepeat: "no-repeat",
               }}
             >
               <div className="noise-overlay" />

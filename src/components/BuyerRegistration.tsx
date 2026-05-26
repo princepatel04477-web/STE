@@ -29,6 +29,17 @@ const FABRICS = [
   "Heavy Handwork Fabrics"
 ];
 
+const PHONE_WA = "919950787787";
+const SUPPORT_DISPLAY = "+91 99507 87787";
+
+type StepErrors = Partial<{
+  buyerType: string;
+  businessName: string;
+  city: string;
+  whatsapp: string;
+  categories: string;
+}>;
+
 export default function BuyerRegistration() {
   const [step, setStep] = useState(1);
   const [buyerType, setBuyerType] = useState("");
@@ -39,6 +50,7 @@ export default function BuyerRegistration() {
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState<StepErrors>({});
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) =>
@@ -52,10 +64,38 @@ export default function BuyerRegistration() {
     );
   };
 
+  const getStepErrors = (currentStep: number): StepErrors => {
+    const nextErrors: StepErrors = {};
+    if (currentStep === 1 && !buyerType) {
+      nextErrors.buyerType = "Select a buyer profile to continue.";
+    }
+    if (currentStep === 2) {
+      if (!businessName) nextErrors.businessName = "Business name is required.";
+      if (!city) nextErrors.city = "City is required.";
+      if (!whatsapp) nextErrors.whatsapp = "WhatsApp number is required.";
+    }
+    if (currentStep === 3 && selectedCategories.length === 0) {
+      nextErrors.categories = "Choose at least one sourcing category.";
+    }
+    return nextErrors;
+  };
+
+  const clearError = (field: keyof StepErrors) => {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
   const handleNext = () => {
-    if (step === 1 && !buyerType) return;
-    if (step === 2 && (!city || !businessName || !whatsapp)) return;
-    if (step === 3 && selectedCategories.length === 0) return;
+    const nextErrors = getStepErrors(step);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+    setErrors({});
     
     if (step < 4) {
       setStep((prev) => prev + 1);
@@ -78,7 +118,7 @@ export default function BuyerRegistration() {
 
   const handleWhatsAppRedirect = () => {
     const text = `Hello STE 2026, I have registered as a B2B Buyer.\n\nBusiness: ${businessName}\nType: ${buyerType}\nCity: ${city}\nInterests: ${selectedCategories.join(", ")}`;
-    const url = `https://wa.me/919950787787?text=${encodeURIComponent(text)}`;
+    const url = `https://wa.me/${PHONE_WA}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   };
 
@@ -99,7 +139,7 @@ export default function BuyerRegistration() {
             07 • B2B BUYER ONBOARDING
           </span>
           <h2 className="font-serif text-3xl sm:text-5xl text-white tracking-wide">
-            Register as a <span className="text-metallic italic font-light">VIP Buyer</span>
+            Register as a <span className="text-metallic italic font-light">Buyer</span>
           </h2>
           <p className="font-sans text-xs sm:text-sm text-expo-warm/50 leading-relaxed mt-4 max-w-lg mx-auto">
             Acquire priority entry badges, bypass registration queues, and receive direct matching invitations from Surat’s leading manufacturers.
@@ -135,6 +175,15 @@ export default function BuyerRegistration() {
                     ))}
                   </div>
                 </div>
+                {(errors.buyerType || errors.businessName || errors.city || errors.whatsapp || errors.categories) && (
+                  <p role="alert" className="text-[10px] text-expo-gold/80 uppercase tracking-[2px]">
+                    {errors.buyerType ||
+                      errors.businessName ||
+                      errors.city ||
+                      errors.whatsapp ||
+                      errors.categories}
+                  </p>
+                )}
 
                 {/* STEP 1: BUYER TYPE */}
                 {step === 1 && (
@@ -146,7 +195,11 @@ export default function BuyerRegistration() {
                       {BUYER_TYPES.map((type) => (
                         <button
                           key={type.id}
-                          onClick={() => setBuyerType(type.name)}
+                          onClick={() => {
+                            setBuyerType(type.name);
+                            clearError("buyerType");
+                          }}
+                          aria-pressed={buyerType === type.name}
                           className={`w-full text-left p-4 rounded-xl border transition-all duration-300 flex items-center justify-between ${
                             buyerType === type.name
                               ? "bg-expo-gold/[0.04] border-expo-gold/45 shadow-[0_0_20px_rgba(214,160,102,0.08)]"
@@ -177,14 +230,27 @@ export default function BuyerRegistration() {
                     <div className="flex flex-col gap-5 mt-2">
                       <div className="flex flex-col gap-2">
                         <label className="text-[9px] tracking-[1.5px] text-expo-warm/50 uppercase font-bold">Company / Firm Name</label>
-                        <input
-                          type="text"
-                          value={businessName}
-                          onChange={(e) => setBusinessName(e.target.value)}
-                          placeholder="e.g., Vardan Fabrics & Couture"
-                          className="w-full bg-white/[0.02] border border-white/10 rounded-lg p-3 text-xs sm:text-sm text-white focus:outline-none focus:border-expo-gold/50 transition-colors"
-                        />
-                      </div>
+                          <input
+                            type="text"
+                            value={businessName}
+                            onChange={(e) => {
+                              setBusinessName(e.target.value);
+                              clearError("businessName");
+                            }}
+                            placeholder="e.g., Vardan Fabrics & Couture"
+                            aria-invalid={Boolean(errors.businessName)}
+                            aria-describedby={errors.businessName ? "businessName-error" : undefined}
+                            aria-required="true"
+                            required
+                            autoComplete="organization"
+                            className="w-full bg-white/[0.02] border border-white/10 rounded-lg p-3 text-xs sm:text-sm text-white focus:outline-none focus:border-expo-gold/50 transition-colors"
+                          />
+                          {errors.businessName && (
+                            <p id="businessName-error" role="alert" className="text-[10px] text-expo-gold/80">
+                              {errors.businessName}
+                            </p>
+                          )}
+                        </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-2">
@@ -192,10 +258,23 @@ export default function BuyerRegistration() {
                           <input
                             type="text"
                             value={city}
-                            onChange={(e) => setCity(e.target.value)}
+                            onChange={(e) => {
+                              setCity(e.target.value);
+                              clearError("city");
+                            }}
                             placeholder="e.g., Delhi, Bangalore, Mumbai"
+                            aria-invalid={Boolean(errors.city)}
+                            aria-describedby={errors.city ? "city-error" : undefined}
+                            aria-required="true"
+                            required
+                            autoComplete="address-level2"
                             className="w-full bg-white/[0.02] border border-white/10 rounded-lg p-3 text-xs sm:text-sm text-white focus:outline-none focus:border-expo-gold/50 transition-colors"
                           />
+                          {errors.city && (
+                            <p id="city-error" role="alert" className="text-[10px] text-expo-gold/80">
+                              {errors.city}
+                            </p>
+                          )}
                         </div>
 
                         <div className="flex flex-col gap-2">
@@ -203,10 +282,24 @@ export default function BuyerRegistration() {
                           <input
                             type="tel"
                             value={whatsapp}
-                            onChange={(e) => setWhatsapp(e.target.value)}
+                            onChange={(e) => {
+                              setWhatsapp(e.target.value);
+                              clearError("whatsapp");
+                            }}
                             placeholder="10-Digit Mobile Number"
+                            aria-invalid={Boolean(errors.whatsapp)}
+                            aria-describedby={errors.whatsapp ? "whatsapp-error" : undefined}
+                            aria-required="true"
+                            required
+                            inputMode="numeric"
+                            autoComplete="tel"
                             className="w-full bg-white/[0.02] border border-white/10 rounded-lg p-3 text-xs sm:text-sm text-white focus:outline-none focus:border-expo-gold/50 transition-colors"
                           />
+                          {errors.whatsapp && (
+                            <p id="whatsapp-error" role="alert" className="text-[10px] text-expo-gold/80">
+                              {errors.whatsapp}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -226,7 +319,11 @@ export default function BuyerRegistration() {
                       {CATEGORIES.map((cat) => (
                         <button
                           key={cat}
-                          onClick={() => toggleCategory(cat)}
+                          onClick={() => {
+                            toggleCategory(cat);
+                            clearError("categories");
+                          }}
+                          aria-pressed={selectedCategories.includes(cat)}
                           className={`w-full text-left p-4 rounded-xl border transition-all duration-300 flex items-center justify-between ${
                             selectedCategories.includes(cat)
                               ? "bg-expo-gold/[0.04] border-expo-gold/45 shadow-[0_0_20px_rgba(214,160,102,0.08)]"
@@ -242,6 +339,11 @@ export default function BuyerRegistration() {
                         </button>
                       ))}
                     </div>
+                    {errors.categories && (
+                      <p id="categories-error" role="alert" className="text-[10px] text-expo-gold/80">
+                        {errors.categories}
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -259,6 +361,7 @@ export default function BuyerRegistration() {
                         <button
                           key={fab}
                           onClick={() => toggleFabric(fab)}
+                          aria-pressed={selectedFabrics.includes(fab)}
                           className={`w-full text-left p-4 rounded-xl border transition-all duration-300 flex items-center justify-between ${
                             selectedFabrics.includes(fab)
                               ? "bg-expo-gold/[0.04] border-expo-gold/45 shadow-[0_0_20px_rgba(214,160,102,0.08)]"
@@ -312,13 +415,14 @@ export default function BuyerRegistration() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
                 className="flex flex-col items-center text-center py-6"
+                aria-live="polite"
               >
                 <div className="w-16 h-16 rounded-full bg-expo-gold/10 border border-expo-gold/30 flex items-center justify-center mb-6">
                   <Check className="w-8 h-8 text-expo-gold stroke-[2.5]" />
                 </div>
 
                 <span className="text-[10px] font-bold tracking-[3px] text-expo-gold uppercase mb-2">
-                  VIP Profile Registered
+                  Profile Registered
                 </span>
                 
                 <h3 className="font-serif text-2xl sm:text-3xl text-white mb-4">
@@ -326,7 +430,7 @@ export default function BuyerRegistration() {
                 </h3>
 
                 <p className="font-sans text-xs sm:text-sm text-expo-warm/60 leading-relaxed max-w-md mb-8">
-                  Your VIP B2B Buyer Onboarding profile has been successfully generated. Our trade concierge desk will verify your business status and generate your official digital badge within 24 hours.
+                  Your B2B Buyer Onboarding profile has been successfully generated. Our trade concierge desk will verify your business status and generate your official digital badge within 24 hours.
                 </p>
 
                 {/* Sourcing Summary */}
@@ -371,7 +475,7 @@ export default function BuyerRegistration() {
                 </div>
 
                 <p className="text-[9px] text-expo-warm/30 uppercase tracking-[1.5px] mt-8">
-                  Concierge Desk Call/WhatsApp Support: +91 9950787787
+                  Concierge Desk Call/WhatsApp Support: {SUPPORT_DISPLAY}
                 </p>
               </motion.div>
             )}

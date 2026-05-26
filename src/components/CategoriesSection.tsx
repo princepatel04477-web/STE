@@ -144,7 +144,7 @@ export default function CategoriesSection() {
         {/* Categories Bento Grid */}
         <div 
           ref={containerRef}
-          className="grid grid-cols-1 md:grid-cols-4 auto-rows-[200px] gap-4 md:gap-6"
+          className="grid grid-cols-1 md:grid-cols-4 auto-rows-[260px] sm:auto-rows-[300px] md:auto-rows-[200px] gap-4 md:gap-6"
         >
           {categoriesData.map((cat) => (
             <div
@@ -160,8 +160,9 @@ export default function CategoriesSection() {
                   src={cat.image}
                   alt={cat.name}
                   fill
+                  unoptimized
                   sizes="(min-width: 768px) 30vw, 90vw"
-                  className={`object-cover ${cat.position || "object-center"} opacity-40 group-hover:opacity-75 transition-all duration-1000 ease-luxury group-hover:scale-105 filter brightness-[0.8] group-hover:brightness-95`}
+                  className={`object-contain md:object-cover ${cat.position || "object-center"} opacity-60 md:opacity-40 group-hover:opacity-75 transition-all duration-1000 ease-luxury md:group-hover:scale-105 filter brightness-[0.85] group-hover:brightness-95`}
                 />
               </div>
 

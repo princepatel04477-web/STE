@@ -153,7 +153,7 @@ export default function AboutSection() {
                         alt={pillar.title}
                         fill
                         sizes="100px"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-[0.7] group-hover:brightness-100"
+                        className="object-contain transition-transform duration-700 group-hover:scale-105 filter brightness-[0.85] group-hover:brightness-100"
                       />
                     </div>
                     {/* Text contents */}

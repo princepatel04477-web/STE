@@ -12,13 +12,40 @@ const categories = [
   { value: "other", label: "Other" },
 ];
 
+type ContactFormValues = {
+  name: string;
+  company: string;
+  phone: string;
+  category: string;
+  message: string;
+};
+
+type ContactErrors = Partial<Record<keyof ContactFormValues, string>>;
+
 export default function ContactSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [formValues, setFormValues] = useState<ContactFormValues>({
+    name: "",
+    company: "",
+    phone: "",
+    category: "",
+    message: "",
+  });
+  const [errors, setErrors] = useState<ContactErrors>({});
 
   // Scroll Reveal and Glow follow effect
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setPrefersReducedMotion(media.matches);
+    updatePreference();
+    media.addEventListener("change", updatePreference);
+    return () => media.removeEventListener("change", updatePreference);
+  }, []);
+
   useEffect(() => {
     if (sectionRef.current && cardRef.current) {
       const card = cardRef.current;
@@ -27,12 +54,16 @@ export default function ContactSection() {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            waapi.animate(card as any, {
-              opacity: [0, 1],
-              translate: ["0 50px", "0 0px"],
-              duration: 1000,
-              ease: "outExpo"
-            });
+            if (!prefersReducedMotion) {
+              waapi.animate(card as any, {
+                opacity: [0, 1],
+                translate: ["0 50px", "0 0px"],
+                duration: 1000,
+                ease: "outExpo"
+              });
+            } else {
+              (card as HTMLElement).style.opacity = "1";
+            }
             observer.disconnect();
           }
         },
@@ -49,16 +80,49 @@ export default function ContactSection() {
         card.style.setProperty("--mouse-y", `${y}px`);
       };
 
-      card.addEventListener("mousemove", handleMouseMove);
+      if (!prefersReducedMotion) {
+        card.addEventListener("mousemove", handleMouseMove);
+      }
       return () => {
         observer.disconnect();
         card.removeEventListener("mousemove", handleMouseMove);
       };
     }
-  }, []);
+  }, [prefersReducedMotion]);
+
+  const clearError = (field: keyof ContactFormValues) => {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const updateField =
+    (field: keyof ContactFormValues) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      setFormValues((prev) => ({ ...prev, [field]: event.target.value }));
+      clearError(field);
+    };
+
+  const validateForm = (): ContactErrors => {
+    const nextErrors: ContactErrors = {};
+    if (!formValues.name.trim()) nextErrors.name = "Full name is required.";
+    if (!formValues.company.trim()) nextErrors.company = "Company name is required.";
+    if (!formValues.phone.trim()) nextErrors.phone = "Phone number is required.";
+    if (!formValues.category) nextErrors.category = "Select a sourcing segment.";
+    return nextErrors;
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const nextErrors = validateForm();
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+    setErrors({});
     setSubmitted(true);
   };
 
@@ -126,8 +190,13 @@ export default function ContactSection() {
                         type="text"
                         id="name"
                         required
+                        value={formValues.name}
+                        onChange={updateField("name")}
                         className="w-full bg-transparent border-b border-expo-border/50 py-3 text-expo-warm outline-none focus:border-expo-gold transition-colors duration-300 peer placeholder-transparent"
                         placeholder="Full Name"
+                        aria-invalid={Boolean(errors.name)}
+                        aria-describedby={errors.name ? "name-error" : undefined}
+                        autoComplete="name"
                       />
                       <label 
                         htmlFor="name" 
@@ -135,6 +204,11 @@ export default function ContactSection() {
                       >
                         Full Name
                       </label>
+                      {errors.name && (
+                        <p id="name-error" role="alert" className="text-[10px] text-expo-gold/80 mt-2">
+                          {errors.name}
+                        </p>
+                      )}
                     </div>
 
                     <div className="relative group">
@@ -142,8 +216,13 @@ export default function ContactSection() {
                         type="text"
                         id="company"
                         required
+                        value={formValues.company}
+                        onChange={updateField("company")}
                         className="w-full bg-transparent border-b border-expo-border/50 py-3 text-expo-warm outline-none focus:border-expo-gold transition-colors duration-300 peer placeholder-transparent"
                         placeholder="Company Name"
+                        aria-invalid={Boolean(errors.company)}
+                        aria-describedby={errors.company ? "company-error" : undefined}
+                        autoComplete="organization"
                       />
                       <label 
                         htmlFor="company" 
@@ -151,6 +230,11 @@ export default function ContactSection() {
                       >
                         Company Name
                       </label>
+                      {errors.company && (
+                        <p id="company-error" role="alert" className="text-[10px] text-expo-gold/80 mt-2">
+                          {errors.company}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -161,8 +245,14 @@ export default function ContactSection() {
                         type="tel"
                         id="phone"
                         required
+                        value={formValues.phone}
+                        onChange={updateField("phone")}
                         className="w-full bg-transparent border-b border-expo-border/50 py-3 text-expo-warm outline-none focus:border-expo-gold transition-colors duration-300 peer placeholder-transparent"
                         placeholder="Phone Number"
+                        aria-invalid={Boolean(errors.phone)}
+                        aria-describedby={errors.phone ? "phone-error" : undefined}
+                        inputMode="numeric"
+                        autoComplete="tel"
                       />
                       <label 
                         htmlFor="phone" 
@@ -170,14 +260,25 @@ export default function ContactSection() {
                       >
                         Phone Number
                       </label>
+                      {errors.phone && (
+                        <p id="phone-error" role="alert" className="text-[10px] text-expo-gold/80 mt-2">
+                          {errors.phone}
+                        </p>
+                      )}
                     </div>
 
                     <div className="relative group">
+                      <label htmlFor="category" className="sr-only">
+                        Select Sourcing Segment
+                      </label>
                       <select
                         id="category"
                         required
+                        value={formValues.category}
+                        onChange={updateField("category")}
                         className="w-full bg-transparent border-b border-expo-border/50 py-3 text-expo-warm/80 outline-none focus:border-expo-gold transition-colors duration-300 appearance-none cursor-pointer"
-                        defaultValue=""
+                        aria-invalid={Boolean(errors.category)}
+                        aria-describedby={errors.category ? "category-error" : undefined}
                       >
                         <option value="" disabled className="bg-expo-midnight text-expo-warm/40">Select Sourcing Segment</option>
                         {categories.map((cat) => (
@@ -189,6 +290,11 @@ export default function ContactSection() {
                       <div className="absolute right-0 top-4 pointer-events-none text-expo-warm/40">
                         ▼
                       </div>
+                      {errors.category && (
+                        <p id="category-error" role="alert" className="text-[10px] text-expo-gold/80 mt-2">
+                          {errors.category}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -197,6 +303,8 @@ export default function ContactSection() {
                     <textarea
                       id="message"
                       rows={3}
+                      value={formValues.message}
+                      onChange={updateField("message")}
                       className="w-full bg-transparent border-b border-expo-border/50 py-3 text-expo-warm outline-none focus:border-expo-gold transition-colors duration-300 peer placeholder-transparent resize-none"
                       placeholder="Message"
                     />
@@ -222,8 +330,11 @@ export default function ContactSection() {
                 </form>
               </>
             ) : (
-              <div className="text-center py-16 flex flex-col items-center">
-                <div className="w-20 h-20 rounded-full border border-expo-gold/40 flex items-center justify-center mb-8 bg-expo-midnight relative">
+                <div className="text-center py-16 flex flex-col items-center">
+                  <div className="sr-only" aria-live="polite">
+                    Registration received. Our team will contact you within 24 hours.
+                  </div>
+                  <div className="w-20 h-20 rounded-full border border-expo-gold/40 flex items-center justify-center mb-8 bg-expo-midnight relative">
                   <div className="absolute inset-0 bg-expo-gold/5 rounded-full blur-md animate-pulse" />
                   <span className="text-expo-gold text-3xl font-display">✓</span>
                 </div>

@@ -28,6 +28,7 @@ import BrochureModal from "@/components/BrochureModal";
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isBrochureOpen, setIsBrochureOpen] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const handleOpen = () => setIsBrochureOpen(true);
@@ -36,23 +37,39 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // Hide preloader after a short cinematic reveal interval (2.2 seconds)
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setPrefersReducedMotion(media.matches);
+    updatePreference();
+    media.addEventListener("change", updatePreference);
+    return () => media.removeEventListener("change", updatePreference);
+  }, []);
+
+  useEffect(() => {
+    if (!loading) return;
+    if (prefersReducedMotion) {
+      const frame = window.requestAnimationFrame(() => setLoading(false));
+      return () => window.cancelAnimationFrame(frame);
+    }
+
     const timer = setTimeout(() => {
       const loader = document.getElementById("cinematic-preloader");
-      if (loader) {
-        waapi.animate(loader, {
-          opacity: 0,
-          duration: 800,
-          ease: "outQuad",
-          onComplete: () => {
-            setLoading(false);
-          },
-        });
+      if (!loader) {
+        setLoading(false);
+        return;
       }
-    }, 2200);
+
+      waapi.animate(loader, {
+        opacity: 0,
+        duration: 800,
+        ease: "outQuad",
+        onComplete: () => {
+          setLoading(false);
+        },
+      });
+    }, 1400);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [loading, prefersReducedMotion]);
 
   return (
     <main className="min-h-screen bg-expo-midnight w-full overflow-hidden relative select-text selection:bg-expo-gold/30 text-expo-warm antialiased">
@@ -65,6 +82,8 @@ export default function Home() {
         <div
           id="cinematic-preloader"
           className="fixed inset-0 z-[10000] bg-[#050505] flex flex-col justify-center items-center select-none"
+          role="status"
+          aria-live="polite"
         >
           <div className="noise-overlay" />
           <div className="grid-overlay-pattern absolute inset-0 opacity-[0.03]" />
@@ -82,6 +101,14 @@ export default function Home() {
             <span className="font-serif text-3xl font-light italic text-white tracking-[2px]">
               Orchestrating Couture...
             </span>
+            <button
+              type="button"
+              onClick={() => setLoading(false)}
+              className="mt-6 text-[9px] uppercase tracking-[0.3em] text-expo-warm/70 hover:text-expo-gold transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+              aria-label="Skip intro"
+            >
+              Skip Intro
+            </button>
           </div>
         </div>
       )}

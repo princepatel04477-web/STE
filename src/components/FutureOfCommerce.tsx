@@ -144,8 +144,8 @@ export default function FutureOfCommerce() {
               className="commerce-panel opacity-0 translate-y-[25px] relative w-full h-[240px] border border-white/10 rounded-sm overflow-hidden p-6 flex flex-col justify-end"
               style={{
                 backgroundImage: `linear-gradient(rgba(5, 5, 5, 0.75), rgba(5, 5, 5, 0.75)), url('/assets/images/b2b-networking1.png')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center 22%",
+                backgroundSize: "contain",
+                backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
               }}
               data-cursor="view"
@@ -174,8 +174,9 @@ export default function FutureOfCommerce() {
               className="commerce-panel opacity-0 translate-y-[25px] relative w-full h-[240px] border border-white/10 rounded-sm overflow-hidden p-6 flex flex-col justify-end"
               style={{
                 backgroundImage: `linear-gradient(rgba(5, 5, 5, 0.7), rgba(5, 5, 5, 0.7)), url('/assets/images/b2b-networking3.png')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center 18%",
+                backgroundSize: "contain",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
               }}
               data-cursor="view"
             >

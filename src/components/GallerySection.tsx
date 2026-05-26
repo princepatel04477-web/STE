@@ -11,6 +11,7 @@ interface GalleryImage {
   src: string;
   title: string;
   category: string;
+  mobileAspect: string;
   aspect: string;
   position?: string;
 }
@@ -21,7 +22,8 @@ const galleryData: GalleryImage[] = [
     src: "/assets/images/saree1.png",
     title: "Traditional Saree Pavilion",
     category: "Sarees",
-    aspect: "aspect-[4/3]",
+    mobileAspect: "aspect-[4/3]",
+    aspect: "sm:aspect-[4/3]",
     position: "object-[center_15%]"
   },
   {
@@ -29,7 +31,8 @@ const galleryData: GalleryImage[] = [
     src: "/assets/images/lehenga.png",
     title: "Luxury Lehenga Exhibition",
     category: "Lehenga",
-    aspect: "aspect-[3/4]",
+    mobileAspect: "aspect-[4/5]",
+    aspect: "sm:aspect-[3/4]",
     position: "object-[center_22%]"
   },
   {
@@ -37,7 +40,8 @@ const galleryData: GalleryImage[] = [
     src: "/assets/images/kurti.png",
     title: "Designer Kurti Showcase",
     category: "Kurti",
-    aspect: "aspect-[1/1]",
+    mobileAspect: "aspect-[4/3]",
+    aspect: "sm:aspect-[1/1]",
     position: "object-[center_12%]"
   },
   {
@@ -45,7 +49,8 @@ const galleryData: GalleryImage[] = [
     src: "/assets/images/fabric-closeup.png",
     title: "Exquisite Bridal Fabrics",
     category: "Wedding Market",
-    aspect: "aspect-[3/4]",
+    mobileAspect: "aspect-[4/3]",
+    aspect: "sm:aspect-[3/4]",
     position: "object-[center_40%]"
   },
   {
@@ -53,7 +58,8 @@ const galleryData: GalleryImage[] = [
     src: "/assets/images/b2b-boardroom.png",
     title: "Corporate B2B Buyer Meet",
     category: "Networking",
-    aspect: "aspect-[4/3]",
+    mobileAspect: "aspect-[4/3]",
+    aspect: "sm:aspect-[4/3]",
     position: "object-[center_18%]"
   },
   {
@@ -61,7 +67,8 @@ const galleryData: GalleryImage[] = [
     src: "/assets/images/sherwani.png",
     title: "Men's Sherwani & Ethnic Sourcing",
     category: "Sherwani",
-    aspect: "aspect-[1/1]",
+    mobileAspect: "aspect-[4/3]",
+    aspect: "sm:aspect-[1/1]",
     position: "object-[center_15%]"
   }
 ];
@@ -137,7 +144,7 @@ export default function GallerySection() {
               <div
                 key={img.id}
                 onClick={() => setSelectedImg(img)}
-                className={`gallery-item scroll-snap-card opacity-0 flex-shrink-0 w-[78vw] sm:w-auto snap-start sm:snap-none group relative overflow-hidden rounded-xl border border-expo-border/50 bg-expo-midnight cursor-pointer transition-all duration-700 hover:border-expo-gold/40 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)] ${img.aspect} break-inside-avoid sm:mb-6`}
+                className={`gallery-item scroll-snap-card opacity-0 flex-shrink-0 w-[82vw] sm:w-auto snap-start sm:snap-none group relative overflow-hidden rounded-xl border border-expo-border/50 bg-expo-midnight cursor-pointer transition-all duration-700 hover:border-expo-gold/40 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)] ${img.mobileAspect} ${img.aspect} break-inside-avoid sm:mb-6`}
               >
                 {/* Image Component */}
                 <div className="relative w-full h-full">
@@ -145,8 +152,9 @@ export default function GallerySection() {
                     src={img.src}
                     alt={img.title}
                     fill
+                    unoptimized
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className={`object-cover ${img.position || "object-center"} transition-all duration-1000 ease-luxury group-hover:scale-105 filter brightness-[0.8] group-hover:brightness-100`}
+                    className={`object-contain sm:object-cover ${img.position || "object-center"} transition-all duration-1000 ease-luxury sm:group-hover:scale-105 filter brightness-[0.85] sm:brightness-[0.8] group-hover:brightness-100`}
                   />
                 </div>
 
@@ -199,6 +207,7 @@ export default function GallerySection() {
               src={selectedImg.src}
               alt={selectedImg.title}
               fill
+              unoptimized
               className="object-contain"
             />
             {/* Overlay Details */}

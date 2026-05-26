@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 
+const PHONE_TEL = "+919950787787";
+const PHONE_WA = "919950787787";
+
 export default function MobileStickyCTA() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -31,8 +34,9 @@ export default function MobileStickyCTA() {
         
         {/* 1. Direct Call Hotline */}
         <a
-          href="tel:+919950787787"
-          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300"
+          href={`tel:${PHONE_TEL}`}
+          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+          aria-label="Call the STE team"
         >
           <span className="text-lg">📞</span>
           <span className="text-[9px] uppercase tracking-[1px] font-sans font-bold mt-1">Call</span>
@@ -40,10 +44,11 @@ export default function MobileStickyCTA() {
 
         {/* 2. Direct WhatsApp Book */}
         <a
-          href="https://wa.me/919950787787?text=I%20want%20to%20book%20a%20stall%20at%20STE%202026"
+          href={`https://wa.me/${PHONE_WA}?text=I%20want%20to%20book%20a%20stall%20at%20STE%202026`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300 bg-[#FF9933]/5"
+          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300 bg-[#FF9933]/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+          aria-label="Message on WhatsApp"
         >
           <span className="text-lg">📲</span>
           <span className="text-[9px] uppercase tracking-[1px] font-sans font-bold mt-1 text-[#FFBF80]">WhatsApp</span>
@@ -52,7 +57,8 @@ export default function MobileStickyCTA() {
         {/* 3. Brochure View Modal */}
         <button
           onClick={handleViewBrochure}
-          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300 w-full"
+          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300 w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+          aria-label="Open brochure"
         >
           <span className="text-lg">📄</span>
           <span className="text-[9px] uppercase tracking-[1px] font-sans font-bold mt-1">Brochure</span>
@@ -61,7 +67,8 @@ export default function MobileStickyCTA() {
         {/* 4. Scroll to Register Form */}
         <a
           href="#final-cta"
-          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300"
+          className="flex flex-col items-center justify-center h-full text-white hover:text-expo-gold transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+          aria-label="Jump to registration"
         >
           <span className="text-lg">🎫</span>
           <span className="text-[9px] uppercase tracking-[1px] font-sans font-bold mt-1">Register</span>

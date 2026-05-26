@@ -6,6 +6,9 @@ import Image from 'next/image';
 import { Instagram, Facebook, Twitter, Linkedin, Phone, Mail, MapPin } from 'lucide-react';
 import { waapi } from 'animejs';
 
+const PHONE_TEL = "+919950787787";
+const PHONE_DISPLAY = "+91 99507 87787";
+
 export default function Footer() {
   const footerRef = useRef<HTMLDivElement>(null);
 
@@ -66,19 +69,35 @@ export default function Footer() {
               The official digital identity of India&apos;s largest textile sourcing ecosystem. A hyper-premium B2B exhibition showcase.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full border border-expo-border/50 flex items-center justify-center hover:border-expo-gold hover:text-expo-gold transition-colors duration-300 relative group">
+              <a
+                href="#"
+                aria-label="Instagram"
+                className="w-10 h-10 rounded-full border border-expo-border/50 flex items-center justify-center hover:border-expo-gold hover:text-expo-gold transition-colors duration-300 relative group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+              >
                 <span className="absolute inset-0 bg-expo-gold/10 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Instagram className="w-4 h-4 relative z-10" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-expo-border/50 flex items-center justify-center hover:border-expo-gold hover:text-expo-gold transition-colors duration-300 relative group">
+              <a
+                href="#"
+                aria-label="Facebook"
+                className="w-10 h-10 rounded-full border border-expo-border/50 flex items-center justify-center hover:border-expo-gold hover:text-expo-gold transition-colors duration-300 relative group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+              >
                 <span className="absolute inset-0 bg-expo-gold/10 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Facebook className="w-4 h-4 relative z-10" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-expo-border/50 flex items-center justify-center hover:border-expo-gold hover:text-expo-gold transition-colors duration-300 relative group">
+              <a
+                href="#"
+                aria-label="Twitter"
+                className="w-10 h-10 rounded-full border border-expo-border/50 flex items-center justify-center hover:border-expo-gold hover:text-expo-gold transition-colors duration-300 relative group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+              >
                 <span className="absolute inset-0 bg-expo-gold/10 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Twitter className="w-4 h-4 relative z-10" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-expo-border/50 flex items-center justify-center hover:border-expo-gold hover:text-expo-gold transition-colors duration-300 relative group">
+              <a
+                href="#"
+                aria-label="LinkedIn"
+                className="w-10 h-10 rounded-full border border-expo-border/50 flex items-center justify-center hover:border-expo-gold hover:text-expo-gold transition-colors duration-300 relative group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+              >
                 <span className="absolute inset-0 bg-expo-gold/10 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Linkedin className="w-4 h-4 relative z-10" />
               </a>
@@ -120,10 +139,15 @@ export default function Footer() {
                  <MapPin className="w-4 h-4 text-expo-gold shrink-0 mt-0.5" />
                  <span>SIECC Sarsana Dome,<br/>Surat, Gujarat, India</span>
                </div>
-               <div className="flex items-center gap-3">
-                 <Phone className="w-4 h-4 text-expo-gold shrink-0" />
-                 <span className="text-base font-display tracking-widest text-expo-warm font-bold">9950787787</span>
-               </div>
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-expo-gold shrink-0" />
+                  <a
+                    href={`tel:${PHONE_TEL}`}
+                    className="text-base font-display tracking-widest text-expo-warm font-bold hover:text-expo-gold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
+                  >
+                    {PHONE_DISPLAY}
+                  </a>
+                </div>
                <div className="flex items-center gap-3">
                  <Mail className="w-4 h-4 text-expo-gold shrink-0" />
                  <span>info@suratexpo.com</span>

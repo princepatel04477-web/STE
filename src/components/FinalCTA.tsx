@@ -6,6 +6,10 @@ import { waapi, splitText, stagger } from "animejs";
 import { motion, AnimatePresence } from "framer-motion";
 import LoomGateVerification from "./LoomGateVerification";
 
+const SUPPORT_PHONE = "+919950787787";
+const SUPPORT_DISPLAY = "+91 99507 87787";
+const SUPPORT_WA = "919950787787";
+
 export default function FinalCTA() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const headlineRef = useRef<HTMLHeadingElement | null>(null);
@@ -196,10 +200,10 @@ export default function FinalCTA() {
 *Category:* ${formData.primaryCategory}
 *Stall Dimension:* ${formData.stallDimension} sq meters
 *Turnover:* ${formData.turnover}
-*Message:* ${formData.message || "N/A"}`;
+    *Message:* ${formData.message || "N/A"}`;
 
     const encoded = encodeURIComponent(textMessage);
-    window.open(`https://wa.me/919950787787?text=${encoded}`, "_blank");
+    window.open(`https://wa.me/${SUPPORT_WA}?text=${encoded}`, "_blank");
   };
 
   const slideVariants = {
@@ -758,10 +762,10 @@ export default function FinalCTA() {
               </div>
               
               <a
-                href="tel:+919950787787"
-                className="w-full py-3 bg-transparent border border-white/5 hover:border-expo-gold/30 hover:text-expo-gold text-expo-warm/50 rounded-sm font-sans font-bold text-center text-[10px] tracking-[2px] uppercase overflow-hidden transition-all duration-500"
+                href={`tel:${SUPPORT_PHONE}`}
+                className="w-full py-3 bg-transparent border border-white/5 hover:border-expo-gold/30 hover:text-expo-gold text-expo-warm/50 rounded-sm font-sans font-bold text-center text-[10px] tracking-[2px] uppercase overflow-hidden transition-all duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold"
               >
-                CALL SOURCING HOTLINE: +91 9950787787
+                CALL SOURCING HOTLINE: {SUPPORT_DISPLAY}
               </a>
             </form>
 
@@ -843,7 +847,7 @@ export default function FinalCTA() {
             </div>
             
             <p className="text-[9px] text-expo-warm/30 uppercase tracking-[1.5px] mt-6">
-              Our sourcing hotline is open 24/7 at +91 9950787787
+              Our sourcing hotline is open 24/7 at {SUPPORT_DISPLAY}
             </p>
           </div>
         </div>

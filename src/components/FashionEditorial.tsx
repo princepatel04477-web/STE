@@ -1,55 +1,155 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { waapi, splitText, stagger } from "animejs";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 const PORTRAITS = [
   {
-    title: "Imperial Sarees",
-    desc: "Intricately detailed metallic weaves of heavy royal silks.",
-    img: "/assets/images/editorial-queen.png",
-    subtitle: "Heritage Couture",
-    coords: "01 / COUTURE",
-    bgPosition: "bg-[position:center_12%] sm:bg-[position:center_15%]",
+    title: "Where Heritage Meets Grandeur",
+    desc: "Preserving centuries of Banarasi and Gujarati weaving legacy, redesigned for global luxury boutiques.",
+    img: "/assets/images/editorial-saree.png",
+    subtitle: "Couture Heritage",
+    coords: "01 / WEAVE",
+    objectPosition: {
+      mobile: "center 12%",
+      tablet: "center 15%",
+      desktop: "center 15%",
+    },
+    aspect: "aspect-[4/5]",
+    scaleClass: "lg:scale-[1.02] lg:group-hover:scale-[1.05]",
   },
   {
-    title: "Trio of Silk Craft",
-    desc: "A breathtaking display of detailed ethnic prints and drapes.",
-    img: "/assets/images/editorial-trio.png",
-    subtitle: "Bridal Assembly",
-    coords: "02 / ANCESTRAL",
-    bgPosition: "bg-[position:center_18%] sm:bg-[position:center_20%]",
+    title: "Crafted with Golden Precision",
+    desc: "High-definition Zardosi and Zari detailing woven by master artisans, representing Surat's premium embellishment scale.",
+    img: "/assets/images/editorial-zari.png",
+    subtitle: "Embroidery Excellence",
+    coords: "02 / EMBROIDERY",
+    objectPosition: {
+      mobile: "center center",
+      tablet: "center center",
+      desktop: "center center",
+    },
+    aspect: "aspect-[4/5]",
+    scaleClass: "lg:scale-[1.02] lg:group-hover:scale-[1.05]",
   },
   {
-    title: "Chiaroscuro Silhouette",
-    desc: "A dramatic composition highlighting intricate embroidery.",
-    img: "/assets/images/editorial-dark.png",
-    subtitle: "Dramatic Silhouette",
-    coords: "03 / EMBELLISH",
-    bgPosition: "bg-[position:center_14%] sm:bg-[position:center_18%]",
+    title: "The Scale of Global Commerce",
+    desc: "Immersive boutique exhibition spaces presenting advanced weaving technologies and high-end merchandising setups.",
+    img: "/assets/images/editorial-booth.png",
+    subtitle: "Textile Innovation",
+    coords: "03 / EXHIBITION",
+    objectPosition: {
+      mobile: "center center",
+      tablet: "center center",
+      desktop: "center center",
+    },
+    aspect: "aspect-[4/5]",
+    scaleClass: "lg:scale-[1.02] lg:group-hover:scale-[1.05]",
   },
   {
-    title: "Modern Ethnic Weave",
-    desc: "Merging heritage looms with contemporary Western draping.",
-    img: "/assets/images/editorial-portrait1.png",
-    subtitle: "Contemporary Indo-Western",
-    coords: "04 / SYNTHESIS",
-    bgPosition: "bg-[position:center_12%] sm:bg-[position:center_15%]",
-  },
-  {
-    title: "Timeless Craftsmanship",
-    desc: "Premium sarees engineered for elite global luxury boutique showcases.",
-    img: "/assets/images/editorial-portrait2.png",
-    subtitle: "Premium Banarasi Prints",
-    coords: "05 / LEGACY",
-    bgPosition: "bg-[position:center_16%] sm:bg-[position:center_20%]",
+    title: "The Future of Ethnic Luxury",
+    desc: "Striking ivory bridal couture showcasing fluid silhouettes and modern structural elegance for elite markets.",
+    img: "/assets/images/editorial-lehenga.png",
+    subtitle: "Bridal Weaves",
+    coords: "04 / COUTURE",
+    objectPosition: {
+      mobile: "center 16%",
+      tablet: "center 20%",
+      desktop: "center 20%",
+    },
+    aspect: "aspect-[4/5]",
+    scaleClass: "lg:scale-[1.02] lg:group-hover:scale-[1.05]",
   },
 ];
 
 export default function FashionEditorial() {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const headlineRef = useRef<HTMLHeadingElement | null>(null);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+
+  // Responsive state for mobile checks
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1024px)");
+    const listener = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
+  }, []);
+
+  // Screen size tracking for responsive inline styling (mobile < 640px, tablet < 1024px, desktop >= 1024px)
+  const [screenSize, setScreenSize] = useState<"mobile" | "tablet" | "desktop">("desktop");
+
+  useEffect(() => {
+    const checkSize = () => {
+      if (window.innerWidth < 640) {
+        setScreenSize("mobile");
+      } else if (window.innerWidth < 1024) {
+        setScreenSize("tablet");
+      } else {
+        setScreenSize("desktop");
+      }
+    };
+    checkSize();
+    window.addEventListener("resize", checkSize);
+    return () => window.removeEventListener("resize", checkSize);
+  }, []);
+
+  // Set up Framer Motion scroll tracker with lerp smoothing (damping)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 70,
+    damping: 24,
+    restDelta: 0.001
+  });
+
+  // Layer 1 — Background Atmosphere (Subtle luxury gradients & drifting mesh glow)
+  const bgY = useTransform(smoothProgress, [0, 1], ["-6%", "6%"]);
+  const bgScale = useTransform(smoothProgress, [0, 1], [1.02, 1.08]);
+  const glowOpacity = useTransform(smoothProgress, [0, 0.5, 1], [0.35, 0.7, 0.35]);
+
+  // Layer 2 — Main Editorial Hero Video Backplate
+  const heroY = useTransform(smoothProgress, [0, 1], ["-12%", "12%"]);
+  const heroOpacity = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0.15, 0.45, 0.45, 0.15]);
+  const heroScale = useTransform(smoothProgress, [0, 1], [1.04, 1.15]);
+
+  // Layer 3 — Product Cards (Asymmetrical motion speeds)
+  const yLeft = useTransform(
+    smoothProgress,
+    [0, 1],
+    isMobile ? ["-20px", "20px"] : ["-60px", "60px"]
+  );
+  const yCenter = useTransform(
+    smoothProgress,
+    [0, 1],
+    isMobile ? ["-10px", "10px"] : ["-30px", "30px"]
+  );
+  const scaleCenter = useTransform(
+    smoothProgress,
+    [0, 1],
+    isMobile ? [0.99, 1.01] : [0.97, 1.05]
+  );
+  const yRight = useTransform(
+    smoothProgress,
+    [0, 1],
+    isMobile ? ["-30px", "30px"] : ["-90px", "90px"]
+  );
+
+  // Layer 4 — Typography (Upward weightless drift & opacity reveals)
+  const textY = useTransform(
+    smoothProgress,
+    [0, 0.5, 1],
+    isMobile ? ["15px", "0px", "-15px"] : ["45px", "0px", "-45px"]
+  );
+  const textOpacity = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0.4, 1, 1, 0.4]);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     // Reveal main headline
@@ -119,35 +219,6 @@ export default function FashionEditorial() {
     };
   }, []);
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isHovering, setIsHovering] = useState(false);
-
-  // Scroll to a specific slide helper
-  const scrollToSlide = (index: number) => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-    
-    const cards = scrollContainer.querySelectorAll(".editorial-card");
-    if (cards.length === 0) return;
-    
-    const cardWidth = (cards[0] as HTMLElement).offsetWidth + 32; // card width + gap-8 (32px)
-    scrollContainer.scrollTo({
-      left: index * cardWidth,
-      behavior: "smooth"
-    });
-    setActiveIndex(index);
-  };
-
-  const handlePrev = () => {
-    const prevIndex = activeIndex === 0 ? PORTRAITS.length - 1 : activeIndex - 1;
-    scrollToSlide(prevIndex);
-  };
-
-  const handleNext = () => {
-    const nextIndex = activeIndex === PORTRAITS.length - 1 ? 0 : activeIndex + 1;
-    scrollToSlide(nextIndex);
-  };
-
   // Sync activeIndex on manual scrolls/swipes
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -197,33 +268,72 @@ export default function FashionEditorial() {
   }, [isHovering]);
 
   return (
-    <section
+    <motion.section
+      ref={sectionRef}
       id="fashion-editorial"
-      className="relative w-full py-24 sm:py-32 bg-[#050505] overflow-hidden"
+      className="relative w-full py-24 sm:py-32 bg-[#050505] overflow-visible"
+      style={{
+        perspective: "1000px",
+        transformStyle: "preserve-3d",
+      }}
     >
-      {/* Dynamic Backplate video */}
-      <div className="absolute inset-0 w-full h-full select-none pointer-events-none z-0">
+      {/* Layer 1 — Background Atmosphere */}
+      <motion.div
+        style={{
+          y: bgY,
+          scale: bgScale,
+          transformStyle: "preserve-3d",
+          willChange: "transform",
+        }}
+        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      >
+        <div className="absolute inset-0 bg-mesh-dark opacity-80" />
+        <motion.div
+          style={{ opacity: glowOpacity }}
+          className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,_rgba(214,160,102,0.15),_transparent_60%)]"
+        />
+        <div className="noise-overlay z-20" />
+      </motion.div>
+
+      {/* Layer 2 — Main Editorial Hero (Drifting model backplate) */}
+      <motion.div
+        style={{
+          y: heroY,
+          opacity: heroOpacity,
+          scale: heroScale,
+          transformStyle: "preserve-3d",
+          willChange: "transform, opacity",
+        }}
+        className="absolute inset-0 w-full h-full select-none pointer-events-none z-0"
+      >
         <video
-          className="w-full h-full object-cover filter brightness-[0.2] contrast-[1.1] opacity-75"
+          className="w-full h-full object-cover filter brightness-[0.25] contrast-[1.1]"
           autoPlay
           muted
           loop
           playsInline
           src="/assets/video/editorial.mp4"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/20 to-[#050505] z-10" />
-        <div className="noise-overlay z-20" />
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505] z-10" />
+      </motion.div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24">
-        {/* Section Header */}
-        <div className="max-w-4xl mb-16 sm:mb-24">
+        {/* Layer 4 — Typography (Upward weightless drifting header) */}
+        <motion.div
+          style={{
+            y: textY,
+            opacity: textOpacity,
+            transformStyle: "preserve-3d",
+            willChange: "transform, opacity",
+          }}
+          className="max-w-4xl mb-16 sm:mb-24"
+        >
           <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             05 • LUXURY EDITORIAL
           </span>
           <h2
             ref={headlineRef}
-            className="font-serif text-3xl sm:text-5xl md:text-7xl tracking-tight text-white leading-[1.1]"
+            className="font-serif text-3xl sm:text-5xl md:text-7xl tracking-tight text-white leading-[1.1] text-balance"
           >
             The Luxury Sensation: <br />
             <span className="text-metallic font-light italic">Heritage Couture</span>
@@ -231,11 +341,11 @@ export default function FashionEditorial() {
           <p className="font-sans text-sm sm:text-base text-expo-warm/60 max-w-xl leading-relaxed mt-6">
             A premium visual testament to textile craftsmanship. Explore high-definition editorial showcases featuring elite ethnic draping and luxurious embroideries.
           </p>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Horizontal Couture Portrait Showcase */}
-      <div className="relative w-full z-10">
+      {/* Layer 3 — Product Cards Showcase with Asymmetrical Depth Offset */}
+      <div className="relative w-full z-10 overflow-visible">
         {/* Left & Right Edge Fade Gradients */}
         <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" />
@@ -244,26 +354,54 @@ export default function FashionEditorial() {
           ref={scrollContainerRef}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
-          className="horizontal-scroll-premium scrollbar-none px-6 sm:px-12 lg:px-24 py-6 w-full"
+          className="horizontal-scroll-premium scrollbar-none px-6 sm:px-12 lg:px-24 py-6 w-full overflow-x-auto overflow-y-visible lg:overflow-visible"
         >
-          <div className="flex gap-8 pr-24 min-w-max">
+          <div className="flex gap-8 pr-24 min-w-max overflow-visible py-6">
             {PORTRAITS.map((p, idx) => {
               const isSelfActive = activeIndex === idx;
+
+              // Assign asymmetrical speeds/scales based on card layout indexes
+              let cardY = yCenter;
+              let cardScale = undefined;
+
+              if (idx % 3 === 0) {
+                cardY = yLeft;
+              } else if (idx % 3 === 1) {
+                cardY = yCenter;
+                cardScale = scaleCenter;
+              } else {
+                cardY = yRight;
+              }
+
               return (
-                <div
+                <motion.div
                   key={idx}
+                  style={{
+                    y: cardY,
+                    scale: cardScale,
+                    transformStyle: "preserve-3d",
+                    willChange: "transform",
+                  }}
                   className={`editorial-card scroll-snap-card opacity-0 translate-x-[50px] w-[80vw] sm:w-[50vw] lg:w-[32vw] flex flex-col group transition-all duration-700 ease-luxury ${
-                    isSelfActive 
-                      ? "scale-100 opacity-100 filter blur-0" 
-                      : "scale-[0.96] opacity-45 filter blur-[0.8px]"
+                    isSelfActive
+                      ? "opacity-100"
+                      : "opacity-45"
                   }`}
                   data-cursor="explore"
                 >
                   {/* Image box */}
-                  <div className="relative w-full aspect-[4/5] overflow-hidden border border-white/10 rounded-sm bg-neutral-900 shadow-2xl">
-                    <div
-                      className={`absolute inset-0 bg-cover ${p.bgPosition || "bg-center"} filter brightness-[0.7] group-hover:brightness-[0.9] group-hover:scale-[1.04] transition-all duration-[900ms] luxury`}
-                      style={{ backgroundImage: `url('${p.img}')` }}
+                  <div className={`relative w-full ${p.aspect || "aspect-[4/5]"} overflow-hidden border border-white/10 rounded-sm bg-neutral-900 shadow-2xl`}>
+                    <Image
+                      src={p.img}
+                      alt={p.title}
+                      fill
+                      unoptimized
+                      sizes="(min-width: 1024px) 32vw, (min-width: 640px) 50vw, 80vw"
+                      className={`object-contain lg:object-cover ${p.scaleClass || "lg:scale-[1.02] lg:group-hover:scale-[1.05]"} filter brightness-[0.78] lg:brightness-[0.7] group-hover:brightness-[0.9] transition-all duration-[900ms] ease-luxury`}
+                      style={{
+                        objectPosition: screenSize === "mobile" ? p.objectPosition.mobile : screenSize === "tablet" ? p.objectPosition.tablet : p.objectPosition.desktop
+                      }}
+                      priority={idx === 0}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-60 z-10 pointer-events-none" />
                     <div className="noise-overlay" />
@@ -288,67 +426,19 @@ export default function FashionEditorial() {
                       {p.desc}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         </div>
       </div>
 
-      {/* Left/Right Premium Navigation Buttons */}
-      <div className="absolute top-[60%] -translate-y-1/2 left-4 sm:left-8 z-30 hidden sm:block">
-        <button
-          onClick={handlePrev}
-          className="w-12 h-12 rounded-full border border-expo-gold/20 bg-[#050505]/75 hover:bg-expo-gold hover:text-expo-midnight hover:border-expo-gold text-expo-gold hover:shadow-expo-glow transition-all duration-300 flex items-center justify-center backdrop-blur-md"
-          aria-label="Previous Slide"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-      </div>
-
-      <div className="absolute top-[60%] -translate-y-1/2 right-4 sm:right-8 z-30 hidden sm:block">
-        <button
-          onClick={handleNext}
-          className="w-12 h-12 rounded-full border border-expo-gold/20 bg-[#050505]/75 hover:bg-expo-gold hover:text-expo-midnight hover:border-expo-gold text-expo-gold hover:shadow-expo-glow transition-all duration-300 flex items-center justify-center backdrop-blur-md"
-          aria-label="Next Slide"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Premium Pagination Indicator Dots */}
-      <div className="flex justify-center items-center gap-2 mt-6 z-30 relative">
-        {PORTRAITS.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => scrollToSlide(idx)}
-            className={`transition-all duration-500 rounded-full h-1.5 ${
-              activeIndex === idx 
-                ? "w-8 bg-expo-gold shadow-[0_0_10px_rgba(214,160,102,0.6)]" 
-                : "w-2 bg-expo-warm/30 hover:bg-expo-warm/60"
-            }`}
-            aria-label={`Go to slide ${idx + 1}`}
-          />
-        ))}
-      </div>
-
       {/* Horizontal scroll advice overlay for desktop */}
       <div className="hidden lg:flex justify-end max-w-7xl mx-auto px-24 mt-8 pointer-events-none">
         <span className="font-sans text-[9px] tracking-[3px] text-expo-warm/30 uppercase animate-pulse">
-          Use Navigation Buttons or Mouse Wheel to Explore →
+          Use Touchpad or Mouse Wheel to Explore →
         </span>
       </div>
-
-      {/* Mobile Swipe Indicator */}
-      <div className="lg:hidden flex justify-center items-center gap-2 mt-6 pointer-events-none">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-expo-gold opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-expo-gold"></span>
-        </span>
-        <span className="font-sans text-[9px] tracking-[3px] text-expo-gold uppercase animate-pulse">
-          Swipe to View More
-        </span>
-      </div>
-    </section>
+    </motion.section>
   );
 }

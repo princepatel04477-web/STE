@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShieldCheck, Users, Network, TrendingUp } from "lucide-react";

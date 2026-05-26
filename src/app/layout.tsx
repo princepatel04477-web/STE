@@ -19,6 +19,34 @@ export const metadata: Metadata = {
     "Lehenga Manufacturers Surat", 
     "AKAS Group Exhibition"
   ],
+  metadataBase: new URL("https://stex2.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Surat Textile Exhibition 2026 (STE)",
+    description:
+      "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 80,000+ buyers at SIECC, Surat.",
+    url: "/",
+    siteName: "Surat Textile Exhibition 2026",
+    type: "website",
+    locale: "en_IN",
+    images: [
+      {
+        url: "/logo_STE.png",
+        width: 1200,
+        height: 630,
+        alt: "Surat Textile Exhibition 2026",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Surat Textile Exhibition 2026 (STE)",
+    description:
+      "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 80,000+ buyers at SIECC, Surat.",
+    images: ["/logo_STE.png"],
+  },
 };
 
 export default function RootLayout({

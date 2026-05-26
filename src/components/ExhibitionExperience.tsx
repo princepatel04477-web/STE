@@ -132,8 +132,9 @@ export default function ExhibitionExperience() {
               className="relative w-full sm:w-1/2 aspect-[4/5] border border-white/10 rounded-sm overflow-hidden p-6 flex flex-col justify-between bg-[#050505]"
               style={{
                 backgroundImage: `linear-gradient(rgba(5, 5, 5, 0.65), rgba(5, 5, 5, 0.65)), url('/assets/images/expo-stall.png')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center 20%",
+                backgroundSize: "contain",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
               }}
               data-cursor="view"
             >

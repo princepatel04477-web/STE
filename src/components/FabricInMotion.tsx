@@ -8,63 +8,71 @@ const GALLERY_ITEMS = [
     title: "Heritage Kanjivaram & Georgette",
     category: "Sarees",
     img: "/assets/images/saree1.png",
-    aspect: "aspect-[4/5]",
-    bgPosition: "bg-[position:center_15%]",
+    mobileAspect: "aspect-[4/3]",
+    aspect: "sm:aspect-[4/5]",
+    bgPosition: "bg-center sm:bg-[position:center_15%]",
     desc: "Intricately detailed silk, georgette, and metallic gold weaves from Surat's master designer looms.",
   },
   {
     title: "Heavy Embroidered Suit Materials",
     category: "Dress Materials",
     img: "/assets/images/salwar-suit.png",
-    aspect: "aspect-[4/5]",
-    bgPosition: "bg-[position:center_18%]",
+    mobileAspect: "aspect-[4/5]",
+    aspect: "sm:aspect-[4/5]",
+    bgPosition: "bg-center sm:bg-[position:center_18%]",
     desc: "Premium salwar kameez fabrics and semi-stitched sets featuring sophisticated festive embroidery.",
   },
   {
     title: "Boutique Fusion Kurtis & Tunics",
     category: "Kurtis",
     img: "/assets/images/kurti.png",
-    aspect: "aspect-[4/5]",
-    bgPosition: "bg-[position:center_12%]",
+    mobileAspect: "aspect-[4/3]",
+    aspect: "sm:aspect-[4/5]",
+    bgPosition: "bg-center sm:bg-[position:center_12%]",
     desc: "Modern everyday elegance and high-end boutique fusion wear crafted for premium retail buyers.",
   },
   {
     title: "Imperial Sherwanis & Indo-Western",
     category: "Menswear",
     img: "/assets/images/sherwani.png",
-    aspect: "aspect-[4/5]",
-    bgPosition: "bg-[position:center_15%]",
+    mobileAspect: "aspect-[4/3]",
+    aspect: "sm:aspect-[4/5]",
+    bgPosition: "bg-center sm:bg-[position:center_15%]",
     desc: "Royal wedding sherwanis, bandhgalas, and designer kurta-pajama fabrics radiating heritage prestige.",
   },
   {
     title: "Value Added Embroidery & Laces",
     category: "Embroidery",
     img: "/assets/images/lehenga.png",
-    aspect: "aspect-[4/5]",
-    bgPosition: "bg-[position:center_22%]",
+    mobileAspect: "aspect-[4/5]",
+    aspect: "sm:aspect-[4/5]",
+    bgPosition: "bg-center sm:bg-[position:center_22%]",
     desc: "Opulent border trims, wedding lehenga panels, and high-density sequin embroidery patterns.",
   },
   {
     title: "Surat Premium Pure Silk Weaves",
     category: "Silk",
     img: "/assets/images/kids-wear.png",
-    aspect: "aspect-[1/1]",
-    bgPosition: "bg-[position:center_20%]",
+    mobileAspect: "aspect-[4/5]",
+    aspect: "sm:aspect-[1/1]",
+    bgPosition: "bg-center sm:bg-[position:center_20%]",
     desc: "Lustrous heavy brocades and authentic raw silk textiles suited for national couture showrooms.",
   },
   {
     title: "Handwoven Cotton & Linen Filaments",
     category: "Cotton",
     img: "/assets/images/festive_editorial_saree.png",
-    aspect: "aspect-[1/1]",
-    bgPosition: "bg-[position:center_20%]",
+    mobileAspect: "aspect-[1/1]",
+    aspect: "sm:aspect-[1/1]",
+    bgPosition: "bg-center sm:bg-[position:center_20%]",
     desc: "Lightweight, highly breathable organic threads curated for spring-summer trade cycles.",
   },
   {
     title: "Bespoke Digital Prints & Jacquards",
     category: "Designer Fabrics",
     img: "/assets/images/fabric-gold.png",
-    aspect: "aspect-[1/1]",
+    mobileAspect: "aspect-[4/3]",
+    aspect: "sm:aspect-[1/1]",
     bgPosition: "bg-center",
     desc: "High-grade jacquards, organza, crepe, and printed base materials for direct custom production.",
   },
@@ -72,7 +80,6 @@ const GALLERY_ITEMS = [
 
 export default function FabricInMotion() {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Reveal animation on load/scroll
@@ -102,26 +109,6 @@ export default function FabricInMotion() {
     }
 
     return () => observer.disconnect();
-  }, []);
-
-  // Intercept scroll event to allow horizontal scrolling on mouse wheel
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      if (e.deltaY !== 0) {
-        // Prevent default browser scrolling only if the mouse is hovered over the gallery container
-        e.preventDefault();
-        scrollContainer.scrollBy({
-          left: e.deltaY * 1.5,
-          behavior: "smooth"
-        });
-      }
-    };
-
-    scrollContainer.addEventListener("wheel", handleWheel, { passive: false });
-    return () => scrollContainer.removeEventListener("wheel", handleWheel);
   }, []);
 
   return (
@@ -198,31 +185,21 @@ export default function FabricInMotion() {
           </div>
         </div>
 
-        {/* Horizontal Scrolling Gallery */}
-        <div className="relative w-full">
-          {/* Side Fading Overlays */}
-          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none hidden sm:block" />
-          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none hidden sm:block" />
-
+        {/* Visual Editorial Grid */}
+        <div className="relative w-full overflow-visible">
           <div
-            ref={scrollContainerRef}
-            className="flex gap-8 overflow-x-auto snap-x snap-mandatory scrollbar-none pb-8 w-full"
-            style={{
-              scrollSnapType: "x mandatory",
-              overscrollBehaviorX: "contain",
-              WebkitOverflowScrolling: "touch",
-            }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10 w-full"
           >
             {GALLERY_ITEMS.map((item, i) => (
               <div
                 key={i}
-                className="gallery-card scroll-snap-card opacity-0 translate-y-[40px] flex-shrink-0 w-[82vw] sm:w-[48vw] md:w-[380px] lg:w-[420px] flex flex-col group snap-start"
+                className="gallery-card opacity-0 translate-y-[40px] w-full flex flex-col group"
                 data-cursor="explore"
               >
                 {/* Image Card Container */}
-                <div className={`relative w-full ${item.aspect} overflow-hidden border border-white/10 rounded-sm shadow-xl bg-neutral-950`}>
+                <div className={`relative w-full ${item.mobileAspect} ${item.aspect} overflow-hidden border border-white/10 rounded-sm shadow-xl bg-neutral-950`}>
                   <div
-                    className={`absolute inset-0 bg-cover ${item.bgPosition} filter brightness-[0.7] group-hover:brightness-[0.95] group-hover:scale-[1.04] transition-all duration-[800ms] ease-luxury`}
+                    className={`absolute inset-0 bg-contain bg-no-repeat sm:bg-cover ${item.bgPosition} filter brightness-[0.82] sm:brightness-[0.7] group-hover:brightness-[0.95] sm:group-hover:scale-[1.04] transition-all duration-[800ms] ease-luxury`}
                     style={{ backgroundImage: `url('${item.img}')` }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-70 z-10 pointer-events-none" />

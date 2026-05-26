@@ -11,6 +11,7 @@ export default function CinematicHero() {
   const [isMounted, setIsMounted] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [stats, setStats] = useState({ exhibitors: 0, buyers: 0, nations: 0, area: 0 });
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const handleViewBrochure = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -22,6 +23,14 @@ export default function CinematicHero() {
     minutes: 0,
     seconds: 0
   });
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setPrefersReducedMotion(media.matches);
+    updatePreference();
+    media.addEventListener("change", updatePreference);
+    return () => media.removeEventListener("change", updatePreference);
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -50,7 +59,7 @@ export default function CinematicHero() {
     const interval = setInterval(updateCountdown, 1000);
 
     // 1. Heading Anime.js Reveals
-    if (headlineRef1.current) {
+    if (!prefersReducedMotion && headlineRef1.current) {
       const split1 = splitText(headlineRef1.current, {
         chars: true,
         accessible: true,
@@ -65,7 +74,7 @@ export default function CinematicHero() {
       });
     }
 
-    if (headlineRef2.current) {
+    if (!prefersReducedMotion && headlineRef2.current) {
       const split2 = splitText(headlineRef2.current, {
         words: true,
         accessible: true,
@@ -98,19 +107,28 @@ export default function CinematicHero() {
       });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    if (!prefersReducedMotion) {
+      window.addEventListener("mousemove", handleMouseMove);
+    }
     return () => {
       clearInterval(interval);
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     if (isMounted) {
       const endExhibitors = 650;
       const endBuyers = 8000;
-      const endNations = 24;
+      const endNations = 28;
       const endArea = 40000;
+
+      if (prefersReducedMotion) {
+        const frame = window.requestAnimationFrame(() => {
+          setStats({ exhibitors: endExhibitors, buyers: endBuyers, nations: endNations, area: endArea });
+        });
+        return () => window.cancelAnimationFrame(frame);
+      }
       
       const duration = 2000; // ms
       const stepTime = 30;
@@ -135,7 +153,7 @@ export default function CinematicHero() {
       
       return () => clearInterval(timer);
     }
-  }, [isMounted]);
+  }, [isMounted, prefersReducedMotion]);
 
   return (
     <section
@@ -309,7 +327,7 @@ export default function CinematicHero() {
           {[
             { value: stats.exhibitors, suffix: "+", label: "Premium Exhibitors" },
             { value: stats.buyers, suffix: "+", label: "Sourcing Buyers" },
-            { value: stats.nations, suffix: "+", label: "Sourcing Nations" },
+            { value: stats.nations, suffix: "+", label: "States Represented" },
             { value: Math.round(stats.area / 1000), suffix: "K+", label: "Sq. Ft. Exhibition Area" }
           ].map((stat, i) => (
             <div key={i} className="text-center">
