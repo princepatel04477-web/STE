@@ -33,7 +33,7 @@ export default function CollaborationSection() {
             <span className="text-metallic font-light italic">Alliance of Industrial Trust</span>
           </h2>
           <p className="font-sans text-sm sm:text-base text-expo-warm/60 leading-relaxed mt-6 max-w-xl">
-            Surat Textile Exhibition (STE) joins forces with Adatiya Kapad Association Surat (AKAS) to orchestrate India’s most trusted, verified, and high-impact B2B textile sourcing ecosystem.
+            Surat Textile Exhibition (STE) joins forces with Adatiya Kapda Association Surat (AKAS) to orchestrate India’s most trusted, verified, and high-impact B2B textile sourcing ecosystem.
           </p>
         </div>
 
@@ -159,7 +159,7 @@ export default function CollaborationSection() {
               </div>
 
               <h3 className="font-serif text-2xl sm:text-3xl text-white mb-4">
-                Adatiya Kapad Association
+                Adatiya Kapda Association Surat
               </h3>
               
               <p className="font-sans text-xs sm:text-sm text-expo-warm/70 leading-relaxed mb-6">

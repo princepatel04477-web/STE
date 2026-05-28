@@ -7,10 +7,10 @@ const GALLERY_ITEMS = [
   {
     title: "Heritage Kanjivaram & Georgette",
     category: "Sarees",
-    img: "/assets/images/saree1.png",
+    img: "/assets/images/Saree.jpg",
     mobileAspect: "aspect-[4/3]",
     aspect: "sm:aspect-[4/5]",
-    bgPosition: "bg-center sm:bg-[position:center_15%]",
+    bgPosition: "bg-[position:30%_0%] bg-[size:150%_auto]",
     desc: "Intricately detailed silk, georgette, and metallic gold weaves from Surat's master designer looms.",
   },
   {
@@ -19,16 +19,16 @@ const GALLERY_ITEMS = [
     img: "/assets/images/salwar-suit.png",
     mobileAspect: "aspect-[4/5]",
     aspect: "sm:aspect-[4/5]",
-    bgPosition: "bg-center sm:bg-[position:center_18%]",
+    bgPosition: "bg-cover bg-center sm:bg-[position:center_18%]",
     desc: "Premium salwar kameez fabrics and semi-stitched sets featuring sophisticated festive embroidery.",
   },
   {
     title: "Boutique Fusion Kurtis & Tunics",
     category: "Kurtis",
-    img: "/assets/images/kurti.png",
+    img: "/assets/images/Kurti.png",
     mobileAspect: "aspect-[4/3]",
     aspect: "sm:aspect-[4/5]",
-    bgPosition: "bg-center sm:bg-[position:center_12%]",
+    bgPosition: "bg-[position:center_0%] bg-[size:150%_auto]",
     desc: "Modern everyday elegance and high-end boutique fusion wear crafted for premium retail buyers.",
   },
   {
@@ -37,7 +37,7 @@ const GALLERY_ITEMS = [
     img: "/assets/images/sherwani.png",
     mobileAspect: "aspect-[4/3]",
     aspect: "sm:aspect-[4/5]",
-    bgPosition: "bg-center sm:bg-[position:center_15%]",
+    bgPosition: "bg-cover bg-[position:73%_center] sm:bg-[position:73%_15%]",
     desc: "Royal wedding sherwanis, bandhgalas, and designer kurta-pajama fabrics radiating heritage prestige.",
   },
   {
@@ -46,16 +46,16 @@ const GALLERY_ITEMS = [
     img: "/assets/images/lehenga.png",
     mobileAspect: "aspect-[4/5]",
     aspect: "sm:aspect-[4/5]",
-    bgPosition: "bg-center sm:bg-[position:center_22%]",
+    bgPosition: "bg-cover bg-center sm:bg-[position:center_22%]",
     desc: "Opulent border trims, wedding lehenga panels, and high-density sequin embroidery patterns.",
   },
   {
     title: "Surat Premium Pure Silk Weaves",
     category: "Silk",
-    img: "/assets/images/kids-wear.png",
+    img: "/assets/images/f_kidswear.jpeg",
     mobileAspect: "aspect-[4/5]",
     aspect: "sm:aspect-[1/1]",
-    bgPosition: "bg-center sm:bg-[position:center_20%]",
+    bgPosition: "bg-[position:center_42%] sm:bg-[position:center_36%] bg-[size:220%_auto]",
     desc: "Lustrous heavy brocades and authentic raw silk textiles suited for national couture showrooms.",
   },
   {
@@ -64,7 +64,7 @@ const GALLERY_ITEMS = [
     img: "/assets/images/festive_editorial_saree.png",
     mobileAspect: "aspect-[1/1]",
     aspect: "sm:aspect-[1/1]",
-    bgPosition: "bg-center sm:bg-[position:center_20%]",
+    bgPosition: "bg-cover bg-center sm:bg-[position:center_20%]",
     desc: "Lightweight, highly breathable organic threads curated for spring-summer trade cycles.",
   },
   {
@@ -73,7 +73,7 @@ const GALLERY_ITEMS = [
     img: "/assets/images/fabric-gold.png",
     mobileAspect: "aspect-[4/3]",
     aspect: "sm:aspect-[1/1]",
-    bgPosition: "bg-center",
+    bgPosition: "bg-cover bg-center",
     desc: "High-grade jacquards, organza, crepe, and printed base materials for direct custom production.",
   },
 ];
@@ -199,7 +199,7 @@ export default function FabricInMotion() {
                 {/* Image Card Container */}
                 <div className={`relative w-full ${item.mobileAspect} ${item.aspect} overflow-hidden border border-white/10 rounded-sm shadow-xl bg-neutral-950`}>
                   <div
-                    className={`absolute inset-0 bg-contain bg-no-repeat sm:bg-cover ${item.bgPosition} filter brightness-[0.82] sm:brightness-[0.7] group-hover:brightness-[0.95] sm:group-hover:scale-[1.04] transition-all duration-[800ms] ease-luxury`}
+                    className={`absolute inset-0 bg-no-repeat ${item.bgPosition} filter brightness-[0.82] sm:brightness-[0.7] group-hover:brightness-[0.95] sm:group-hover:scale-[1.04] transition-all duration-[800ms] ease-luxury`}
                     style={{ backgroundImage: `url('${item.img}')` }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-70 z-10 pointer-events-none" />
