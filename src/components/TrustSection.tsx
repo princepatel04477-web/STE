@@ -332,7 +332,7 @@ export default function TrustSection() {
                               e.stopPropagation();
                               emblaApi?.scrollPrev();
                             }}
-                            className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-white/30 text-white transition-colors duration-300"
+                            className="w-11 h-11 rounded-full border border-white/10 flex items-center justify-center hover:border-white/30 text-white transition-colors duration-300 active:scale-95"
                             aria-label="Previous testimonial"
                           >
                             ‹
@@ -342,7 +342,7 @@ export default function TrustSection() {
                               e.stopPropagation();
                               emblaApi?.scrollNext();
                             }}
-                            className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-white/30 text-white transition-colors duration-300"
+                            className="w-11 h-11 rounded-full border border-white/10 flex items-center justify-center hover:border-white/30 text-white transition-colors duration-300 active:scale-95"
                             aria-label="Next testimonial"
                           >
                             ›
@@ -355,16 +355,20 @@ export default function TrustSection() {
               </div>
               
               {/* Dot Indicators */}
-              <div className="flex justify-center gap-2 pb-4">
+              <div className="flex justify-center gap-1 pb-4">
                 {scrollSnaps.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => emblaApi?.scrollTo(index)}
-                    className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                      index === selectedIndex ? "bg-expo-gold" : "bg-expo-copper/30"
-                    }`}
+                    className="w-11 h-11 flex items-center justify-center"
                     aria-label={`Go to slide ${index + 1}`}
-                  />
+                  >
+                    <span
+                      className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                        index === selectedIndex ? "bg-expo-gold" : "bg-expo-copper/30"
+                      }`}
+                    />
+                  </button>
                 ))}
               </div>        </div>
 

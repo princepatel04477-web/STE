@@ -287,7 +287,7 @@ export default function Navbar() {
               transitionDelay: "400ms"
             }}
           >
-            <div className="relative flex items-center bg-black/40 border border-white/10 rounded-full p-0.5 select-none w-[120px] h-[36px] overflow-hidden">
+            <div className="relative flex items-center bg-black/40 border border-white/10 rounded-full p-0.5 select-none w-[120px] h-[44px] overflow-hidden">
               <div
                 className="absolute top-0.5 bottom-0.5 rounded-full bg-expo-gold/25 border border-expo-gold/45 transition-all duration-300 ease-out"
                 style={{

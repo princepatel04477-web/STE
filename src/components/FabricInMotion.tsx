@@ -309,16 +309,20 @@ export default function FabricInMotion() {
             </div>
  
             {/* Dot Indicators */}
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="flex justify-center gap-1 mt-4">
               {scrollSnaps.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => emblaApi?.scrollTo(index)}
-                  className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 badge-tap ${
-                    index === selectedIndex ? "bg-expo-gold" : "bg-expo-copper/30"
-                  }`}
+                  className="w-11 h-11 flex items-center justify-center badge-tap"
                   aria-label={`Go to slide ${index + 1}`}
-                />
+                >
+                  <span
+                    className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${
+                      index === selectedIndex ? "bg-expo-gold" : "bg-expo-copper/30"
+                    }`}
+                  />
+                </button>
               ))}
             </div>
           </div>

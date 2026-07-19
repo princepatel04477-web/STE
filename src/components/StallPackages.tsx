@@ -106,7 +106,7 @@ export default function StallPackages() {
           <SlideFromLeft delay={0} className="h-full">
             <TapCard className="h-full">
               <motion.div
-                whileHover={{ y: -8, boxShadow: "0 24px 48px rgba(212,175,55,0.15)" }}
+                whileHover={typeof window !== "undefined" && window.innerWidth >= 1024 ? { y: -8, boxShadow: "0 24px 48px rgba(212,175,55,0.15)" } : {}}
                 className="relative bg-black/40 border border-white/5 p-8 rounded-2xl flex flex-col justify-between h-full transition-all duration-300 overflow-hidden card-tap"
                 style={{ borderTop: "3px solid #D4AF37" }}
               >
@@ -172,7 +172,7 @@ export default function StallPackages() {
           <FadeUp delay={0.12} className="h-full">
             <TapCard className="h-full">
               <motion.div
-                whileHover={{ y: -20, boxShadow: "0 24px 48px rgba(212,175,55,0.25)" }}
+                whileHover={typeof window !== "undefined" && window.innerWidth >= 1024 ? { y: -20, boxShadow: "0 24px 48px rgba(212,175,55,0.25)" } : {}}
                 className="relative bg-black/50 border border-expo-gold/30 p-8 rounded-2xl flex flex-col justify-between h-full transition-all duration-300 border-l-[4px] border-l-[#D4AF37] lg:border-l lg:-translate-y-4 shadow-xl card-tap gold-border-pulse"
                 style={{ borderTop: "3px solid #D4AF37" }}
               >
@@ -245,7 +245,7 @@ export default function StallPackages() {
           <SlideFromRight delay={0.24} className="h-full">
             <TapCard className="h-full">
               <motion.div
-                whileHover={{ y: -8, boxShadow: "0 24px 48px rgba(212,175,55,0.25)" }}
+                whileHover={typeof window !== "undefined" && window.innerWidth >= 1024 ? { y: -8, boxShadow: "0 24px 48px rgba(212,175,55,0.25)" } : {}}
                 className="rotating-gradient-border relative bg-black/45 p-8 rounded-2xl flex flex-col justify-between h-full transition-all duration-300 overflow-hidden card-tap"
               >
                 <div>
