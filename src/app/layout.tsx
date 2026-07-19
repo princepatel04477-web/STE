@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Surat Textile Exhibition 2026 (STE) | India's Premier B2B Sourcing Machine",
-  description: "Official portal for Surat Textile Exhibition 2026 (STE) organized by AKAS Group. Showcase for 650+ exhibitors & 80,000+ B2B buyers at SIECC, Surat.",
+  description: "Official portal for Surat Textile Exhibition 2026 (STE) organized by AKAS Group. Showcase for 650+ exhibitors & 8,000+ B2B customers at SIECC, Surat.",
   keywords: [
     "Surat Textile Exhibition", 
     "STE 2026", 
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Surat Textile Exhibition 2026 (STE)",
     description:
-      "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 80,000+ buyers at SIECC, Surat.",
+      "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 8,000+ B2B customers at SIECC, Surat.",
     url: "/",
     siteName: "Surat Textile Exhibition 2026",
     type: "website",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Surat Textile Exhibition 2026 (STE)",
     description:
-      "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 80,000+ buyers at SIECC, Surat.",
+      "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 8,000+ B2B customers at SIECC, Surat.",
     images: ["/assets/logo_STE.webp"],
   },
 };
@@ -72,7 +72,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Event",
     "name": "Surat Textile Exhibition (STE) 2026",
-    "description": "India's premier B2B textile sourcing exhibition showcasing heritage drapes, sarees, premium lehengas, kurtis, and contemporary wedding wear. Explore 650+ exhibitors and 80,000+ buyers from across the world.",
+    "description": "India's premier B2B textile sourcing exhibition showcasing heritage drapes, sarees, premium lehengas, kurtis, and contemporary wedding wear. Explore 650+ exhibitors and 8,000+ B2B customers from across the world.",
     "startDate": "2026-09-12T10:00:00+05:30",
     "endDate": "2026-09-13T18:00:00+05:30",
     "eventStatus": "https://schema.org/EventScheduled",

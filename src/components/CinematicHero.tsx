@@ -500,12 +500,12 @@ export default function CinematicHero() {
               labelHi: "सत्यापित B2B खरीदार"
             },
             {
-              end: 500,
+              end: 950,
               prefix: "",
               suffix: "+",
-              fallback: "500+",
-              labelEn: "Premium Exhibitors",
-              labelHi: "प्रीमियम प्रदर्शक"
+              fallback: "950+",
+              labelEn: "Agents",
+              labelHi: "एजेंट"
             }
           ].map((stat, i) => (
             <div 

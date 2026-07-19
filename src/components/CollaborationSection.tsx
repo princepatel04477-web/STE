@@ -133,7 +133,7 @@ export default function CollaborationSection() {
                       <Translate en="Reach:" hi="पहुंच:" />
                     </span>
                     <span className="text-white text-sm font-bold font-sans">
-                      <Translate en="80,000+ Sourcing Footfalls" hi="80,000+ सोर्सिंग खरीदार" />
+                      <Translate en="8,000+ Customers" hi="8,000+ ग्राहक" />
                     </span>
                   </div>
                 </div>
