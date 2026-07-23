@@ -32,12 +32,14 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    let lastScrolled = false;
     const handleScroll = () => {
       const threshold = window.innerWidth < 768 ? 60 : 80;
-      if (window.scrollY > threshold) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      const nowScrolled = window.scrollY > threshold;
+      // Only re-render when crossing the threshold
+      if (nowScrolled !== lastScrolled) {
+        lastScrolled = nowScrolled;
+        setIsScrolled(nowScrolled);
       }
     };
 

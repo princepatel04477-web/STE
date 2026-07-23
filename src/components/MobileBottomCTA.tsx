@@ -16,12 +16,14 @@ export default function MobileBottomCTA() {
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
     if (!isMobile) return;
 
+    let lastVisible = false;
     const handleScroll = () => {
       // Show CTA bar after user scrolls 300px (past the hero fold)
-      if (window.scrollY > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
+      const shouldShow = window.scrollY > 300;
+      // Only trigger React re-render when visibility actually changes
+      if (shouldShow !== lastVisible) {
+        lastVisible = shouldShow;
+        setIsVisible(shouldShow);
       }
     };
 

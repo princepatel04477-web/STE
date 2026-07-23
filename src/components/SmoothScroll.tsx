@@ -2,13 +2,16 @@
 
 import { useEffect } from 'react';
 import Lenis from 'lenis';
-import gsap from 'gsap';
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // On touch/mobile devices, skip Lenis entirely.
+    // Native browser scrolling is smoother, uses compositor thread,
+    // and doesn't add any main-thread JS overhead.
     const isTouchDevice = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+    if (isTouchDevice) return;
 
     const lenis = new Lenis({
       duration: 1.0,
@@ -17,7 +20,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1.0,
-      touchMultiplier: isTouchDevice ? 0 : 1.0,
+      touchMultiplier: 1.0,
     });
 
     let rafId: number;

@@ -5,14 +5,18 @@ import { useEffect, useState, useRef, useMemo } from "react";
 export default function GlobalVisuals() {
   const [mounted, setMounted] = useState(false);
   const [introDone, setIntroDone] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const particleRefs = useRef<(HTMLDivElement | null)[]>([]);
   const orbitRefs = useRef<(HTMLDivElement | null)[]>([]);
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Setup mounted state asynchronously to avoid lint warnings
+  // Setup mounted state and detect mobile
   useEffect(() => {
     const timer = setTimeout(() => {
       setMounted(true);
+      // Detect mobile/touch device once on mount
+      const mobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+      setIsMobile(mobile);
     }, 0);
     return () => clearTimeout(timer);
   }, []);
@@ -70,6 +74,8 @@ export default function GlobalVisuals() {
 
   useEffect(() => {
     if (!introDone) return;
+    // Skip all visual effects, listeners, and RAF on mobile devices
+    if (isMobile) return;
 
     // ─── 1. Existing Editorial Setup Logic (Headings, Cards, Images) ───
     const setupElements = () => {
@@ -225,12 +231,8 @@ export default function GlobalVisuals() {
 
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const isMobileDevice = window.matchMedia("(pointer: coarse)").matches || width < 768;
-
-      if (isMobileDevice) {
-        // On mobile, skip continuous particle physics RAF loop for maximum PageSpeed Insights performance
-        return;
-      }
+      // Note: mobile is already filtered out at the useEffect level above
+      // This RAF loop only runs on desktop
 
       // Update Orbital Lines Parallax Parent Transforms
       if (orbitRefs.current[0]) {
@@ -277,7 +279,7 @@ export default function GlobalVisuals() {
         let dispX = 0;
         let dispY = 0;
 
-        if (mouseX !== -1000 && !isMobileDevice) {
+        if (mouseX !== -1000) {
           const currX = baseX + driftX;
           const currY = baseY + driftY + scrollOffset;
 
@@ -319,9 +321,11 @@ export default function GlobalVisuals() {
       window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [particles, introDone]);
+  }, [particles, introDone, isMobile]);
 
   if (!mounted) return null;
+  // Skip rendering all particle/orbital DOM nodes on mobile
+  if (isMobile) return null;
 
   return (
     <div className="fixed inset-0 w-full h-full pointer-events-none overflow-hidden z-[1]">

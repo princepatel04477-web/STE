@@ -62,14 +62,41 @@ body {
   .dot-navigation-sidebar { display: none !important; }
   .horizontal-scroll-section { display: block !important; }
 
+  /* Let browser handle touch scrolling natively — no JS interception */
+  body {
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Videos: GPU layer but NOT will-change (each will-change creates a
+     separate compositing layer consuming ~4MB RAM on mobile GPUs) */
   video {
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
-    will-change: transform;
+    -webkit-backface-visibility: hidden;
   }
 
+  /* Let browser skip rendering and layout for off-screen sections */
   section {
     contain: content;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+
+  /* Remove will-change from video/canvas on mobile to reduce GPU memory */
+  video, canvas {
+    will-change: auto;
+  }
+
+  /* Disable premium-reveal transition on mobile to free compositor */
+  .premium-reveal {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+  .premium-reveal.premium-revealed {
+    opacity: 1;
+    transform: none;
   }
 }
 
