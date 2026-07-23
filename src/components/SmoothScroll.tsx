@@ -8,6 +8,8 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+
     const lenis = new Lenis({
       duration: 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -15,7 +17,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1.0,
-      touchMultiplier: 1.0,
+      touchMultiplier: isTouchDevice ? 0 : 1.0,
     });
 
     let rafId: number;

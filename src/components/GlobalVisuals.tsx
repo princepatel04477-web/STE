@@ -227,6 +227,11 @@ export default function GlobalVisuals() {
       const height = window.innerHeight;
       const isMobileDevice = window.matchMedia("(pointer: coarse)").matches || width < 768;
 
+      if (isMobileDevice) {
+        // On mobile, skip continuous particle physics RAF loop for maximum PageSpeed Insights performance
+        return;
+      }
+
       // Update Orbital Lines Parallax Parent Transforms
       if (orbitRefs.current[0]) {
         const offset1 = Math.max(-80, Math.min(80, scrollY * 0.035));

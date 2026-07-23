@@ -3,12 +3,28 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage, Translate } from "@/components/LanguageContext";
-import { useInView } from "react-intersection-observer";
-
 import dynamic from "next/dynamic";
 
 import Navbar from "@/components/Navbar";
 import CinematicHero from "@/components/CinematicHero";
+import CollaborationSection from "@/components/CollaborationSection";
+import PowerOfSurat from "@/components/PowerOfSurat";
+import BusinessEcosystem from "@/components/BusinessEcosystem";
+import FabricInMotion from "@/components/FabricInMotion";
+import ExhibitionExperience from "@/components/ExhibitionExperience";
+import FutureOfCommerce from "@/components/FutureOfCommerce";
+import BilingualSection from "@/components/BilingualSection";
+import TrustSection from "@/components/TrustSection";
+import SponsorSection from "@/components/SponsorSection";
+import PremiumTransitions from "@/components/PremiumTransitions";
+import FestivalSeason from "@/components/FestivalSeason";
+import CountdownSection from "@/components/CountdownSection";
+import BuyerRegistration from "@/components/BuyerRegistration";
+import FinalCTA from "@/components/FinalCTA";
+import Footer from "@/components/Footer";
+import StallPackages from "@/components/StallPackages";
+
+const BrochureModal = dynamic(() => import("@/components/BrochureModal"));
 
 interface LazySectionProps {
   id?: string;
@@ -17,36 +33,13 @@ interface LazySectionProps {
   children: React.ReactNode;
 }
 
-function LazySection({ id, className = "", minHeight = "150px", children }: LazySectionProps) {
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    rootMargin: "300px 0px", // preload when within 300px
-  });
-
+function LazySection({ id, className = "", children }: LazySectionProps) {
   return (
-    <div id={id} ref={ref} className={className} style={{ minHeight: inView ? "auto" : minHeight }}>
-      {inView ? children : <div className="w-full h-full" />}
+    <div id={id} className={className}>
+      {children}
     </div>
   );
 }
-
-const CollaborationSection = dynamic(() => import("@/components/CollaborationSection"));
-const PowerOfSurat = dynamic(() => import("@/components/PowerOfSurat"));
-const BusinessEcosystem = dynamic(() => import("@/components/BusinessEcosystem"));
-const FabricInMotion = dynamic(() => import("@/components/FabricInMotion"));
-const ExhibitionExperience = dynamic(() => import("@/components/ExhibitionExperience"));
-const FutureOfCommerce = dynamic(() => import("@/components/FutureOfCommerce"));
-const BilingualSection = dynamic(() => import("@/components/BilingualSection"));
-const TrustSection = dynamic(() => import("@/components/TrustSection"));
-const SponsorSection = dynamic(() => import("@/components/SponsorSection"));
-const PremiumTransitions = dynamic(() => import("@/components/PremiumTransitions"));
-const FestivalSeason = dynamic(() => import("@/components/FestivalSeason"));
-const CountdownSection = dynamic(() => import("@/components/CountdownSection"));
-const BuyerRegistration = dynamic(() => import("@/components/BuyerRegistration"));
-const FinalCTA = dynamic(() => import("@/components/FinalCTA"));
-const Footer = dynamic(() => import("@/components/Footer"));
-const BrochureModal = dynamic(() => import("@/components/BrochureModal"));
-const StallPackages = dynamic(() => import("@/components/StallPackages"));
 
 export default function Home() {
   const { language } = useLanguage();
