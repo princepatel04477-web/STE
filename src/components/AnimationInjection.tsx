@@ -116,28 +116,43 @@ export default function AnimationInjection() {
       });
     }
 
+    let ticking = false;
+    let lastScrollPct = -1;
+
+    const updateHueShift = () => {
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      if (docHeight <= 0) {
+        ticking = false;
+        return;
+      }
+
+      const scrollPct = window.scrollY / docHeight;
+      if (Math.abs(scrollPct - lastScrollPct) > 0.005) {
+        lastScrollPct = scrollPct;
+        hueTargets.forEach(({ el, baseBg }) => {
+          const shifted = baseBg.replace(
+            /hsl\(\s*(\d+)/g,
+            (_, h) => `hsl(${Math.round(parseInt(h, 10) + scrollPct * 30)}`
+          );
+          const shifted2 = shifted.replace(
+            /(\d{1,3})deg\s*,\s*[\d.]+%/g,
+            (match, deg) => {
+              const newDeg = (parseInt(deg, 10) + scrollPct * 20) % 360;
+              return `${Math.round(newDeg)}deg, 90%`;
+            }
+          );
+          el.style.backgroundImage = shifted2;
+        });
+      }
+
+      ticking = false;
+    };
+
     const onScroll = () => {
-      const scrollPct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-
-      // Hue shift: cycles from gold (45) through warm spectrum back
-      const hue = 35 + scrollPct * 40;
-
-      hueTargets.forEach(({ el, baseBg }) => {
-        // Replace hue value in hsl() calls inside the gradient
-        const shifted = baseBg.replace(
-          /hsl\(\s*(\d+)/g,
-          (_, h) => `hsl(${Math.round(parseInt(h, 10) + scrollPct * 30)}`
-        );
-        // Also shift linear-gradient hue numbers
-        const shifted2 = shifted.replace(
-          /(\d{1,3})deg\s*,\s*[\d.]+%/g,
-          (match, deg) => {
-            const newDeg = (parseInt(deg, 10) + scrollPct * 20) % 360;
-            return `${Math.round(newDeg)}deg, 90%`;
-          }
-        );
-        el.style.backgroundImage = shifted2;
-      });
+      if (!ticking && hueTargets.length > 0) {
+        ticking = true;
+        requestAnimationFrame(updateHueShift);
+      }
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });

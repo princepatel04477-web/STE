@@ -130,14 +130,8 @@ export default function GlobalVisuals() {
 
     setupElements();
 
-    const observer = new MutationObserver(() => {
-      setupElements();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    // Run setupElements once more after initial DOM renders complete
+    const setupTimer = setTimeout(setupElements, 500);
 
     // ─── 2. Premium Ambient Radial Glow Injection ───
     const targetGlowSections = document.querySelectorAll(
@@ -311,9 +305,9 @@ export default function GlobalVisuals() {
 
     // Cleanup logic
     return () => {
+      clearTimeout(setupTimer);
       headingObserver.disconnect();
       sectionObserver.disconnect();
-      observer.disconnect();
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('scroll', handleScroll);

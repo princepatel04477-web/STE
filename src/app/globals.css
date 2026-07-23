@@ -18,7 +18,7 @@ html {
   -webkit-text-size-adjust: 100%;   /* prevent iOS font scaling */
   text-size-adjust: 100%;
   touch-action: manipulation;        /* remove 300ms tap delay */
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 * {
@@ -293,7 +293,7 @@ html.lenis, html.lenis body {
   height: auto;
 }
 
-.lenis.lenis-smooth {
+.lenis.lenis-smooth, html.lenis {
   scroll-behavior: auto !important;
 }
 
@@ -307,6 +307,23 @@ html.lenis, html.lenis body {
 
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* GPU hardware acceleration & mobile performance optimizations */
+.fixed, .glass, .glass-card, .glass-panel {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+@media (max-width: 767px) {
+  .glass, .glass-card, .glass-gold, .glass-panel {
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+  .glass-strong {
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
 }
 
 /* --- Premium STE Redesign Custom Utilities --- */
