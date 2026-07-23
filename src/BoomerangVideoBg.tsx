@@ -144,10 +144,18 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
 
     const onLoaded = () => {
       el.play().catch(() => {});
-      if (hasVFC) {
-        vfc.requestVideoFrameCallback!(vfcLoop);
+      const startCapture = () => {
+        if (!s.capturing) return;
+        if (hasVFC) {
+          vfc.requestVideoFrameCallback!(vfcLoop);
+        } else {
+          rafCapId = requestAnimationFrame(rafCapLoop);
+        }
+      };
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        window.requestIdleCallback(startCapture, { timeout: 1500 });
       } else {
-        rafCapId = requestAnimationFrame(rafCapLoop);
+        setTimeout(startCapture, 400);
       }
     };
 

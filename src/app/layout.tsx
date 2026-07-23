@@ -110,13 +110,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
-        {/* Preload the video so boomerang capture starts faster */}
-        <link 
-          rel="preload" 
-          href="/assets/video/hero.mp4"
-          as="fetch"
-          crossOrigin="anonymous"
-        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preload" href="/assets/images/f_kidswear.webp" as="image" type="image/webp" fetchPriority="high" />
 
         <script
           id="ld-json-schema"

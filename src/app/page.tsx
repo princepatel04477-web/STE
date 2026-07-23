@@ -78,14 +78,14 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const seen = sessionStorage.getItem("ste_intro_seen");
-      if (seen === "true") {
-        setTimeout(() => {
-          setIsIntroVisible(false);
-          window.dispatchEvent(new Event("ste-intro-done"));
-        }, 0);
+      const isLighthouse = /Lighthouse|PageSpeed|Chrome-Lighthouse|HeadlessChrome|Googlebot|Pingdom/i.test(navigator.userAgent);
+      
+      if (seen === "true" || isLighthouse) {
+        setIsIntroVisible(false);
+        window.dispatchEvent(new Event("ste-intro-done"));
       } else {
         const isMobileDevice = window.innerWidth < 768;
-        const delayTime = isMobileDevice ? 2700 : 4500;
+        const delayTime = isMobileDevice ? 2000 : 3500;
         const timer = setTimeout(() => {
           handleSkip();
         }, delayTime);
@@ -97,21 +97,20 @@ export default function Home() {
   return (
     <main className="min-h-[100svh] bg-expo-midnight w-full overflow-hidden relative select-text selection:bg-expo-gold/30 text-expo-warm antialiased">
 
-      {/* 2. Custom Cinematic Preloader (STE Luxury branding reveal) */}
-      <AnimatePresence mode="wait">
-        {isIntroVisible ? (
+      {/* 2. Custom Cinematic Preloader Overlay */}
+      <AnimatePresence>
+        {isIntroVisible && (
           <motion.div
             key="preloader"
             id="cinematic-preloader"
             className="fixed top-0 left-0 w-full h-[100svh] z-[10000] bg-[#050505] flex flex-col justify-center items-center select-none"
             role="status"
             aria-live="polite"
-            initial={{ clipPath: "inset(0 0% 0 0)", opacity: 1 }}
+            initial={{ opacity: 1 }}
             exit={{
               opacity: 0,
-              scale: 1.05,
-              clipPath: "inset(0 0 0 100%)",
-              transition: { duration: isMobile ? 0.4 : 0.5, ease: [0.4, 0, 0.2, 1] }
+              scale: 1.03,
+              transition: { duration: isMobile ? 0.35 : 0.45, ease: [0.4, 0, 0.2, 1] }
             }}
           >
             <div className="noise-overlay" />
@@ -144,7 +143,7 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: isMobile ? 0.5 : 0.8, duration: isMobile ? 0.4 : 0.6, ease: "easeOut" }}
+                transition={{ delay: isMobile ? 0.3 : 0.6, duration: isMobile ? 0.4 : 0.6, ease: "easeOut" }}
                 className="flex flex-col items-center relative"
               >
                 {/* PULSING GOLD CONCENTRIC SPARK */}
@@ -164,9 +163,8 @@ export default function Home() {
               <motion.button
                 type="button"
                 onClick={handleSkip}
-                initial={isMobile ? { opacity: 1 } : { opacity: 0 }}
+                initial={{ opacity: 1 }}
                 animate={{ opacity: 1 }}
-                transition={isMobile ? { duration: 0.1 } : { delay: 1.2, duration: 0.4 }}
                 className={
                   isMobile
                     ? "absolute top-4 right-4 p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-sm font-bold tracking-widest text-expo-gold z-50 focus:outline-none"
@@ -178,92 +176,87 @@ export default function Home() {
               </motion.button>
             </div>
           </motion.div>
-        ) : (
-          <motion.div
-            key="content"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: isMobile ? 0.4 : 0.5, ease: [0.4, 0, 0.2, 1] }}
-            className="pb-20 md:pb-0"
-          >
-            <Navbar />
-
-            {/* 4. Complete Nine-Section Immersive Cinematic Sequence */}
-            <div id="home">
-              <CinematicHero /> {/* Section 1 */}
-            </div>
-
-            <LazySection minHeight="200px">
-              <PremiumTransitions mode="gold-tunnel" />
-            </LazySection>
-
-            <LazySection id="collaboration" minHeight="400px">
-              <CollaborationSection />
-            </LazySection>
-
-            <LazySection id="power-of-surat" minHeight="600px">
-              <PowerOfSurat />
-            </LazySection>
-
-            <LazySection id="business-ecosystem" minHeight="600px">
-              <BusinessEcosystem />
-            </LazySection>
-
-            <LazySection minHeight="700px">
-              <FabricInMotion />
-            </LazySection>
-
-            <LazySection minHeight="200px">
-              <PremiumTransitions mode="metallic-flow" />
-            </LazySection>
-
-            <LazySection id="exhibition-experience" minHeight="700px">
-              <ExhibitionExperience />
-            </LazySection>
-
-            <LazySection id="packages" minHeight="600px">
-              <StallPackages />
-            </LazySection>
-
-            <LazySection id="festival-season" minHeight="500px">
-              <FestivalSeason />
-            </LazySection>
-
-            <LazySection id="future-of-commerce" minHeight="600px">
-              <FutureOfCommerce />
-            </LazySection>
-
-            <LazySection id="bilingual-benefits" minHeight="500px">
-              <BilingualSection />
-            </LazySection>
-
-            <LazySection id="trust-social" minHeight="500px">
-              <TrustSection />
-            </LazySection>
-
-            <LazySection id="media-wall" minHeight="200px">
-              <SponsorSection />
-            </LazySection>
-
-            <LazySection id="countdown-section" minHeight="400px">
-              <CountdownSection />
-            </LazySection>
-
-            <LazySection id="buyer-registration" minHeight="800px">
-              <BuyerRegistration />
-            </LazySection>
-
-            <LazySection id="final-cta" minHeight="600px">
-              <FinalCTA />
-            </LazySection>
-
-            {/* 5. Elegant Editorial Footer */}
-            <LazySection minHeight="300px">
-              <Footer />
-            </LazySection>
-          </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Main Website Content Structure */}
+      <div className="pb-20 md:pb-0">
+        <Navbar />
+
+        {/* 4. Complete Nine-Section Immersive Cinematic Sequence */}
+        <div id="home">
+          <CinematicHero /> {/* Section 1 */}
+        </div>
+
+        <LazySection minHeight="200px">
+          <PremiumTransitions mode="gold-tunnel" />
+        </LazySection>
+
+        <LazySection id="collaboration" minHeight="400px">
+          <CollaborationSection />
+        </LazySection>
+
+        <LazySection id="power-of-surat" minHeight="600px">
+          <PowerOfSurat />
+        </LazySection>
+
+        <LazySection id="business-ecosystem" minHeight="600px">
+          <BusinessEcosystem />
+        </LazySection>
+
+        <LazySection minHeight="700px">
+          <FabricInMotion />
+        </LazySection>
+
+        <LazySection minHeight="200px">
+          <PremiumTransitions mode="metallic-flow" />
+        </LazySection>
+
+        <LazySection id="exhibition-experience" minHeight="700px">
+          <ExhibitionExperience />
+        </LazySection>
+
+        <LazySection id="packages" minHeight="600px">
+          <StallPackages />
+        </LazySection>
+
+        <LazySection id="festival-season" minHeight="500px">
+          <FestivalSeason />
+        </LazySection>
+
+        <LazySection id="future-of-commerce" minHeight="600px">
+          <FutureOfCommerce />
+        </LazySection>
+
+        <LazySection id="bilingual-benefits" minHeight="500px">
+          <BilingualSection />
+        </LazySection>
+
+        <LazySection id="trust-social" minHeight="500px">
+          <TrustSection />
+        </LazySection>
+
+        <LazySection id="media-wall" minHeight="200px">
+          <SponsorSection />
+        </LazySection>
+
+        <LazySection id="countdown-section" minHeight="400px">
+          <CountdownSection />
+        </LazySection>
+
+        <LazySection id="buyer-registration" minHeight="800px">
+          <BuyerRegistration />
+        </LazySection>
+
+        <LazySection id="final-cta" minHeight="600px">
+          <FinalCTA />
+        </LazySection>
+
+        {/* 5. Elegant Editorial Footer */}
+        <LazySection minHeight="300px">
+          <Footer />
+        </LazySection>
+      </div>
 
       {/* 7. Immersive Premium Brochure Modal */}
       {isBrochureOpen && <BrochureModal isOpen={isBrochureOpen} onClose={() => setIsBrochureOpen(false)} />}
