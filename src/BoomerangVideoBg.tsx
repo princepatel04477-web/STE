@@ -215,6 +215,8 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
         style={{ opacity: 1 }}
         muted
         playsInline
+        autoPlay
+        loop
         preload="auto"
         crossOrigin="anonymous"
         onError={() => setLoadError(true)}

@@ -61,6 +61,16 @@ body {
   .three-js-canvas { display: none !important; }
   .dot-navigation-sidebar { display: none !important; }
   .horizontal-scroll-section { display: block !important; }
+
+  video {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  section {
+    contain: content;
+  }
 }
 
 @layer utilities {

@@ -47,7 +47,7 @@ export default function OptimizedVideoBg({
   }, []);
 
   useEffect(() => {
-    if (isMobile || !isMounted) return;
+    if (!isMounted) return;
 
     const container = containerRef.current;
     if (!container) return;
@@ -102,22 +102,9 @@ export default function OptimizedVideoBg({
       visibilityObserver.disconnect();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [isMobile, isMounted]);
+  }, [isMounted]);
 
   if (!isMounted) {
-    return (
-      <div ref={containerRef} className={className} style={{ ...style, position: "relative" }}>
-        {fallbackImage && (
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url('${fallbackImage}')` }}
-          />
-        )}
-      </div>
-    );
-  }
-
-  if (isMobile) {
     return (
       <div ref={containerRef} className={className} style={{ ...style, position: "relative" }}>
         {fallbackImage && (
