@@ -137,9 +137,6 @@ export default function GlobalVisuals() {
 
     setupElements();
 
-    // Run setupElements once more after initial DOM renders complete
-    const setupTimer = setTimeout(setupElements, 500);
-
     // ─── 2. Premium Ambient Radial Glow Injection ───
     const targetGlowSections = document.querySelectorAll(
       '#collaboration, #exhibition-experience, #future-of-commerce, #final-cta'
@@ -313,7 +310,6 @@ export default function GlobalVisuals() {
 
     // Cleanup logic
     return () => {
-      clearTimeout(setupTimer);
       headingObserver.disconnect();
       sectionObserver.disconnect();
       window.removeEventListener('mousemove', handleMouseMove);

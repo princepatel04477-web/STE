@@ -30,26 +30,39 @@ export default function AnimationInjection() {
       el.style.willChange = "transform";
 
       let rect: DOMRect | null = null;
+      let framePending = false;
+      let pendingEvent: MouseEvent | null = null;
 
       const onEnter = () => {
         rect = el.getBoundingClientRect();
       };
 
-      const onMove = (e: MouseEvent) => {
-        if (!rect) {
-          rect = el.getBoundingClientRect();
-        }
+      const applyTilt = () => {
+        framePending = false;
+        if (!rect || !pendingEvent) return;
+
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) / (rect.width / 2);
-        const dy = (e.clientY - cy) / (rect.height / 2);
+        const dx = (pendingEvent.clientX - cx) / (rect.width / 2);
+        const dy = (pendingEvent.clientY - cy) / (rect.height / 2);
         const rotateY = dx * 6;
         const rotateX = -dy * 6;
         el.style.transform = `perspective(600px) translateY(-6px) scale(1.01) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        pendingEvent = null;
+      };
+
+      const onMove = (e: MouseEvent) => {
+        if (!rect) return;
+        pendingEvent = e;
+        if (!framePending) {
+          framePending = true;
+          requestAnimationFrame(applyTilt);
+        }
       };
 
       const onLeave = () => {
         rect = null;
+        pendingEvent = null;
         el.style.transform = "";
       };
 

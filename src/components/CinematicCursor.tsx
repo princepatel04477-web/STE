@@ -13,6 +13,8 @@ interface Particle {
   color: string;
 }
 
+const MAX_PARTICLES = 80;
+
 export default function CinematicCursor() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const cursorRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
@@ -20,7 +22,6 @@ export default function CinematicCursor() {
   const particles = useRef<Particle[]>([]);
 
   useEffect(() => {
-    // Check for prefers-reduced-motion or mobile devices
     if (
       window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
       window.innerWidth < 768
@@ -37,83 +38,82 @@ export default function CinematicCursor() {
     document.documentElement.classList.add("has-custom-cursor");
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas, { passive: true });
 
-    // Track mouse position
+    const addParticle = (particle: Particle) => {
+      const pArr = particles.current;
+      pArr.push(particle);
+      if (pArr.length > MAX_PARTICLES) {
+        pArr.splice(0, pArr.length - MAX_PARTICLES);
+      }
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       cursorRef.current.targetX = e.clientX;
       cursorRef.current.targetY = e.clientY;
 
-      // Spawn golden dust particles occasionally
-      if (Math.random() < 0.3) {
-        particles.current.push({
+      if (Math.random() < 0.16) {
+        addParticle({
           x: e.clientX,
           y: e.clientY,
           vx: (Math.random() - 0.5) * 1.5,
           vy: (Math.random() - 0.5) * 1.5 - 0.5,
           alpha: 1,
           size: Math.random() * 2 + 1,
-          color: Math.random() < 0.7 ? "#D6A066" : "#F0C48A", // warm gold
+          color: Math.random() < 0.7 ? "#D6A066" : "#F0C48A",
         });
       }
     };
 
-    // Track click shockwaves
     const handleMouseDown = () => {
-      // Spawn a burst of golden sparks
       for (let i = 0; i < 8; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 3 + 2;
-        particles.current.push({
+        addParticle({
           x: cursorRef.current.targetX,
           y: cursorRef.current.targetY,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           alpha: 1,
           size: Math.random() * 3 + 1,
-          color: "#B87333", // metallic copper spark
+          color: "#B87333",
         });
       }
     };
 
-    // Track hover states for interactive tags
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target) return;
-
-      const clickable = target.closest("a, button, [role='button'], input, textarea, select");
-
-      if (clickable) {
-        hoveredTypeRef.current = "click";
-      } else {
-        hoveredTypeRef.current = null;
-      }
+    const handlePointerMove = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      const clickable = target?.closest(
+        "a, button, [role='button'], input, textarea, select"
+      );
+      hoveredTypeRef.current = clickable ? "click" : null;
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mouseover", handleMouseOver);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("mousedown", handleMouseDown, { passive: true });
+    document.addEventListener("pointermove", handlePointerMove, { passive: true });
 
-    // Animation Loop
     const render = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // 1. Smoothly interpolate cursor position (lerp)
       const current = cursorRef.current;
-      current.x += (current.targetX - current.x) * 0.12;
-      current.y += (current.targetY - current.y) * 0.12;
+      current.x += (current.targetX - current.x) * 0.18;
+      current.y += (current.targetY - current.y) * 0.18;
 
-      // 2. Draw trailing gold dust particles
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
       const pArr = particles.current;
       for (let i = pArr.length - 1; i >= 0; i--) {
         const p = pArr[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.alpha -= 0.015;
+        p.alpha -= 0.02;
         p.size *= 0.98;
 
         if (p.alpha <= 0) {
@@ -121,21 +121,18 @@ export default function CinematicCursor() {
           continue;
         }
 
-        ctx.save();
         ctx.globalAlpha = p.alpha;
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
       }
 
-      // 3. Draw premium cursor lens
+      ctx.globalAlpha = 1;
       ctx.save();
       ctx.translate(current.x, current.y);
 
       if (hoveredTypeRef.current === "click") {
-        // Expand circle on clickable items
         ctx.beginPath();
         ctx.arc(0, 0, 20, 0, Math.PI * 2);
         ctx.strokeStyle = "rgba(214, 160, 102, 0.8)";
@@ -147,7 +144,6 @@ export default function CinematicCursor() {
         ctx.fillStyle = "#F0C48A";
         ctx.fill();
       } else {
-        // Standard premium minimalist dot with soft glowing sweep ring
         ctx.beginPath();
         ctx.arc(0, 0, 10, 0, Math.PI * 2);
         ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
@@ -169,7 +165,7 @@ export default function CinematicCursor() {
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mousedown", handleMouseDown);
-      window.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("pointermove", handlePointerMove);
       document.documentElement.classList.remove("has-custom-cursor");
       unsubscribe();
     };

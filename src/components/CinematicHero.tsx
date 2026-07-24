@@ -225,18 +225,12 @@ export default function CinematicHero() {
 
     const handleScroll = () => {
       scrollYRef.current = window.scrollY;
-      // On mobile, batch scroll-driven parallax into a single RAF to avoid
-      // running 4 DOM style writes on every scroll event (60-120 per second).
-      if (isMobile) {
-        if (!scrollRafPending.current) {
-          scrollRafPending.current = true;
-          requestAnimationFrame(() => {
-            scrollRafPending.current = false;
-            updatePositions();
-          });
-        }
-      } else {
-        updatePositions();
+      if (!scrollRafPending.current) {
+        scrollRafPending.current = true;
+        requestAnimationFrame(() => {
+          scrollRafPending.current = false;
+          updatePositions();
+        });
       }
     };
 
