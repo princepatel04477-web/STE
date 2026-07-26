@@ -475,7 +475,7 @@ export default function CinematicHero() {
           </div>
         </div>
 
-        {/* Animated Statistics Counter Grid Row (Fix ₹0.0T bug + adds gold border, hover animations, scroll-spy) */}
+        {/* Animated Statistics Counter Grid Row */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-6 w-full max-w-lg mx-auto md:max-w-none mt-16 z-40 px-1 sm:px-0">
           {[
             {
@@ -484,8 +484,8 @@ export default function CinematicHero() {
               prefix: "₹",
               suffix: "T",
               fallback: "₹15.5T",
-              labelEn: "Sourcing Market Size",
-              labelHi: "सोर्सिंग मार्केट आकार"
+              labelEn: "Surat Market Output*",
+              labelHi: "सूरत बाजार आउटपुट*"
             },
             {
               end: 8000,
@@ -496,12 +496,12 @@ export default function CinematicHero() {
               labelHi: "सत्यापित B2B खरीदार"
             },
             {
-              end: 950,
+              end: 650,
               prefix: "",
               suffix: "+",
-              fallback: "950+",
-              labelEn: "Agents",
-              labelHi: "एजेंट"
+              fallback: "650+",
+              labelEn: "Exhibiting Mills",
+              labelHi: "प्रदर्शनी मिलें"
             }
           ].map((stat, i) => (
             <div 
@@ -541,6 +541,9 @@ export default function CinematicHero() {
             </div>
           ))}
         </div>
+        <p className="text-[9px] text-expo-warm/30 mt-3 font-sans tracking-wider">
+          *<Translate en="Source: Surat Textile Sourcing Industry Data & AKAS Market Audit" hi="स्रोत: सूरत टेक्सटाइल सोर्सिंग उद्योग डेटा और अकास मार्केट ऑडिट" />
+        </p>
       </div>
 
       {/* 4. Luxury Scroll Down Indicator */}

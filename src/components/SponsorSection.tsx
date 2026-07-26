@@ -8,66 +8,65 @@ import { Translate } from "@/components/LanguageContext";
 
 const sponsors = [
   {
-    name: "Apex Machinery",
+    name: "Surat Weavers Alliance",
     logo: (
-      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg className="w-48 h-10" viewBox="0 0 240 50" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 10L35 40H5L20 10Z" fill="currentColor" className="text-expo-gold" />
-        <text x="50" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="18" fontWeight="bold" letterSpacing="0.2em" fill="currentColor">APEX</text>
-        <text x="50" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.1em" fill="currentColor" opacity="0.6">MACHINERY</text>
+        <text x="48" y="28" fontFamily="var(--font-playfair), serif" fontSize="14" fontWeight="bold" letterSpacing="0.15em" fill="currentColor">SURAT WEAVERS</text>
+        <text x="48" y="42" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.25em" fill="currentColor" opacity="0.6">INDUSTRY ALLIANCE</text>
       </svg>
     )
   },
   {
-    name: "Global Threads",
+    name: "Gujarat Textile Machinery Guild",
     logo: (
-      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="25" cy="25" r="15" stroke="currentColor" strokeWidth="3" className="text-expo-gold" />
-        <circle cx="25" cy="25" r="8" fill="currentColor" className="text-expo-gold" />
-        <text x="55" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="16" fontWeight="bold" letterSpacing="0.15em" fill="currentColor">GLOBAL</text>
-        <text x="55" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.2em" fill="currentColor" opacity="0.6">THREADS</text>
+      <svg className="w-48 h-10" viewBox="0 0 240 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="25" r="14" stroke="currentColor" strokeWidth="2.5" className="text-expo-gold" />
+        <circle cx="20" cy="25" r="7" fill="currentColor" className="text-expo-gold" />
+        <text x="45" y="28" fontFamily="var(--font-playfair), serif" fontSize="13" fontWeight="bold" letterSpacing="0.12em" fill="currentColor">GUJARAT TEXTILE</text>
+        <text x="45" y="42" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.2em" fill="currentColor" opacity="0.6">MACHINERY GUILD</text>
       </svg>
     )
   },
   {
-    name: "Silk Road Exports",
+    name: "Silk & Synthetic Export Council",
     logo: (
-      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10 25C15 15, 25 15, 30 25C35 35, 45 35, 50 25" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="text-expo-gold" />
-        <text x="65" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="16" fontWeight="bold" letterSpacing="0.15em" fill="currentColor">SILKROAD</text>
-        <text x="65" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.15em" fill="currentColor" opacity="0.6">EXPORTS GROUP</text>
+      <svg className="w-48 h-10" viewBox="0 0 240 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 25C15 15, 25 15, 30 25C35 35, 45 35, 50 25" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-expo-gold" />
+        <text x="60" y="28" fontFamily="var(--font-playfair), serif" fontSize="13" fontWeight="bold" letterSpacing="0.12em" fill="currentColor">SRTEPC ALLIANCE</text>
+        <text x="60" y="42" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.2em" fill="currentColor" opacity="0.6">EXPORT PROMOTION COUNCIL</text>
       </svg>
     )
   },
   {
-    name: "Tex-Tech Solutions",
+    name: "Surat Textile Traders Association",
     logo: (
-      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="5" y="10" width="30" height="30" rx="3" stroke="currentColor" strokeWidth="2.5" className="text-expo-gold" />
-        <line x1="12" y1="20" x2="28" y2="20" stroke="currentColor" strokeWidth="2" className="text-expo-gold" />
-        <line x1="12" y1="30" x2="24" y2="30" stroke="currentColor" strokeWidth="2" className="text-expo-gold" />
-        <text x="50" y="30" fontFamily="var(--font-oswald), sans-serif" fontSize="17" fontWeight="bold" letterSpacing="0.2em" fill="currentColor">TEX-TECH</text>
-        <text x="50" y="42" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.1em" fill="currentColor" opacity="0.6">DIGITAL SOLUTIONS</text>
+      <svg className="w-48 h-10" viewBox="0 0 240 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="10" width="28" height="28" rx="3" stroke="currentColor" strokeWidth="2" className="text-expo-gold" />
+        <line x1="11" y1="19" x2="27" y2="19" stroke="currentColor" strokeWidth="2" className="text-expo-gold" />
+        <line x1="11" y1="29" x2="23" y2="29" stroke="currentColor" strokeWidth="2" className="text-expo-gold" />
+        <text x="45" y="28" fontFamily="var(--font-playfair), serif" fontSize="13" fontWeight="bold" letterSpacing="0.12em" fill="currentColor">SURAT TRADERS</text>
+        <text x="45" y="42" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.2em" fill="currentColor" opacity="0.6">WHOLESALE FEDERATION</text>
       </svg>
     )
   },
   {
-    name: "Surat Weavers",
+    name: "Eco-Textile Processing Forum",
     logo: (
-      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="10" y="10" width="20" height="30" rx="2" stroke="currentColor" strokeWidth="2" className="text-expo-gold" />
-        <rect x="15" y="15" width="20" height="30" rx="2" stroke="currentColor" strokeWidth="2" className="text-expo-gold" opacity="0.5" />
-        <text x="50" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="16" fontWeight="bold" letterSpacing="0.15em" fill="currentColor">SURAT</text>
-        <text x="50" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.2em" fill="currentColor" opacity="0.6">WEAVERS ALLIANCE</text>
+      <svg className="w-48 h-10" viewBox="0 0 240 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 8C10 18, 8 25, 18 40C28 25, 26 18, 18 8Z" fill="currentColor" className="text-expo-gold" />
+        <text x="42" y="28" fontFamily="var(--font-playfair), serif" fontSize="13" fontWeight="bold" letterSpacing="0.12em" fill="currentColor">ECO-PROCESSING</text>
+        <text x="42" y="42" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.2em" fill="currentColor" opacity="0.6">SUSTAINABLE DYEING FORUM</text>
       </svg>
     )
   },
   {
-    name: "Eco-Dye Innovations",
+    name: "All India Garment Guild",
     logo: (
-      <svg className="w-40 h-10" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 8C12 18, 10 25, 20 40C30 25, 28 18, 20 8Z" fill="currentColor" className="text-expo-gold" />
-        <text x="45" y="32" fontFamily="var(--font-oswald), sans-serif" fontSize="16" fontWeight="bold" letterSpacing="0.15em" fill="currentColor">ECO-DYE</text>
-        <text x="45" y="44" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.15em" fill="currentColor" opacity="0.6">INNOVATIONS</text>
+      <svg className="w-48 h-10" viewBox="0 0 240 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="20,8 32,38 8,38" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-expo-gold" />
+        <text x="45" y="28" fontFamily="var(--font-playfair), serif" fontSize="13" fontWeight="bold" letterSpacing="0.12em" fill="currentColor">GARMENT GUILD</text>
+        <text x="45" y="42" fontFamily="var(--font-inter), sans-serif" fontSize="8" letterSpacing="0.2em" fill="currentColor" opacity="0.6">NATIONAL MANUFACTURERS</text>
       </svg>
     )
   }

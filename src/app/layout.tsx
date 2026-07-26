@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     "Lehenga Manufacturers Surat", 
     "AKAS Group Exhibition"
   ],
-  metadataBase: new URL("https://stex2.vercel.app"),
+  metadataBase: new URL("https://www.stesurat.com"),
   alternates: {
     canonical: "/",
   },
@@ -39,16 +39,16 @@ export const metadata: Metadata = {
     title: "Surat Textile Exhibition 2026 (STE)",
     description:
       "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 8,000+ B2B customers at SIECC, Surat.",
-    url: "/",
+    url: "https://www.stesurat.com",
     siteName: "Surat Textile Exhibition 2026",
     type: "website",
     locale: "en_IN",
     images: [
       {
-        url: "/assets/logo_STE.webp",
+        url: "/assets/og-banner.webp",
         width: 1200,
         height: 630,
-        alt: "Surat Textile Exhibition 2026",
+        alt: "Surat Textile Exhibition 2026 (STE) — Sept 12-14, 2026, SIECC Surat",
       },
     ],
   },
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     title: "Surat Textile Exhibition 2026 (STE)",
     description:
       "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 8,000+ B2B customers at SIECC, Surat.",
-    images: ["/assets/logo_STE.webp"],
+    images: ["/assets/og-banner.webp"],
   },
 };
 
@@ -74,7 +74,7 @@ export default function RootLayout({
     "name": "Surat Textile Exhibition (STE) 2026",
     "description": "India's premier B2B textile sourcing exhibition showcasing heritage drapes, sarees, premium lehengas, kurtis, and contemporary wedding wear. Explore 650+ exhibitors and 8,000+ B2B customers from across the world.",
     "startDate": "2026-09-12T10:00:00+05:30",
-    "endDate": "2026-09-13T18:00:00+05:30",
+    "endDate": "2026-09-14T18:00:00+05:30",
     "eventStatus": "https://schema.org/EventScheduled",
     "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
     "location": {
@@ -90,16 +90,16 @@ export default function RootLayout({
       }
     },
     "image": [
-      "https://stex2.vercel.app/assets/logo_STE.webp"
+      "https://www.stesurat.com/assets/og-banner.webp"
     ],
     "organizer": {
       "@type": "Organization",
-      "name": "AKAS Group",
-      "url": "https://stex2.vercel.app"
+      "name": "AKAS Events",
+      "url": "https://www.stesurat.com"
     },
     "offers": {
       "@type": "Offer",
-      "url": "https://stex2.vercel.app/#final-cta",
+      "url": "https://www.stesurat.com/#final-cta",
       "price": "0",
       "priceCurrency": "INR",
       "availability": "https://schema.org/InStock",

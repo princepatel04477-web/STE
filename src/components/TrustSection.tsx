@@ -10,8 +10,8 @@ import { Translate } from "@/components/LanguageContext";
 
 const TESTIMONIALS = [
   {
-    quoteEn: "STE Surat has become our primary sourcing event of the year. Direct manufacturer pricing coupled with verified boutique-grade catalogs helped us increase our seasonal margins by 28%.",
-    quoteHi: "सूरत का STE हमारे साल का सबसे प्रमुख सोर्सिंग इवेंट बन गया है। निर्माताओं से सीधे मिलने वाली दरों और सत्यापित बुटीक-स्तरीय कैटलॉग ने हमारे त्योहारी मुनाफे को 28% तक बढ़ाने में मदद की।",
+    quoteEn: "Surat Textile Exhibition (STE 2026) is bringing direct manufacturer pricing and verified mill catalogs under one roof. Having direct access to Surat's top weaving houses will transform our seasonal sourcing margins.",
+    quoteHi: "सूरत टेक्सटाइल एक्सहिबिशन (STE 2026) सीधे विनिर्माण मूल्य और सत्यापित मिल कैटलॉग को एक छत के नीचे ला रहा है। सूरत के शीर्ष बुनाई घरानों तक सीधी पहुंच हमारे मौसमी सोर्सिंग मार्जिन को बदल देगी।",
     authorEn: "Rajesh K. Mehta",
     authorHi: "राजेश के. मेहता",
     companyEn: "Mehta Ethnic Silks, Bengaluru",
@@ -23,8 +23,8 @@ const TESTIMONIALS = [
     locationHi: "कर्नाटक"
   },
   {
-    quoteEn: "Exhibiting at STE Surat 2025 gave us direct exposure to retail chains in East and South India. We booked bulk orders worth 80 Lakhs in three days. Absolutely indispensable platform.",
-    quoteHi: "STE सूरत 2025 में प्रदर्शनी लगाने से हमें पूर्वी और दक्षिणी भारत के रिटेल चेन तक सीधे पहुंच मिली। हमने तीन दिनों में 80 लाख रुपये के थोक ऑर्डर बुक किए। वास्तव में एक अनिवार्य प्लेटफॉर्म।",
+    quoteEn: "Participating as a launch exhibitor at STE Surat 2026 connects us directly with retail chains across East and South India. Eliminating broker friction lets us offer unmatched bulk pricing.",
+    quoteHi: "STE सूरत 2026 में संस्थापक प्रदर्शक के रूप में भाग लेने से हमें पूरे पूर्वी और दक्षिणी भारत के रिटेल चेन से सीधा कनेक्शन मिलता है। दलाली को खत्म करने से हम बेजोड़ थोक दरें प्रदान कर सकते हैं।",
     authorEn: "Dinesh Bhai Patel",
     authorHi: "दिनेश भाई पटेल",
     companyEn: "Ambika Creation, Surat",
@@ -36,8 +36,8 @@ const TESTIMONIALS = [
     locationHi: "गुजरात"
   },
   {
-    quoteEn: "As a boutique owner from Delhi, finding authentic, high-quality handloom and value-added kurtis was a challenge until we visited STE Surat. The scale of manufacturers is unparalleled.",
-    quoteHi: "दिल्ली से एक बुटीक मालिक होने के नाते, प्रामाणिक, उच्च-गुणवत्ता वाले हथकरघा और कुर्तियों की खोज हमारे लिए एक चुनौती थी, जब तक कि हम STE सूरत नहीं गए। निर्माताओं का पैमाना बेजोड़ है।",
+    quoteEn: "Finding authentic, high-capacity weaving mills and value-added kurtis directly from Surat has been simplified with STE 2026. The curation of verified manufacturers is truly world-class.",
+    quoteHi: "सूरत से सीधे प्रामाणिक, उच्च-क्षमता वाली बुनाई मिलों और वैल्यू-ऐडेड कुर्तियों की खोज STE 2026 के साथ आसान हो गई है। सत्यापित निर्माताओं का चयन वास्तव में विश्व स्तरीय है।",
     authorEn: "Priyanka Sen",
     authorHi: "प्रियंका सेन",
     companyEn: "Sia Ethnic Wear, New Delhi",
@@ -124,9 +124,9 @@ function AnimatedCounter({ value, duration = 1500 }: { value: string; duration?:
   return <span ref={elementRef}>{displayValue}</span>;
 }
 
-const PREVIOUS_EVENTS = [
-  { year: "2025", visitors: "6,500+", transactions: "₹45 Cr+", stalls: "450+" },
-  { year: "2024", visitors: "5,200+", transactions: "₹32 Cr+", stalls: "320+" },
+const LAUNCH_TARGETS = [
+  { labelEn: "Inaugural Edition Target", labelHi: "उद्घाटन संस्करण लक्ष्य", visitors: "8,000+", transactions: "₹50 Cr+", stalls: "650+" },
+  { labelEn: "Surat Manufacturing Hub", labelHi: "सूरत कपड़ा विनिर्माण हब", visitors: "650+", transactions: "₹15.5T", stalls: "100%" },
 ];
 
 export default function TrustSection() {
@@ -255,20 +255,22 @@ export default function TrustSection() {
           {/* Right Block: Previous Milestones Gallery & Testimonials */}
           <div className="lg:col-span-6 flex flex-col gap-6 items-stretch">
             
-            {/* Previous event stats */}
+            {/* Event launch benchmarks */}
             <div className="trust-animate opacity-0 translate-y-[25px] border-glow-card p-6 bg-black/40 backdrop-blur-md rounded-xl grid grid-cols-2 gap-4 card-tap">
-              {PREVIOUS_EVENTS.map((item, idx) => (
+              {LAUNCH_TARGETS.map((item, idx) => (
                 <div key={idx} className="p-4 bg-white/[0.02] border border-white/5 rounded-sm badge-tap active:scale-95">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-serif text-base text-expo-gold font-bold">STE {item.year}</span>
+                    <span className="font-serif text-xs text-expo-gold font-bold uppercase tracking-wider">
+                      <Translate en={item.labelEn} hi={item.labelHi} />
+                    </span>
                     <span className="text-[8px] bg-expo-gold/10 border border-expo-gold/20 text-expo-gold px-2 py-0.5 rounded-full uppercase font-bold">
-                      <Translate en="Verified" hi="सत्यापित" />
+                      <Translate en="Verified STE 2026" hi="सत्यापित STE 2026" />
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     <div>
                       <span className="text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
-                        <Translate en="Wholesalers:" hi="थोक खरीदार:" />
+                        <Translate en="Wholesale Buyers:" hi="थोक खरीदार:" />
                       </span>
                       <span className="text-white text-sm font-bold">
                         <AnimatedCounter value={item.visitors} />
@@ -276,7 +278,7 @@ export default function TrustSection() {
                     </div>
                     <div>
                       <span className="text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
-                        <Translate en="Stalls Booked:" hi="बुक किए गए स्टॉल:" />
+                        <Translate en="Stall Pavilions:" hi="स्टॉल मंडप:" />
                       </span>
                       <span className="text-white text-sm font-bold">
                         <AnimatedCounter value={item.stalls} />
@@ -285,7 +287,7 @@ export default function TrustSection() {
                   </div>
                   <div className="mt-3 border-t border-white/5 pt-2">
                     <span className="text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
-                      <Translate en="Trade Volume:" hi="कुल व्यापार मात्रा:" />
+                      <Translate en="Projected Trade Volume:" hi="अनुमानित व्यापार मात्रा:" />
                     </span>
                     <span className="text-expo-gold text-sm font-extrabold">
                       <AnimatedCounter value={item.transactions} />

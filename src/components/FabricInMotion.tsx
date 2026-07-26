@@ -201,70 +201,47 @@ export default function FabricInMotion() {
         <FadeUp className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 md:mb-16">
           <div className="max-w-2xl">
             <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
-              <Translate en="COUTURE COLLECTION" hi="फैशन संग्रह" />
+              <Translate en="EXHIBITION CATEGORIES & SOURCING" hi="प्रदर्शनी श्रेणियां और सोर्सिंग" />
             </span>
             <h2
               ref={headingRef}
               className={`font-serif text-3xl sm:text-5xl md:text-6xl tracking-widest text-white leading-tight heading-underline ${headingInView ? "in-view" : ""}`}
             >
-              <span className="gold-shimmer-text"><Translate en="Fabric in " hi="परिधान की " /></span><span className="text-metallic font-light italic"><Translate en="Motion" hi="गतिशीलता" /></span>
+              <span className="gold-shimmer-text"><Translate en="Exhibiting " hi="प्रदर्शित " /></span><span className="text-metallic font-light italic"><Translate en="Categories" hi="कपड़ा श्रेणियां" /></span>
             </h2>
           </div>
           <p className="font-sans text-sm sm:text-base text-expo-warm/60 max-w-sm leading-relaxed">
-            <Translate en="Witness the elegant flow of haute couture. A journey through India's premier B2B sourcing categories." hi="हाइ-फैशन के सुरुचिपूर्ण प्रवाह का अनुभव करें। भारत की प्रमुख बी2बी सोर्सिंग श्रेणियों की एक यात्रा।" />
+            <Translate en="Explore India's premier B2B sourcing categories — from luxury ethnic drapes and dress materials to high-speed designer weaves." hi="भारत की प्रमुख बी2बी सोर्सिंग श्रेणियों का अन्वेषण करें — लक्जरी एथनिक परिधानों से लेकर हाई-स्पीड डिजाइनर बुनाई तक।" />
           </p>
         </FadeUp>
 
-        {/* Cinematic Backdrop & Text */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch mb-16">
-          <div className="col-span-12 md:col-span-5 relative group overflow-hidden border border-white/10 rounded-sm shadow-2xl min-h-[320px] flex flex-col justify-end p-8 card-tap">
-            <OptimizedVideoBg
-              src="/assets/video/fabric.mp4"
-              className="absolute inset-0 w-full h-full filter brightness-[0.55] group-hover:brightness-[0.7] transition-all duration-700 scale-100 group-hover:scale-[1.03]"
-              fallbackImage="/assets/images/fabric-gold.webp"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent z-10 pointer-events-none" />
-            
-            <div className="relative z-20">
-              <span className="text-[9px] font-bold tracking-[4px] text-expo-gold uppercase mb-2 block">
-                <Translate en="Couture Showcase" hi="उत्कृष्ट परिधान प्रदर्शन" />
-              </span>
-              <h3 className="font-serif text-2xl sm:text-3xl text-white tracking-wide leading-tight mb-4 gold-shimmer-text">
-                <Translate en="Flowing Textile Drapes" hi="प्रवाहमान वस्त्र कला" />
-              </h3>
-              <p className="font-sans text-xs text-expo-warm/60 leading-relaxed">
-                <Translate en="Observe the cinematic drapes of luxury ethnic weaves under ambient exhibition lighting." hi="प्रदर्शनी की सुंदर रोशनी में लक्जरी एथनिक बुनाई के कलात्मक प्रदर्शन को करीब से देखें।" />
-              </p>
-            </div>
-          </div>
-
-          <div className="col-span-12 md:col-span-7 flex flex-col justify-center border border-white/5 bg-black/40 backdrop-blur-md p-8 sm:p-12 rounded-sm relative overflow-hidden card-tap">
-            <div className="absolute right-[-10%] top-[-10%] w-[300px] h-[300px] bg-expo-gold/5 blur-[80px] pointer-events-none" />
-            <h4 className="font-serif text-xl sm:text-2xl text-expo-gold mb-6 italic gold-shimmer-text">
-              <Translate en="Premium Sourcing Portfolio" hi="प्रीमियम सोर्सिंग पोर्टफोलियो" />
-            </h4>
-            <p className="font-sans text-sm sm:text-base text-expo-warm/75 leading-relaxed mb-8">
-              <Translate en="Explore custom ethnic collections tailored for worldwide B2B distributors. Every fiber represents a synthesis of traditional Indian handloom heritage and modern high-speed production." hi="दुनिया भर के बी2बी वितरकों के लिए तैयार किए गए कस्टम एथनिक संग्रह का अन्वेषण करें। हर एक धागा पारंपरिक भारतीय हथकरघा विरासत और आधुनिक तीव्र गति उत्पादन के संगम का प्रतिनिधित्व करता है।" />
-            </p>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 pt-6 border-t border-white/10">
-              {[
-                { en: "SAREES", hi: "साड़ी" },
-                { en: "SUIT MATERIAL", hi: "सूट मटेरियल" },
-                { en: "DESIGNER BLOUSES", hi: "डिजाइनर ब्लाउज" },
-                { en: "DESIGNER SILKS", hi: "डिजाइनर सिल्क" },
-                { en: "CUSTOM FABRICS", hi: "कस्टम फैब्रिक्स" }
-              ].map((cat, idx) => (
-                <div key={idx} className="flex flex-col badge-tap">
-                  <span className="font-display text-sm text-white font-bold tracking-[1px]">
-                    <Translate en={cat.en} hi={cat.hi} />
-                  </span>
-                  <span className="font-sans text-[10px] text-expo-warm/40 mt-1">
-                    <Translate en="Export Ready" hi="निर्यात के लिए तैयार" />
-                  </span>
-                </div>
-              ))}
-            </div>
+        {/* Premium Sourcing Portfolio Categories Banner */}
+        <div className="w-full border border-white/5 bg-black/40 backdrop-blur-md p-8 sm:p-12 rounded-sm relative overflow-hidden card-tap mb-16">
+          <div className="absolute right-[-10%] top-[-10%] w-[300px] h-[300px] bg-expo-gold/5 blur-[80px] pointer-events-none" />
+          <h3 className="font-serif text-xl sm:text-3xl text-expo-gold mb-4 italic gold-shimmer-text">
+            <Translate en="Exhibiting Sourcing Portfolio" hi="प्रदर्शित सोर्सिंग पोर्टफोलियो" />
+          </h3>
+          <p className="font-sans text-sm sm:text-base text-expo-warm/75 leading-relaxed mb-8 max-w-4xl">
+            <Translate en="Explore custom ethnic collections tailored for worldwide B2B distributors. Every fiber represents a synthesis of traditional Indian handloom heritage and modern high-speed production." hi="दुनिया भर के बी2बी वितरकों के लिए तैयार किए गए कस्टम एथनिक संग्रह का अन्वेषण करें। हर एक धागा पारंपरिक भारतीय हथकरघा विरासत और आधुनिक तीव्र गति उत्पादन के संगम का प्रतिनिधित्व करता है।" />
+          </p>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 pt-6 border-t border-white/10">
+            {[
+              { en: "SAREES", hi: "साड़ी" },
+              { en: "SUIT MATERIAL", hi: "सूट मटेरियल" },
+              { en: "DESIGNER BLOUSES", hi: "डिजाइनर ब्लाउज" },
+              { en: "DESIGNER SILKS", hi: "डिजाइनर सिल्क" },
+              { en: "CUSTOM FABRICS", hi: "कस्टम फैब्रिक्स" }
+            ].map((cat, idx) => (
+              <div key={idx} className="flex flex-col badge-tap">
+                <span className="font-display text-sm text-white font-bold tracking-[1px]">
+                  <Translate en={cat.en} hi={cat.hi} />
+                </span>
+                <span className="font-sans text-[10px] text-expo-warm/40 mt-1">
+                  <Translate en="Export Ready" hi="निर्यात के लिए तैयार" />
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 

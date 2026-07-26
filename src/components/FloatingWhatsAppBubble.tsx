@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
 
 const PHONE_NUMBER = "919950787787";
@@ -12,14 +12,10 @@ export default function FloatingWhatsAppBubble() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Only active on mobile devices
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    if (!isMobile) return;
-
-    // Show after 3 seconds
+    // Show after 1.5 seconds
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 3000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -35,16 +31,19 @@ export default function FloatingWhatsAppBubble() {
     <AnimatePresence>
       {isVisible && (
         <motion.button
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0 }}
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
           onClick={handleClick}
-          className="fixed bottom-[88px] right-4 z-[9998] w-[52px] h-[52px] rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform animate-wa-pulse md:hidden"
+          className="fixed bottom-6 right-6 z-[9998] group flex items-center gap-2.5 px-4 py-3 rounded-full bg-[#25D366] text-white font-bold text-xs uppercase tracking-wider shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20"
           type="button"
           aria-label={language === "en" ? "Contact us on WhatsApp" : "व्हाट्सएप पर हमसे संपर्क करें"}
         >
-          <MessageSquare className="w-7 h-7 fill-white text-white" />
+          <MessageCircle className="w-5 h-5 fill-white text-[#25D366]" />
+          <span className="font-sans text-xs tracking-wider font-extrabold drop-shadow-sm">
+            {language === "en" ? "WhatsApp Us" : "व्हाट्सएप करें"}
+          </span>
         </motion.button>
       )}
     </AnimatePresence>

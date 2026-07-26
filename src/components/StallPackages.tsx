@@ -9,8 +9,7 @@ import {
   FadeUp,
   SlideFromLeft,
   SlideFromRight,
-  TapCard,
-  TapButton
+  TapCard
 } from "@/components/animations/MobileAnimations";
 
 const PHONE_NUMBER = "919950787787";
@@ -29,7 +28,7 @@ const stallTiers = [
   { id: "400", name: "Premium", nameHi: "प्रीमियम", size: 400, sqm: 37.2, base: 204000, descEn: "Large premium exhibit space designed for prominent wholesalers and bridal manufacturers.", descHi: "प्रमुख थोक विक्रेताओं और ब्राइडल निर्माताओं के लिए डिज़ाइन किया गया बड़ा प्रीमियम प्रदर्शनी स्थान।" },
   { id: "600", name: "Pro", nameHi: "प्रो", size: 600, sqm: 55.7, base: 306000, descEn: "High-visibility concourse area optimized for leading apparel and design groups.", descHi: "प्रमुख परिधान और डिजाइन समूहों के लिए अनुकूलित उच्च-दृश्यता वाला कॉनकोर्स क्षेत्र।" },
   { id: "800", name: "Pro Max", nameHi: "प्रो मैक्स", size: 800, sqm: 74.3, base: 408000, descEn: "Colossal booth layout tailored for national textile mills and premium conglomerates.", descHi: "राष्ट्रीय कपड़ा मिलों और प्रीमियम समूहों के लिए विशेष रूप से तैयार किया गया विशाल बूथ लेआउट।" },
-  { id: "1000", name: "Ultra Pro Max", nameHi: "अल्ट्रा प्रो मैक्स", size: 1000, sqm: 92.9, base: 510000, descEn: "Ultimate luxury custom-built pavilion for international export conglomerates and market leaders.", descHi: "अंतर्राष्ट्रीय निर्यात समूहों और बाजार के दिग्गजों के लिए अंतिम लक्जरी कस्टम-निर्मित मंडप।" }
+  { id: "1000", name: "Flagship Pavilion", nameHi: "फ्लैगशिप मंडप", size: 1000, sqm: 92.9, base: 510000, descEn: "Ultimate luxury custom-built pavilion for international export conglomerates and market leaders.", descHi: "अंतर्राष्ट्रीय निर्यात समूहों और बाजार के दिग्गजों के लिए अंतिम लक्जरी कस्टम-निर्मित मंडप।" }
 ];
 
 function SelfDrawingCheckmark() {
@@ -51,7 +50,6 @@ function SelfDrawingCheckmark() {
 }
 
 export default function StallPackages() {
-  const { language } = useLanguage();
   const [selectedSize, setSelectedSize] = useState<string>("400");
   const { ref: headingRef, inView: headingInView } = useInView<HTMLHeadingElement>(0.3);
 
@@ -274,7 +272,7 @@ export default function StallPackages() {
                   </div>
 
                   <h3 className="font-serif text-xl lg:text-2xl tracking-wider text-[#FFD700] uppercase mb-3 font-semibold gold-shimmer-text">
-                    Ultra Pro Max
+                    Flagship Pavilion
                   </h3>
                   <p className="font-sans text-xs text-expo-warm/75 leading-relaxed mb-6">
                     <Translate
@@ -286,14 +284,14 @@ export default function StallPackages() {
                   <div className="border-t border-white/5 py-4 flex flex-col gap-2">
                     <span className="text-2xl font-serif text-expo-gold">₹5,10,000</span>
                     <span className="text-[9px] uppercase tracking-wider text-expo-gold block">
-                      +18% GST • <Translate en="Ultra Luxury Concourse (₹510/Sqft)" hi="अल्ट्रा लक्जरी कॉनकोर्स (₹510/Sqft)" />
+                      +18% GST • <Translate en="Flagship Concourse (₹510/Sqft)" hi="फ्लैगशिप कॉनकोर्स (₹510/Sqft)" />
                     </span>
                   </div>
                 </div>
 
                 <div className="mt-8 border-t border-white/5 pt-6">
                   <a
-                    href={`https://wa.me/${PHONE_NUMBER}?text=Hi,%20I'm%20interested%20in%20the%20Ultra%20Pro%20Max%20(1000%20Sqft)%20stall%20at%20STE%202026`}
+                    href={`https://wa.me/${PHONE_NUMBER}?text=Hi,%20I'm%20interested%20in%20the%20Flagship%20Pavilion%20(1000%20Sqft)%20stall%20at%20STE%202026`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full h-[52px] md:h-auto py-3.5 md:py-3 bg-[#0c0c0c] border border-expo-gold/40 rounded-xl md:rounded-md text-expo-gold hover:text-white hover:border-[#FFD700] text-center text-sm md:text-xs tracking-wider uppercase font-bold transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 btn-shimmer"
@@ -348,7 +346,7 @@ export default function StallPackages() {
                 {[
                   { id: "100", label: "3×3m (Starter - 100 Sqft)" },
                   { id: "400", label: "6×6m (Premium - 400 Sqft)" },
-                  { id: "1000", label: "9×9m (Ultra Pro Max - 1000 Sqft)" }
+                  { id: "1000", label: "9×9m (Flagship Pavilion - 1000 Sqft)" }
                 ].map((btn) => (
                   <button
                     key={btn.id}
@@ -407,7 +405,7 @@ export default function StallPackages() {
                   <span className="text-white font-semibold">₹{currentCalc.base.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-white/[0.04]">
-                  <span className="text-expo-warm/50"><Translate en="GST (18% Service Tax)" hi="जीएसटी (18% सेवा कर)" /></span>
+                  <span className="text-expo-warm/50"><Translate en="GST (18%)" hi="जीएसटी (18%)" /></span>
                   <span className="text-white">₹{gst.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-white/10 items-center">

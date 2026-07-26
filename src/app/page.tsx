@@ -23,6 +23,11 @@ import BuyerRegistration from "@/components/BuyerRegistration";
 import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 import StallPackages from "@/components/StallPackages";
+import FloatingWhatsAppBubble from "@/components/FloatingWhatsAppBubble";
+import VenueGallery from "@/components/VenueGallery";
+import FloorPlanMap from "@/components/FloorPlanMap";
+import TravelStay from "@/components/TravelStay";
+import EventSchedule from "@/components/EventSchedule";
 
 const BrochureModal = dynamic(() => import("@/components/BrochureModal"));
 
@@ -74,8 +79,10 @@ export default function Home() {
       const isLighthouse = /Lighthouse|PageSpeed|Chrome-Lighthouse|HeadlessChrome|Googlebot|Pingdom/i.test(navigator.userAgent);
       
       if (seen === "true" || isLighthouse) {
-        setIsIntroVisible(false);
-        window.dispatchEvent(new Event("ste-intro-done"));
+        setTimeout(() => {
+          setIsIntroVisible(false);
+          window.dispatchEvent(new Event("ste-intro-done"));
+        }, 0);
       } else {
         const isMobileDevice = window.innerWidth < 768;
         const delayTime = isMobileDevice ? 2000 : 3500;
@@ -176,9 +183,9 @@ export default function Home() {
       <div className="pb-20 md:pb-0">
         <Navbar />
 
-        {/* 4. Complete Nine-Section Immersive Cinematic Sequence */}
+        {/* 4. Complete Immersive Cinematic Sequence */}
         <div id="home">
-          <CinematicHero /> {/* Section 1 */}
+          <CinematicHero />
         </div>
 
         <LazySection minHeight="200px">
@@ -213,6 +220,22 @@ export default function Home() {
           <StallPackages />
         </LazySection>
 
+        <LazySection id="floor-plan-map" minHeight="500px">
+          <FloorPlanMap />
+        </LazySection>
+
+        <LazySection id="venue-gallery" minHeight="600px">
+          <VenueGallery />
+        </LazySection>
+
+        <LazySection id="event-schedule" minHeight="500px">
+          <EventSchedule />
+        </LazySection>
+
+        <LazySection id="travel-stay" minHeight="500px">
+          <TravelStay />
+        </LazySection>
+
         <LazySection id="festival-season" minHeight="500px">
           <FestivalSeason />
         </LazySection>
@@ -245,14 +268,17 @@ export default function Home() {
           <FinalCTA />
         </LazySection>
 
-        {/* 5. Elegant Editorial Footer */}
+        {/* Editorial Footer */}
         <LazySection minHeight="300px">
           <Footer />
         </LazySection>
       </div>
 
-      {/* 7. Immersive Premium Brochure Modal */}
+      {/* Premium Brochure Modal */}
       {isBrochureOpen && <BrochureModal isOpen={isBrochureOpen} onClose={() => setIsBrochureOpen(false)} />}
+
+      {/* Floating WhatsApp Bubble */}
+      <FloatingWhatsAppBubble />
 
     </main>
   );

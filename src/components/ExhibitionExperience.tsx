@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { waapi } from "animejs";
 import { useInView } from "@/hooks/useInView";
 import { FadeUp } from "@/components/animations/MobileAnimations";
@@ -53,6 +53,25 @@ const EXHIBITION_HIGHLIGHTS = [
 export default function ExhibitionExperience() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { ref: headingRef, inView: headingInView } = useInView(0.3);
+  const [activeVideo, setActiveVideo] = useState<"exhibition" | "fabric" | "commerce">("exhibition");
+
+  const videoSources = {
+    exhibition: {
+      src: "/assets/video/exhibition.mp4",
+      titleEn: "Exhibition Walkthrough",
+      titleHi: "प्रदर्शनी वॉकथ्रू",
+    },
+    fabric: {
+      src: "/assets/video/fabric.mp4",
+      titleEn: "Fabric in Motion",
+      titleHi: "फैब्रिक इन मोशन",
+    },
+    commerce: {
+      src: "/assets/video/commerce.mp4",
+      titleEn: "B2B Commerce Portal",
+      titleHi: "B2B कॉमर्स पोर्टल",
+    },
+  };
 
   useEffect(() => {
     const listItems = containerRef.current?.querySelectorAll(".pavilion-item");
@@ -103,8 +122,9 @@ export default function ExhibitionExperience() {
       {/* Background loop walkthrough video */}
       <div className="absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none z-0">
         <OptimizedVideoBg
-          src="/assets/video/exhibition.mp4"
-          className="w-full h-full filter brightness-[0.35] contrast-[1.05]"
+          key={activeVideo}
+          src={videoSources[activeVideo].src}
+          className="w-full h-full filter brightness-[0.35] contrast-[1.05] transition-opacity duration-700"
           fallbackImage="/f_kidswear.jpeg"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-[#050505] z-10" />
@@ -114,9 +134,9 @@ export default function ExhibitionExperience() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 w-full">
         {/* Section Header */}
-        <FadeUp className="max-w-3xl mb-8 md:mb-16">
+        <FadeUp className="max-w-3xl mb-8 md:mb-12">
           <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
-            <Translate en="THE EXHIBITION VENUE" hi="प्रदर्शनी स्थल" />
+            <Translate en="THE EXHIBITION VENUE & CINEMATIC SHOWCASE" hi="प्रदर्शनी स्थल और सिनेमाई शोकेस" />
           </span>
           <h2
             ref={headingRef}
@@ -128,6 +148,30 @@ export default function ExhibitionExperience() {
           <p className="font-sans text-sm sm:text-base text-expo-warm/60 leading-relaxed mt-6 max-w-xl">
             <Translate en="Walk into India’s most prestigious, purpose-built textile arena. SIECC Sarsana Dome, Surat, is architecturally engineered to host the grandest B2B textile trade exhibitions." hi="भारत के सबसे प्रतिष्ठित, उद्देश्य-निर्मित टेक्सटाइल क्षेत्र में प्रवेश करें। SIECC सरसाना डोम, सूरत, भव्यतम B2B कपड़ा व्यापार प्रदर्शनियों की मेजबानी के लिए विशेष रूप से डिज़ाइन किया गया है।" />
           </p>
+
+          {/* Interactive Video Showcase Tabs */}
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <span className="text-[10px] uppercase tracking-widest text-expo-warm/50 font-medium mr-2">
+              <Translate en="Cinematic Reels:" hi="सिनेमाई रील्स:" />
+            </span>
+            {(["exhibition", "fabric", "commerce"] as const).map((key) => {
+              const isActive = activeVideo === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveVideo(key)}
+                  className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wider transition-all duration-300 flex items-center gap-2 border ${
+                    isActive
+                      ? "bg-expo-gold/20 border-expo-gold text-white shadow-lg shadow-expo-gold/10"
+                      : "bg-black/40 border-white/10 text-expo-warm/60 hover:text-white hover:border-white/30"
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${isActive ? "bg-expo-gold animate-ping" : "bg-white/30"}`} />
+                  <Translate en={videoSources[key].titleEn} hi={videoSources[key].titleHi} />
+                </button>
+              );
+            })}
+          </div>
         </FadeUp>
 
         {/* Layout: Interactive Blueprint overlays & Pavilions list */}

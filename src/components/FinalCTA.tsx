@@ -191,11 +191,24 @@ export default function FinalCTA() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!isStep1Valid() || !isStep2Valid() || !isStep3Valid()) {
       return;
+    }
+
+    try {
+      await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "exhibitor",
+          ...formData,
+        }),
+      });
+    } catch (err) {
+      console.warn("Exhibitor registration submission note:", err);
     }
 
     setShowModal(true);

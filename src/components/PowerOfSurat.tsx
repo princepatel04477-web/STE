@@ -10,7 +10,7 @@ import { Translate } from "@/components/LanguageContext";
 const STATS_DATA = [
   { value: 650, suffix: "+", labelEn: "EXHIBITOR STALLS", labelHi: "प्रदर्शक स्टॉल", subEn: "Surat's leading manufacturers showcasing premium catalogs", subHi: "सूरत के अग्रणी निर्माता अपने प्रीमियम संग्रह का प्रदर्शन करते हैं" },
   { value: 8000, suffix: "+", labelEn: "VERIFIED B2B BUYERS", labelHi: "सत्यापित B2B खरीदार", subEn: "Retailers, wholesalers, boutique owners & chain stores", subHi: "रिटेलर्स, थोक विक्रेता, बुटीक मालिक और स्टोर चेन" },
-  { value: 0, suffix: "", labelEn: "PAN INDIA REACH", labelHi: "अखिल भारतीय पहुंच", subEn: "Connecting sourcing hubs from across the nation", subHi: "देश भर के प्रमुख कपड़ा व्यापार केंद्रों को जोड़ना" },
+  { value: 28, suffix: " STATES", labelEn: "PAN INDIA REACH", labelHi: "अखिल भारतीय पहुंच", subEn: "Connecting buyers from all 28 Indian states & UTs", subHi: "भारत के सभी 28 राज्यों और केंद्र शासित प्रदेशों के खरीदारों को जोड़ना" },
   { value: 100, suffix: "%", labelEn: "WHOLESALE BUSINESS FOCUS", labelHi: "थोक व्यापार पर ध्यान", subEn: "Direct manufacturer pricing & high margin inventory sourcing", subHi: "सीधे निर्माताओं से मूल्य निर्धारण और उच्च मार्जिन इन्वेंट्री सोर्सिंग" },
 ];
 
@@ -62,7 +62,6 @@ export default function PowerOfSurat() {
 
             // Trigger Anime.js number animations
             STATS_DATA.forEach((stat, idx) => {
-              if (idx === 2) return; // Keep PAN India static
               const counterObj = { val: 0 };
               animate(counterObj, {
                 val: stat.value,

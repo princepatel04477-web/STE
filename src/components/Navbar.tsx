@@ -2,18 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { X, PhoneCall } from "lucide-react";
+import { X, PhoneCall, FileText, MessageCircle } from "lucide-react";
 import { useLanguage, Translate } from "@/components/LanguageContext";
 
 const PHONE_TEL = "+919950787787";
 const PHONE_DISPLAY = "+91 99507 87787";
+const WHATSAPP_URL = "https://wa.me/919950787787?text=Namaste!%20I%20visited%20the%20STE%202026%20website%20and%20would%20like%20more%20information.";
 
 const navItems = [
   { name: "Home", hiName: "होम", href: "#home" },
-  { name: "Couture", hiName: "वस्त्र कला", href: "#fabric-in-motion" },
+  { name: "Categories", hiName: "श्रेणियां", href: "#fabric-in-motion" },
   { name: "Exhibition", hiName: "प्रदर्शनी", href: "#exhibition-experience" },
-  { name: "Digital Commerce", hiName: "डिजिटल वाणिज्य", href: "#future-of-commerce" },
-  { name: "Countdown", hiName: "उल्टी गिनती", href: "#countdown-section" },
+  { name: "Commerce", hiName: "वाणिज्य", href: "#future-of-commerce" },
+  { name: "Packages", hiName: "पैकेज", href: "#packages" },
   { name: "Register", hiName: "पंजीकरण", href: "#buyer-registration" }
 ];
 
@@ -53,8 +54,8 @@ export default function Navbar() {
       "home",
       "fabric-in-motion",
       "exhibition-experience",
+      "packages",
       "future-of-commerce",
-      "countdown-section",
       "buyer-registration"
     ];
     const elements = sections.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
@@ -162,7 +163,7 @@ export default function Navbar() {
         </div>
 
         {/* Center Column: Desktop Navigation Links */}
-        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-4 lg:gap-8 text-[10px] lg:text-[11px] uppercase tracking-[0.12em] font-medium select-none">
+        <nav className="hidden lg:flex items-center justify-center gap-4 xl:gap-7 text-[10px] xl:text-[11px] uppercase tracking-[0.12em] font-medium select-none mx-auto">
           {navItems.map((item) => {
             const isActive = activeSection === item.href;
             return (
@@ -181,8 +182,8 @@ export default function Navbar() {
         </nav>
 
         {/* Right Column: Action Button, Call Support & Mobile Toggle */}
-        <div className="flex items-center z-10 gap-4 xl:gap-8">
-          <div className="hidden md:flex items-center gap-6 xl:gap-8">
+        <div className="flex items-center z-10 gap-3 xl:gap-6">
+          <div className="hidden md:flex items-center gap-3 xl:gap-5">
             <a 
               href={`tel:${PHONE_TEL}`}
               className="hidden min-[1700px]:flex items-center gap-2.5 text-expo-warm/75 hover:text-expo-gold transition-colors duration-300 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold badge-tap"
@@ -194,12 +195,12 @@ export default function Navbar() {
             </a>
 
             {/* Language Toggle Pill */}
-            <div className="relative flex items-center bg-black/40 border border-white/10 rounded-full p-0.5 select-none w-[80px] h-[32px] overflow-hidden">
+            <div className="relative flex items-center bg-black/40 border border-white/10 rounded-full p-0.5 select-none w-[76px] h-[30px] overflow-hidden shrink-0">
               <div
                 className="absolute top-0.5 bottom-0.5 rounded-full bg-expo-gold/25 border border-expo-gold/45 transition-all duration-300 ease-out"
                 style={{
-                  left: language === "en" ? "2px" : "40px",
-                  width: "36px"
+                  left: language === "en" ? "2px" : "38px",
+                  width: "34px"
                 }}
               />
               <button
@@ -220,10 +221,30 @@ export default function Navbar() {
               </button>
             </div>
             
+            {/* Download Brochure Button */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent("open-brochure"))}
+              className="hidden xl:flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-expo-gold/40 text-expo-gold font-bold text-[9px] uppercase tracking-[0.15em] hover:bg-expo-gold/10 transition-all duration-300 badge-tap shrink-0"
+            >
+              <FileText className="w-3 h-3 text-expo-gold" />
+              <Translate en="Brochure" hi="विवरणिका" />
+            </button>
+
+            {/* WhatsApp Link Button */}
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden 2xl:flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#25D366]/15 border border-[#25D366]/40 text-[#25D366] font-bold text-[9px] uppercase tracking-[0.15em] hover:bg-[#25D366]/25 transition-all duration-300 badge-tap shrink-0"
+            >
+              <MessageCircle className="w-3.5 h-3.5 fill-[#25D366] text-[#25D366]" />
+              <span>WhatsApp</span>
+            </a>
+
             <a 
               href="#final-cta"
               data-cursor="cta"
-              className="px-6 py-2.5 rounded-full bg-gold-gradient text-black font-bold text-[9px] uppercase tracking-[0.2em] transition-all duration-300 hover:scale-105 active:scale-95 shadow-md flex items-center justify-center"
+              className="px-4 py-2 rounded-full bg-gold-gradient text-black font-bold text-[9px] uppercase tracking-[0.18em] transition-all duration-300 hover:scale-105 active:scale-95 shadow-md flex items-center justify-center shrink-0"
             >
               <Translate en="Book Your Stall" hi="अपना स्टॉल बुक करें" />
             </a>
@@ -331,6 +352,23 @@ export default function Navbar() {
             <span>📲 WhatsApp Us</span>
           </a>
 
+          {/* Download Brochure Button */}
+          <button
+            onClick={() => {
+              setIsMobileOpen(false);
+              window.dispatchEvent(new CustomEvent("open-brochure"));
+            }}
+            className={`w-full h-[52px] border-2 border-expo-gold text-expo-gold flex items-center justify-center gap-2 rounded-xl font-bold text-[15px] uppercase tracking-wider btn-shimmer tap-feedback mobile-menu-cta ${
+              isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+            style={{
+              transitionDelay: "480ms"
+            }}
+          >
+            <FileText className="w-5 h-5 text-expo-gold" />
+            <Translate en="Download Brochure" hi="विवरणिका डाउनलोड करें" />
+          </button>
+
           {/* Book a Stall Button */}
           <a
             href="#packages"
@@ -339,7 +377,7 @@ export default function Navbar() {
               isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
             style={{
-              transitionDelay: "500ms"
+              transitionDelay: "520ms"
             }}
           >
             <Translate en="Book a Stall" hi="अपना स्टॉल बुक करें" />
