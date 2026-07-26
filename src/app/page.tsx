@@ -25,7 +25,6 @@ import Footer from "@/components/Footer";
 import StallPackages from "@/components/StallPackages";
 import FloatingWhatsAppBubble from "@/components/FloatingWhatsAppBubble";
 import VenueGallery from "@/components/VenueGallery";
-import FloorPlanMap from "@/components/FloorPlanMap";
 import TravelStay from "@/components/TravelStay";
 import EventSchedule from "@/components/EventSchedule";
 
@@ -218,10 +217,6 @@ export default function Home() {
 
         <LazySection id="packages" minHeight="600px">
           <StallPackages />
-        </LazySection>
-
-        <LazySection id="floor-plan-map" minHeight="500px">
-          <FloorPlanMap />
         </LazySection>
 
         <LazySection id="venue-gallery" minHeight="600px">
