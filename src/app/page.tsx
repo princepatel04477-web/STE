@@ -24,8 +24,6 @@ import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 import StallPackages from "@/components/StallPackages";
 import FloatingWhatsAppBubble from "@/components/FloatingWhatsAppBubble";
-import VenueGallery from "@/components/VenueGallery";
-import TravelStay from "@/components/TravelStay";
 import EventSchedule from "@/components/EventSchedule";
 
 const BrochureModal = dynamic(() => import("@/components/BrochureModal"));
@@ -219,16 +217,8 @@ export default function Home() {
           <StallPackages />
         </LazySection>
 
-        <LazySection id="venue-gallery" minHeight="600px">
-          <VenueGallery />
-        </LazySection>
-
         <LazySection id="event-schedule" minHeight="500px">
           <EventSchedule />
-        </LazySection>
-
-        <LazySection id="travel-stay" minHeight="500px">
-          <TravelStay />
         </LazySection>
 
         <LazySection id="festival-season" minHeight="500px">
