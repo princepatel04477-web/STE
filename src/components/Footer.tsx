@@ -173,10 +173,25 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="footer-bottom opacity-0 flex flex-col md:flex-row items-center justify-between text-[10px] font-sans tracking-widest uppercase gap-4 text-expo-warm/40">
-          <p className="text-expo-copper/70 font-semibold">
-            © 2026 AKAS Events. Crafted with precision.
-          </p>
-          <div className="flex gap-6 mt-4 md:mt-0">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+            <p className="text-expo-copper/70 font-semibold">
+              © 2026 AKAS Events. All Rights Reserved.
+            </p>
+            <span className="hidden sm:inline text-white/20">•</span>
+            <p className="text-amber-400/90 font-medium tracking-wider">
+              Developed & Managed by{" "}
+              <a
+                href="https://varunyatechnologies.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-amber-300 hover:text-white underline underline-offset-4 decoration-amber-500/50 transition-colors"
+              >
+                Varunya Technologies
+              </a>
+            </p>
+          </div>
+
+          <div className="flex gap-6 mt-2 md:mt-0">
             <a href="/privacy-policy" className="hover:text-expo-gold transition-colors duration-300">
               <Translate en="Privacy Policy" hi="गोपनीयता नीति" />
             </a>

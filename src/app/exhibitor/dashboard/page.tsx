@@ -178,6 +178,9 @@ export default function ExhibitorDashboardPage() {
       }));
 
     try {
+      // Also save stall profile
+      await handleSaveProfile();
+
       const res = await fetch('/api/exhibitor/extras', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -186,9 +189,11 @@ export default function ExhibitorDashboardPage() {
 
       const data = await res.json();
       if (res.ok) {
-        setExtrasSuccessMsg('Your extra requirements have been submitted to the organizers!');
+        setExtrasSuccessMsg('Your requirements have been submitted successfully! Redirecting to homepage...');
         setLastSubmittedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-        setTimeout(() => setExtrasSuccessMsg(''), 5000);
+        setTimeout(() => {
+          router.push('/');
+        }, 1500);
       }
     } catch (err) {
       console.error(err);

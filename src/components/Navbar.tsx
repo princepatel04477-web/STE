@@ -13,7 +13,6 @@ const navItems = [
   { name: "Couture", hiName: "वस्त्र कला", href: "#fabric-in-motion" },
   { name: "Exhibition", hiName: "प्रदर्शनी", href: "#exhibition-experience" },
   { name: "Digital Commerce", hiName: "डिजिटल वाणिज्य", href: "#future-of-commerce" },
-  { name: "Countdown", hiName: "उल्टी गिनती", href: "#countdown-section" },
   { name: "Register", hiName: "पंजीकरण", href: "#buyer-registration" }
 ];
 
