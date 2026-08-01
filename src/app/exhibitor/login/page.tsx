@@ -32,7 +32,7 @@ export default function ExhibitorLoginPage() {
         return;
       }
 
-      router.push('/exhibitor/dashboard');
+      router.push(data.redirectUrl || '/exhibitor/dashboard');
     } catch (err) {
       console.error(err);
       setError('Connection error. Please try again.');

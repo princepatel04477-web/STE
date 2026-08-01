@@ -242,7 +242,15 @@ export default function ExhibitorDashboardPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {(mobile === '9106139666' || mobile === '9950787787') && (
+              <a
+                href="/admin/exhibitors"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-extrabold transition-all shadow-md animate-pulse"
+              >
+                👑 Organizer Admin Console
+              </a>
+            )}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-950 border border-neutral-800 text-xs text-neutral-300">
               <Phone className="w-3.5 h-3.5 text-amber-500" />
               <span>User ID: <strong className="text-white">{mobile}</strong></span>

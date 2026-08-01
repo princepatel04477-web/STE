@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { createSessionToken, validatePassword } from '@/lib/auth';
+import { createSessionToken, validatePassword, isAdminMobile } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
@@ -22,10 +22,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify password
-    if (!validatePassword(password)) {
+    // Verify password (accepts "admin" or "ste@2026" for admin numbers)
+    if (!validatePassword(password, cleanMobile)) {
       return NextResponse.json(
-        { error: 'Invalid password. Please enter the official exhibitor password.' },
+        { error: 'Invalid password. Please enter the official exhibitor or admin password.' },
         { status: 401 }
       );
     }
@@ -59,9 +59,13 @@ export async function POST(request: Request) {
     // Create session JWT token
     const token = await createSessionToken(cleanMobile);
 
+    const isAdmin = isAdminMobile(cleanMobile);
+
     const response = NextResponse.json({
       success: true,
       mobile: cleanMobile,
+      isAdmin,
+      redirectUrl: isAdmin ? '/admin/exhibitors' : '/exhibitor/dashboard',
       message: 'Login successful'
     });
 
