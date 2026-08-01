@@ -11,8 +11,13 @@ export interface SyncPayload {
  * Sends exhibitor application data to Google Sheets Webhook URL in real-time.
  * Maps individual product quantities into dedicated spreadsheet columns.
  */
+const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwAqQFBsWvgiz5lSGvkfAlpKTObhIQNVI8nb1cTXza8uUVrwCPImG_-OtyJ78EDnq0j/exec';
+
 export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean> {
-  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL || process.env.GOOGLE_SHEET_WEBHOOK_URL;
+  const webhookUrl =
+    process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
+    process.env.GOOGLE_SHEET_WEBHOOK_URL ||
+    DEFAULT_WEBHOOK_URL;
 
   if (!webhookUrl || !webhookUrl.startsWith('http')) {
     console.log('[GoogleSheets] No valid GOOGLE_SHEETS_WEBHOOK_URL set in env. Skipping external sync.');

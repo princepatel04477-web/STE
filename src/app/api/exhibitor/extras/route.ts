@@ -77,14 +77,18 @@ export async function POST(request: Request) {
       .prepare('SELECT brand_name, stall_sqft FROM exhibitors WHERE mobile = ?')
       .get(session.mobile) as { brand_name: string; stall_sqft: string } | undefined;
 
-    // Trigger async sync to Google Sheets
-    syncToGoogleSheets({
-      mobile: session.mobile,
-      brand_name: profile?.brand_name || '',
-      stall_sqft: profile?.stall_sqft || '',
-      items,
-      special_notes: cleanNotes
-    }).catch(err => console.error('Google Sheets background sync error:', err));
+    // Sync to Google Sheets and await completion for Vercel Serverless execution
+    try {
+      await syncToGoogleSheets({
+        mobile: session.mobile,
+        brand_name: profile?.brand_name || '',
+        stall_sqft: profile?.stall_sqft || '',
+        items,
+        special_notes: cleanNotes
+      });
+    } catch (err) {
+      console.error('Google Sheets background sync error:', err);
+    }
 
     return NextResponse.json({
       success: true,
