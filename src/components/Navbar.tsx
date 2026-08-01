@@ -51,7 +51,6 @@ export default function Navbar() {
       "fabric-in-motion",
       "exhibition-experience",
       "future-of-commerce",
-      "countdown-section",
       "buyer-registration"
     ];
     const elements = sections.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
