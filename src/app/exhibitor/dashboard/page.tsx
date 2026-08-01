@@ -120,8 +120,8 @@ export default function ExhibitorDashboardPage() {
     }
   };
 
-  const handleSaveProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveProfile = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setProfileSaving(true);
     setProfileSuccessMsg('');
     setProfileError('');
