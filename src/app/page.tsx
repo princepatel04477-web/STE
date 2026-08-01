@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage, Translate } from "@/components/LanguageContext";
 import { useInView } from "react-intersection-observer";
 
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 
 import Navbar from "@/components/Navbar";
 import CinematicHero from "@/components/CinematicHero";
@@ -33,23 +33,23 @@ function LazySection({ id, className = "", minHeight = "150px", children }: Lazy
   );
 }
 
-const CollaborationSection = dynamic(() => import("@/components/CollaborationSection"));
-const PowerOfSurat = dynamic(() => import("@/components/PowerOfSurat"));
-const BusinessEcosystem = dynamic(() => import("@/components/BusinessEcosystem"));
-const FabricInMotion = dynamic(() => import("@/components/FabricInMotion"));
-const ExhibitionExperience = dynamic(() => import("@/components/ExhibitionExperience"));
-const FutureOfCommerce = dynamic(() => import("@/components/FutureOfCommerce"));
-const BilingualSection = dynamic(() => import("@/components/BilingualSection"));
-const TrustSection = dynamic(() => import("@/components/TrustSection"));
-const SponsorSection = dynamic(() => import("@/components/SponsorSection"));
-const PremiumTransitions = dynamic(() => import("@/components/PremiumTransitions"));
-const FestivalSeason = dynamic(() => import("@/components/FestivalSeason"));
-const CountdownSection = dynamic(() => import("@/components/CountdownSection"));
-const BuyerRegistration = dynamic(() => import("@/components/BuyerRegistration"));
-const FinalCTA = dynamic(() => import("@/components/FinalCTA"));
-const Footer = dynamic(() => import("@/components/Footer"));
-const BrochureModal = dynamic(() => import("@/components/BrochureModal"));
-const StallPackages = dynamic(() => import("@/components/StallPackages"));
+const CollaborationSection = nextDynamic(() => import("@/components/CollaborationSection"));
+const PowerOfSurat = nextDynamic(() => import("@/components/PowerOfSurat"));
+const BusinessEcosystem = nextDynamic(() => import("@/components/BusinessEcosystem"));
+const FabricInMotion = nextDynamic(() => import("@/components/FabricInMotion"));
+const ExhibitionExperience = nextDynamic(() => import("@/components/ExhibitionExperience"));
+const FutureOfCommerce = nextDynamic(() => import("@/components/FutureOfCommerce"));
+const BilingualSection = nextDynamic(() => import("@/components/BilingualSection"));
+const TrustSection = nextDynamic(() => import("@/components/TrustSection"));
+const SponsorSection = nextDynamic(() => import("@/components/SponsorSection"));
+const PremiumTransitions = nextDynamic(() => import("@/components/PremiumTransitions"));
+const FestivalSeason = nextDynamic(() => import("@/components/FestivalSeason"));
+const CountdownSection = nextDynamic(() => import("@/components/CountdownSection"));
+const BuyerRegistration = nextDynamic(() => import("@/components/BuyerRegistration"));
+const FinalCTA = nextDynamic(() => import("@/components/FinalCTA"));
+const Footer = nextDynamic(() => import("@/components/Footer"));
+const BrochureModal = nextDynamic(() => import("@/components/BrochureModal"));
+const StallPackages = nextDynamic(() => import("@/components/StallPackages"));
 
 export default function Home() {
   const { language } = useLanguage();
