@@ -11,7 +11,7 @@ export interface SyncPayload {
  * Sends exhibitor application data to Google Sheets Webhook URL in real-time.
  * Maps individual product quantities into dedicated spreadsheet columns.
  */
-const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwAqQFBsWvgiz5lSGvkfAlpKTObhIQNVI8nb1cTXza8uUVrwCPImG_-OtyJ78EDnq0j/exec';
+const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyQ1S-MmDZ_2Q6jW-Eo6MhPfWcQslplwcbFZjn_sZZRPeN1169qkQd8vOdOGvt91d3q/exec';
 
 export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean> {
   const webhookUrl =
