@@ -132,10 +132,10 @@ export default function BilingualSection() {
 
             <div className="border-t border-white/10 pt-6 mt-8">
               <a
-                href="#final-cta"
+                href="/exhibitor/login"
                 className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[2px] text-[#FFBF80] hover:text-[#FF9933] transition-colors duration-300"
               >
-                Book Manufacturer Stall • <span className="text-hindi text-[10px] tracking-normal font-semibold lowercase">स्टॉल बुक करें</span> ➔
+                Exhibitor's Portal • <span className="text-hindi text-[10px] tracking-normal font-semibold lowercase">प्रदर्शक पोर्टल</span> ➔
               </a>
             </div>
           </div>

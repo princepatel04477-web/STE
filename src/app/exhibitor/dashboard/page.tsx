@@ -580,6 +580,42 @@ export default function ExhibitorDashboardPage() {
         </section>
 
       </main>
+
+      {/* Sticky Floating Bottom Submit Bar for Easy Mobile & Desktop Access */}
+      <div className="fixed bottom-0 inset-x-0 z-40 bg-neutral-900/95 backdrop-blur-xl border-t border-amber-500/30 p-4 shadow-2xl">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="text-xs">
+              <span className="text-white font-bold block sm:inline">
+                {brandName ? brandName : 'Stall Profile'}: {selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : 'Custom') : `${selectedSqftOption} sq ft`}
+              </span>
+              <span className="text-neutral-400 sm:ml-2">
+                ({totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'} selected)
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button
+              onClick={handleSaveProfile}
+              disabled={profileSaving}
+              className="flex-1 sm:flex-initial px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold rounded-xl text-xs border border-neutral-700 transition-all disabled:opacity-50"
+            >
+              {profileSaving ? 'Saving...' : '1. Save Details'}
+            </button>
+
+            <button
+              onClick={handleSaveExtras}
+              disabled={extrasSaving}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-neutral-950 font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all transform active:scale-95 disabled:opacity-50"
+            >
+              <Send className="w-4 h-4" />
+              <span>{extrasSaving ? 'Submitting...' : '2. Submit All Requirements'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

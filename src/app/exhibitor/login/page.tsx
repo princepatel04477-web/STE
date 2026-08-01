@@ -110,7 +110,7 @@ export default function ExhibitorLoginPage() {
               </div>
               <p className="mt-2 text-xs text-neutral-500 flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-                Default password for exhibitors: <span className="font-mono text-amber-400 font-semibold">STE2026</span>
+                Default password for exhibitors: <span className="font-mono text-amber-400 font-semibold">ste@2026</span>
               </p>
             </div>
 

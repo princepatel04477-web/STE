@@ -49,6 +49,29 @@ db.exec(`
   );
 `);
 
+// Seed allowed exhibitors from file if present
+try {
+  const filePath = path.join(process.cwd(), 'STE-Registerd-Mobile-Numbers.md');
+  if (fs.existsSync(filePath)) {
+    const fileData = fs.readFileSync(filePath, 'utf8');
+    const lines = fileData.split(/\r?\n/);
+    const insertAllowed = db.prepare('INSERT OR IGNORE INTO allowed_exhibitors (mobile, notes) VALUES (?, ?)');
+    db.transaction(() => {
+      insertAllowed.run('9106139666', 'Demo Exhibitor Account');
+      lines.forEach(line => {
+        const clean = line.replace(/\D/g, '');
+        if (clean.length >= 10) {
+          insertAllowed.run(clean.slice(-10), 'Registered Exhibitor');
+        }
+      });
+    })();
+  } else {
+    db.prepare('INSERT OR IGNORE INTO allowed_exhibitors (mobile, notes) VALUES (?, ?)').run('9106139666', 'Demo Exhibitor Account');
+  }
+} catch (e) {
+  console.warn('Allowed exhibitors auto-seed warning:', e);
+}
+
 // Seed initial default products if table is empty
 const productCount = db.prepare('SELECT COUNT(*) as count FROM extra_products').get() as { count: number };
 if (productCount.count === 0) {

@@ -296,17 +296,25 @@ export default function FinalCTA() {
               inView ? "in-view" : ""
             }`}
           >
-            <Translate en="Exhibitor Stall" hi="प्रदर्शक स्टॉल" /> <br />
-            <span className="text-metallic font-light italic normal-case">
-              <Translate en="Booking Request" hi="बुकिंग अनुरोध" />
+            <Translate en="Exhibitor Stalls" hi="प्रदर्शक स्टॉल" /> <br />
+            <span className="text-amber-400 font-bold normal-case">
+              <Translate en="100% SOLD OUT" hi="100% सोल्ड आउट" />
             </span>
           </h2>
-          <p className="font-sans text-sm sm:text-base text-expo-warm/60 leading-relaxed max-w-lg mb-8">
-            <Translate
-              en="Book your premium exhibition space at SIECC Sarsana Dome, Surat. With 650+ stalls and 8000+ verified buyers from all across India, establish critical connections and command maximum B2B seasonal trade."
-              hi="सूरत के एसआईईसीसी सरसाणा डोम में अपने प्रीमियम प्रदर्शनी स्थान को बुक करें। पूरे भारत से 650+ स्टॉल और 8000+ सत्यापित खरीदारों के साथ, महत्वपूर्ण संबंध स्थापित करें और अधिकतम बी2बी मौसमी व्यापार का लाभ उठाएं।"
-            />
-          </p>
+          <div className="mb-8 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 max-w-lg">
+            <p className="font-sans text-xs sm:text-sm text-amber-300 font-semibold leading-relaxed mb-3">
+              <Translate
+                en="All exhibition stalls for STE 2026 are officially sold out. Registered exhibitors can log in below to manage booth requirements and extra amenities."
+                hi="STE 2026 के लिए सभी प्रदर्शनी स्टॉल आधिकारिक तौर पर बिक चुके हैं। पंजीकृत प्रदर्शक अपनी आवश्यकताओं और अतिरिक्त सुविधाओं का प्रबंधन करने के लिए नीचे लॉग इन कर सकते हैं।"
+              />
+            </p>
+            <a
+              href="/exhibitor/login"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+            >
+              <Translate en="Enter Exhibitor's Portal ➔" hi="प्रदर्शक पोर्टल में प्रवेश करें ➔" />
+            </a>
+          </div>
 
           <div className="flex items-center gap-6 border-t border-white/10 pt-8 mt-4 z-30 select-none">
             {/* STE Logo */}

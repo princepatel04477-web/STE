@@ -444,12 +444,12 @@ export default function CinematicHero() {
             }}
           >
             <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 mt-10 z-40 w-full max-w-sm md:max-w-none px-4 md:px-0">
-              {/* Book Stall CTA */}
+              {/* Exhibitor's Portal CTA */}
               <MagneticButton
-                href="#final-cta"
+                href="/exhibitor/login"
                 className="w-full md:w-auto md:min-w-[200px] h-[52px] md:h-auto md:py-4 px-6 rounded-xl md:rounded-md bg-gold-gradient text-black font-bold text-base md:text-xs tracking-[1.5px] uppercase flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg"
               >
-                <Translate en="Book Exhibition Stall" hi="प्रदर्शनी स्टॉल बुक करें" />
+                <Translate en="Exhibitor's Portal" hi="प्रदर्शक पोर्टल" />
               </MagneticButton>
 
               {/* View Stall Brochure in Modal */}

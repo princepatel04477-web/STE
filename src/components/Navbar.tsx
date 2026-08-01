@@ -219,11 +219,11 @@ export default function Navbar() {
             </div>
             
             <a 
-              href="#final-cta"
+              href="/exhibitor/login"
               data-cursor="cta"
               className="px-6 py-2.5 rounded-full bg-gold-gradient text-black font-bold text-[9px] uppercase tracking-[0.2em] transition-all duration-300 hover:scale-105 active:scale-95 shadow-md flex items-center justify-center"
             >
-              <Translate en="Book Your Stall" hi="अपना स्टॉल बुक करें" />
+              <Translate en="Exhibitor's Portal" hi="प्रदर्शक पोर्टल" />
             </a>
           </div>
 
@@ -329,9 +329,9 @@ export default function Navbar() {
             <span>📲 WhatsApp Us</span>
           </a>
 
-          {/* Book a Stall Button */}
+          {/* Exhibitor's Portal Button */}
           <a
-            href="#packages"
+            href="/exhibitor/login"
             onClick={() => setIsMobileOpen(false)}
             className={`w-full h-[52px] bg-gold-gradient text-black flex items-center justify-center rounded-xl font-extrabold text-[15px] uppercase tracking-wider btn-shimmer tap-feedback mobile-menu-cta ${
               isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
@@ -340,7 +340,7 @@ export default function Navbar() {
               transitionDelay: "500ms"
             }}
           >
-            <Translate en="Book a Stall" hi="अपना स्टॉल बुक करें" />
+            <Translate en="Exhibitor's Portal" hi="प्रदर्शक पोर्टल" />
           </a>
         </div>
       </div>

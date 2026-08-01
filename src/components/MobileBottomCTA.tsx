@@ -74,17 +74,16 @@ export default function MobileBottomCTA() {
               </span>
             </button>
 
-            {/* Direct Booking CTA */}
-            <button
-              onClick={handleBookClick}
-              className="flex-1 h-full text-black flex items-center justify-center gap-1.5 font-display font-extrabold text-sm tracking-widest uppercase active:bg-black/5 transition-all btn-shimmer tap-feedback"
-              type="button"
+            {/* Exhibitor's Portal CTA */}
+            <a
+              href="/exhibitor/login"
+              className="flex-1 h-full text-black flex items-center justify-center gap-1.5 font-display font-extrabold text-xs tracking-widest uppercase active:bg-black/5 transition-all btn-shimmer tap-feedback"
             >
               <span>
-                <Translate en="Book Stall Now" hi="अभी स्टॉल बुक करें" />
+                <Translate en="Exhibitor's Portal" hi="प्रदर्शक पोर्टल" />
               </span>
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </a>
           </div>
         </motion.div>
       )}
