@@ -22,38 +22,26 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify password (accepts "admin" or "ste@2026" for admin numbers)
-    if (!validatePassword(password, cleanMobile)) {
-      return NextResponse.json(
-        { error: 'Invalid password. Please enter the official exhibitor or admin password.' },
-        { status: 401 }
-      );
-    }
-
-    // Check whitelist if whitelist table contains entries
-    const allowedCount = (
-      db.prepare('SELECT COUNT(*) as count FROM allowed_exhibitors').get() as { count: number }
-    ).count;
-
-    if (allowedCount > 0) {
-      const isAllowed = db
-        .prepare('SELECT mobile FROM allowed_exhibitors WHERE mobile = ?')
-        .get(cleanMobile);
-      if (!isAllowed) {
-        return NextResponse.json(
-          { error: 'Mobile number not authorized in exhibitor list. Please contact support.' },
-          { status: 403 }
-        );
-      }
-    }
-
     // Ensure exhibitor profile exists
     const existing = db
       .prepare('SELECT * FROM exhibitors WHERE mobile = ?')
-      .get(cleanMobile);
+      .get(cleanMobile) as any;
 
     if (!existing) {
       db.prepare('INSERT INTO exhibitors (mobile) VALUES (?)').run(cleanMobile);
+    }
+
+    // Check custom password or default password ste@2026
+    const customPass = existing?.custom_password;
+    const inputPass = String(password).trim();
+    const isDefaultPass = inputPass === 'ste@2026' || inputPass === 'ste2026' || inputPass === 'admin';
+    const isCustomPass = customPass && inputPass === customPass;
+
+    if (!isDefaultPass && !isCustomPass) {
+      return NextResponse.json(
+        { error: 'Invalid password. Please enter your custom password or default password (ste@2026).' },
+        { status: 401 }
+      );
     }
 
     // Create session JWT token

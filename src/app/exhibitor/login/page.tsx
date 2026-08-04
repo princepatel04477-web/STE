@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, Phone, ArrowRight, ShieldCheck, Sparkles, Building2, Crown, Store } from 'lucide-react';
+import { Lock, Phone, ArrowRight, ShieldCheck, Sparkles, Building2, Crown, Store, KeyRound, CheckCircle2, X } from 'lucide-react';
 
 export default function ExhibitorLoginPage() {
   const router = useRouter();
@@ -13,6 +13,72 @@ export default function ExhibitorLoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showAdminChoiceModal, setShowAdminChoiceModal] = useState(false);
+
+  // Reset Password Modal States
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetMobile, setResetMobile] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+
+  const handleOpenReset = () => {
+    setResetMobile(mobile);
+    setNewPassword('');
+    setConfirmPassword('');
+    setResetError('');
+    setResetSuccess('');
+    setShowResetModal(true);
+  };
+
+  const handleResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError('');
+    setResetSuccess('');
+
+    if (newPassword !== confirmPassword) {
+      setResetError('Passwords do not match. Please re-type.');
+      return;
+    }
+
+    if (newPassword.length < 4) {
+      setResetError('Password must be at least 4 characters.');
+      return;
+    }
+
+    setResetLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile: resetMobile, new_password: newPassword })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setResetError(data.error || 'Failed to update password.');
+        setResetLoading(false);
+        return;
+      }
+
+      setResetSuccess('Password updated successfully! Redirecting...');
+      setTimeout(() => {
+        if (data.isAdmin) {
+          setShowResetModal(false);
+          setShowAdminChoiceModal(true);
+        } else {
+          router.push('/exhibitor/dashboard');
+        }
+      }, 1200);
+    } catch (err) {
+      console.error(err);
+      setResetError('Connection error. Please try again.');
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,10 +182,20 @@ export default function ExhibitorLoginPage() {
                   className="block w-full pl-11 pr-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm"
                 />
               </div>
-              <p className="mt-2 text-xs text-neutral-500 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-                Default password for exhibitors: <span className="font-mono text-amber-400 font-semibold">ste@2026</span>
-              </p>
+              <div className="mt-2 flex items-center justify-between text-xs">
+                <p className="text-neutral-500 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
+                  Default pass: <span className="font-mono text-amber-400 font-semibold">ste@2026</span>
+                </p>
+                <button
+                  type="button"
+                  onClick={handleOpenReset}
+                  className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 flex items-center gap-1 transition-colors"
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                  <span>Set / Forgot Password?</span>
+                </button>
+              </div>
             </div>
 
             <div>
@@ -146,6 +222,114 @@ export default function ExhibitorLoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Reset / Create Custom Password Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border border-amber-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <button
+              type="button"
+              onClick={() => setShowResetModal(false)}
+              className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-white rounded-full bg-neutral-800/50 hover:bg-neutral-800 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-4 text-amber-400">
+              <KeyRound className="w-6 h-6" />
+            </div>
+
+            <h3 className="text-2xl font-bold text-white mb-1 font-serif tracking-tight">
+              Create / Reset Password
+            </h3>
+            <p className="text-xs text-neutral-400 mb-6 leading-relaxed">
+              Enter your registered mobile number and set your custom login password.
+            </p>
+
+            {resetError && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs flex items-center gap-2">
+                <span className="font-bold">Error:</span> {resetError}
+              </div>
+            )}
+
+            {resetSuccess && (
+              <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{resetSuccess}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleResetSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  Registered Mobile Number
+                </label>
+                <div className="relative rounded-xl shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
+                    <Phone className="h-4 w-4" />
+                  </div>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Enter registered 10-digit mobile"
+                    value={resetMobile}
+                    onChange={(e) => setResetMobile(e.target.value)}
+                    className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-xs font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  New Custom Password
+                </label>
+                <div className="relative rounded-xl shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
+                    <Lock className="h-4 w-4" />
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Type new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
+                  Confirm New Password
+                </label>
+                <div className="relative rounded-xl shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
+                    <Lock className="h-4 w-4" />
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Re-type new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={resetLoading}
+                  className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-amber-500/30 rounded-xl shadow-lg text-xs font-bold text-neutral-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition-all disabled:opacity-50"
+                >
+                  {resetLoading ? 'Saving Password...' : 'Save New Password & Log In'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Admin Access Choice Modal */}
       {showAdminChoiceModal && (

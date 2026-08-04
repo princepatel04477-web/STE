@@ -41,7 +41,7 @@ export const REGISTERED_EXHIBITOR_MOBILES = [
 
 interface Schema {
   allowed_exhibitors: Array<{ id: number; mobile: string; notes: string; created_at: string }>;
-  exhibitors: Array<{ id: number; mobile: string; brand_name: string; stall_sqft: string; updated_at: string }>;
+  exhibitors: Array<{ id: number; mobile: string; brand_name: string; stall_sqft: string; custom_password?: string; updated_at: string }>;
   extra_products: Array<{ id: string; name: string; category: string; description: string; unit: string; icon_name: string; is_active: number }>;
   exhibitor_orders: Array<{ id: number; mobile: string; items_json: string; special_notes: string; updated_at: string }>;
 }
@@ -200,6 +200,27 @@ export const db = {
               mobile,
               brand_name,
               stall_sqft,
+              updated_at: new Date().toISOString()
+            });
+          }
+          saveData(data);
+          return { changes: 1 };
+        }
+
+        if (q.includes('update exhibitors set custom_password = ?')) {
+          const custom_password = String(args[0]);
+          const mobile = String(args[1]);
+          const ex = data.exhibitors.find(e => e.mobile === mobile);
+          if (ex) {
+            ex.custom_password = custom_password;
+            ex.updated_at = new Date().toISOString();
+          } else {
+            data.exhibitors.push({
+              id: data.exhibitors.length + 1,
+              mobile,
+              brand_name: '',
+              stall_sqft: '',
+              custom_password,
               updated_at: new Date().toISOString()
             });
           }
