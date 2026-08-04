@@ -27,41 +27,19 @@ export default function OptimizedVideoBg({
 }: OptimizedVideoBgProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile, { passive: true });
-    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   useEffect(() => {
-    if (isMobile || !isMounted) return;
-
+    if (!isMounted) return;
     const container = containerRef.current;
     if (!container) return;
 
-    let isVisible = false;
-    let isTabActive = !document.hidden;
-
-    const updatePlayState = () => {
-      const video = videoRef.current;
-      if (!video) return;
-
-      if (isVisible && isTabActive) {
-        video.play().catch(() => {});
-      } else {
-        video.pause();
-      }
-    };
-
-    // Lazy load the video source when container is close to the viewport (200px)
+    // Immediately load video or use IntersectionObserver with 400px margin
     const lazyObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -71,81 +49,57 @@ export default function OptimizedVideoBg({
           }
         });
       },
-      { rootMargin: "200px" }
+      { rootMargin: "400px" }
     );
     lazyObserver.observe(container);
 
-    const visibilityObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          isVisible = entry.isIntersecting;
-          updatePlayState();
-        });
-      },
-      { threshold: 0.01 }
-    );
-    visibilityObserver.observe(container);
+    return () => lazyObserver.disconnect();
+  }, [isMounted]);
 
-    const handleVisibilityChange = () => {
-      isTabActive = !document.hidden;
-      updatePlayState();
+  useEffect(() => {
+    if (!shouldLoadVideo) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    const playVideo = () => {
+      video.muted = true;
+      video.play().catch(() => {});
     };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    playVideo();
+    video.addEventListener("canplay", playVideo);
+    video.addEventListener("loadeddata", playVideo);
+    window.addEventListener("touchstart", playVideo, { once: true });
+    window.addEventListener("click", playVideo, { once: true });
 
     return () => {
-      lazyObserver.disconnect();
-      visibilityObserver.disconnect();
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      video.removeEventListener("canplay", playVideo);
+      video.removeEventListener("loadeddata", playVideo);
+      window.removeEventListener("touchstart", playVideo);
+      window.removeEventListener("click", playVideo);
     };
-  }, [isMobile, isMounted]);
-
-  if (!isMounted) {
-    return (
-      <div ref={containerRef} className={className} style={{ ...style, position: "relative" }}>
-        {fallbackImage && (
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url('${fallbackImage}')` }}
-          />
-        )}
-      </div>
-    );
-  }
-
-  if (isMobile) {
-    return (
-      <div ref={containerRef} className={className} style={{ ...style, position: "relative" }}>
-        {fallbackImage && (
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url('${fallbackImage}')` }}
-          />
-        )}
-      </div>
-    );
-  }
+  }, [shouldLoadVideo, src]);
 
   return (
-    <div ref={containerRef} className={className} style={{ ...style, position: "relative" }}>
-      {shouldLoadVideo ? (
+    <div ref={containerRef} className={`${className} relative overflow-hidden`} style={style}>
+      {fallbackImage && (
+        <div
+          className="absolute inset-0 bg-cover bg-center pointer-events-none -z-10"
+          style={{ backgroundImage: `url('${fallbackImage}')` }}
+        />
+      )}
+      {shouldLoadVideo && (
         <video
           ref={videoRef}
           src={src}
           poster={poster || fallbackImage}
-          preload="metadata"
+          preload="auto"
           autoPlay={autoPlay}
           loop={loop}
           muted={muted}
           playsInline={playsInline}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover relative z-0"
         />
-      ) : (
-        fallbackImage && (
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url('${fallbackImage}')` }}
-          />
-        )
       )}
     </div>
   );

@@ -283,22 +283,11 @@ export default function CinematicHero() {
         ref={bgRef}
         className="absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none z-0"
       >
-        {isMounted && !isMobile && (
+        {isMounted && (
           <BoomerangVideoBg
             src="/assets/video/hero.mp4"
-            className="w-full h-full object-cover filter brightness-[0.35] contrast-[1.1] animate-canvas-zoom"
+            className="w-full h-full object-cover filter brightness-[0.45] contrast-[1.1] animate-canvas-zoom"
             fallbackImage="/assets/images/f_kidswear.webp"
-          />
-        )}
-        {/* Mobile static image fallback */}
-        {(isMobile || !isMounted) && (
-          <img
-            src="/assets/images/f_kidswear.webp"
-            alt=""
-            fetchPriority="high"
-            loading="eager"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.25] contrast-[1.1]"
           />
         )}
         {/* Cinematic dark linear gradient & noise texture */}

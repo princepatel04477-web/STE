@@ -17,7 +17,9 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const framesRef = useRef<ImageBitmap[]>([]);
-  
+  const [loadError, setLoadError] = useState(false);
+  const [useNativeVideo, setUseNativeVideo] = useState(false);
+
   const stateRef = useRef({
     capturing: true,
     framesReady: false,
@@ -27,12 +29,37 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
     lastCapTime: -1,
   });
 
-  const [loadError, setLoadError] = useState(false);
-
   const PLAYBACK_FPS = 30;
   const FRAME_MS = 1000 / PLAYBACK_FPS;
   const MAX_WIDTH = 960;
   const MAX_FRAMES = 90; // max 3 seconds at 30fps
+
+  // Force play video natively on all devices
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const playVideo = () => {
+      video.muted = true;
+      video.play().catch((err) => {
+        console.warn("Autoplay attempt handled:", err);
+      });
+    };
+
+    playVideo();
+
+    video.addEventListener("canplay", playVideo);
+    video.addEventListener("loadedmetadata", playVideo);
+    window.addEventListener("touchstart", playVideo, { once: true });
+    window.addEventListener("click", playVideo, { once: true });
+
+    return () => {
+      video.removeEventListener("canplay", playVideo);
+      video.removeEventListener("loadedmetadata", playVideo);
+      window.removeEventListener("touchstart", playVideo);
+      window.removeEventListener("click", playVideo);
+    };
+  }, [src]);
 
   useEffect(() => {
     const el = videoRef.current;
@@ -89,38 +116,17 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
         });
         framesRef.current.push(bitmap);
       } catch {
-        // Fallback to canvas capture if createImageBitmap fails
-        const offscreen = document.createElement("canvas");
-        offscreen.width = w;
-        offscreen.height = h;
-        const ctx = offscreen.getContext("2d");
-        if (!ctx) return;
-        ctx.drawImage(vid, 0, 0, w, h);
-        const fallback = await createImageBitmap(offscreen);
-        framesRef.current.push(fallback);
+        // Fallback to native HTML5 video if canvas bitmap capture fails
+        s.capturing = false;
+        setUseNativeVideo(true);
       }
     };
 
-    // VFC loop for capture (most accurate)
-    type VFCVideo = HTMLVideoElement & {
-      requestVideoFrameCallback?: (cb: () => void) => number;
-    };
-    const vfc = el as VFCVideo;
-    const hasVFC = typeof vfc.requestVideoFrameCallback === "function";
-
     let rafCapId = 0;
-
     const rafCapLoop = () => {
       captureFrame();
       if (s.capturing) {
         rafCapId = requestAnimationFrame(rafCapLoop);
-      }
-    };
-
-    const vfcLoop = () => {
-      captureFrame();
-      if (s.capturing && vfc.requestVideoFrameCallback) {
-        vfc.requestVideoFrameCallback(vfcLoop);
       }
     };
 
@@ -139,16 +145,14 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
         if (video) {
           video.style.display = "none";
         }
+      } else {
+        setUseNativeVideo(true);
       }
     };
 
     const onLoaded = () => {
       el.play().catch(() => {});
-      if (hasVFC) {
-        vfc.requestVideoFrameCallback!(vfcLoop);
-      } else {
-        rafCapId = requestAnimationFrame(rafCapLoop);
-      }
+      rafCapId = requestAnimationFrame(rafCapLoop);
     };
 
     el.addEventListener("loadedmetadata", onLoaded);
@@ -160,7 +164,6 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
       cancelAnimationFrame(rafCapId);
       el.removeEventListener("loadedmetadata", onLoaded);
       el.removeEventListener("ended", onEnded);
-      // Cleanup ImageBitmaps to free GPU memory
       framesRef.current.forEach((bm) => bm.close());
       framesRef.current = [];
     };
@@ -171,28 +174,24 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Use 2d context with alpha: false for faster compositing
     const ctx = canvas.getContext("2d", {
       alpha: false,
-      desynchronized: true, // reduces latency on supported browsers
+      desynchronized: true,
     });
     if (!ctx) return;
 
     const s = stateRef.current;
 
     const unsubscribe = masterRAF.subscribe((timestamp: number) => {
-      if (!s.framesReady) return;
+      if (!s.framesReady || useNativeVideo) return;
       const frames = framesRef.current;
       if (frames.length === 0) return;
 
-      // Throttle to PLAYBACK_FPS
       if (timestamp - s.lastTick < FRAME_MS) return;
       s.lastTick = timestamp;
 
-      // Draw current frame
       ctx.drawImage(frames[s.index], 0, 0);
 
-      // Advance boomerang index
       s.index += s.direction;
       if (s.index >= frames.length - 1) {
         s.index = frames.length - 1;
@@ -204,7 +203,7 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
     });
 
     return unsubscribe;
-  }, []);
+  }, [useNativeVideo]);
 
   return (
     <div className={`absolute inset-0 w-full h-full overflow-hidden ${className}`}>
@@ -212,19 +211,22 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
         ref={videoRef}
         src={src}
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ opacity: 1 }}
+        style={{ opacity: 1, display: useNativeVideo ? "block" : undefined }}
+        autoPlay
+        loop
         muted
         playsInline
         preload="auto"
-        crossOrigin="anonymous"
-        onError={() => setLoadError(true)}
+        onError={() => {
+          setLoadError(true);
+          setUseNativeVideo(true);
+        }}
       />
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         style={{ display: "none" }}
       />
-      {/* Image fallback for mobile or load errors */}
       {loadError && fallbackImage && (
         <div
           className="absolute inset-0 bg-cover bg-center"
