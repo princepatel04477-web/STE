@@ -42,8 +42,12 @@ export function isAdminMobile(mobile: string): boolean {
   return ADMIN_MOBILES.includes(clean);
 }
 
-export function validatePassword(password: string, mobile?: string): boolean {
-  const p = password.trim().toLowerCase();
+export function validatePassword(password: string, customPassword?: string): boolean {
+  const p = password.trim();
+  if (customPassword && customPassword.trim() !== '') {
+    return p === customPassword.trim();
+  }
+  const pLower = p.toLowerCase();
   const envPass = DEFAULT_PASSWORD.trim().toLowerCase();
-  return p === envPass || p === 'ste@2026' || p === 'ste2026' || p === 'admin';
+  return pLower === envPass || pLower === 'ste@2026' || pLower === 'ste2026' || pLower === 'admin';
 }

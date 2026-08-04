@@ -34,12 +34,15 @@ export async function POST(request: Request) {
     // Check custom password or default password ste@2026
     const customPass = existing?.custom_password;
     const inputPass = String(password).trim();
-    const isDefaultPass = inputPass === 'ste@2026' || inputPass === 'ste2026' || inputPass === 'admin';
-    const isCustomPass = customPass && inputPass === customPass;
+    const isValidPassword = validatePassword(inputPass, customPass);
 
-    if (!isDefaultPass && !isCustomPass) {
+    if (!isValidPassword) {
       return NextResponse.json(
-        { error: 'Invalid password. Please enter your custom password or default password (ste@2026).' },
+        {
+          error: customPass
+            ? 'Invalid password. Please enter your custom password.'
+            : 'Invalid password. Please enter your custom password or default password (ste@2026).'
+        },
         { status: 401 }
       );
     }
