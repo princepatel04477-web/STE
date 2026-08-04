@@ -7,6 +7,7 @@ import { useMobileAnimation } from "./useMobileAnimation";
 import { GoldParticles } from "@/components/GoldParticles";
 import BoomerangVideoBg from "@/BoomerangVideoBg";
 import { masterRAF } from "@/hooks/useMasterRAF";
+import TextReveal from "@/components/TextReveal";
 
 const MinimalThreeOverlay = lazy(() => import("@/MinimalThreeOverlay"));
 
@@ -342,18 +343,12 @@ export default function CinematicHero() {
             }}
           >
             <h1 className="font-serif text-hero-mobile md:text-7xl lg:text-8xl tracking-[-0.02em] md:tracking-[-0.035em] text-white mb-6 leading-[1.15] md:leading-[0.9] uppercase max-w-4xl flex flex-wrap justify-center gap-x-3 gap-y-1 gold-shimmer-text">
-              {currentTitleWords.map((word, idx) => (
-                <span
-                  key={`${language}-${idx}`}
-                  className={`inline-block ${
-                    word.highlight
-                      ? "gold-foil-text font-light italic normal-case pr-2"
-                      : ""
-                  }`}
-                >
-                  {word.text}
-                </span>
-              ))}
+              <TextReveal
+                text={language === "en" ? "INDIA'S BIGGEST Textile B2B OPPORTUNITY" : "भारत का सबसे बड़ा टेक्सटाइल B2B अवसर"}
+                highlightWords={["Textile", "B2B", "टेक्सटाइल"]}
+                stagger={0.09}
+                delay={0.15}
+              />
             </h1>
           </div>
         </div>
