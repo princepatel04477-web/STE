@@ -3,7 +3,8 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
-import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award } from 'lucide-react';
+import Link from 'next/link';
+import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store } from 'lucide-react';
 
 interface ExhibitorItem {
   id: string;
@@ -114,7 +115,15 @@ export default function AdminExhibitorsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/exhibitor/dashboard"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent hover:bg-amber-500/20 border border-amber-500/40 text-xs font-bold text-amber-300 transition-all shadow-sm"
+            >
+              <Store className="w-4 h-4 text-amber-400" />
+              <span>Exhibitor Portal</span>
+            </Link>
+
             <button
               onClick={fetchExhibitors}
               className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs font-semibold text-neutral-300 transition-all shadow-sm"
