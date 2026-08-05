@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import db, { REGISTERED_EXHIBITOR_MOBILES } from '@/lib/db';
+import db, { REGISTERED_EXHIBITOR_MOBILES, saveRemotePassword } from '@/lib/db';
 import { createSessionToken, isAdminMobile } from '@/lib/auth';
 
 export async function POST(request: Request) {
@@ -38,8 +38,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Update custom_password in DB
+    // Update custom_password in local DB memory & remote persistent store
     db.prepare('UPDATE exhibitors SET custom_password = ? WHERE mobile = ?').run(cleanPass, cleanMobile);
+    await saveRemotePassword(cleanMobile, cleanPass);
 
     // Create session JWT token for instant login
     const token = await createSessionToken(cleanMobile);
@@ -53,13 +54,22 @@ export async function POST(request: Request) {
       message: 'Password updated successfully! Logging you in...'
     });
 
-    // Set HTTP-only cookie
+    // Set HTTP-only session cookie
     response.cookies.set('exhibitor_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7 // 7 days
+    });
+
+    // Set HTTP-only custom password backup cookie
+    response.cookies.set(`ste_custom_pass_${cleanMobile}`, cleanPass, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365 // 1 year
     });
 
     return response;

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
+import { cookies } from 'next/headers';
+import db, { fetchRemotePasswords } from '@/lib/db';
 import { createSessionToken, validatePassword, isAdminMobile } from '@/lib/auth';
 
 export async function POST(request: Request) {
@@ -31,8 +32,13 @@ export async function POST(request: Request) {
       db.prepare('INSERT INTO exhibitors (mobile) VALUES (?)').run(cleanMobile);
     }
 
-    // Check custom password or default password ste@2026
-    const customPass = existing?.custom_password;
+    // Retrieve custom password from local memory, backup cookie, or remote persistent store
+    const cookieStore = await cookies();
+    const cookiePass = cookieStore.get(`ste_custom_pass_${cleanMobile}`)?.value;
+    const remoteMap = await fetchRemotePasswords();
+    const remotePass = remoteMap[cleanMobile];
+
+    const customPass = existing?.custom_password || cookiePass || remotePass;
     const inputPass = String(password).trim();
     const isValidPassword = validatePassword(inputPass, customPass);
 

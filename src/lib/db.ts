@@ -104,6 +104,47 @@ function saveData(data: Schema) {
   }
 }
 
+const STORE_ID = 'ff8081819f7e10ae019fd336b0567bfa';
+const STORE_URL = `https://api.restful-api.dev/objects/${STORE_ID}`;
+let remotePassMapCache: Record<string, string> | null = null;
+
+export async function fetchRemotePasswords(): Promise<Record<string, string>> {
+  try {
+    const res = await fetch(STORE_URL, { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data && json.data.pass_map) {
+        remotePassMapCache = json.data.pass_map;
+        return json.data.pass_map;
+      }
+    }
+  } catch (e) {
+    console.error('Error fetching remote passwords:', e);
+  }
+  return remotePassMapCache || {};
+}
+
+export async function saveRemotePassword(mobile: string, customPass: string): Promise<boolean> {
+  try {
+    const currentMap = await fetchRemotePasswords();
+    currentMap[mobile] = customPass;
+    remotePassMapCache = currentMap;
+
+    await fetch(STORE_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'ste_passwords',
+        data: { pass_map: currentMap }
+      })
+    });
+    return true;
+  } catch (e) {
+    console.error('Error saving remote password:', e);
+    return false;
+  }
+}
+
 // Database API Abstraction Layer matching SQL operations
 export const db = {
   prepare(sql: string) {
