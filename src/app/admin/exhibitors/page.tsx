@@ -201,7 +201,7 @@ export default function AdminExhibitorsPage() {
                   <span className="text-2xl font-black text-amber-400 font-mono">
                     {item.quantity}
                   </span>
-                  <span className="text-[10px] font-mono uppercase text-neutral-500">
+                  <span className="text-xs font-mono uppercase text-neutral-500">
                     {item.unit}
                   </span>
                 </div>
@@ -239,7 +239,7 @@ export default function AdminExhibitorsPage() {
             <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs text-neutral-300">
-                  <thead className="bg-neutral-950 border-b border-neutral-800 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+                  <thead className="bg-neutral-950 border-b border-neutral-800 text-xs font-bold uppercase tracking-wider text-neutral-400">
                     <tr>
                       <th className="py-3.5 px-4">Mobile (ID)</th>
                       <th className="py-3.5 px-4">Brand Name</th>
@@ -259,7 +259,7 @@ export default function AdminExhibitorsPage() {
                           {ex.brand_name}
                         </td>
                         <td className="py-4 px-4 whitespace-nowrap">
-                          <span className="px-2.5 py-1 rounded-md bg-neutral-950 border border-neutral-800 font-mono text-amber-300 text-[11px]">
+                          <span className="px-2.5 py-1 rounded-md bg-neutral-950 border border-neutral-800 font-mono text-amber-300 text-xs">
                             {ex.stall_sqft}
                           </span>
                         </td>
@@ -267,7 +267,7 @@ export default function AdminExhibitorsPage() {
                           {ex.items && ex.items.length > 0 ? (
                             <div className="space-y-1">
                               {ex.items.map((item, i) => (
-                                <div key={i} className="flex items-center gap-1.5 text-[11px]">
+                                <div key={i} className="flex items-center gap-1.5 text-xs">
                                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                                   <span className="font-medium text-white">{item.name}</span>
                                   <span className="text-neutral-500 font-mono">({item.quantity} {item.unit})</span>
@@ -281,7 +281,7 @@ export default function AdminExhibitorsPage() {
                         <td className="py-4 px-4 max-w-xs text-neutral-400 truncate">
                           {ex.special_notes || '—'}
                         </td>
-                        <td className="py-4 px-4 text-neutral-500 whitespace-nowrap text-[11px]">
+                        <td className="py-4 px-4 text-neutral-500 whitespace-nowrap text-xs">
                           {ex.last_updated ? new Date(ex.last_updated).toLocaleString() : '—'}
                         </td>
                       </tr>

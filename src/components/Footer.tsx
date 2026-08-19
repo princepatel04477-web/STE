@@ -172,7 +172,7 @@ export default function Footer() {
         <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#B87333]/30 to-transparent mb-8" />
 
         {/* Bottom Bar */}
-        <div className="footer-bottom opacity-0 flex flex-col md:flex-row items-center justify-between text-[10px] font-sans tracking-widest uppercase gap-4 text-expo-warm/40">
+        <div className="footer-bottom opacity-0 flex flex-col md:flex-row items-center justify-between text-xs font-sans tracking-widest uppercase gap-4 text-expo-warm/60">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
             <p className="text-expo-copper/70 font-semibold">
               © 2026 AKAS Events. All Rights Reserved.

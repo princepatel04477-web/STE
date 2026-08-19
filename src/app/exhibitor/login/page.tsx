@@ -341,7 +341,7 @@ export default function ExhibitorLoginPage() {
               <Crown className="w-7 h-7" />
             </div>
 
-            <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold uppercase tracking-widest rounded-full inline-block mb-2">
+            <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-widest rounded-full inline-block mb-2">
               Admin Access Granted
             </span>
 
@@ -366,7 +366,7 @@ export default function ExhibitorLoginPage() {
                     <div className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">
                       Organizer Admin Console
                     </div>
-                    <div className="text-[11px] text-neutral-400">
+                    <div className="text-xs text-neutral-400">
                       View all exhibitors & item-wise total quantities
                     </div>
                   </div>
@@ -387,7 +387,7 @@ export default function ExhibitorLoginPage() {
                     <div className="text-sm font-bold text-white group-hover:text-amber-200 transition-colors">
                       Exhibitor Portal
                     </div>
-                    <div className="text-[11px] text-neutral-400">
+                    <div className="text-xs text-neutral-400">
                       Manage your own stall & extra item requirements
                     </div>
                   </div>

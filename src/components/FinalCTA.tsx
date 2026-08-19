@@ -287,7 +287,7 @@ export default function FinalCTA() {
         
         {/* Left column: Text invitations */}
         <div className="lg:col-span-5 flex flex-col justify-center">
-          <span className="text-[10px] sm:text-xs font-bold tracking-[6px] text-expo-gold uppercase mb-6 block">
+          <span className="text-xs font-bold tracking-[6px] text-expo-gold uppercase mb-6 block">
             <Translate en="EXHIBITOR REGISTRATION" hi="प्रदर्शक पंजीकरण" />
           </span>
           <h2
@@ -329,7 +329,7 @@ export default function FinalCTA() {
                   className="object-contain filter drop-shadow-[0_0_8px_rgba(214,160,102,0.3)] transition-transform duration-500 group-hover/logo:scale-105"
                 />
               </div>
-              <span className="font-sans text-[8px] tracking-[1.5px] text-expo-warm/50 block mt-2 text-center uppercase font-bold">
+              <span className="font-sans text-xs tracking-[1.5px] text-expo-warm/50 block mt-2 text-center uppercase font-bold">
                 <Translate en="Ecosystem Organizer" hi="मुख्य आयोजक" />
               </span>
             </div>
@@ -347,7 +347,7 @@ export default function FinalCTA() {
                   className="object-contain scale-[1.3] transition-transform duration-500 group-hover/logo:scale-[1.38]"
                 />
               </div>
-              <span className="font-sans text-[8px] tracking-[1.5px] text-expo-warm/50 block mt-3 text-center uppercase font-bold">
+              <span className="font-sans text-xs tracking-[1.5px] text-expo-warm/50 block mt-3 text-center uppercase font-bold">
                 <Translate en="Supporting Association" hi="सहायक संघ" />
               </span>
             </div>
@@ -366,11 +366,11 @@ export default function FinalCTA() {
                   <h3 className="font-serif text-xl sm:text-2xl text-white italic">
                     <Translate en="Stall Registration" hi="स्टॉल पंजीकरण" />
                   </h3>
-                  <p className="font-sans text-[9px] tracking-[1.5px] uppercase text-expo-warm/50 mt-1">
+                  <p className="font-sans text-xs tracking-[1.5px] uppercase text-expo-warm/50 mt-1">
                     <Translate en="Surat Textile Exhibition 2026" hi="सूरत टेक्सटाइल प्रदर्शनी 2026" />
                   </p>
                 </div>
-                <span className="font-sans text-[10px] tracking-[3px] text-expo-gold font-bold uppercase">
+                <span className="font-sans text-xs tracking-[3px] text-expo-gold font-bold uppercase">
                   <Translate en="Step" hi="चरण" /> {currentStep} / 3
                 </span>
               </div>
@@ -397,12 +397,12 @@ export default function FinalCTA() {
                   return (
                     <div key={item.step} className="flex flex-col items-center relative z-10">
                       <motion.div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center font-sans text-[10px] font-bold transition-all duration-500 border ${
+                        className={`w-7 h-7 rounded-full flex items-center justify-center font-sans text-xs font-bold transition-all duration-500 border ${
                           isActive
                             ? "bg-black border-expo-gold text-expo-gold shadow-[0_0_10px_rgba(214,160,102,0.3)]"
                             : isCompleted
                             ? "bg-expo-gold border-expo-gold text-expo-midnight"
-                            : "bg-[#0c0c0c] border-white/10 text-expo-warm/40"
+                            : "bg-[#0c0c0c] border-white/10 text-expo-warm/60"
                         }`}
                         animate={{
                           scale: isActive ? 1.08 : 1,
@@ -416,7 +416,7 @@ export default function FinalCTA() {
                             ? "text-expo-gold"
                             : isCompleted
                             ? "text-expo-warm"
-                            : "text-expo-warm/30"
+                            : "text-expo-warm/60"
                         }`}
                       >
                         {language === "en" ? item.labelEn : item.labelHi}
@@ -447,7 +447,7 @@ export default function FinalCTA() {
                       <div className="flex flex-col gap-4">
                         {/* Company Name */}
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                          <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                             <Translate en="Company Name *" hi="कंपनी का नाम *" />
                           </label>
                           <input
@@ -462,7 +462,7 @@ export default function FinalCTA() {
 
                         {/* Contact Person */}
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                          <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                             <Translate en="Contact Person *" hi="संपर्क व्यक्ति *" />
                           </label>
                           <input
@@ -477,7 +477,7 @@ export default function FinalCTA() {
 
                         {/* Email Address */}
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                          <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                             <Translate en="Email Address *" hi="ईमेल पता *" />
                           </label>
                           <input
@@ -492,7 +492,7 @@ export default function FinalCTA() {
 
                         {/* Mobile / Contact Number */}
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                          <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                             <Translate en="Mobile Number *" hi="मोबाइल नंबर *" />
                           </label>
                           <input
@@ -507,7 +507,7 @@ export default function FinalCTA() {
 
                         {/* WhatsApp Checkbox */}
                         <label className="flex items-center justify-between py-2 cursor-pointer select-none group">
-                          <span className="font-sans text-[10px] text-expo-warm/80 uppercase tracking-[1px] group-hover:text-expo-gold transition-colors duration-300">
+                          <span className="font-sans text-xs text-expo-warm/80 uppercase tracking-[1px] group-hover:text-expo-gold transition-colors duration-300">
                             <Translate en="WhatsApp same as mobile" hi="व्हाट्सएप मोबाइल नंबर के समान है" />
                           </span>
                           <div className="relative inline-flex items-center">
@@ -531,7 +531,7 @@ export default function FinalCTA() {
                               transition={{ duration: 0.25, ease: "easeInOut" }}
                               className="overflow-hidden flex flex-col gap-1.5"
                             >
-                              <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                              <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                                 <Translate en="WhatsApp Number *" hi="व्हाट्सएप नंबर *" />
                               </label>
                               <input
@@ -554,11 +554,11 @@ export default function FinalCTA() {
                         {/* GSTIN with loader and validation badges */}
                         <div className="flex flex-col gap-1.5 relative">
                           <div className="flex justify-between items-center">
-                            <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                            <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                               <Translate en="GSTIN (Optional)" hi="जीएसटीआईएन (वैकल्पिक)" />
                             </label>
                             {isGstLoading && (
-                              <span className="flex items-center gap-1.5 text-[8px] text-expo-gold/70 font-bold uppercase tracking-[1px]">
+                              <span className="flex items-center gap-1.5 text-xs text-expo-gold/70 font-bold uppercase tracking-[1px]">
                                 <svg className="animate-spin h-2.5 w-2.5 text-expo-gold" fill="none" viewBox="0 0 24 24">
                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -567,12 +567,12 @@ export default function FinalCTA() {
                               </span>
                             )}
                             {!isGstLoading && gstValid === true && (
-                              <span className="text-[8px] text-emerald-400 font-bold uppercase tracking-[1px] flex items-center gap-1 animate-fade-in">
+                              <span className="text-xs text-emerald-400 font-bold uppercase tracking-[1px] flex items-center gap-1 animate-fade-in">
                                 <Translate en="✓ Form Verified" hi="✓ फॉर्म सत्यापित" />
                               </span>
                             )}
                             {!isGstLoading && gstValid === false && (
-                              <span className="text-[8px] text-rose-400 font-bold uppercase tracking-[1px] flex items-center gap-1 animate-fade-in">
+                              <span className="text-xs text-rose-400 font-bold uppercase tracking-[1px] flex items-center gap-1 animate-fade-in">
                                 <Translate en="⚠ Invalid Format" hi="⚠ अमान्य प्रारूप" />
                               </span>
                             )}
@@ -595,7 +595,7 @@ export default function FinalCTA() {
 
                         {/* Business Type */}
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                          <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                             <Translate en="Business Type *" hi="व्यवसाय का प्रकार *" />
                           </label>
                           <select
@@ -616,7 +616,7 @@ export default function FinalCTA() {
 
                         {/* Monthly/Annual Turnover */}
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                          <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                             <Translate en="Annual Turnover *" hi="वार्षिक टर्नओवर *" />
                           </label>
                           <select
@@ -640,7 +640,7 @@ export default function FinalCTA() {
                       <div className="flex flex-col gap-4">
                         {/* Preferred Stall Area */}
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                          <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                             <Translate en="Preferred Stall Area *" hi="पसंदीदा स्टॉल क्षेत्र *" />
                           </label>
                           <select
@@ -659,7 +659,7 @@ export default function FinalCTA() {
 
                         {/* Category Interested In */}
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                          <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                             <Translate en="Category Interested In *" hi="रुचि की श्रेणी *" />
                           </label>
                           <select
@@ -682,7 +682,7 @@ export default function FinalCTA() {
 
                         {/* City */}
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-sans text-[9px] tracking-[2px] text-expo-gold uppercase">
+                          <label className="font-sans text-xs tracking-[2px] text-expo-gold uppercase">
                             <Translate en="City *" hi="शहर *" />
                           </label>
                           <input
@@ -716,7 +716,7 @@ export default function FinalCTA() {
                             <span className="font-serif text-xs text-white italic">
                               <Translate en="Surat Textile Exhibition 2026" hi="सूरत टेक्सटाइल प्रदर्शनी 2026" />
                             </span>
-                            <span className="font-sans text-[8px] tracking-[2px] bg-expo-gold/15 text-expo-gold px-2 py-0.5 rounded-sm uppercase font-bold">
+                            <span className="font-sans text-xs tracking-[2px] bg-expo-gold/15 text-expo-gold px-2 py-0.5 rounded-sm uppercase font-bold">
                               STE Surat 2026
                             </span>
                           </div>
@@ -770,7 +770,7 @@ export default function FinalCTA() {
                     className="flex-[2] py-4 bg-white/5 border border-white/10 text-white hover:border-expo-gold/60 hover:text-expo-gold disabled:opacity-30 disabled:border-white/5 disabled:text-white/20 disabled:hover:text-white/20 disabled:hover:border-white/5 rounded-sm font-sans font-bold text-xs tracking-[3px] uppercase transition-all duration-300 flex items-center justify-center gap-1"
                   >
                     <span><Translate en="Continue" hi="जारी रखें" /></span>
-                    <span className="text-[10px]">→</span>
+                    <span className="text-xs">→</span>
                   </button>
                 ) : (
                   <motion.button
@@ -786,7 +786,7 @@ export default function FinalCTA() {
               
               <a
                 href={`tel:${SUPPORT_PHONE}`}
-                className="w-full py-3 bg-transparent border border-white/5 hover:border-expo-gold/30 hover:text-expo-gold text-expo-warm/50 rounded-sm font-sans font-bold text-center text-[10px] tracking-[2px] uppercase overflow-hidden transition-all duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold badge-tap active:scale-95"
+                className="w-full py-3 bg-transparent border border-white/5 hover:border-expo-gold/30 hover:text-expo-gold text-expo-warm/50 rounded-sm font-sans font-bold text-center text-xs tracking-[2px] uppercase overflow-hidden transition-all duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold badge-tap active:scale-95"
               >
                 <Translate en="CALL SOURCING HOTLINE:" hi="सोर्सिंग हॉटलाइन पर कॉल करें:" /> {SUPPORT_DISPLAY}
               </a>
@@ -801,7 +801,7 @@ export default function FinalCTA() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 md:backdrop-blur-sm">
           <div className="relative w-full max-w-lg border border-expo-gold/30 bg-[#070707] p-8 sm:p-10 rounded-lg shadow-[0_0_40px_rgba(214,160,102,0.25)] flex flex-col items-center text-center animate-fade-in">
-             <div className="absolute top-4 right-4 cursor-pointer text-expo-warm/40 hover:text-white transition-colors duration-300"
+             <div className="absolute top-4 right-4 cursor-pointer text-expo-warm/60 hover:text-white transition-colors duration-300"
                   onClick={() => {
                     setShowModal(false);
                     triggerCaptchaReset();
@@ -828,20 +828,20 @@ export default function FinalCTA() {
             </p>
 
             <div className="w-full bg-white/[0.02] border border-white/5 p-4 rounded-sm text-left mb-6 flex flex-col gap-2.5">
-              <div className="flex justify-between text-[11px]">
-                <span className="text-expo-warm/40 uppercase tracking-[1px]">
+              <div className="flex justify-between text-xs">
+                <span className="text-expo-warm/60 uppercase tracking-[1px]">
                   <Translate en="Company Name:" hi="कंपनी का नाम:" />
                 </span>
                 <span className="text-white font-bold">{formData.companyName}</span>
               </div>
-              <div className="flex justify-between text-[11px]">
-                <span className="text-expo-warm/40 uppercase tracking-[1px]">
+              <div className="flex justify-between text-xs">
+                <span className="text-expo-warm/60 uppercase tracking-[1px]">
                   <Translate en="Contact Person:" hi="संपर्क व्यक्ति:" />
                 </span>
                 <span className="text-white font-bold">{formData.contactPerson}</span>
               </div>
-              <div className="flex justify-between text-[11px]">
-                <span className="text-expo-warm/40 uppercase tracking-[1px]">
+              <div className="flex justify-between text-xs">
+                <span className="text-expo-warm/60 uppercase tracking-[1px]">
                   <Translate en="Required Area:" hi="आवश्यक क्षेत्र:" />
                 </span>
                 <span className="text-expo-gold font-bold">
@@ -852,8 +852,8 @@ export default function FinalCTA() {
                    formData.stallDimension}
                 </span>
               </div>
-              <div className="flex justify-between text-[11px]">
-                <span className="text-expo-warm/40 uppercase tracking-[1px]">
+              <div className="flex justify-between text-xs">
+                <span className="text-expo-warm/60 uppercase tracking-[1px]">
                   <Translate en="Trade Category:" hi="व्यापाल श्रेणी:" />
                 </span>
                 <span className="text-white font-bold">
@@ -868,8 +868,8 @@ export default function FinalCTA() {
                    formData.primaryCategory}
                 </span>
               </div>
-              <div className="flex justify-between text-[11px]">
-                <span className="text-expo-warm/40 uppercase tracking-[1px]">
+              <div className="flex justify-between text-xs">
+                <span className="text-expo-warm/60 uppercase tracking-[1px]">
                   <Translate en="City Sourced:" hi="शहर:" />
                 </span>
                 <span className="text-white font-bold">{formData.city}</span>
@@ -892,13 +892,13 @@ export default function FinalCTA() {
                   setShowModal(false);
                   triggerCaptchaReset();
                 }}
-                className="w-full py-3.5 bg-transparent border border-white/10 hover:border-white/30 rounded-sm text-white/70 hover:text-white font-sans text-[11px] tracking-[2px] uppercase transition-all duration-300 badge-tap active:scale-95"
+                className="w-full py-3.5 bg-transparent border border-white/10 hover:border-white/30 rounded-sm text-white/70 hover:text-white font-sans text-xs tracking-[2px] uppercase transition-all duration-300 badge-tap active:scale-95"
               >
                 <Translate en="Close Window" hi="विंडो बंद करें" />
               </button>
             </div>
             
-            <p className="text-[9px] text-expo-warm/30 uppercase tracking-[1.5px] mt-6">
+            <p className="text-xs text-expo-warm/60 uppercase tracking-[1.5px] mt-6">
               <Translate en="Our sourcing hotline is open 24/7 at" hi="हमारी सोर्सिंग हॉटलाइन 24/7 खुली है:" /> {SUPPORT_DISPLAY}
             </p>
           </div>

@@ -116,7 +116,7 @@ export default function FestivalSeason() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24">
         {/* Section Header */}
         <FadeUp className="max-w-3xl mb-16 sm:mb-24">
-          <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+          <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             <Translate en="THE FESTIVAL IMPERATIVE" hi="त्योहारी मांग का महत्व" />
           </span>
           <h2
@@ -149,19 +149,19 @@ export default function FestivalSeason() {
             >
               <div className="noise-overlay" />
               <div className="flex justify-between items-start">
-                <span className="font-sans text-[8px] tracking-[3px] text-expo-gold uppercase bg-black/60 px-2 py-1 border border-white/5 rounded-sm badge-tap">
+                <span className="font-sans text-xs tracking-[3px] text-expo-gold uppercase bg-black/60 px-2 py-1 border border-white/5 rounded-sm badge-tap">
                   <Translate en="Seasonal Trade Analysis" hi="मौसमी व्यापार विश्लेषण" />
                 </span>
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
               <div>
-                <span className="font-sans text-[9px] tracking-[2px] text-expo-warm/50 uppercase block mb-1">
+                <span className="font-sans text-xs tracking-[2px] text-expo-warm/50 uppercase block mb-1">
                   <Translate en="B2B INDEX REPORT" hi="बी2बी इंडेक्स रिपोर्ट" />
                 </span>
                 <h3 className="font-serif text-lg sm:text-xl text-white font-medium gold-shimmer-text">
                   <Translate en="Loom Demand Peak" hi="लूम मांग का उच्चतम स्तर" />
                 </h3>
-                <p className="font-sans text-[10px] text-expo-warm/60 mt-1 leading-relaxed">
+                <p className="font-sans text-xs text-expo-warm/60 mt-1 leading-relaxed">
                   <Translate en="Surat's weaving clusters project a 400% average manufacturing surge leading up to the Diwali and Wedding season." hi="सूरत के बुनाई क्लस्टर्स दिवाली और शादी के सीजन से पहले विनिर्माण में औसतन 400% की वृद्धि का अनुमान लगाते हैं।" />
                 </p>
               </div>
@@ -178,14 +178,14 @@ export default function FestivalSeason() {
               }}
             >
               <div className="noise-overlay" />
-              <span className="font-sans text-[8px] tracking-[3px] text-expo-gold uppercase bg-black/60 px-2 py-1 border border-white/5 rounded-sm self-start badge-tap">
+              <span className="font-sans text-xs tracking-[3px] text-expo-gold uppercase bg-black/60 px-2 py-1 border border-white/5 rounded-sm self-start badge-tap">
                 <Translate en="Textile Sourcing Core" hi="कपड़ा सोर्सिंग का केंद्र" />
               </span>
               <div>
                 <h3 className="font-serif text-lg sm:text-xl text-white font-medium gold-shimmer-text">
                   <Translate en="Haute Zari Threads" hi="उत्कृष्ट जरी धागे" />
                 </h3>
-                <p className="font-sans text-[10px] text-expo-warm/60 mt-1 leading-relaxed">
+                <p className="font-sans text-xs text-expo-warm/60 mt-1 leading-relaxed">
                   <Translate en="High-fidelity metallic weaves crafted specifically for premium bridal suits and wedding heavy-drape sarees." hi="विशेष रूप से प्रीमियम ब्राइडल सूट और भारी शादी की साड़ियों के लिए तैयार की गई बारीक धातुई बुनाई।" />
                 </p>
               </div>
@@ -208,15 +208,15 @@ export default function FestivalSeason() {
                       <h4 className="font-serif text-lg text-white font-semibold group-hover:text-expo-gold transition-colors duration-300 gold-shimmer-text">
                         <Translate en={fest.nameEn} hi={fest.nameHi} />
                       </h4>
-                      <span className="font-sans text-[9px] tracking-wide text-expo-warm/40 block mt-0.5">
+                      <span className="font-sans text-xs tracking-wide text-expo-warm/60 block mt-0.5">
                         <Translate en={fest.periodEn} hi={fest.periodHi} />
                       </span>
                     </div>
-                    <span className="font-sans text-[9px] tracking-wider text-expo-gold bg-[#D6A066]/10 border border-[#D6A066]/20 px-2 py-0.5 rounded font-bold uppercase shrink-0 badge-tap">
+                    <span className="font-sans text-xs tracking-wider text-expo-gold bg-[#D6A066]/10 border border-[#D6A066]/20 px-2 py-0.5 rounded font-bold uppercase shrink-0 badge-tap">
                       <Translate en={fest.demandEn} hi={fest.demandHi} />
                     </span>
                   </div>
-                  <p className="font-sans text-[11px] sm:text-xs text-expo-warm/50 leading-relaxed">
+                  <p className="font-sans text-xs text-expo-warm/50 leading-relaxed">
                     <Translate en={fest.descEn} hi={fest.descHi} />
                   </p>
                 </div>

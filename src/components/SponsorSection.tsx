@@ -139,7 +139,7 @@ export default function SponsorSection() {
             {doubleSponsors.map((sponsor, idx) => (
               <div
                 key={`${sponsor.name}-${idx}`}
-                className="floating-logo-item flex items-center justify-center px-8 py-4 rounded-xl border border-white/5 bg-[#0a0a0a]/50 text-expo-warm/40 hover:text-expo-gold hover:border-expo-gold/40 hover:shadow-[0_0_30px_rgba(214,160,102,0.25)] transition-all duration-700 ease-luxury cursor-pointer filter grayscale-[100%] brightness-[160%] opacity-[70%] hover:grayscale-0 hover:brightness-[100%] hover:opacity-100 card-tap"
+                className="floating-logo-item flex items-center justify-center px-8 py-4 rounded-xl border border-white/5 bg-[#0a0a0a]/50 text-expo-warm/60 hover:text-expo-gold hover:border-expo-gold/40 hover:shadow-[0_0_30px_rgba(214,160,102,0.25)] transition-all duration-700 ease-luxury cursor-pointer filter grayscale-[100%] brightness-[160%] opacity-[70%] hover:grayscale-0 hover:brightness-[100%] hover:opacity-100 card-tap"
               >
                 {sponsor.logo}
               </div>

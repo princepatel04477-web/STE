@@ -113,7 +113,7 @@ export default function FutureOfCommerce() {
         {/* Section Header */}
         <div className="max-w-3xl mb-16 sm:mb-24">
           <FadeUp delay={0}>
-            <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+            <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
               <Translate en="WHOLESALE SOURCING PORTAL" hi="थोक सोर्सिंग पोर्टल" />
             </span>
           </FadeUp>
@@ -141,7 +141,7 @@ export default function FutureOfCommerce() {
           {/* Left Block: Business Benefits */}
           <div className="commerce-panel opacity-0 translate-y-[25px] lg:col-span-7 flex flex-col justify-between border-glow-card p-8 sm:p-12 min-h-[500px] card-tap">
             <div>
-              <span className="font-sans text-[10px] tracking-[4px] text-expo-gold uppercase font-bold block mb-4">
+              <span className="font-sans text-xs tracking-[4px] text-expo-gold uppercase font-bold block mb-4">
                 <Translate en="COMMERCIAL ADVANTAGES" hi="वाणिज्यिक लाभ" />
               </span>
               <h3 className="font-serif text-2xl sm:text-3xl text-white tracking-wide mb-6">
@@ -172,7 +172,7 @@ export default function FutureOfCommerce() {
                   STE
                 </div>
                 <div>
-                  <span className="font-sans text-[9px] tracking-[2.5px] text-expo-warm/40 uppercase block mb-1">
+                  <span className="font-sans text-xs tracking-[2.5px] text-expo-warm/60 uppercase block mb-1">
                     <Translate en="ACTIVE DIRECT SOURCING" hi="सक्रिय डायरेक्ट सोर्सिंग" />
                   </span>
                   <span className="font-sans text-xs text-white font-semibold">
@@ -182,7 +182,7 @@ export default function FutureOfCommerce() {
               </div>
 
               <div className="flex items-center gap-2 bg-[#D6A066]/15 border border-[#D6A066]/20 px-3 py-1 rounded-sm">
-                <span className="font-sans text-[9px] tracking-[2px] text-expo-gold font-bold uppercase">
+                <span className="font-sans text-xs tracking-[2px] text-expo-gold font-bold uppercase">
                   <Translate en="650+ MANUFACTURERS LIVE" hi="650+ निर्माता लाइव" />
                 </span>
               </div>
@@ -206,7 +206,7 @@ export default function FutureOfCommerce() {
             >
               <div className="noise-overlay" />
               <div className="relative z-10">
-                <span className="font-sans text-[8px] tracking-[3px] text-expo-gold uppercase block mb-2">
+                <span className="font-sans text-xs tracking-[3px] text-expo-gold uppercase block mb-2">
                   <Translate en="TARGET DEMOGRAPHICS" hi="लक्षित जनसांख्यिकी" />
                 </span>
                 <h3 className="font-serif text-lg sm:text-xl text-white font-medium mb-3">
@@ -216,7 +216,7 @@ export default function FutureOfCommerce() {
                   {BUYER_DEMOGRAPHICS.map((buyer, idx) => (
                     <span
                       key={idx}
-                      className="font-sans text-[9px] tracking-wider text-expo-gold bg-expo-midnight/75 border border-expo-gold/20 px-2.5 py-1 rounded font-semibold uppercase badge-tap active:scale-95"
+                      className="font-sans text-xs tracking-wider text-expo-gold bg-expo-midnight/75 border border-expo-gold/20 px-2.5 py-1 rounded font-semibold uppercase badge-tap active:scale-95"
                     >
                       <Translate en={buyer.en} hi={buyer.hi} />
                     </span>
@@ -238,13 +238,13 @@ export default function FutureOfCommerce() {
             >
               <div className="noise-overlay" />
               <div className="relative z-10">
-                <span className="font-sans text-[8px] tracking-[3px] text-expo-gold uppercase block mb-2">
+                <span className="font-sans text-xs tracking-[3px] text-expo-gold uppercase block mb-2">
                   <Translate en="BUSINESS NETWORKING" hi="व्यावसायिक नेटवर्किंग" />
                 </span>
                 <h3 className="font-serif text-lg sm:text-xl text-white font-medium">
                   <Translate en="Global Trade Matching" hi="वैश्विक व्यापार मिलान" />
                 </h3>
-                <p className="font-sans text-[10px] text-expo-warm/50 mt-1 leading-relaxed">
+                <p className="font-sans text-xs text-expo-warm/50 mt-1 leading-relaxed">
                   <Translate en="Establish critical industry networks with primary distributors and retail boutique owners nationwide." hi="देश भर में प्राथमिक वितरकों और खुदरा बुटीक मालिकों के साथ महत्वपूर्ण उद्योग नेटवर्क स्थापित करें।" />
                 </p>
               </div>

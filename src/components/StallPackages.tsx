@@ -72,7 +72,7 @@ export default function StallPackages() {
         {/* Section Header */}
         <div className="max-w-3xl mb-16 sm:mb-24">
           <FadeUp delay={0}>
-            <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+            <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
               <Translate en="STALL EXHIBITION PACKAGES" hi="स्टॉल प्रदर्शनी पैकेज" />
             </span>
           </FadeUp>
@@ -130,7 +130,7 @@ export default function StallPackages() {
                         );
                       })}
                     </svg>
-                    <span className="text-[10px] uppercase tracking-widest text-expo-warm/40 font-semibold font-sans">
+                    <span className="text-xs uppercase tracking-widest text-expo-warm/60 font-semibold font-sans">
                       100 Sqft (~9.3 m²)
                     </span>
                   </div>
@@ -147,7 +147,7 @@ export default function StallPackages() {
 
                   <div className="border-t border-white/5 py-4 flex flex-col gap-2">
                     <span className="text-2xl font-serif text-expo-gold">₹51,000</span>
-                    <span className="text-[9px] uppercase tracking-wider text-expo-warm/40 block">
+                    <span className="text-xs uppercase tracking-wider text-expo-warm/60 block">
                       +18% GST • <Translate en="Direct Mill Rate (₹510/Sqft)" hi="डायरेक्ट मिल रेट (₹510/Sqft)" />
                     </span>
                   </div>
@@ -178,7 +178,7 @@ export default function StallPackages() {
               >
                 {/* Popular Badge */}
                 <div className="absolute top-0 right-6 -translate-y-1/2 bg-gradient-to-r from-[#B87333] to-[#D4AF37] px-4 py-1.5 rounded-full border border-expo-gold/40 shadow-md">
-                  <span className="text-[9px] text-white tracking-[2.5px] uppercase font-bold font-serif italic">
+                  <span className="text-xs text-white tracking-[2.5px] uppercase font-bold font-serif italic">
                     <Translate en="Most Sought" hi="सर्वाधिक लोकप्रिय" />
                   </span>
                 </div>
@@ -203,7 +203,7 @@ export default function StallPackages() {
                         );
                       })}
                     </svg>
-                    <span className="text-[10px] uppercase tracking-widest text-expo-gold font-bold font-sans">
+                    <span className="text-xs uppercase tracking-widest text-expo-gold font-bold font-sans">
                       400 Sqft (~37.2 m²)
                     </span>
                   </div>
@@ -220,7 +220,7 @@ export default function StallPackages() {
 
                   <div className="border-t border-white/5 py-4 flex flex-col gap-2">
                     <span className="text-2xl font-serif text-white">₹2,04,000</span>
-                    <span className="text-[9px] uppercase tracking-wider text-expo-gold block font-semibold">
+                    <span className="text-xs uppercase tracking-wider text-expo-gold block font-semibold">
                       +18% GST • <Translate en="VIP Concourse Edge (₹510/Sqft)" hi="VIP कॉनकोर्स एज (₹510/Sqft)" />
                     </span>
                   </div>
@@ -268,7 +268,7 @@ export default function StallPackages() {
                         );
                       })}
                     </svg>
-                    <span className="text-[10px] uppercase tracking-widest text-[#FFD700] font-bold font-sans">
+                    <span className="text-xs uppercase tracking-widest text-[#FFD700] font-bold font-sans">
                       1000 Sqft (~92.9 m²)
                     </span>
                   </div>
@@ -285,7 +285,7 @@ export default function StallPackages() {
 
                   <div className="border-t border-white/5 py-4 flex flex-col gap-2">
                     <span className="text-2xl font-serif text-expo-gold">₹5,10,000</span>
-                    <span className="text-[9px] uppercase tracking-wider text-expo-gold block">
+                    <span className="text-xs uppercase tracking-wider text-expo-gold block">
                       +18% GST • <Translate en="Ultra Luxury Concourse (₹510/Sqft)" hi="अल्ट्रा लक्जरी कॉनकोर्स (₹510/Sqft)" />
                     </span>
                   </div>
@@ -328,7 +328,7 @@ export default function StallPackages() {
         {/* Stall Size Calculator Component */}
         <FadeInSection className="max-w-4xl mx-auto border border-expo-gold/20 p-8 sm:p-10 rounded-2xl bg-[#0a0a0a]/80 shadow-[0_15px_35px_rgba(214,160,102,0.08)] card-tap">
           <div className="text-center mb-8">
-            <span className="text-[9px] tracking-[3px] text-expo-gold uppercase font-bold block mb-2">
+            <span className="text-xs tracking-[3px] text-expo-gold uppercase font-bold block mb-2">
               <Translate en="EXHIBITION COST CALCULATOR" hi="प्रदर्शनी लागत कैलकुलेटर" />
             </span>
             <h3 className="font-serif text-2xl sm:text-3xl text-white italic">
@@ -339,7 +339,7 @@ export default function StallPackages() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             {/* Left: Size Toggle Buttons */}
             <div className="flex flex-col gap-4">
-              <span className="text-[10px] tracking-widest uppercase text-expo-warm/50 font-bold block mb-1">
+              <span className="text-xs tracking-widest uppercase text-expo-warm/50 font-bold block mb-1">
                 <Translate en="Select Desired Dimensions" hi="वांछित आयामों का चयन करें" />
               </span>
               

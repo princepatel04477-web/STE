@@ -201,7 +201,7 @@ export default function TrustSection() {
         {/* Header */}
         <div className="max-w-3xl mb-8 md:mb-16">
           <FadeUp delay={0}>
-            <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+            <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
               <Translate en="TRUST, EXPERIENCE & SOCIAL PROOF" hi="विश्वास, अनुभव और सामाजिक प्रमाण" />
             </span>
           </FadeUp>
@@ -229,7 +229,7 @@ export default function TrustSection() {
           {/* Left Block: Organizer Profile & Credentials */}
           <div className="trust-animate opacity-0 translate-y-[25px] lg:col-span-6 border-glow-card p-8 sm:p-10 bg-black/45 md:backdrop-blur-sm rounded-xl flex flex-col justify-between card-tap">
             <div>
-              <span className="text-[9px] tracking-[2.5px] text-expo-gold uppercase block mb-3 font-bold">
+              <span className="text-xs tracking-[2.5px] text-expo-gold uppercase block mb-3 font-bold">
                 <Translate en="Ecosystem Organizer" hi="इकोसिस्टम आयोजक" />
               </span>
               <h3 className="font-serif text-2xl sm:text-3xl text-white mb-6">
@@ -242,7 +242,7 @@ export default function TrustSection() {
 
             {/* Media logos panel */}
             <div className="border-t border-white/10 pt-6 mt-4">
-              <span className="text-[8px] tracking-[2px] text-expo-warm/40 uppercase block mb-4 font-bold">
+              <span className="text-xs tracking-[2px] text-expo-warm/60 uppercase block mb-4 font-bold">
                 <Translate en="PROMINENT MEDIA COVERAGE & ALLIANCE" hi="प्रमुख मीडिया कवरेज और गठबंधन" />
               </span>
               <div className="flex flex-wrap items-center gap-6 opacity-60">
@@ -261,13 +261,13 @@ export default function TrustSection() {
                 <div key={idx} className="p-4 bg-white/[0.02] border border-white/5 rounded-sm badge-tap active:scale-95">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-serif text-base text-expo-gold font-bold">STE {item.year}</span>
-                    <span className="text-[8px] bg-expo-gold/10 border border-expo-gold/20 text-expo-gold px-2 py-0.5 rounded-full uppercase font-bold">
+                    <span className="text-xs bg-expo-gold/10 border border-expo-gold/20 text-expo-gold px-2 py-0.5 rounded-full uppercase font-bold">
                       <Translate en="Verified" hi="सत्यापित" />
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 mt-3">
                     <div>
-                      <span className="text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
+                      <span className="text-xs text-expo-warm/60 uppercase block tracking-[1px]">
                         <Translate en="Wholesalers:" hi="थोक खरीदार:" />
                       </span>
                       <span className="text-white text-sm font-bold">
@@ -275,7 +275,7 @@ export default function TrustSection() {
                       </span>
                     </div>
                     <div>
-                      <span className="text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
+                      <span className="text-xs text-expo-warm/60 uppercase block tracking-[1px]">
                         <Translate en="Stalls Booked:" hi="बुक किए गए स्टॉल:" />
                       </span>
                       <span className="text-white text-sm font-bold">
@@ -284,7 +284,7 @@ export default function TrustSection() {
                     </div>
                   </div>
                   <div className="mt-3 border-t border-white/5 pt-2">
-                    <span className="text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
+                    <span className="text-xs text-expo-warm/60 uppercase block tracking-[1px]">
                       <Translate en="Trade Volume:" hi="कुल व्यापार मात्रा:" />
                     </span>
                     <span className="text-expo-gold text-sm font-extrabold">
@@ -321,7 +321,7 @@ export default function TrustSection() {
                           <h4 className="font-sans text-xs font-bold text-white uppercase tracking-[1px]">
                             <Translate en={testimonial.authorEn} hi={testimonial.authorHi} />
                           </h4>
-                          <span className="text-[9px] text-expo-warm/50 block mt-0.5">
+                          <span className="text-xs text-expo-warm/50 block mt-0.5">
                             <Translate en={testimonial.companyEn} hi={testimonial.companyHi} />
                           </span>
                         </div>

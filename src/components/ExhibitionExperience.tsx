@@ -115,7 +115,7 @@ export default function ExhibitionExperience() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 w-full">
         {/* Section Header */}
         <FadeUp className="max-w-3xl mb-8 md:mb-16">
-          <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+          <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             <Translate en="THE EXHIBITION VENUE" hi="प्रदर्शनी स्थल" />
           </span>
           <h2
@@ -148,14 +148,14 @@ export default function ExhibitionExperience() {
               data-cursor="view"
             >
               <div className="noise-overlay" />
-              <span className="font-sans text-[8px] tracking-[3px] text-expo-gold uppercase bg-black/60 px-2 py-1 border border-white/5 rounded-sm self-start">
+              <span className="font-sans text-xs tracking-[3px] text-expo-gold uppercase bg-black/60 px-2 py-1 border border-white/5 rounded-sm self-start">
                 <Translate en="Blueprint Grid" hi="ब्लूप्रिंट ग्रिड" />
               </span>
               <div>
                 <h3 className="font-serif text-xl text-white font-medium gold-shimmer-text">
                   <Translate en="VIP Pavilions" hi="वीआईपी पवेलियन" />
                 </h3>
-                <p className="font-sans text-[10px] text-expo-warm/50 mt-2 leading-relaxed">
+                <p className="font-sans text-xs text-expo-warm/50 mt-2 leading-relaxed">
                   <Translate en="Concentric architectural designs ensuring fluid pedestrian drapes and transitions." hi="सर्कुलर और विस्तृत आर्किटेक्चरल डिजाइन जो आने-जाने वाले खरीदारों के आसान आवागमन को सुनिश्चित करता है।" />
                 </p>
               </div>
@@ -173,14 +173,14 @@ export default function ExhibitionExperience() {
               data-cursor="view"
             >
               <div className="noise-overlay" />
-              <span className="font-sans text-[8px] tracking-[3px] text-expo-gold uppercase bg-black/60 px-2 py-1 border border-white/5 rounded-sm self-start">
+              <span className="font-sans text-xs tracking-[3px] text-expo-gold uppercase bg-black/60 px-2 py-1 border border-white/5 rounded-sm self-start">
                 <Translate en="Design Space" hi="डिजाइन स्पेस" />
               </span>
               <div>
                 <h3 className="font-serif text-xl text-white font-medium gold-shimmer-text">
                   <Translate en="Bespoke Stalls" hi="विशेष रूप से निर्मित स्टॉल" />
                 </h3>
-                <p className="font-sans text-[10px] text-expo-warm/50 mt-2 leading-relaxed">
+                <p className="font-sans text-xs text-expo-warm/50 mt-2 leading-relaxed">
                   <Translate en="Double-height premium draped SARIS exhibit platforms with custom spotlighting." hi="कस्टम स्पॉटलाइटिंग के साथ डबल-हाइट प्रीमियम ड्रेप्ड साड़ियों के प्रदर्शनी प्लेटफॉर्म।" />
                 </p>
               </div>
@@ -190,7 +190,7 @@ export default function ExhibitionExperience() {
 
           {/* Right Block: Interactive Pavilions Map Indices */}
           <div className="lg:col-span-6 flex flex-col gap-6">
-            <h4 className="font-sans text-[11px] font-bold tracking-[3px] text-expo-gold uppercase border-b border-white/10 pb-4">
+            <h4 className="font-sans text-xs font-bold tracking-[3px] text-expo-gold uppercase border-b border-white/10 pb-4">
               <Translate en="EXHIBITOR ADVANTAGES & SOURCING HIGHLIGHTS" hi="प्रदर्शकों के लाभ और सोर्सिंग की मुख्य विशेषताएं" />
             </h4>
 
@@ -205,7 +205,7 @@ export default function ExhibitionExperience() {
                       <span className="font-display text-lg text-white font-semibold tracking-wide group-hover:text-expo-gold transition-colors duration-300 gold-shimmer-text">
                         <Translate en={pav.nameEn} hi={pav.nameHi} />
                       </span>
-                      <span className="font-sans text-[9px] tracking-[1.5px] text-white/40 bg-white/5 border border-white/10 px-2 py-0.5 rounded-sm badge-tap">
+                      <span className="font-sans text-xs tracking-[1.5px] text-white/40 bg-white/5 border border-white/10 px-2 py-0.5 rounded-sm badge-tap">
                         <Translate en={pav.coordsEn} hi={pav.coordsHi} />
                       </span>
                     </div>
@@ -222,7 +222,7 @@ export default function ExhibitionExperience() {
             </div>
 
             <div className="bg-[#D6A066]/5 border border-[#D6A066]/15 p-6 rounded-sm mt-4 card-tap">
-              <span className="font-sans text-[9px] tracking-[3px] text-expo-gold font-bold uppercase block mb-2">
+              <span className="font-sans text-xs tracking-[3px] text-expo-gold font-bold uppercase block mb-2">
                 <Translate en="EXHIBITOR BOOKINGS" hi="प्रदर्शक बुकिंग" />
               </span>
               <p className="font-sans text-xs text-expo-warm/70 leading-relaxed">

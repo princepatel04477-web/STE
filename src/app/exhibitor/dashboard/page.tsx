@@ -239,7 +239,7 @@ export default function ExhibitorDashboardPage() {
             <div>
               <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
                 Exhibitor Portal
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
                   2026
                 </span>
               </h1>
@@ -356,7 +356,7 @@ export default function ExhibitorDashboardPage() {
                     }`}
                   >
                     <span className="text-sm font-bold">{sqft}</span>
-                    <span className="text-[10px] opacity-75">sq ft</span>
+                    <span className="text-xs opacity-75">sq ft</span>
                   </button>
                 ))}
 
@@ -371,7 +371,7 @@ export default function ExhibitorDashboardPage() {
                   }`}
                 >
                   <span className="text-sm font-bold">Other</span>
-                  <span className="text-[10px] opacity-75">Custom</span>
+                  <span className="text-xs opacity-75">Custom</span>
                 </button>
               </div>
 
@@ -458,7 +458,7 @@ export default function ExhibitorDashboardPage() {
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-md">
+                      <span className="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-md">
                         {p.category}
                       </span>
                       <span className="text-xs text-neutral-400 font-mono">
@@ -550,12 +550,12 @@ export default function ExhibitorDashboardPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-800">
-              <span className="text-[10px] text-neutral-400 font-semibold uppercase">Brand Name</span>
+              <span className="text-xs text-neutral-400 font-semibold uppercase">Brand Name</span>
               <p className="text-base font-bold text-white mt-1">{brandName || 'Not saved yet'}</p>
             </div>
 
             <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-800">
-              <span className="text-[10px] text-neutral-400 font-semibold uppercase">Stall Size</span>
+              <span className="text-xs text-neutral-400 font-semibold uppercase">Stall Size</span>
               <p className="text-base font-bold text-amber-400 mt-1">
                 {selectedSqftOption === 'Other'
                   ? customSqft ? `${customSqft} sq ft` : 'Custom (Other)'
@@ -564,7 +564,7 @@ export default function ExhibitorDashboardPage() {
             </div>
 
             <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-800">
-              <span className="text-[10px] text-neutral-400 font-semibold uppercase">Total Requested Extras</span>
+              <span className="text-xs text-neutral-400 font-semibold uppercase">Total Requested Extras</span>
               <p className="text-base font-bold text-emerald-400 mt-1">{totalSelectedItemsCount} item(s)</p>
             </div>
           </div>

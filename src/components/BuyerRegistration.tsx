@@ -142,7 +142,7 @@ export default function BuyerRegistration() {
         {/* Header */}
         <div className="text-center mb-16">
           <FadeUp delay={0}>
-            <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-3 block">
+            <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-3 block">
               <Translate en="B2B BUYER ONBOARDING" hi="B2B खरीदार ऑनबोर्डिंग" />
             </span>
           </FadeUp>
@@ -184,7 +184,7 @@ export default function BuyerRegistration() {
               >
                 {/* Step Indicator */}
                 <div className="flex justify-between items-center border-b border-white/5 pb-4 mb-2">
-                  <span className="text-[9px] tracking-[2px] text-expo-gold uppercase font-bold">
+                  <span className="text-xs tracking-[2px] text-expo-gold uppercase font-bold">
                     <Translate 
                       en={`Step ${step} of 4 • ${step === 1 ? "Identity" : step === 2 ? "Profile" : step === 3 ? "Interests" : "Verification"}`} 
                       hi={`चरण ${step}/4 • ${step === 1 ? "पहचान" : step === 2 ? "प्रोफ़ाइल" : step === 3 ? "रुचि" : "सत्यापन"}`} 
@@ -202,7 +202,7 @@ export default function BuyerRegistration() {
                   </div>
                 </div>
                 {(errors.buyerType || errors.businessName || errors.city || errors.whatsapp || errors.categories) && (
-                  <p role="alert" className="text-[10px] text-expo-gold/80 uppercase tracking-[2px]">
+                  <p role="alert" className="text-xs text-expo-gold/80 uppercase tracking-[2px]">
                     {errors.buyerType ||
                       errors.businessName ||
                       errors.city ||
@@ -236,7 +236,7 @@ export default function BuyerRegistration() {
                             <span className="text-xs sm:text-sm font-sans font-bold text-white">
                               <Translate en={type.nameEn} hi={type.nameHi} />
                             </span>
-                            <span className="text-[10px] text-expo-warm/50 font-sans mt-0.5">
+                            <span className="text-xs text-expo-warm/50 font-sans mt-0.5">
                               <Translate en={type.descEn} hi={type.descHi} />
                             </span>
                           </div>
@@ -280,7 +280,7 @@ export default function BuyerRegistration() {
                           className="w-full h-[52px] bg-white/[0.02] border border-white/10 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:border-expo-gold/50 transition-colors"
                         />
                         {errors.businessName && (
-                          <p id="businessName-error" role="alert" className="text-[10px] text-expo-gold/80">
+                          <p id="businessName-error" role="alert" className="text-xs text-expo-gold/80">
                             {errors.businessName}
                           </p>
                         )}
@@ -309,7 +309,7 @@ export default function BuyerRegistration() {
                             className="w-full h-[52px] bg-white/[0.02] border border-white/10 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:border-expo-gold/50 transition-colors"
                           />
                           {errors.city && (
-                            <p id="city-error" role="alert" className="text-[10px] text-expo-gold/80">
+                            <p id="city-error" role="alert" className="text-xs text-expo-gold/80">
                               {errors.city}
                             </p>
                           )}
@@ -337,7 +337,7 @@ export default function BuyerRegistration() {
                             className="w-full h-[52px] bg-white/[0.02] border border-white/10 rounded-lg px-4 py-3 text-base text-white focus:outline-none focus:border-expo-gold/50 transition-colors"
                           />
                           {errors.whatsapp && (
-                            <p id="whatsapp-error" role="alert" className="text-[10px] text-expo-gold/80">
+                            <p id="whatsapp-error" role="alert" className="text-xs text-expo-gold/80">
                               {errors.whatsapp}
                             </p>
                           )}
@@ -353,7 +353,7 @@ export default function BuyerRegistration() {
                     <h3 className="font-serif text-lg sm:text-xl text-white flex items-center gap-2">
                       <Tag className="w-5 h-5 text-expo-gold" /> <Translate en="Select Sourcing Interests" hi="सोर्सिंग रुचियां चुनें" />
                     </h3>
-                    <p className="text-[10px] text-expo-warm/40 uppercase tracking-[1px] -mt-2">
+                    <p className="text-xs text-expo-warm/60 uppercase tracking-[1px] -mt-2">
                       <Translate en="Choose at least one category to customize match suggestions" hi="कस्टम मैच सुझाव प्राप्त करने के लिए कम से कम एक श्रेणी चुनें" />
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
@@ -383,7 +383,7 @@ export default function BuyerRegistration() {
                       ))}
                     </div>
                     {errors.categories && (
-                      <p id="categories-error" role="alert" className="text-[10px] text-expo-gold/80">
+                      <p id="categories-error" role="alert" className="text-xs text-expo-gold/80">
                         {errors.categories}
                       </p>
                     )}
@@ -396,7 +396,7 @@ export default function BuyerRegistration() {
                     <h3 className="font-serif text-lg sm:text-xl text-white flex items-center gap-2">
                       <Heart className="w-5 h-5 text-expo-gold" /> <Translate en="Specific Fabric Interests" hi="विशिष्ट फैब्रिक रुचियां" />
                     </h3>
-                    <p className="text-[10px] text-expo-warm/40 uppercase tracking-[1px] -mt-2">
+                    <p className="text-xs text-expo-warm/60 uppercase tracking-[1px] -mt-2">
                       <Translate en="Help us match you with specialized looms" hi="विशेषीकृत लूम से मिलान करने में हमारी सहायता करें" />
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
@@ -430,7 +430,7 @@ export default function BuyerRegistration() {
                   {step > 1 ? (
                     <button
                       onClick={handleBack}
-                      className="px-6 py-3 rounded-full border border-white/10 hover:border-white/30 text-white font-sans text-[10px] tracking-[1.5px] uppercase transition-colors badge-tap active:scale-95"
+                      className="px-6 py-3 rounded-full border border-white/10 hover:border-white/30 text-white font-sans text-xs tracking-[1.5px] uppercase transition-colors badge-tap active:scale-95"
                     >
                       <Translate en="Back" hi="पीछे" />
                     </button>
@@ -446,7 +446,7 @@ export default function BuyerRegistration() {
                       (step === 2 && (!city || !businessName || !whatsapp)) ||
                       (step === 3 && selectedCategories.length === 0)
                     }
-                    className="px-6 py-3 rounded-full bg-gold-gradient text-expo-midnight font-bold font-sans text-[10px] tracking-[1.5px] uppercase shadow-lg hover:shadow-expo-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 btn-shimmer active:scale-95"
+                    className="px-6 py-3 rounded-full bg-gold-gradient text-expo-midnight font-bold font-sans text-xs tracking-[1.5px] uppercase shadow-lg hover:shadow-expo-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 btn-shimmer active:scale-95"
                   >
                     {loading ? (
                       <Translate en="Processing..." hi="प्रसंस्करण..." />
@@ -472,7 +472,7 @@ export default function BuyerRegistration() {
                   <Check className="w-8 h-8 text-expo-gold stroke-[2.5]" />
                 </div>
 
-                <span className="text-[10px] font-bold tracking-[3px] text-expo-gold uppercase mb-2">
+                <span className="text-xs font-bold tracking-[3px] text-expo-gold uppercase mb-2">
                   <Translate en="Profile Registered" hi="प्रोफ़ाइल पंजीकृत" />
                 </span>
                 
@@ -486,20 +486,20 @@ export default function BuyerRegistration() {
 
                 {/* Sourcing Summary */}
                 <div className="w-full max-w-sm bg-white/[0.02] border border-white/5 p-4 rounded-xl text-left mb-8 flex flex-col gap-2.5">
-                  <div className="flex justify-between text-[10px] sm:text-xs">
-                    <span className="text-expo-warm/40 uppercase tracking-[1px]">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-expo-warm/60 uppercase tracking-[1px]">
                       <Translate en="Business Name:" hi="कंपनी का नाम:" />
                     </span>
                     <span className="text-white font-bold">{businessName}</span>
                   </div>
-                  <div className="flex justify-between text-[10px] sm:text-xs">
-                    <span className="text-expo-warm/40 uppercase tracking-[1px]">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-expo-warm/60 uppercase tracking-[1px]">
                       <Translate en="Buyer Profile:" hi="खरीदार प्रोफ़ाइल:" />
                     </span>
                     <span className="text-white font-bold">{buyerType}</span>
                   </div>
-                  <div className="flex justify-between text-[10px] sm:text-xs">
-                    <span className="text-expo-warm/40 uppercase tracking-[1px]">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-expo-warm/60 uppercase tracking-[1px]">
                       <Translate en="Sourcing Hub:" hi="सोर्सिंग हब:" />
                     </span>
                     <span className="text-white font-bold">{city}</span>
@@ -510,7 +510,7 @@ export default function BuyerRegistration() {
                 <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md justify-center">
                   <button
                     onClick={handleWhatsAppRedirect}
-                    className="w-full sm:w-auto px-8 py-3.5 bg-gold-gradient rounded-full text-expo-midnight font-sans font-bold text-[10px] tracking-[2px] uppercase shadow-lg hover:shadow-expo-glow transition-all flex items-center justify-center gap-1.5 btn-shimmer gold-border-pulse"
+                    className="w-full sm:w-auto px-8 py-3.5 bg-gold-gradient rounded-full text-expo-midnight font-sans font-bold text-xs tracking-[2px] uppercase shadow-lg hover:shadow-expo-glow transition-all flex items-center justify-center gap-1.5 btn-shimmer gold-border-pulse"
                   >
                     <MessageSquare className="w-4 h-4 stroke-[2.5]" /> <Translate en="Send Verification via WhatsApp" hi="व्हाट्सएप के माध्यम से सत्यापन भेजें" />
                   </button>
@@ -525,13 +525,13 @@ export default function BuyerRegistration() {
                       setSelectedCategories([]);
                       setSelectedFabrics([]);
                     }}
-                    className="w-full sm:w-auto px-6 py-3.5 bg-transparent border border-white/10 hover:border-white/30 rounded-full text-white font-sans text-[10px] tracking-[2px] uppercase transition-colors badge-tap active:scale-95"
+                    className="w-full sm:w-auto px-6 py-3.5 bg-transparent border border-white/10 hover:border-white/30 rounded-full text-white font-sans text-xs tracking-[2px] uppercase transition-colors badge-tap active:scale-95"
                   >
                     <Translate en="New Profile" hi="नया प्रोफ़ाइल" />
                   </button>
                 </div>
 
-                <p className="text-[9px] text-expo-warm/30 uppercase tracking-[1.5px] mt-8">
+                <p className="text-xs text-expo-warm/60 uppercase tracking-[1.5px] mt-8">
                   <Translate en="Concierge Desk Call/WhatsApp Support: " hi="सहायता डेस्क कॉल/व्हाट्सएप सहायता: " /> {SUPPORT_DISPLAY}
                 </p>
               </motion.div>

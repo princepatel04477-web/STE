@@ -17,15 +17,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Load language preference from localStorage on mount
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("ste_lang") as Language;
-      if (stored === "en" || stored === "hi") {
-        setTimeout(() => {
-          setLanguageState(stored);
-        }, 0);
-      }
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("ste_lang") as Language;
+    if (stored === "en" || stored === "hi") {
+      setTimeout(() => setLanguageState(stored), 0);
     }
   }, []);
+
+  // Keep <html lang> in step with the toggle, or a screen reader reads
+  // Devanagari with English phonetics.
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);

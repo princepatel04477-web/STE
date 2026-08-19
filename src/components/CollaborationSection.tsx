@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { EVENT, formatCount } from "@/lib/event-facts";
 import { ShieldCheck, Users, Network, TrendingUp } from "lucide-react";
 import { useInView } from "@/hooks/useInView";
 import OptimizedVideoBg from "@/components/OptimizedVideoBg";
@@ -40,7 +41,7 @@ export default function CollaborationSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 w-full">
         {/* Section Header */}
         <FadeUp className="max-w-3xl mb-8 md:mb-16">
-          <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+          <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             <Translate en="THE POWER COLLABORATION" hi="महा-गठबंधन का प्रभाव" />
           </span>
           <h2
@@ -93,7 +94,7 @@ export default function CollaborationSection() {
             <TapCard className="border-glow-card p-8 sm:p-10 bg-black/40 md:backdrop-blur-sm rounded-xl flex flex-col justify-between w-full card-tap">
               <div>
                 <div className="flex items-center justify-between mb-8">
-                  <span className="text-[9px] tracking-[2px] text-expo-gold border border-expo-gold/30 px-3 py-1 rounded-full uppercase font-bold bg-expo-gold/5">
+                  <span className="text-xs tracking-[2px] text-expo-gold border border-expo-gold/30 px-3 py-1 rounded-full uppercase font-bold bg-expo-gold/5">
                     <Translate en="THE EXHIBITION SUMMIT" hi="प्रदर्शनी शिखर सम्मेलन" />
                   </span>
                   <span className="text-xl">🏆</span>
@@ -121,7 +122,7 @@ export default function CollaborationSection() {
 
                 <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-6 mt-4">
                   <div>
-                    <span className="font-sans text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
+                    <span className="font-sans text-xs text-expo-warm/60 uppercase block tracking-[1px]">
                       <Translate en="Capacity:" hi="क्षमता:" />
                     </span>
                     <span className="text-white text-sm font-bold font-sans">
@@ -129,11 +130,14 @@ export default function CollaborationSection() {
                     </span>
                   </div>
                   <div>
-                    <span className="font-sans text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
+                    <span className="font-sans text-xs text-expo-warm/60 uppercase block tracking-[1px]">
                       <Translate en="Reach:" hi="पहुंच:" />
                     </span>
                     <span className="text-white text-sm font-bold font-sans">
-                      <Translate en="80,000+ Sourcing Footfalls" hi="80,000+ सोर्सिंग खरीदार" />
+                      <Translate
+                        en={`${formatCount(EVENT.buyers)}+ Sourcing Footfalls`}
+                        hi={`${formatCount(EVENT.buyers)}+ सोर्सिंग खरीदार`}
+                      />
                     </span>
                   </div>
                 </div>
@@ -159,7 +163,7 @@ export default function CollaborationSection() {
             <TapCard className="border-glow-card p-8 sm:p-10 bg-black/40 md:backdrop-blur-sm rounded-xl flex flex-col justify-between w-full card-tap">
               <div>
                 <div className="flex items-center justify-between mb-8">
-                  <span className="text-[9px] tracking-[2px] text-expo-gold border border-expo-gold/30 px-3 py-1 rounded-full uppercase font-bold bg-expo-gold/5">
+                  <span className="text-xs tracking-[2px] text-expo-gold border border-expo-gold/30 px-3 py-1 rounded-full uppercase font-bold bg-expo-gold/5">
                     <Translate en="SUPPORTING ASSOCIATION" hi="समर्थक संघ" />
                   </span>
                   <span className="text-xl">🤝</span>
@@ -188,7 +192,7 @@ export default function CollaborationSection() {
 
                 <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-6 mt-4">
                   <div>
-                    <span className="font-sans text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
+                    <span className="font-sans text-xs text-expo-warm/60 uppercase block tracking-[1px]">
                       <Translate en="Ecosystem Trust:" hi="इकोसिस्टम विश्वास:" />
                     </span>
                     <span className="text-white text-sm font-bold font-sans">
@@ -196,7 +200,7 @@ export default function CollaborationSection() {
                     </span>
                   </div>
                   <div>
-                    <span className="font-sans text-[8px] text-expo-warm/40 uppercase block tracking-[1px]">
+                    <span className="font-sans text-xs text-expo-warm/60 uppercase block tracking-[1px]">
                       <Translate en="Network:" hi="नेटवर्क:" />
                     </span>
                     <span className="text-white text-sm font-bold font-sans">

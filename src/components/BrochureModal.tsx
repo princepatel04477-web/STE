@@ -100,7 +100,7 @@ export default function BrochureModal({ isOpen, onClose }: BrochureModalProps) {
             {/* Header Controls */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0c0c0c]/80 md:backdrop-blur-sm select-none">
               <div className="flex flex-col">
-                <span className="font-sans text-[8px] font-bold tracking-[3px] text-expo-gold uppercase">
+                <span className="font-sans text-xs font-bold tracking-[3px] text-expo-gold uppercase">
                   <Translate en="Official Brochure" hi="आधिकारिक ब्रोशर" />
                 </span>
                 <h3
@@ -122,7 +122,7 @@ export default function BrochureModal({ isOpen, onClose }: BrochureModalProps) {
                   >
                     <ZoomOut className="w-4 h-4" />
                   </button>
-                  <span className="text-[10px] font-mono px-1.5 text-expo-warm/50 w-12 text-center">
+                  <span className="text-xs font-mono px-1.5 text-expo-warm/50 w-12 text-center">
                     {Math.round(scale * 100)}%
                   </span>
                   <button
@@ -146,7 +146,7 @@ export default function BrochureModal({ isOpen, onClose }: BrochureModalProps) {
                 <a
                   href="/pdf/STE_2026_Prospectus.pdf"
                   download="STE2026-Brochure.pdf"
-                  className="flex items-center gap-1.5 px-4 py-2 bg-gold-gradient text-expo-midnight font-bold font-sans text-[10px] tracking-[1.5px] uppercase rounded-full shadow-lg transition-all duration-300 btn-shimmer tap-feedback"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-gold-gradient text-expo-midnight font-bold font-sans text-xs tracking-[1.5px] uppercase rounded-full shadow-lg transition-all duration-300 btn-shimmer tap-feedback"
                   aria-label={language === "en" ? "Download brochure" : "ब्रोशर डाउनलोड करें"}
                 >
                   <FileText className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -193,7 +193,7 @@ export default function BrochureModal({ isOpen, onClose }: BrochureModalProps) {
             {/* Footer Presentation */}
             <div
               id="brochure-subtitle"
-              className="px-6 py-3 border-t border-white/5 bg-[#0c0c0c]/80 flex justify-between items-center text-[9px] uppercase tracking-[1.5px] text-expo-warm/30 select-none"
+              className="px-6 py-3 border-t border-white/5 bg-[#0c0c0c]/80 flex justify-between items-center text-xs uppercase tracking-[1.5px] text-expo-warm/60 select-none"
             >
               <span><Translate en="STE Surat 2026 • September 12-13" hi="एसटीई सूरत 2026 • सितंबर 12-13" /></span>
               <span><Translate en="All Rights Reserved • AKAS Group" hi="सर्वाधिकार सुरक्षित • अकास ग्रुप" /></span>

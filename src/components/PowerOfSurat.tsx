@@ -105,7 +105,7 @@ export default function PowerOfSurat() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24">
         {/* Section Header */}
         <FadeUp className="max-w-3xl mb-16 sm:mb-24">
-          <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+          <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             <Translate en="INDUSTRIAL SUPREMACY" hi="औद्योगिक वर्चस्व" />
           </span>
           <h2
@@ -157,7 +157,7 @@ export default function PowerOfSurat() {
                     <Translate en={stat.labelEn} hi={stat.labelHi} />
                   </h3>
                 </div>
-                <p className="font-sans text-[11px] sm:text-xs text-expo-warm/50 leading-relaxed">
+                <p className="font-sans text-xs text-expo-warm/50 leading-relaxed">
                   <Translate en={stat.subEn} hi={stat.subHi} />
                 </p>
               </div>
@@ -173,7 +173,7 @@ export default function PowerOfSurat() {
                  fallbackImage="/assets/images/world-map.webp"
                />
               <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-60 z-20 pointer-events-none" />
-              <span className="absolute bottom-4 left-4 font-sans text-[10px] tracking-[3px] text-expo-gold uppercase bg-black/60 md:backdrop-blur-sm px-3 py-1.5 border border-white/10 rounded-sm badge-tap">
+              <span className="absolute bottom-4 left-4 font-sans text-xs tracking-[3px] text-expo-gold uppercase bg-black/60 md:backdrop-blur-sm px-3 py-1.5 border border-white/10 rounded-sm badge-tap">
                 <Translate en="SURAT PRODUCTION GRID" hi="सूरत उत्पादन ग्रिड" />
               </span>
             </div>
@@ -198,7 +198,7 @@ export default function PowerOfSurat() {
 
               <div className="relative z-10 flex items-center justify-between">
                 <div>
-                  <span className="font-sans text-[9px] tracking-[3px] text-expo-warm/50 uppercase block mb-1">
+                  <span className="font-sans text-xs tracking-[3px] text-expo-warm/50 uppercase block mb-1">
                     <Translate en="B2B CHANNEL METRICS" hi="B2B चैनल मेट्रिक्स" />
                   </span>
                   <span className="font-display text-lg text-white font-bold tracking-[1px] uppercase">
@@ -207,7 +207,7 @@ export default function PowerOfSurat() {
                 </div>
                 <div className="flex items-center gap-2 bg-[#D6A066]/10 border border-[#D6A066]/20 px-3 py-1.5 rounded-full badge-tap">
                   <span className="w-1.5 h-1.5 rounded-full bg-expo-gold animate-ping" />
-                  <span className="font-sans text-[9px] tracking-[2px] text-expo-gold font-bold uppercase">
+                  <span className="font-sans text-xs tracking-[2px] text-expo-gold font-bold uppercase">
                     <Translate en="LIVE CONNECTION" hi="लाइव कनेक्शन" />
                   </span>
                 </div>

@@ -200,7 +200,7 @@ export default function FabricInMotion() {
         {/* Section Header */}
         <FadeUp className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 md:mb-16">
           <div className="max-w-2xl">
-            <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+            <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
               <Translate en="COUTURE COLLECTION" hi="फैशन संग्रह" />
             </span>
             <h2
@@ -226,7 +226,7 @@ export default function FabricInMotion() {
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent z-10 pointer-events-none" />
             
             <div className="relative z-20">
-              <span className="text-[9px] font-bold tracking-[4px] text-expo-gold uppercase mb-2 block">
+              <span className="text-xs font-bold tracking-[4px] text-expo-gold uppercase mb-2 block">
                 <Translate en="Couture Showcase" hi="उत्कृष्ट परिधान प्रदर्शन" />
               </span>
               <h3 className="font-serif text-2xl sm:text-3xl text-white tracking-wide leading-tight mb-4 gold-shimmer-text">
@@ -259,7 +259,7 @@ export default function FabricInMotion() {
                   <span className="font-display text-sm text-white font-bold tracking-[1px]">
                     <Translate en={cat.en} hi={cat.hi} />
                   </span>
-                  <span className="font-sans text-[10px] text-expo-warm/40 mt-1">
+                  <span className="font-sans text-xs text-expo-warm/60 mt-1">
                     <Translate en="Export Ready" hi="निर्यात के लिए तैयार" />
                   </span>
                 </div>
@@ -289,7 +289,7 @@ export default function FabricInMotion() {
                       <div className="noise-overlay" />
                       
                       {/* Category Stamp */}
-                      <span className="absolute top-4 left-4 z-20 font-sans text-[8px] font-bold tracking-[3px] text-expo-gold bg-black/75 border border-white/15 px-3 py-1.5 rounded-full md:backdrop-blur-sm uppercase badge-tap">
+                      <span className="absolute top-4 left-4 z-20 font-sans text-xs font-bold tracking-[3px] text-expo-gold bg-black/75 border border-white/15 px-3 py-1.5 rounded-full md:backdrop-blur-sm uppercase badge-tap">
                         <Translate en={item.categoryEn} hi={item.categoryHi} />
                       </span>
                     </div>
@@ -299,7 +299,7 @@ export default function FabricInMotion() {
                       <h3 className="font-serif text-base text-white tracking-wide gold-shimmer-text">
                         <Translate en={item.titleEn} hi={item.titleHi} />
                       </h3>
-                      <p className="font-sans text-[11px] text-expo-warm/50 leading-relaxed mt-1">
+                      <p className="font-sans text-xs text-expo-warm/50 leading-relaxed mt-1">
                         <Translate en={item.descEn} hi={item.descHi} />
                       </p>
                     </div>
@@ -345,7 +345,7 @@ export default function FabricInMotion() {
                       <div className="noise-overlay" />
                       
                       {/* Category Stamp */}
-                      <span className="absolute top-4 left-4 z-20 font-sans text-[8px] font-bold tracking-[3px] text-expo-gold bg-black/75 border border-white/15 px-3 py-1.5 rounded-full md:backdrop-blur-sm uppercase badge-tap">
+                      <span className="absolute top-4 left-4 z-20 font-sans text-xs font-bold tracking-[3px] text-expo-gold bg-black/75 border border-white/15 px-3 py-1.5 rounded-full md:backdrop-blur-sm uppercase badge-tap">
                         <Translate en={item.categoryEn} hi={item.categoryHi} />
                       </span>
                     </div>

@@ -117,7 +117,7 @@ export default function CountdownSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 lg:px-24 flex flex-col items-center text-center w-full">
         {/* Title */}
         <FadeUp delay={0}>
-          <span className="text-[10px] sm:text-xs font-bold tracking-[6px] text-expo-gold uppercase mb-4 block">
+          <span className="text-xs font-bold tracking-[6px] text-expo-gold uppercase mb-4 block">
             <Translate en="SECURE YOUR COMMERCIAL STALL" hi="अपना कमर्शियल स्टॉल सुरक्षित करें" />
           </span>
         </FadeUp>
@@ -153,7 +153,7 @@ export default function CountdownSection() {
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
                   110
                 </span>
-                <span className="text-[10px] sm:text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
+                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
                   <Translate en="Days" hi="दिन" />
                 </span>
               </div>
@@ -163,7 +163,7 @@ export default function CountdownSection() {
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                   12
                 </span>
-                <span className="text-[10px] sm:text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
+                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
                   <Translate en="Hours" hi="घंटे" />
                 </span>
               </div>
@@ -173,7 +173,7 @@ export default function CountdownSection() {
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                   30
                 </span>
-                <span className="text-[10px] sm:text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
+                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
                   <Translate en="Minutes" hi="मिनट" />
                 </span>
               </div>
@@ -183,7 +183,7 @@ export default function CountdownSection() {
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
                   45
                 </span>
-                <span className="text-[10px] sm:text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
+                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
                   <Translate en="Seconds" hi="सेकंड" />
                 </span>
               </div>
@@ -206,7 +206,7 @@ export default function CountdownSection() {
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
                   <FlipDigit value={timeLeft.days} />
                 </span>
-                <span className="text-[10px] sm:text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
+                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
                   <Translate en="Days" hi="दिन" />
                 </span>
               </div>
@@ -217,7 +217,7 @@ export default function CountdownSection() {
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                   <FlipDigit value={timeLeft.hours} />
                 </span>
-                <span className="text-[10px] sm:text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
+                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
                   <Translate en="Hours" hi="घंटे" />
                 </span>
               </div>
@@ -228,7 +228,7 @@ export default function CountdownSection() {
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                   <FlipDigit value={timeLeft.minutes} />
                 </span>
-                <span className="text-[10px] sm:text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
+                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
                   <Translate en="Minutes" hi="मिनट" />
                 </span>
               </div>
@@ -239,7 +239,7 @@ export default function CountdownSection() {
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
                   <FlipDigit value={timeLeft.seconds} />
                 </span>
-                <span className="text-[10px] sm:text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
+                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
                   <Translate en="Seconds" hi="सेकंड" />
                 </span>
               </div>

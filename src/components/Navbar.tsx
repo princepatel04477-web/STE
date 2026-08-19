@@ -145,7 +145,7 @@ export default function Navbar() {
 
             {/* Brand Text */}
             <div className="hidden md:flex flex-col select-none ml-2">
-              <span className="text-[8px] uppercase tracking-[0.2em] text-expo-warm/55 leading-tight font-semibold">
+              <span className="text-xs uppercase tracking-[0.2em] text-expo-warm/55 leading-tight font-semibold">
                 <Translate en="Surat Textile" hi="सूरत टेक्सटाइल" />
               </span>
               <span className="text-xs sm:text-sm font-display tracking-widest text-expo-gold font-black leading-none gold-shimmer-text">
@@ -156,7 +156,7 @@ export default function Navbar() {
         </div>
 
         {/* Center Column: Desktop Navigation Links */}
-        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-4 lg:gap-8 text-[10px] lg:text-[11px] uppercase tracking-[0.12em] font-medium select-none">
+        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-4 lg:gap-8 text-xs uppercase tracking-[0.12em] font-medium select-none">
           {navItems.map((item) => {
             const isActive = activeSection === item.href;
             return (
@@ -182,7 +182,7 @@ export default function Navbar() {
               className="hidden min-[1700px]:flex items-center gap-2.5 text-expo-warm/75 hover:text-expo-gold transition-colors duration-300 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold badge-tap"
             >
               <PhoneCall className="w-3.5 h-3.5 text-expo-gold/80" />
-              <span className="text-[10px] tracking-[0.18em] font-sans uppercase">
+              <span className="text-xs tracking-[0.18em] font-sans uppercase">
                 <Translate en={`Call: ${PHONE_DISPLAY}`} hi={`कॉल: ${PHONE_DISPLAY}`} />
               </span>
             </a>
@@ -198,7 +198,7 @@ export default function Navbar() {
               />
               <button
                 onClick={() => setLanguage("en")}
-                className={`relative z-10 w-1/2 text-center text-[10px] font-bold tracking-wider transition-colors duration-300 badge-tap ${
+                className={`relative z-10 w-1/2 text-center text-xs font-bold tracking-wider transition-colors duration-300 badge-tap ${
                   language === "en" ? "text-expo-gold" : "text-expo-warm/50"
                 }`}
               >
@@ -206,7 +206,7 @@ export default function Navbar() {
               </button>
               <button
                 onClick={() => setLanguage("hi")}
-                className={`relative z-10 w-1/2 text-center text-[10px] font-bold tracking-wider transition-colors duration-300 badge-tap ${
+                className={`relative z-10 w-1/2 text-center text-xs font-bold tracking-wider transition-colors duration-300 badge-tap ${
                   language === "hi" ? "text-expo-gold" : "text-expo-warm/50"
                 }`}
               >
@@ -217,7 +217,7 @@ export default function Navbar() {
             <a 
               href="/exhibitor/login"
               data-cursor="cta"
-              className="px-6 py-2.5 rounded-full bg-gold-gradient text-black font-bold text-[9px] uppercase tracking-[0.2em] transition-all duration-300 hover:scale-105 active:scale-95 shadow-md flex items-center justify-center"
+              className="px-6 py-2.5 rounded-full bg-gold-gradient text-black font-bold text-xs uppercase tracking-[0.2em] transition-all duration-300 hover:scale-105 active:scale-95 shadow-md flex items-center justify-center"
             >
               <Translate en="Exhibitor's Portal" hi="प्रदर्शक पोर्टल" />
             </a>

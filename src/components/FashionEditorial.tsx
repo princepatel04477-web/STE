@@ -373,7 +373,7 @@ export default function FashionEditorial() {
           }}
           className="max-w-4xl mb-8 md:mb-16"
         >
-          <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+          <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
             05 • LUXURY EDITORIAL
           </span>
           <h2
@@ -453,7 +453,7 @@ export default function FashionEditorial() {
 
                     {/* Section tags */}
                     <div className="absolute top-4 left-4 z-20 flex flex-col">
-                      <span className="font-sans text-[8px] font-bold tracking-[2px] text-expo-gold bg-black/60 px-2.5 py-1 border border-white/5 rounded-sm badge-tap">
+                      <span className="font-sans text-xs font-bold tracking-[2px] text-expo-gold bg-black/60 px-2.5 py-1 border border-white/5 rounded-sm badge-tap">
                         {p.coords}
                       </span>
                     </div>
@@ -461,7 +461,7 @@ export default function FashionEditorial() {
 
                   {/* Description tags */}
                   <div className="mt-6 flex flex-col">
-                    <span className="font-sans text-[10px] tracking-[3px] text-expo-gold uppercase block mb-1">
+                    <span className="font-sans text-xs tracking-[3px] text-expo-gold uppercase block mb-1">
                       {p.subtitle}
                     </span>
                     <h3 className="font-serif text-lg sm:text-2xl text-white tracking-wide group-hover:text-expo-gold transition-colors duration-500 gold-shimmer-text">
@@ -480,7 +480,7 @@ export default function FashionEditorial() {
 
       {/* Horizontal scroll advice overlay for desktop */}
       <div className="hidden lg:flex justify-end max-w-7xl mx-auto px-24 mt-8 pointer-events-none">
-        <span className="font-sans text-[9px] tracking-[3px] text-expo-warm/30 uppercase animate-pulse">
+        <span className="font-sans text-xs tracking-[3px] text-expo-warm/60 uppercase animate-pulse">
           Use Touchpad or Mouse Wheel to Explore →
         </span>
       </div>

@@ -103,7 +103,7 @@ export default function BusinessEcosystem() {
         {/* Section Header */}
         <div className="max-w-3xl mb-16 sm:mb-24">
           <FadeUp delay={0}>
-            <span className="text-[10px] sm:text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
+            <span className="text-xs font-bold tracking-[5px] text-expo-gold uppercase mb-4 block">
               <Translate en="BUSINESS ECOSYSTEM" hi="व्यापारिक इकोसिस्टम" />
             </span>
           </FadeUp>
@@ -156,7 +156,7 @@ export default function BusinessEcosystem() {
                       <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-expo-gold/40 group-hover:bg-expo-gold/5 transition-all duration-500">
                         {node.icon}
                       </div>
-                      <span className="font-sans text-[9px] tracking-[2.5px] text-expo-gold font-bold uppercase bg-[#D6A066]/10 border border-[#D6A066]/20 px-3 py-1 rounded-full badge-tap">
+                      <span className="font-sans text-xs tracking-[2.5px] text-expo-gold font-bold uppercase bg-[#D6A066]/10 border border-[#D6A066]/20 px-3 py-1 rounded-full badge-tap">
                         <Translate en={node.statsEn} hi={node.statsHi} />
                       </span>
                     </div>
@@ -164,7 +164,7 @@ export default function BusinessEcosystem() {
                     <h3 className="font-serif text-2xl text-white group-hover:text-expo-gold transition-colors duration-500 mb-1">
                       <span className="gold-shimmer-text"><Translate en={node.titleEn} hi={node.titleHi} /></span>
                     </h3>
-                    <span className="font-sans text-[10px] tracking-[2px] text-expo-warm/40 uppercase block mb-4">
+                    <span className="font-sans text-xs tracking-[2px] text-expo-warm/60 uppercase block mb-4">
                       <Translate en={node.subEn} hi={node.subHi} />
                     </span>
                     
@@ -174,7 +174,7 @@ export default function BusinessEcosystem() {
                   </div>
 
                   {/* Stats Footer inside Card */}
-                  <div className="border-t border-white/5 pt-6 mt-6 flex justify-between items-center text-[10px] tracking-[2px] uppercase text-expo-gold/70 group-hover:text-expo-gold transition-colors duration-500 font-bold font-sans">
+                  <div className="border-t border-white/5 pt-6 mt-6 flex justify-between items-center text-xs tracking-[2px] uppercase text-expo-gold/70 group-hover:text-expo-gold transition-colors duration-500 font-bold font-sans">
                     <span>
                       <Translate en="Explore Node" hi="नोड देखें" />
                     </span>

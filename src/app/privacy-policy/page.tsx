@@ -28,7 +28,7 @@ export default function PrivacyPolicy() {
 
         {/* Header */}
         <div className="border-b border-white/10 pb-8 mb-12">
-          <span className="text-[10px] font-bold tracking-[6px] text-expo-gold uppercase mb-3 block">
+          <span className="text-xs font-bold tracking-[6px] text-expo-gold uppercase mb-3 block">
             <Translate en="STE 2026 • COMPLIANCE" hi="एसटीई 2026 • अनुपालन" />
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl tracking-tight text-white leading-none">
@@ -37,7 +37,7 @@ export default function PrivacyPolicy() {
               <Translate en="Policy" hi="नीति" />
             </span>
           </h1>
-          <p className="font-sans text-xs text-expo-warm/40 mt-4">
+          <p className="font-sans text-xs text-expo-warm/60 mt-4">
             <Translate en="Last Updated: May 23, 2026" hi="अंतिम अपडेट: 23 मई, 2026" />
           </p>
         </div>

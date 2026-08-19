@@ -309,7 +309,7 @@ export default function CinematicHero() {
                   hi="जहाँ निर्माता, थोक विक्रेता, निर्यातक और खरीदार जुड़ते हैं"
                 />
               </h2>
-              <p className="font-sans text-[11px] md:text-sm text-expo-warm/75 tracking-[0.5px] md:tracking-[1px] font-light">
+              <p className="font-sans text-xs md:text-sm text-expo-warm/75 tracking-[0.5px] md:tracking-[1px] font-light">
                 <Translate
                   en={`${EVENT.stalls}+ Stalls · ${formatCount(EVENT.buyers)}+ Verified Buyers · ${EVENT.agents}+ Sourcing Agents · ${EVENT.venueShortEn}`}
                   hi={`${EVENT.stalls}+ स्टॉल · ${formatCount(EVENT.buyers)}+ सत्यापित खरीदार · ${EVENT.agents}+ सोर्सिंग एजेंट · ${EVENT.venueShortHi}`}

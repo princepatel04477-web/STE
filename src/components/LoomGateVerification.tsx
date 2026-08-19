@@ -142,10 +142,10 @@ export default function LoomGateVerification({
             <Shield className={`w-4 h-4 ${status === "verifying" ? "animate-pulse" : ""}`} />
           </div>
           <div>
-            <h4 className="font-sans text-[10px] sm:text-[11px] font-bold tracking-[2.5px] text-white uppercase leading-none mb-1.5">
+            <h4 className="font-sans text-xs font-bold tracking-[2.5px] text-white uppercase leading-none mb-1.5">
               {language === "en" ? "LoomGate Verification" : "लूमगेट सत्यापन"}
             </h4>
-            <p className="font-sans text-[9px] tracking-[1px] text-expo-warm/40 uppercase">
+            <p className="font-sans text-xs tracking-[1px] text-expo-warm/60 uppercase">
               {status === "success"
                 ? (language === "en" ? "Access granted successfully" : "पहुंच सफलतापूर्वक स्वीकृत")
                 : status === "verifying"
@@ -196,7 +196,7 @@ export default function LoomGateVerification({
               type="button"
               onClick={generateDigits}
               aria-label="Refresh Captcha Dials"
-              className="p-2 rounded-lg border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] text-expo-warm/40 hover:text-expo-gold transition-all duration-300"
+              className="p-2 rounded-lg border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] text-expo-warm/60 hover:text-expo-gold transition-all duration-300"
             >
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
@@ -232,7 +232,7 @@ export default function LoomGateVerification({
                 <div className="absolute w-3 h-3 border border-expo-gold/20 border-b-transparent rounded-full animate-spin duration-500" />
                 <div className="absolute w-1 h-1 bg-expo-gold rounded-full animate-ping" />
               </div>
-              <span className="font-sans text-[10px] text-expo-gold font-bold tracking-[2px] uppercase">
+              <span className="font-sans text-xs text-expo-gold font-bold tracking-[2px] uppercase">
                 {language === "en" ? "Analyzing Biometric Speed Path..." : "बायोमेट्रिक गति पथ का विश्लेषण..."}
               </span>
             </motion.div>
@@ -252,7 +252,7 @@ export default function LoomGateVerification({
 
               {/* Central text placeholder */}
               <div
-                className="absolute inset-0 flex items-center justify-center font-sans text-[9px] sm:text-[10px] font-bold text-expo-warm/25 uppercase tracking-[2px] select-none pointer-events-none z-10 transition-opacity duration-300"
+                className="absolute inset-0 flex items-center justify-center font-sans text-xs font-bold text-expo-warm/60 uppercase tracking-[2px] select-none pointer-events-none z-10 transition-opacity duration-300"
                 style={{ opacity: (100 - slideValue) / 100 }}
               >
                 {language === "en" ? "Drag shuttle to lock verification" : "सत्यापन लॉक करने के लिए शटल खींचें"}
