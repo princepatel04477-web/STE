@@ -46,8 +46,8 @@ export default function PrivacyPolicy() {
         <div className="font-sans text-sm sm:text-base text-expo-warm/75 leading-relaxed space-y-8">
           <p>
             <Translate
-              en="Surat Textile Exhibition (STE 2026), organized by AKAS Group, is committed to protecting the privacy and security of your business and personal information. This Privacy Policy describes how we collect, use, and safeguard data when you visit our website (stex2.vercel.app), register as an exhibitor, book exhibition stalls, or submit inquiries."
-              hi="अकास ग्रुप द्वारा आयोजित सूरत टेक्सटाइल प्रदर्शनी (STE 2026), आपके व्यवसाय और व्यक्तिगत जानकारी की गोपनीयता और सुरक्षा की रक्षा करने के लिए प्रतिबद्ध है। यह गोपनीयता नीति बताती है कि जब आप हमारी वेबसाइट (stex2.vercel.app) पर जाते हैं, एक प्रदर्शक के रूप में पंजीकरण करते हैं, प्रदर्शनी स्टॉल बुक करते हैं, या पूछताछ सबमिट करते हैं, तो हम डेटा को कैसे एकत्र, उपयोग और सुरक्षित करते हैं।"
+              en="Surat Textile Exhibition (STE 2026), organized by AKAS Group, is committed to protecting the privacy and security of your business and personal information. This Privacy Policy describes how we collect, use, and safeguard data when you visit our website (www.stesurat.com), register as an exhibitor, book exhibition stalls, or submit inquiries."
+              hi="अकास ग्रुप द्वारा आयोजित सूरत टेक्सटाइल प्रदर्शनी (STE 2026), आपके व्यवसाय और व्यक्तिगत जानकारी की गोपनीयता और सुरक्षा की रक्षा करने के लिए प्रतिबद्ध है। यह गोपनीयता नीति बताती है कि जब आप हमारी वेबसाइट (www.stesurat.com) पर जाते हैं, एक प्रदर्शक के रूप में पंजीकरण करते हैं, प्रदर्शनी स्टॉल बुक करते हैं, या पूछताछ सबमिट करते हैं, तो हम डेटा को कैसे एकत्र, उपयोग और सुरक्षित करते हैं।"
             />
           </p>
 

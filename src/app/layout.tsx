@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { LazyMotion, domAnimation } from "framer-motion";
+import { SITE_URL, IS_PRODUCTION_SITE, absoluteUrl } from "@/lib/site";
+import { EVENT, EVENT_SUMMARY_EN, formatCount } from "@/lib/event-facts";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { PageTransition } from "@/components/PageTransition";
@@ -21,43 +23,41 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Surat Textile Exhibition 2026 (STE) | India's Premier B2B Sourcing Machine",
-  description: "Official portal for Surat Textile Exhibition 2026 (STE) organized by AKAS Group. Showcase for 650+ exhibitors & 80,000+ B2B buyers at SIECC, Surat.",
+  description:
+    `Official portal for ${EVENT.name} presented by ${EVENT.presenterName} and supported by ${EVENT.organizerName}. ` +
+    `${EVENT.stalls}+ stalls, ${formatCount(EVENT.buyers)}+ verified B2B buyers and ${EVENT.agents}+ sourcing agents at ${EVENT.venueShortEn}.`,
   keywords: [
-    "Surat Textile Exhibition", 
-    "STE 2026", 
-    "Textile Exhibition Surat", 
-    "B2B Textile Sourcing", 
-    "Surat Sarees Wholesale", 
-    "Lehenga Manufacturers Surat", 
+    "Surat Textile Exhibition",
+    "STE 2026",
+    "Textile Exhibition Surat",
+    "B2B Textile Sourcing",
+    "Surat Sarees Wholesale",
+    "Lehenga Manufacturers Surat",
     "AKAS Group Exhibition"
   ],
-  metadataBase: new URL("https://stex2.vercel.app"),
+  // Everything below is resolved against this. Keep all paths RELATIVE so the
+  // canonical/OG host can never drift away from the deployment again.
+  metadataBase: new URL(SITE_URL),
   alternates: {
     canonical: "/",
   },
+  robots: IS_PRODUCTION_SITE
+    ? { index: true, follow: true }
+    : { index: false, follow: false },
   openGraph: {
     title: "Surat Textile Exhibition 2026 (STE)",
-    description:
-      "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 80,000+ buyers at SIECC, Surat.",
+    description: EVENT_SUMMARY_EN,
     url: "/",
     siteName: "Surat Textile Exhibition 2026",
     type: "website",
     locale: "en_IN",
-    images: [
-      {
-        url: "/assets/logo_STE.webp",
-        width: 1200,
-        height: 630,
-        alt: "Surat Textile Exhibition 2026",
-      },
-    ],
+    // og:image comes from app/opengraph-image.tsx — a real 1200x630 PNG.
   },
   twitter: {
     card: "summary_large_image",
     title: "Surat Textile Exhibition 2026 (STE)",
-    description:
-      "India's premier B2B textile sourcing exhibition with 650+ exhibitors and 80,000+ buyers at SIECC, Surat.",
-    images: ["/assets/logo_STE.webp"],
+    description: EVENT_SUMMARY_EN,
+    // twitter:image comes from app/twitter-image.tsx.
   },
 };
 
@@ -71,52 +71,36 @@ export default function RootLayout({
   const eventJsonLd = {
     "@context": "https://schema.org",
     "@type": "Event",
-    "name": "Surat Textile Exhibition (STE) 2026",
-    "description": "India's premier B2B textile sourcing exhibition showcasing heritage drapes, sarees, premium lehengas, kurtis, and contemporary wedding wear. Explore 650+ exhibitors and 80,000+ buyers from across the world.",
-    "startDate": "2026-09-12T10:00:00+05:30",
-    "endDate": "2026-09-13T18:00:00+05:30",
+    "name": EVENT.name,
+    "description": EVENT_SUMMARY_EN,
+    "startDate": EVENT.startDate,
+    "endDate": EVENT.endDate,
     "eventStatus": "https://schema.org/EventScheduled",
     "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "url": absoluteUrl("/"),
     "location": {
       "@type": "Place",
-      "name": "Surat International Exhibition and Convention Centre (SIECC)",
+      "name": EVENT.venueName,
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Althan-Sarsana Road, Sarsana",
-        "addressLocality": "Surat",
-        "addressRegion": "Gujarat",
-        "postalCode": "395007",
-        "addressCountry": "IN"
+        "streetAddress": EVENT.streetAddress,
+        "addressLocality": EVENT.city,
+        "addressRegion": EVENT.region,
+        "postalCode": EVENT.postalCode,
+        "addressCountry": EVENT.country
       }
     },
-    "image": [
-      "https://stex2.vercel.app/assets/logo_STE.webp"
-    ],
+    "image": [absoluteUrl("/opengraph-image")],
     "organizer": {
       "@type": "Organization",
-      "name": "AKAS Group",
-      "url": "https://stex2.vercel.app"
-    },
-    "offers": {
-      "@type": "Offer",
-      "url": "https://stex2.vercel.app/#final-cta",
-      "price": "0",
-      "priceCurrency": "INR",
-      "availability": "https://schema.org/InStock",
-      "validFrom": "2026-05-23T00:00:00+05:30"
+      "name": EVENT.organizerName,
+      "url": absoluteUrl("/")
     }
   };
 
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
-        {/* Preload the video so boomerang capture starts faster */}
-        <link 
-          rel="preload" 
-          href="/assets/video/hero.mp4"
-          as="fetch"
-          crossOrigin="anonymous"
-        />
 
         <script
           id="ld-json-schema"
