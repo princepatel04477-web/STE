@@ -173,7 +173,7 @@ export default function PowerOfSurat() {
                  fallbackImage="/assets/images/world-map.webp"
                />
               <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-60 z-20 pointer-events-none" />
-              <span className="absolute bottom-4 left-4 font-sans text-[10px] tracking-[3px] text-expo-gold uppercase bg-black/60 backdrop-blur-md px-3 py-1.5 border border-white/10 rounded-sm badge-tap">
+              <span className="absolute bottom-4 left-4 font-sans text-[10px] tracking-[3px] text-expo-gold uppercase bg-black/60 md:backdrop-blur-sm px-3 py-1.5 border border-white/10 rounded-sm badge-tap">
                 <Translate en="SURAT PRODUCTION GRID" hi="सूरत उत्पादन ग्रिड" />
               </span>
             </div>
@@ -181,18 +181,18 @@ export default function PowerOfSurat() {
             {/* Simulated Live Trade Routes Visualizer */}
             <div
               ref={mapRef}
-              className="stat-card opacity-0 translate-y-[30px] relative w-full h-[180px] border border-white/5 rounded-sm p-4 bg-black/40 backdrop-blur-md flex flex-col justify-end overflow-hidden z-10 card-tap"
+              className="stat-card opacity-0 translate-y-[30px] relative w-full h-[180px] border border-white/5 rounded-sm p-4 bg-black/40 md:backdrop-blur-sm flex flex-col justify-end overflow-hidden z-10 card-tap"
               style={{
                 backgroundImage: `linear-gradient(rgba(5, 5, 5, 0.85), rgba(5, 5, 5, 0.85)), url('/assets/images/world-map.webp')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
             >
-              <div className="absolute inset-0 bg-[#070707]/30 mix-blend-color" />
+              <div className="absolute inset-0 bg-[#070707]/45" />
               
               {/* Graphic overlays: Luminous lines representing seasonal demands */}
               <div 
-                className="absolute inset-0 bg-contain bg-no-repeat bg-center opacity-[0.25] mix-blend-screen scale-[1.08] translate-y-[-10%]"
+                className="absolute inset-0 bg-contain bg-no-repeat bg-center opacity-[0.25] md:mix-blend-screen scale-[1.08] translate-y-[-10%]"
                 style={{ backgroundImage: `url('/assets/images/line-graph-rising.webp')` }}
               />
 

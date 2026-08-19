@@ -227,7 +227,7 @@ export default function TrustSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch mb-16">
           
           {/* Left Block: Organizer Profile & Credentials */}
-          <div className="trust-animate opacity-0 translate-y-[25px] lg:col-span-6 border-glow-card p-8 sm:p-10 bg-black/45 backdrop-blur-md rounded-xl flex flex-col justify-between card-tap">
+          <div className="trust-animate opacity-0 translate-y-[25px] lg:col-span-6 border-glow-card p-8 sm:p-10 bg-black/45 md:backdrop-blur-sm rounded-xl flex flex-col justify-between card-tap">
             <div>
               <span className="text-[9px] tracking-[2.5px] text-expo-gold uppercase block mb-3 font-bold">
                 <Translate en="Ecosystem Organizer" hi="इकोसिस्टम आयोजक" />
@@ -256,7 +256,7 @@ export default function TrustSection() {
           <div className="lg:col-span-6 flex flex-col gap-6 items-stretch">
             
             {/* Previous event stats */}
-            <div className="trust-animate opacity-0 translate-y-[25px] border-glow-card p-6 bg-black/40 backdrop-blur-md rounded-xl grid grid-cols-2 gap-4 card-tap">
+            <div className="trust-animate opacity-0 translate-y-[25px] border-glow-card p-6 bg-black/40 md:backdrop-blur-sm rounded-xl grid grid-cols-2 gap-4 card-tap">
               {PREVIOUS_EVENTS.map((item, idx) => (
                 <div key={idx} className="p-4 bg-white/[0.02] border border-white/5 rounded-sm badge-tap active:scale-95">
                   <div className="flex justify-between items-center mb-2">

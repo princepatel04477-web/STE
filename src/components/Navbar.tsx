@@ -76,9 +76,7 @@ export default function Navbar() {
   const headerStyle = isMobile
     ? (isScrolled
       ? {
-          backgroundColor: "rgba(5, 5, 5, 0.92)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
+          backgroundColor: "rgba(5, 5, 5, 0.97)",
           borderBottom: "1px solid rgba(212, 175, 55, 0.25)",
           height: "56px",
           transition: "all 0.2s ease"
@@ -91,9 +89,9 @@ export default function Navbar() {
         })
     : (isScrolled
       ? {
-          backgroundColor: "rgba(5, 5, 5, 0.85)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          backgroundColor: "rgba(5, 5, 5, 0.88)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
           borderBottom: "1px solid rgba(212, 175, 55, 0.3)",
           boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
           paddingTop: "0.875rem",
@@ -110,7 +108,7 @@ export default function Navbar() {
 
   return (
     <header
-      className="fixed top-0 left-0 w-full z-50 flex items-center animate-navbar-slide-down"
+      className="fixed top-0 left-0 w-full z-nav flex items-center animate-navbar-slide-down"
       style={headerStyle}
     >
       <div className="max-w-[1440px] mx-auto px-5 md:px-10 flex items-center justify-between relative w-full h-full">
@@ -228,7 +226,7 @@ export default function Navbar() {
           {/* Mobile Toggle Button (Visible below MD break) */}
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="md:hidden text-expo-warm hover:text-expo-gold transition-colors p-3 z-[9999] relative w-11 h-11 flex items-center justify-center focus:outline-none badge-tap"
+            className="md:hidden text-expo-warm hover:text-expo-gold transition-colors p-3 z-modal relative w-11 h-11 flex items-center justify-center focus:outline-none badge-tap"
             aria-label="Toggle Menu"
             aria-expanded={isMobileOpen}
           >
@@ -245,7 +243,7 @@ export default function Navbar() {
       {/* Mobile Navigation Panel (Visible below MD break) */}
       <div
         id="primary-mobile-menu"
-        className={`mobile-drawer md:hidden fixed inset-0 z-[9997] bg-[#050505]/95 pt-20 pb-8 px-6 flex flex-col justify-between shadow-2xl overflow-y-auto mobile-menu-drawer ${
+        className={`mobile-drawer md:hidden fixed inset-0 z-overlay bg-[#050505]/95 pt-20 pb-8 px-6 flex flex-col justify-between shadow-2xl overflow-y-auto mobile-menu-drawer ${
           isMobileOpen ? "open" : "closed"
         }`}
         style={{

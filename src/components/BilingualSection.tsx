@@ -81,7 +81,7 @@ export default function BilingualSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-stretch">
           
           {/* Card 1: For Manufacturers (Weavers / Processor Sellers) */}
-          <div className="bilingual-card opacity-0 translate-y-[30px] border border-[#FF9933]/20 hover:border-[#FF9933]/50 p-8 sm:p-12 bg-black/40 backdrop-blur-md rounded-xl flex flex-col justify-between shadow-[0_0_40px_rgba(255,153,51,0.02)] transition-colors duration-500 card-tap">
+          <div className="bilingual-card opacity-0 translate-y-[30px] border border-[#FF9933]/20 hover:border-[#FF9933]/50 p-8 sm:p-12 bg-black/40 md:backdrop-blur-sm rounded-xl flex flex-col justify-between shadow-[0_0_40px_rgba(255,153,51,0.02)] transition-colors duration-500 card-tap">
             <div>
               {/* Badge */}
               <div className="flex items-center justify-between mb-8">
@@ -141,7 +141,7 @@ export default function BilingualSection() {
           </div>
 
           {/* Card 2: For B2B Buyers (Wholesalers / Retail Boutique Owners) */}
-          <div className="bilingual-card opacity-0 translate-y-[30px] border border-[#FFBF80]/20 hover:border-[#FFBF80]/50 p-8 sm:p-12 bg-black/40 backdrop-blur-md rounded-xl flex flex-col justify-between shadow-[0_0_40px_rgba(255,191,128,0.02)] transition-colors duration-500 card-tap">
+          <div className="bilingual-card opacity-0 translate-y-[30px] border border-[#FFBF80]/20 hover:border-[#FFBF80]/50 p-8 sm:p-12 bg-black/40 md:backdrop-blur-sm rounded-xl flex flex-col justify-between shadow-[0_0_40px_rgba(255,191,128,0.02)] transition-colors duration-500 card-tap">
             <div>
               {/* Badge */}
               <div className="flex items-center justify-between mb-8">

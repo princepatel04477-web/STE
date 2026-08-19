@@ -78,7 +78,7 @@ export default function BrochureModal({ isOpen, onClose }: BrochureModalProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl"
+          className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/90 md:backdrop-blur-sm"
         >
           {/* Close Area */}
           <div className="absolute inset-0 cursor-zoom-out" onClick={onClose} aria-hidden="true" />
@@ -89,7 +89,7 @@ export default function BrochureModal({ isOpen, onClose }: BrochureModalProps) {
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 20, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative w-full max-w-5xl h-[82vh] md:h-[88vh] bg-[#070707] border border-expo-gold/20 rounded-xl overflow-hidden shadow-[0_0_80px_rgba(214,160,102,0.15)] flex flex-col z-10"
+            className="relative w-full max-w-5xl h-[82vh] md:h-[88vh] bg-[#070707] border border-expo-gold/20 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(214,160,102,0.15)] flex flex-col z-10"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -98,7 +98,7 @@ export default function BrochureModal({ isOpen, onClose }: BrochureModalProps) {
             tabIndex={-1}
           >
             {/* Header Controls */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0c0c0c]/80 backdrop-blur-md select-none">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#0c0c0c]/80 md:backdrop-blur-sm select-none">
               <div className="flex flex-col">
                 <span className="font-sans text-[8px] font-bold tracking-[3px] text-expo-gold uppercase">
                   <Translate en="Official Brochure" hi="आधिकारिक ब्रोशर" />

@@ -134,7 +134,7 @@ export default function ExhibitorLoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4">
-        <div className="bg-neutral-900/80 backdrop-blur-xl border border-neutral-800/80 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
+        <div className="bg-neutral-900/80 md:backdrop-blur-sm border border-neutral-800/80 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
           {error && (
             <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm flex items-start gap-2">
               <span className="font-semibold">Error:</span> {error}
@@ -225,7 +225,7 @@ export default function ExhibitorLoginPage() {
 
       {/* Reset / Create Custom Password Modal */}
       {showResetModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/85 md:backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-neutral-900 border border-amber-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <button
               type="button"
@@ -333,7 +333,7 @@ export default function ExhibitorLoginPage() {
 
       {/* Admin Access Choice Modal */}
       {showAdminChoiceModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/85 md:backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-neutral-900 border border-amber-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-center relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 blur-2xl rounded-full pointer-events-none" />
 

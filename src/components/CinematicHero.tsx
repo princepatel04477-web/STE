@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, lazy, Suspense } from "react";
-import CountUp from "react-countup";
 import { useLanguage, Translate } from "@/components/LanguageContext";
+import HeroCountdown from "@/components/HeroCountdown";
+import StatCounter from "@/components/StatCounter";
+import { EVENT, formatCount } from "@/lib/event-facts";
 import { useMobileAnimation } from "./useMobileAnimation";
 import { GoldParticles } from "@/components/GoldParticles";
 import BoomerangVideoBg from "@/BoomerangVideoBg";
@@ -10,38 +12,6 @@ import { masterRAF } from "@/hooks/useMasterRAF";
 import TextReveal from "@/components/TextReveal";
 
 const MinimalThreeOverlay = lazy(() => import("@/MinimalThreeOverlay"));
-
-function FlipDigit({ value, label }: { value: string; label: string }) {
-  const [displayValue, setDisplayValue] = useState(value);
-  const [flipping, setFlipping] = useState(false);
-
-  useEffect(() => {
-    if (value !== displayValue) {
-      setFlipping(true);
-      const timer = setTimeout(() => {
-        setDisplayValue(value);
-        setFlipping(false);
-      }, 200);
-      return () => clearTimeout(timer);
-    }
-  }, [value, displayValue]);
-
-  return (
-    <div className="text-center flex-1 flex flex-col items-center max-w-[70px] sm:max-w-[80px]">
-      <div className="digit w-10 h-12 sm:w-16 sm:h-18 bg-black/75 border border-expo-gold/20 rounded-lg flex items-center justify-center relative shadow-md overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
-        <span className={`font-serif text-[clamp(20px,5vw,36px)] sm:text-4xl font-bold text-expo-gold leading-none tracking-normal drop-shadow-[0_0_10px_rgba(214,160,102,0.4)] ${flipping ? "flip-digit" : ""}`}>
-          {displayValue}
-        </span>
-      </div>
-      <span 
-        className="text-[9px] uppercase tracking-[0.1em] text-[#B87333] block mt-2 font-semibold font-sans"
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
 
 interface MagneticButtonProps {
   children: React.ReactNode;
@@ -133,8 +103,6 @@ export default function CinematicHero() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useMobileAnimation();
 
-  const [isMounted, setIsMounted] = useState(false);
-  const [isExpired, setIsExpired] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const { language } = useLanguage();
 
@@ -142,13 +110,6 @@ export default function CinematicHero() {
     e.preventDefault();
     window.dispatchEvent(new CustomEvent("open-brochure"));
   };
-
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
 
   const mouseRef = useRef({ x: 0, y: 0 });
   const currentMouseOffsetRef = useRef({ x: 0, y: 0 });
@@ -168,31 +129,6 @@ export default function CinematicHero() {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsMounted(true);
-    }, 0);
-    const targetDate = new Date("2026-09-12T00:00:00+05:30");
-    const updateCountdown = () => {
-      const now = new Date();
-      const difference = targetDate.getTime() - now.getTime();
-      
-      if (difference <= 0) {
-        setIsExpired(true);
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-      
-      const d = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const h = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((difference % (1000 * 60)) / 1000);
-      
-      setTimeLeft({ days: d, hours: h, minutes: m, seconds: s });
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-
     const updatePositions = () => {
       const scrollY = scrollYRef.current;
       const current = currentMouseOffsetRef.current;
@@ -249,7 +185,6 @@ export default function CinematicHero() {
     }
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousemove", handleMouseMove);
       if (unsubscribeParallax) unsubscribeParallax();
@@ -308,7 +243,7 @@ export default function CinematicHero() {
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-10 select-none">
         {/* World map city lights layer */}
         <div
-          className="parallax-layer absolute inset-0 bg-cover bg-center opacity-[0.1] mix-blend-screen scale-[1.1]"
+          className="parallax-layer absolute inset-0 bg-cover bg-center opacity-[0.1] md:mix-blend-screen scale-[1.1]"
           style={{ backgroundImage: `url('/assets/images/world-map.webp')` }}
           data-speed="0.25"
         />
@@ -327,8 +262,11 @@ export default function CinematicHero() {
           className="animate-hero-fade-up" 
           style={{ animationDelay: "100ms" }}
         >
-          <span className="text-xs font-bold tracking-[3px] md:tracking-[6px] text-expo-gold uppercase mb-6 bg-expo-gold/5 border border-expo-gold/15 px-3.5 py-1.5 md:px-5 md:py-2.5 rounded-full backdrop-blur-md glow-soft animate-pulse">
-            <Translate en="September 12-13, 2026 • SIECC, Sarsana Dome, Surat" hi="12-13 सितंबर, 2026 • SIECC, सरसाना डोम, सूरत" />
+          <span className="text-xs font-bold tracking-[3px] md:tracking-[6px] text-expo-gold uppercase mb-6 bg-expo-gold/5 border border-expo-gold/15 px-3.5 py-1.5 md:px-5 md:py-2.5 rounded-full md:backdrop-blur-sm glow-soft animate-pulse">
+            <Translate
+              en={`${EVENT.dateLabelEn} • ${EVENT.venueShortEn}`}
+              hi={`${EVENT.dateLabelHi} • ${EVENT.venueShortHi}`}
+            />
           </span>
         </div>
 
@@ -373,11 +311,11 @@ export default function CinematicHero() {
               </h2>
               <p className="font-sans text-[11px] md:text-sm text-expo-warm/75 tracking-[0.5px] md:tracking-[1px] font-light">
                 <Translate
-                  en="650+ Stalls · 8000+ Verified Buyers · SIECC Sarsana Dome, Surat · September 2026"
-                  hi="650+ स्टॉल · 8000+ सत्यापित खरीदार · SIECC सरसाना डोम, सूरत · सितंबर 2026"
+                  en={`${EVENT.stalls}+ Stalls · ${formatCount(EVENT.buyers)}+ Verified Buyers · ${EVENT.agents}+ Sourcing Agents · ${EVENT.venueShortEn}`}
+                  hi={`${EVENT.stalls}+ स्टॉल · ${formatCount(EVENT.buyers)}+ सत्यापित खरीदार · ${EVENT.agents}+ सोर्सिंग एजेंट · ${EVENT.venueShortHi}`}
                 />
               </p>
-              <span className="text-[8px] md:text-[9px] tracking-[1.5px] md:tracking-[2.5px] uppercase text-expo-warm/50 mt-1 block">
+              <span className="text-xs tracking-[1.5px] md:tracking-[2.5px] uppercase text-expo-warm/70 mt-1 block">
                 <Translate en="Organized By STE • Supported By AKAS" hi="STE द्वारा आयोजित • AKAS द्वारा समर्थित" />
               </span>
             </div>
@@ -389,31 +327,9 @@ export default function CinematicHero() {
           className="animate-hero-fade-up" 
           style={{ animationDelay: "620ms" }}
         >
-          <div className="mt-8 flex justify-center items-center gap-1.5 sm:gap-4 bg-[#0a0a0a]/65 backdrop-blur-xl border border-expo-gold/20 p-3 sm:p-5 rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.15)] max-w-sm sm:max-w-md w-full relative">
+          <div className="mt-8 flex justify-center items-center gap-1.5 sm:gap-4 bg-[#0a0a0a]/65 md:backdrop-blur-sm border border-expo-gold/20 p-3 sm:p-5 rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.15)] max-w-sm sm:max-w-md w-full relative">
             <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
-            {!isMounted ? (
-              <div className="w-full text-center py-1">
-                <span className="font-serif text-base sm:text-lg tracking-[3px] text-expo-gold uppercase">
-                  September 12-13, 2026
-                </span>
-              </div>
-            ) : isExpired ? (
-              <div className="w-full text-center py-1">
-                <span className="font-serif text-base sm:text-lg tracking-[3px] text-expo-gold uppercase animate-pulse">
-                  EVENT IN PROGRESS
-                </span>
-              </div>
-            ) : (
-              <>
-                <FlipDigit value={String(timeLeft.days).padStart(2, "0")} label={language === "en" ? "Days" : "दिन"} />
-                <div className="text-[#B87333] text-lg font-light -translate-y-3 select-none sm:text-2xl">:</div>
-                <FlipDigit value={String(timeLeft.hours).padStart(2, "0")} label={language === "en" ? "Hours" : "घंटे"} />
-                <div className="text-[#B87333] text-lg font-light -translate-y-3 select-none sm:text-2xl">:</div>
-                <FlipDigit value={String(timeLeft.minutes).padStart(2, "0")} label={language === "en" ? "Mins" : "मिनट"} />
-                <div className="text-[#B87333] text-lg font-light -translate-y-3 select-none sm:text-2xl">:</div>
-                <FlipDigit value={String(timeLeft.seconds).padStart(2, "0")} label={language === "en" ? "Secs" : "सेकंड"} />
-              </>
-            )}
+            <HeroCountdown />
           </div>
         </div>
 
@@ -459,66 +375,50 @@ export default function CinematicHero() {
           </div>
         </div>
 
-        {/* Animated Statistics Counter Grid Row (Fix ₹0.0T bug + adds gold border, hover animations, scroll-spy) */}
+        {/* Headline statistics. Figures come from lib/event-facts.ts — the
+            single source of truth — and render server-side, so the panel can
+            never sit at zero the way it used to. */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-6 w-full max-w-lg mx-auto md:max-w-none mt-16 z-40 px-1 sm:px-0">
           {[
             {
-              end: 15.5,
+              end: EVENT.sourcingMarketSizeTrillionINR,
               decimals: 1,
               prefix: "₹",
               suffix: "T",
-              fallback: "₹15.5T",
               labelEn: "Sourcing Market Size",
               labelHi: "सोर्सिंग मार्केट आकार"
             },
             {
-              end: 8000,
+              end: EVENT.buyers,
               prefix: "",
               suffix: "+",
-              fallback: "8,000+",
               labelEn: "Verified B2B Buyers",
               labelHi: "सत्यापित B2B खरीदार"
             },
             {
-              end: 500,
+              end: EVENT.agents,
               prefix: "",
               suffix: "+",
-              fallback: "500+",
-              labelEn: "Premium Exhibitors",
-              labelHi: "प्रीमियम प्रदर्शक"
+              labelEn: "Sourcing Agents",
+              labelHi: "सोर्सिंग एजेंट"
             }
           ].map((stat, i) => (
-            <div 
-              key={i} 
+            <div
+              key={stat.labelEn}
               className="h-full animate-hero-pop-in"
               style={{ animationDelay: `${750 + i * 80}ms` }}
             >
               <div
-                className="relative h-full bg-black/80 border-t-2 border-t-[#D4AF37] border-x border-b border-white/5 p-3.5 md:p-6 rounded-lg md:rounded-xl backdrop-blur-md text-center overflow-hidden transition-all duration-300 active:scale-95 card-tap"
+                className="relative h-full bg-black/80 border-t-2 border-t-[#D4AF37] border-x border-b border-white/5 p-3.5 md:p-6 rounded-lg md:rounded-xl md:backdrop-blur-sm text-center overflow-hidden transition-all duration-300 active:scale-95 card-tap"
               >
-                <span className="block font-serif text-[22px] font-bold md:text-4xl md:font-light text-white drop-shadow-[0_0_10px_rgba(214,160,102,0.25)] gold-shimmer-text">
-                  {isMounted ? (
-                    <CountUp
-                      end={stat.end}
-                      decimals={stat.decimals || 0}
-                      separator=","
-                      duration={2.5}
-                      enableScrollSpy
-                      scrollSpyOnce
-                    >
-                      {({ countUpRef }) => (
-                        <span>
-                          {stat.prefix}
-                          <span ref={countUpRef}>{stat.fallback.replace(/[₹T+]/g, "")}</span>
-                          {stat.suffix}
-                        </span>
-                      )}
-                    </CountUp>
-                  ) : (
-                    <span>{stat.fallback}</span>
-                  )}
-                </span>
-                <span className="text-[11px] md:text-[9px] uppercase tracking-[1px] md:tracking-[1.5px] text-expo-warm/60 block mt-2 font-sans font-semibold">
+                <StatCounter
+                  end={stat.end}
+                  decimals={stat.decimals}
+                  prefix={stat.prefix}
+                  suffix={stat.suffix}
+                  className="block font-serif text-[22px] font-bold md:text-4xl md:font-light text-white drop-shadow-[0_0_10px_rgba(214,160,102,0.25)] gold-shimmer-text"
+                />
+                <span className="text-xs uppercase tracking-[1px] md:tracking-[1.5px] text-expo-warm/70 block mt-2 font-sans font-semibold">
                   <Translate en={stat.labelEn} hi={stat.labelHi} />
                 </span>
               </div>
@@ -529,7 +429,7 @@ export default function CinematicHero() {
 
       {/* 4. Luxury Scroll Down Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center pointer-events-none z-30 select-none">
-        <span className="font-sans text-[9px] tracking-[4px] text-expo-warm/40 uppercase mb-3">
+        <span className="font-sans text-xs tracking-[4px] text-expo-warm/60 uppercase mb-3">
           <Translate en="Scroll to explore" hi="खोजने के लिए स्क्रॉल करें" />
         </span>
         <div className="w-[18px] h-[34px] rounded-full border border-expo-warm/20 flex justify-center p-1">

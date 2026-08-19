@@ -148,7 +148,7 @@ export default function CountdownSection() {
           {!isMounted ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 w-full">
               {/* Days Fallback */}
-              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 backdrop-blur-2xl p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.05)] card-tap">
+              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
                 <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
                   110
@@ -158,7 +158,7 @@ export default function CountdownSection() {
                 </span>
               </div>
               {/* Hours Fallback */}
-              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 backdrop-blur-2xl p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.05)] card-tap">
+              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
                 <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                   12
@@ -168,7 +168,7 @@ export default function CountdownSection() {
                 </span>
               </div>
               {/* Minutes Fallback */}
-              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 backdrop-blur-2xl p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.05)] card-tap">
+              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
                 <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                   30
@@ -178,7 +178,7 @@ export default function CountdownSection() {
                 </span>
               </div>
               {/* Seconds Fallback */}
-              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 backdrop-blur-2xl p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.05)] card-tap">
+              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
                 <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
                   45
@@ -189,7 +189,7 @@ export default function CountdownSection() {
               </div>
             </div>
           ) : isExpired ? (
-            <div className="glow-panel relative border-glow-card bg-expo-midnight/40 backdrop-blur-2xl p-12 md:p-16 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.15)] max-w-2xl w-full card-tap">
+            <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-12 md:p-16 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.15)] max-w-2xl w-full card-tap">
               <div className="absolute inset-0 bg-gold-gradient opacity-[0.05] rounded-2xl pointer-events-none" />
               <span className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-expo-gold leading-none tracking-wider uppercase animate-pulse">
                 <Translate en="EVENT IN PROGRESS" hi="इवेंट प्रगति पर है" />
@@ -201,7 +201,7 @@ export default function CountdownSection() {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 w-full">
               {/* Days */}
-              <div className="glow-panel opacity-0 translate-y-[20px] relative border-glow-card bg-expo-midnight/40 backdrop-blur-2xl p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.05)] card-tap">
+              <div className="glow-panel opacity-0 translate-y-[20px] relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
                 <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
                   <FlipDigit value={timeLeft.days} />
@@ -212,7 +212,7 @@ export default function CountdownSection() {
               </div>
 
               {/* Hours */}
-              <div className="glow-panel opacity-0 translate-y-[20px] relative border-glow-card bg-expo-midnight/40 backdrop-blur-2xl p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.05)] card-tap">
+              <div className="glow-panel opacity-0 translate-y-[20px] relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
                 <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                   <FlipDigit value={timeLeft.hours} />
@@ -223,7 +223,7 @@ export default function CountdownSection() {
               </div>
 
               {/* Minutes */}
-              <div className="glow-panel opacity-0 translate-y-[20px] relative border-glow-card bg-expo-midnight/40 backdrop-blur-2xl p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.05)] card-tap">
+              <div className="glow-panel opacity-0 translate-y-[20px] relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
                 <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                   <FlipDigit value={timeLeft.minutes} />
@@ -234,7 +234,7 @@ export default function CountdownSection() {
               </div>
 
               {/* Seconds */}
-              <div className="glow-panel opacity-0 translate-y-[20px] relative border-glow-card bg-expo-midnight/40 backdrop-blur-2xl p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_50px_rgba(214,160,102,0.05)] card-tap">
+              <div className="glow-panel opacity-0 translate-y-[20px] relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
                 <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
                 <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
                   <FlipDigit value={timeLeft.seconds} />

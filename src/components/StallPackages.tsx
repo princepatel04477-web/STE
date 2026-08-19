@@ -309,7 +309,7 @@ export default function StallPackages() {
         </div>
 
         {/* Feature Checklist (With self-drawing checkmarks on scroll) */}
-        <FadeInSection className="max-w-4xl mx-auto mb-20 bg-black/40 border border-white/5 p-8 rounded-xl backdrop-blur-md">
+        <FadeInSection className="max-w-4xl mx-auto mb-20 bg-black/40 border border-white/5 p-8 rounded-xl md:backdrop-blur-sm">
           <h4 className="font-serif text-lg text-white text-center mb-6 italic">
             <Translate en="Standard Amenities Included in All Stalls" hi="सभी स्टालों में शामिल मानक सुविधाएं" />
           </h4>

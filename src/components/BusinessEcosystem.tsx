@@ -131,7 +131,7 @@ export default function BusinessEcosystem() {
         </div>
 
         {/* Global Network Graphic backdrop (Dotted map styling) */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.04] mix-blend-screen z-0">
+        <div className="absolute inset-0 pointer-events-none opacity-[0.04] md:mix-blend-screen z-0">
           <div
             className="w-full h-full bg-center bg-no-repeat bg-contain"
             style={{ backgroundImage: `url('/assets/images/world-map.webp')` }}
@@ -147,7 +147,7 @@ export default function BusinessEcosystem() {
             <StaggerChild key={idx}>
               <TapCard className="h-full">
                 <div
-                  className="border-glow-card p-6 sm:p-8 bg-black/45 backdrop-blur-xl flex flex-col justify-between group cursor-default transition-all duration-500 hover:-translate-y-1 hover:bg-black/60 shadow-[0_4px_30px_rgba(0,0,0,0.4)] card-tap h-full"
+                  className="border-glow-card p-6 sm:p-8 bg-black/45 md:backdrop-blur-sm flex flex-col justify-between group cursor-default transition-all duration-500 hover:-translate-y-1 hover:bg-black/60 shadow-[0_4px_30px_rgba(0,0,0,0.4)] card-tap h-full"
                   data-cursor="view"
                 >
                   <div>

@@ -238,7 +238,7 @@ export default function FabricInMotion() {
             </div>
           </div>
 
-          <div className="col-span-12 md:col-span-7 flex flex-col justify-center border border-white/5 bg-black/40 backdrop-blur-md p-8 sm:p-12 rounded-sm relative overflow-hidden card-tap">
+          <div className="col-span-12 md:col-span-7 flex flex-col justify-center border border-white/5 bg-black/40 md:backdrop-blur-sm p-8 sm:p-12 rounded-sm relative overflow-hidden card-tap">
             <div className="absolute right-[-10%] top-[-10%] w-[300px] h-[300px] bg-expo-gold/5 blur-[80px] pointer-events-none" />
             <h4 className="font-serif text-xl sm:text-2xl text-expo-gold mb-6 italic gold-shimmer-text">
               <Translate en="Premium Sourcing Portfolio" hi="प्रीमियम सोर्सिंग पोर्टफोलियो" />
@@ -289,7 +289,7 @@ export default function FabricInMotion() {
                       <div className="noise-overlay" />
                       
                       {/* Category Stamp */}
-                      <span className="absolute top-4 left-4 z-20 font-sans text-[8px] font-bold tracking-[3px] text-expo-gold bg-black/75 border border-white/15 px-3 py-1.5 rounded-full backdrop-blur-md uppercase badge-tap">
+                      <span className="absolute top-4 left-4 z-20 font-sans text-[8px] font-bold tracking-[3px] text-expo-gold bg-black/75 border border-white/15 px-3 py-1.5 rounded-full md:backdrop-blur-sm uppercase badge-tap">
                         <Translate en={item.categoryEn} hi={item.categoryHi} />
                       </span>
                     </div>
@@ -345,7 +345,7 @@ export default function FabricInMotion() {
                       <div className="noise-overlay" />
                       
                       {/* Category Stamp */}
-                      <span className="absolute top-4 left-4 z-20 font-sans text-[8px] font-bold tracking-[3px] text-expo-gold bg-black/75 border border-white/15 px-3 py-1.5 rounded-full backdrop-blur-md uppercase badge-tap">
+                      <span className="absolute top-4 left-4 z-20 font-sans text-[8px] font-bold tracking-[3px] text-expo-gold bg-black/75 border border-white/15 px-3 py-1.5 rounded-full md:backdrop-blur-sm uppercase badge-tap">
                         <Translate en={item.categoryEn} hi={item.categoryHi} />
                       </span>
                     </div>

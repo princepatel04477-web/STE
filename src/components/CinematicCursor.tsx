@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { masterRAF } from "@/hooks/useMasterRAF";
 
 interface Particle {
@@ -13,18 +13,43 @@ interface Particle {
   color: string;
 }
 
+/** Exactly the condition under which a replacement cursor is actually drawn. */
+const FINE_POINTER_QUERY = "(pointer: fine) and (min-width: 768px)";
+
 export default function CinematicCursor() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const cursorRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
   const hoveredTypeRef = useRef<string | null>(null);
   const particles = useRef<Particle[]>([]);
 
+  // The canvas used to be rendered always and merely `hidden md:block`, while
+  // `has-custom-cursor` was set on <html> unconditionally. A mouse user on a
+  // narrow window therefore got `cursor: none !important` with nothing drawn in
+  // its place — the pointer simply vanished. The class and the canvas now share
+  // one source of truth and are re-evaluated on every viewport change.
+  const [active, setActive] = useState(false);
+
   useEffect(() => {
-    // Check for prefers-reduced-motion or mobile devices
-    if (
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      window.innerWidth < 768
-    ) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const fine = window.matchMedia(FINE_POINTER_QUERY);
+    const apply = () => setActive(fine.matches);
+    apply();
+    fine.addEventListener("change", apply);
+
+    // Any uncaught error must not leave the site permanently cursor-less.
+    const recover = () => setActive(false);
+    window.addEventListener("error", recover);
+
+    return () => {
+      fine.removeEventListener("change", apply);
+      window.removeEventListener("error", recover);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!active) {
+      document.documentElement.classList.remove("has-custom-cursor");
       return;
     }
 
@@ -36,14 +61,24 @@ export default function CinematicCursor() {
 
     document.documentElement.classList.add("has-custom-cursor");
 
+    // Attribute size used to be a stretched 1280x633 with no devicePixelRatio
+    // handling — blurry on every HiDPI display. Cap DPR at 2: at DPR 3 on a
+    // 4K display the per-frame clearRect alone is a serious cost.
+    let width = 0;
+    let height = 0;
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas, { passive: true });
 
-    // Track mouse position
     const handleMouseMove = (e: MouseEvent) => {
       cursorRef.current.targetX = e.clientX;
       cursorRef.current.targetY = e.clientY;
@@ -62,7 +97,6 @@ export default function CinematicCursor() {
       }
     };
 
-    // Track click shockwaves
     const handleMouseDown = () => {
       // Spawn a burst of golden sparks
       for (let i = 0; i < 8; i++) {
@@ -80,34 +114,35 @@ export default function CinematicCursor() {
       }
     };
 
-    // Track hover states for interactive tags
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target) return;
-
       const clickable = target.closest("a, button, [role='button'], input, textarea, select");
-
-      if (clickable) {
-        hoveredTypeRef.current = "click";
-      } else {
-        hoveredTypeRef.current = null;
-      }
+      hoveredTypeRef.current = clickable ? "click" : null;
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mouseover", handleMouseOver);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("mousedown", handleMouseDown, { passive: true });
+    window.addEventListener("mouseover", handleMouseOver, { passive: true });
 
-    // Animation Loop
+    // Only the region the cursor and its particles actually occupy is cleared.
+    // A full-viewport clearRect every frame was paying 4K-worth of fill for a
+    // few hundred pixels of artwork.
+    const PAD = 48;
+    let prev = { x: 0, y: 0, w: 0, h: 0 };
+
     const render = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (prev.w > 0) ctx.clearRect(prev.x, prev.y, prev.w, prev.h);
 
-      // 1. Smoothly interpolate cursor position (lerp)
       const current = cursorRef.current;
       current.x += (current.targetX - current.x) * 0.12;
       current.y += (current.targetY - current.y) * 0.12;
 
-      // 2. Draw trailing gold dust particles
+      let minX = current.x - PAD;
+      let minY = current.y - PAD;
+      let maxX = current.x + PAD;
+      let maxY = current.y + PAD;
+
       const pArr = particles.current;
       for (let i = pArr.length - 1; i >= 0; i--) {
         const p = pArr[i];
@@ -121,6 +156,11 @@ export default function CinematicCursor() {
           continue;
         }
 
+        if (p.x - PAD < minX) minX = p.x - PAD;
+        if (p.y - PAD < minY) minY = p.y - PAD;
+        if (p.x + PAD > maxX) maxX = p.x + PAD;
+        if (p.y + PAD > maxY) maxY = p.y + PAD;
+
         ctx.save();
         ctx.globalAlpha = p.alpha;
         ctx.fillStyle = p.color;
@@ -130,12 +170,10 @@ export default function CinematicCursor() {
         ctx.restore();
       }
 
-      // 3. Draw premium cursor lens
       ctx.save();
       ctx.translate(current.x, current.y);
 
       if (hoveredTypeRef.current === "click") {
-        // Expand circle on clickable items
         ctx.beginPath();
         ctx.arc(0, 0, 20, 0, Math.PI * 2);
         ctx.strokeStyle = "rgba(214, 160, 102, 0.8)";
@@ -147,7 +185,6 @@ export default function CinematicCursor() {
         ctx.fillStyle = "#F0C48A";
         ctx.fill();
       } else {
-        // Standard premium minimalist dot with soft glowing sweep ring
         ctx.beginPath();
         ctx.arc(0, 0, 10, 0, Math.PI * 2);
         ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
@@ -161,6 +198,13 @@ export default function CinematicCursor() {
       }
 
       ctx.restore();
+
+      prev = {
+        x: Math.max(0, minX),
+        y: Math.max(0, minY),
+        w: Math.min(width, maxX) - Math.max(0, minX),
+        h: Math.min(height, maxY) - Math.max(0, minY),
+      };
     };
 
     const unsubscribe = masterRAF.subscribe(render);
@@ -173,12 +217,15 @@ export default function CinematicCursor() {
       document.documentElement.classList.remove("has-custom-cursor");
       unsubscribe();
     };
-  }, []);
+  }, [active]);
+
+  if (!active) return null;
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-[9999] hidden md:block"
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-cursor"
     />
   );
 }

@@ -90,7 +90,7 @@ export default function CollaborationSection() {
 
           {/* Left Column: STE - The Sourcing Powerhouse */}
           <SlideFromLeft className="lg:col-span-5 flex z-10" delay={0}>
-            <TapCard className="border-glow-card p-8 sm:p-10 bg-black/40 backdrop-blur-md rounded-xl flex flex-col justify-between w-full card-tap">
+            <TapCard className="border-glow-card p-8 sm:p-10 bg-black/40 md:backdrop-blur-sm rounded-xl flex flex-col justify-between w-full card-tap">
               <div>
                 <div className="flex items-center justify-between mb-8">
                   <span className="text-[9px] tracking-[2px] text-expo-gold border border-expo-gold/30 px-3 py-1 rounded-full uppercase font-bold bg-expo-gold/5">
@@ -156,7 +156,7 @@ export default function CollaborationSection() {
 
           {/* Right Column: AKAS - The Foundation of Trust */}
           <SlideFromRight className="lg:col-span-5 flex z-10" delay={0.15}>
-            <TapCard className="border-glow-card p-8 sm:p-10 bg-black/40 backdrop-blur-md rounded-xl flex flex-col justify-between w-full card-tap">
+            <TapCard className="border-glow-card p-8 sm:p-10 bg-black/40 md:backdrop-blur-sm rounded-xl flex flex-col justify-between w-full card-tap">
               <div>
                 <div className="flex items-center justify-between mb-8">
                   <span className="text-[9px] tracking-[2px] text-expo-gold border border-expo-gold/30 px-3 py-1 rounded-full uppercase font-bold bg-expo-gold/5">

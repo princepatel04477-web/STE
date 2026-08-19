@@ -84,22 +84,22 @@ body {
   /* Enhanced Glassmorphism Utilities */
   .glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
   }
 
   .glass-strong {
     background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
   .glass-gold {
     background: rgba(214, 160, 102, 0.05);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(214, 160, 102, 0.2);
   }
 
@@ -109,8 +109,8 @@ body {
       rgba(255, 255, 255, 0.1) 0%,
       rgba(255, 255, 255, 0.02) 100%
     );
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow:
       0 8px 32px 0 rgba(0, 0, 0, 0.37),
@@ -119,8 +119,8 @@ body {
 
   .glass-panel {
     background: rgba(11, 11, 11, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -154,45 +154,6 @@ body {
     transform: translateX(100%);
   }
 
-  .morph-word {
-    animation: morph-word-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
-    will-change: clip-path, filter, opacity, transform;
-  }
-
-  /* Morph blob effect */
-  .morph-blob {
-    position: relative;
-  }
-
-  .morph-blob::before {
-    content: '';
-    position: absolute;
-    inset: -50%;
-    background: radial-gradient(circle, rgba(214, 160, 102, 0.1) 0%, transparent 70%);
-    filter: blur(40px);
-    animation: morph-float 8s ease-in-out infinite;
-    pointer-events: none;
-  }
-
-  /* Animated border gradient */
-  .border-gradient {
-    position: relative;
-  }
-
-  .border-gradient::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, rgba(214,160,102,0.5), rgba(255,255,255,0.1), rgba(214,160,102,0.5));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: border-rotate 4s linear infinite;
-  }
-
   /* Glow effects */
   .glow-gold {
     box-shadow: 0 0 20px rgba(214, 160, 102, 0.2), 0 0 60px rgba(214, 160, 102, 0.1);
@@ -211,75 +172,16 @@ body {
   }
 }
 
-@keyframes morph-word-in {
-  0% {
-    opacity: 0.45;
-    filter: blur(10px);
-    clip-path: polygon(0 44%, 12% 38%, 28% 52%, 44% 35%, 60% 49%, 78% 36%, 100% 45%, 100% 55%, 82% 65%, 62% 51%, 44% 66%, 24% 50%, 0 62%);
-    transform: translateY(14px) scaleX(0.92);
-  }
-
-  58% {
-    opacity: 1;
-    filter: blur(1px);
-    clip-path: polygon(0 6%, 14% 0, 32% 8%, 48% 1%, 67% 7%, 84% 0, 100% 8%, 100% 94%, 86% 100%, 66% 92%, 49% 99%, 31% 93%, 12% 100%, 0 92%);
-    transform: translateY(0) scaleX(1.015);
-  }
-
-  100% {
-    opacity: 1;
-    filter: blur(0);
-    clip-path: inset(0);
-    transform: translateY(0) scaleX(1);
-  }
-}
-
-@keyframes morph-float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-  }
-  25% {
-    transform: translate(10px, -15px) scale(1.05);
-    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
-  }
-  50% {
-    transform: translate(-5px, 10px) scale(0.95);
-    border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%;
-  }
-  75% {
-    transform: translate(-10px, -5px) scale(1.02);
-    border-radius: 60% 40% 60% 30% / 70% 30% 50% 60%;
-  }
-}
-
-@keyframes border-rotate {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Floating particles animation */
-@keyframes particle-float {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateY(-20px) rotate(180deg);
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .morph-word {
-    animation: none;
+/* Mobile GPUs pay the most for backdrop blur and gain the least — the design
+   reads fine against the solid midnight background without it. */
+@media (max-width: 767px) {
+  .glass,
+  .glass-strong,
+  .glass-gold,
+  .glass-card,
+  .glass-panel {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -350,6 +252,9 @@ html.lenis, html.lenis body {
   display: flex;
   width: max-content;
   animation: marquee 25s linear infinite;
+  /* One long-lived layer for the track itself is correct — it genuinely
+     animates continuously. Its children must not each get one. */
+  will-change: transform;
 }
 
 .marquee-track:hover {
@@ -448,8 +353,6 @@ html.lenis, html.lenis body {
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior-x: contain !important;
   scroll-behavior: smooth !important;
-  transform: translate3d(0, 0, 0);
-  will-change: transform;
 }
 
 .horizontal-scroll-premium::-webkit-scrollbar {
@@ -457,10 +360,17 @@ html.lenis, html.lenis body {
 }
 
 /* Premium Scroll Snap Child Card */
+/* No will-change here: this class is on every card in the carousel, and
+   will-change promotes each one to its own compositor layer and KEEPS it
+   there. Dozens of full-size GPU layers held for the session is what
+   "laggy scrolling" feels like on a mobile GPU. Opt in per element while it
+   is actually animating instead. */
 .scroll-snap-card {
   scroll-snap-align: start !important;
   flex-shrink: 0 !important;
-  transform: translate3d(0, 0, 0);
+}
+
+.is-animating {
   will-change: transform;
 }
 
@@ -481,10 +391,15 @@ html.lenis, html.lenis body {
     135deg, 
     #B87333 0%, #D6A066 25%, #E5A96A 50%, #D6A066 75%, #B87333 100%
   ) !important;
-  background-size: 300% 300% !important;
+  background-size: 100% 100% !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  animation: goldShimmer 4s ease infinite !important;
+}
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .gold-foil-text {
+    background-size: 300% 300% !important;
+    animation: goldShimmer 4s ease infinite !important;
+  }
 }
 
 /* Digit 3D flip card */
@@ -496,31 +411,36 @@ html.lenis, html.lenis body {
 }
 
 /* Conic gradient border rotating effect */
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-@keyframes rotateConic {
-  to { --angle: 360deg; }
+@keyframes spin-conic {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 .rotating-gradient-border {
   position: relative;
+  isolation: isolate;
 }
+/* ::before is the spinning gold disc, ::after masks out everything but a 2px
+   rim. Both are transform/opacity only — no per-frame gradient re-resolution. */
 .rotating-gradient-border::before {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 2px;
-  background: conic-gradient(from var(--angle), #B87333, #D6A066, #E5A96A, #B87333);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  top: 50%;
+  left: 50%;
+  width: 180%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(#B87333, #D6A066, #E5A96A, #B87333);
+  animation: spin-conic 3s linear infinite;
   pointer-events: none;
-  animation: rotateConic 3s linear infinite;
-  z-index: 10;
+  z-index: -2;
+}
+.rotating-gradient-border::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: #0B0B0B;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Liquid fill CTA buttons */
@@ -554,8 +474,11 @@ html.lenis, html.lenis body {
   stroke-dashoffset: 0;
 }
 
-/* Hide default cursor on desktop hover-capable devices when custom cursor is active */
-@media (hover: hover) and (pointer: fine) {
+/* Hide the native cursor ONLY where a replacement is actually being drawn.
+   CinematicCursor adds .has-custom-cursor under exactly the same conditions
+   this rule requires, and removes it on any uncaught error — so there is
+   always a recovery path back to a visible pointer. */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
   .has-custom-cursor,
   .has-custom-cursor body,
   .has-custom-cursor a,
@@ -683,19 +606,6 @@ html.lenis, html.lenis body {
   border-color: rgba(212, 175, 55, 0.6);
 }
 
-/* 2. GOLD TEXT SHIMMER */
-.text-shimmer {
-  background: linear-gradient(120deg, #B87333 0%, #D6A066 30%, #E5A96A 50%, #D6A066 70%, #B87333 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  transition: background-position 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.text-shimmer:hover, .group:hover .text-shimmer {
-  background-position: 200% center;
-}
-
 /* 3. BUTTON SWEEP */
 .btn-sweep {
   position: relative;
@@ -711,11 +621,30 @@ html.lenis, html.lenis body {
 }
 .btn-sweep:hover::after { left: 100%; }
 
-/* Respect reduced motion — always */
+/* ── Off-screen animations cost exactly as much as on-screen ones ──
+   GlobalVisuals marks sections that have scrolled out of view; everything
+   inside one stops animating until it comes back. */
+[data-motion="paused"],
+[data-motion="paused"] *,
+[data-motion="paused"] *::before,
+[data-motion="paused"] *::after {
+  animation-play-state: paused !important;
+}
+
+/* Respect reduced motion — always.
+   The stylesheet used to contain exactly one reduced-motion rule while the
+   site shipped a cinematic intro, hijacked scrolling, marquees, particles,
+   spotlight sweeps, shimmer loops and a cursor trail. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
   }
 }
 
@@ -744,11 +673,10 @@ html.lenis, html.lenis body {
     #D6A066 75%,
     #B87333 100%
   );
-  background-size: 250% auto;
+  background-size: 100% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: goldTextFlow 4s linear infinite;
 }
 
 .gold-shimmer-text * {
@@ -760,11 +688,18 @@ html.lenis, html.lenis body {
     #D6A066 75%,
     #B87333 100%
   ) !important;
-  background-size: 250% auto !important;
+  background-size: 100% auto !important;
   background-clip: text !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  animation: goldTextFlow 4s linear infinite !important;
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .gold-shimmer-text,
+  .gold-shimmer-text * {
+    background-size: 250% auto !important;
+    animation: goldTextFlow 4s linear infinite !important;
+  }
 }
 
 @keyframes goldTextFlow {
@@ -1076,18 +1011,13 @@ html.lenis, html.lenis body {
 .mobile-menu-drawer {
   transform: translate3d(100%, 0, 0);
   opacity: 0;
-  backdrop-filter: blur(0px);
-  -webkit-backdrop-filter: blur(0px);
   transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1),
-              opacity 0.6s ease,
-              backdrop-filter 0.6s ease;
+              opacity 0.6s ease;
 }
 
 .mobile-menu-drawer.open {
   transform: translate3d(0, 0, 0);
   opacity: 1;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
 }
 
 .mobile-nav-link {
@@ -1176,17 +1106,22 @@ html.lenis, html.lenis body {
   will-change: transform, opacity;
 }
 
+/* Release the layer once the one-shot reveal has run — otherwise every
+   section on the page holds a promoted layer forever. */
 .premium-reveal.premium-revealed {
   opacity: 1;
   transform: translateY(0) translateZ(0);
+  will-change: auto;
 }
 
-/* ── Promote video + canvas to their own GPU layers ── */
+/* ── Video + canvas ── */
+/* will-change was applied to EVERY video and canvas on the page, promoting
+   each to a retained compositor layer whether or not it was animating.
+   translateZ(0) alone is enough to keep decoded frames off the main layer. */
 video,
 canvas {
-  will-change: transform;
-  transform: translateZ(0);        /* force GPU layer */
-  backface-visibility: hidden;     /* prevent unnecessary repaints */
+  transform: translateZ(0);
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
@@ -1205,24 +1140,24 @@ body {
   font-synthesis: none;
 }
 
-/* ── Mobile menu overlay: promote to own layer ── */
-.mobile-overlay {
-  will-change: opacity;
+/* ── Mobile menu overlay / drawer ── */
+/* Promoted only while open, not for the entire session. */
+.mobile-overlay,
+.mobile-drawer {
   transform: translateZ(0);
 }
 
-/* ── Mobile drawer: GPU accelerated slide ── */
-.mobile-drawer {
-  will-change: transform;
-  transform: translateZ(0);
-}
+.mobile-overlay.open { will-change: opacity; }
+.mobile-drawer.open { will-change: transform; }
 
 /* ── Buttons: only transition opacity+transform (cheap) ── */
 .btn-gpu {
-  will-change: transform, opacity;
   transform: translateZ(0);
   transition: transform 150ms ease, opacity 150ms ease;
 }
+
+.btn-gpu:hover,
+.btn-gpu:active { will-change: transform, opacity; }
 
 .btn-gpu:hover  { transform: translateZ(0) scale(1.02); }
 .btn-gpu:active { transform: translateZ(0) scale(0.97); }

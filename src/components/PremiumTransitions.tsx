@@ -56,7 +56,7 @@ export default function PremiumTransitions({ mode }: TransitionProps) {
 
       {/* 2. Abstract background texture overlays */}
       <div
-        className="absolute inset-0 bg-contain bg-no-repeat bg-center opacity-[0.06] mix-blend-screen"
+        className="absolute inset-0 bg-contain bg-no-repeat bg-center opacity-[0.06] md:mix-blend-screen"
         style={{
           backgroundImage: isTunnel
             ? `url('/assets/images/golden-fabric.webp')`

@@ -230,7 +230,7 @@ export default function ExhibitorDashboardPage() {
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans pb-20">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-30 bg-neutral-900/90 backdrop-blur-md border-b border-neutral-800/80 px-4 lg:px-8 py-4">
+      <header className="sticky top-0 z-30 bg-neutral-900/90 md:backdrop-blur-sm border-b border-neutral-800/80 px-4 lg:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/10 text-neutral-950 font-bold">
@@ -275,7 +275,7 @@ export default function ExhibitorDashboardPage() {
       <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-8 space-y-8">
 
         {/* Section 1: Exhibitor & Stall Profile Setup */}
-        <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 backdrop-blur-sm relative overflow-hidden shadow-xl">
+        <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 md:backdrop-blur-sm relative overflow-hidden shadow-xl">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
               <Building2 className="w-5 h-5" />
@@ -406,7 +406,7 @@ export default function ExhibitorDashboardPage() {
         </section>
 
         {/* Section 2: Extras Catalog Store */}
-        <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 backdrop-blur-sm shadow-xl">
+        <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 md:backdrop-blur-sm shadow-xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
@@ -597,7 +597,7 @@ export default function ExhibitorDashboardPage() {
       </main>
 
       {/* Sticky Floating Bottom Submit Bar for Easy Mobile & Desktop Access */}
-      <div className="fixed bottom-0 inset-x-0 z-40 bg-neutral-900/95 backdrop-blur-xl border-t border-amber-500/30 p-4 shadow-2xl">
+      <div className="fixed bottom-0 inset-x-0 z-40 bg-neutral-900/95 md:backdrop-blur-sm border-t border-amber-500/30 p-4 shadow-2xl">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />

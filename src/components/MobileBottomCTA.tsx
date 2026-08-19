@@ -51,7 +51,7 @@ export default function MobileBottomCTA() {
           animate={{ y: 0 }}
           exit={{ y: 100 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="fixed bottom-0 left-0 right-0 z-[9998] md:hidden bg-gradient-to-r from-[#B87333] to-[#D4AF37] shadow-[0_-10px_30px_rgba(0,0,0,0.5)] border-t border-[#B87333]/30"
+          className="fixed bottom-0 left-0 right-0 z-overlay md:hidden bg-gradient-to-r from-[#B87333] to-[#D4AF37] shadow-[0_-10px_30px_rgba(0,0,0,0.5)] border-t border-[#B87333]/30"
           style={{
             paddingBottom: "env(safe-area-inset-bottom, 0px)"
           }}

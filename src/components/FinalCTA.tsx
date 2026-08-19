@@ -319,7 +319,7 @@ export default function FinalCTA() {
           <div className="flex items-center gap-6 border-t border-white/10 pt-8 mt-4 z-30 select-none">
             {/* STE Logo */}
             <div className="flex flex-col">
-              <div className="relative w-28 h-16 overflow-hidden bg-white/[0.02] border border-white/10 rounded-lg p-2.5 backdrop-blur-md flex items-center justify-center group/logo hover:border-expo-gold/40 transition-all duration-500 hover:-translate-y-1">
+              <div className="relative w-28 h-16 overflow-hidden bg-white/[0.02] border border-white/10 rounded-lg p-2.5 md:backdrop-blur-sm flex items-center justify-center group/logo hover:border-expo-gold/40 transition-all duration-500 hover:-translate-y-1">
                 <div className="absolute inset-0 bg-gold-gradient opacity-0 group-hover/logo:opacity-[0.03] transition-opacity duration-500" />
                 <Image
                   src="/assets/logo_STE.webp"
@@ -356,7 +356,7 @@ export default function FinalCTA() {
 
         {/* Right column: Premium Inquiry Form */}
         <div className="lg:col-span-7 flex justify-center lg:justify-end">
-          <div className="cta-card opacity-0 translate-y-[30px] w-full border-glow-card p-6 sm:p-10 relative overflow-hidden bg-black/45 backdrop-blur-xl card-tap">
+          <div className="cta-card opacity-0 translate-y-[30px] w-full border-glow-card p-6 sm:p-10 relative overflow-hidden bg-black/45 md:backdrop-blur-sm card-tap">
             <div className="absolute right-[-10%] top-[-10%] w-[150px] h-[150px] bg-expo-gold/5 blur-[50px] pointer-events-none" />
             
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -708,7 +708,7 @@ export default function FinalCTA() {
                           initial={{ opacity: 0, scale: 0.98 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.1, duration: 0.4 }}
-                          className="border border-expo-gold/20 bg-expo-gold/[0.02] p-5 rounded-md flex flex-col gap-3 backdrop-blur-md relative overflow-hidden"
+                          className="border border-expo-gold/20 bg-expo-gold/[0.02] p-5 rounded-md flex flex-col gap-3 md:backdrop-blur-sm relative overflow-hidden"
                         >
                           <div className="absolute right-0 top-0 w-24 h-24 bg-expo-gold/5 blur-2xl pointer-events-none rounded-full" />
                           
@@ -799,8 +799,8 @@ export default function FinalCTA() {
 
       {/* Premium Success Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-          <div className="relative w-full max-w-lg border border-expo-gold/30 bg-[#070707] p-8 sm:p-10 rounded-lg shadow-[0_0_80px_rgba(214,160,102,0.25)] flex flex-col items-center text-center animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 md:backdrop-blur-sm">
+          <div className="relative w-full max-w-lg border border-expo-gold/30 bg-[#070707] p-8 sm:p-10 rounded-lg shadow-[0_0_40px_rgba(214,160,102,0.25)] flex flex-col items-center text-center animate-fade-in">
              <div className="absolute top-4 right-4 cursor-pointer text-expo-warm/40 hover:text-white transition-colors duration-300"
                   onClick={() => {
                     setShowModal(false);

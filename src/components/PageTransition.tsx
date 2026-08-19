@@ -2,58 +2,52 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [isFirstMount, setIsFirstMount] = useState(true);
+  const isFirstRender = useRef(true);
+  const [wipeKey, setWipeKey] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsFirstMount(false);
-    }, 0);
-    return () => clearTimeout(timer);
-  }, []);
+    // No wipe on the very first paint — it would just be a gold flash.
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setWipeKey(pathname);
+  }, [pathname]);
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={pathname}
-        className="w-full min-h-screen relative"
-        initial="initial"
-        animate="enter"
-        exit="exit"
-      >
-        {/* Copper-gold overlay panel that slides away on entry (disabled on first mount to prevent flash) */}
-        {!isFirstMount && (
+    <div className="w-full min-h-screen relative">
+      {/* The wipe used to stay mounted for the whole session as a
+          fixed inset-0 layer at z-[99999]. It now exists only while it runs. */}
+      <AnimatePresence>
+        {wipeKey && (
           <motion.div
-            className="fixed inset-0 bg-gradient-to-r from-[#B87333] via-[#D4AF37] to-[#FFD700] z-[99999] pointer-events-none"
-            variants={{
-              initial: { clipPath: "inset(0 0% 0 0)" },
-              enter: {
-                clipPath: "inset(0 0% 0 100%)",
-                transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
-              },
-              exit: {
-                clipPath: "inset(0 100% 0 0)",
-                transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
-              }
-            }}
+            key={wipeKey}
+            aria-hidden="true"
+            className="fixed inset-0 bg-gradient-to-r from-[#B87333] via-[#D4AF37] to-[#FFD700] z-transition pointer-events-none"
+            initial={{ clipPath: "inset(0 0% 0 0)" }}
+            animate={{ clipPath: "inset(0 0% 0 100%)" }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            onAnimationComplete={() => setWipeKey(null)}
           />
         )}
+      </AnimatePresence>
 
-        {/* Page Content Animation */}
-        <motion.div
-          variants={{
-            initial: { opacity: 0.9, y: 10 },
-            enter: { opacity: 1, y: 0 },
-            exit: { opacity: 0.9, y: -10 }
-          }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {children}
-        </motion.div>
+      {/* Opacity only. Any non-`none` transform on this wrapper makes it the
+          containing block for every position:fixed descendant — during a
+          transition the fixed nav, the WhatsApp button and any open modal would
+          stop being viewport-fixed and drift with the page. */}
+      <motion.div
+        key={pathname}
+        initial={{ opacity: 0.9 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {children}
       </motion.div>
-    </AnimatePresence>
+    </div>
   );
 }

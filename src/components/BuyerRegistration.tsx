@@ -169,7 +169,7 @@ export default function BuyerRegistration() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl rounded-2xl overflow-hidden p-6 sm:p-12 shadow-[0_0_80px_rgba(0,0,0,0.8)] relative card-tap"
+          className="w-full bg-[#0a0a0a]/80 border border-white/5 md:backdrop-blur-sm rounded-2xl overflow-hidden p-6 sm:p-12 shadow-[0_0_40px_rgba(0,0,0,0.8)] relative card-tap"
         >
           
           <AnimatePresence mode="wait">

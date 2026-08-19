@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
+import { masterRAF } from "@/hooks/useMasterRAF";
 
 export default function GlobalVisuals() {
   const [mounted, setMounted] = useState(false);
@@ -132,6 +133,7 @@ export default function GlobalVisuals() {
 
     const observer = new MutationObserver(() => {
       setupElements();
+      observeMotionTargets();
     });
 
     observer.observe(document.body, {
@@ -181,6 +183,29 @@ export default function GlobalVisuals() {
       sectionObserver.observe(section);
     });
 
+    // ─── 3b. Pause animations in off-screen sections ───
+    // An infinite keyframe animation costs exactly as much scrolled past as it
+    // does on screen. data-motion="paused" is picked up by a global CSS rule.
+    const motionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          (entry.target as HTMLElement).dataset.motion = entry.isIntersecting
+            ? 'running'
+            : 'paused';
+        });
+      },
+      { rootMargin: '150px 0px' }
+    );
+
+    const observeMotionTargets = () => {
+      document.querySelectorAll('section').forEach((el) => {
+        if ((el as HTMLElement).dataset.motionObserved) return;
+        (el as HTMLElement).dataset.motionObserved = '1';
+        motionObserver.observe(el);
+      });
+    };
+    observeMotionTargets();
+
     // ─── 4. Mouse Proximity Interaction tracking ───
     let mouseX = -1000;
     let mouseY = -1000;
@@ -201,7 +226,6 @@ export default function GlobalVisuals() {
     document.addEventListener('mouseleave', handleMouseLeave, { passive: true });
 
     // ─── 5. High Performance Parallax Scroll & Drift tick loop ───
-    let animationFrameId: number;
     let scrollY = window.scrollY;
     let targetScrollY = scrollY;
 
@@ -304,33 +328,34 @@ export default function GlobalVisuals() {
         el.style.transform = `translate3d(${finalX}px, ${finalY}px, 0)`;
       });
 
-      animationFrameId = requestAnimationFrame(tick);
     };
 
-    tick();
+    const unsubscribeTick = masterRAF.subscribe(tick);
 
     // Cleanup logic
     return () => {
       headingObserver.disconnect();
       sectionObserver.disconnect();
+      motionObserver.disconnect();
       observer.disconnect();
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('scroll', handleScroll);
-      cancelAnimationFrame(animationFrameId);
+      unsubscribeTick();
     };
   }, [particles, introDone]);
 
   if (!mounted) return null;
 
   return (
-    <div className="fixed inset-0 w-full h-full pointer-events-none overflow-hidden z-[1]">
+    <div className="fixed inset-0 w-full h-full pointer-events-none overflow-hidden z-[1]"
+      aria-hidden="true">
       {introDone && (
         <>
           {/* 1. Animated Orbital Lines (Parallax Parents + slow CSS Rotations) */}
           <div
             ref={(el) => { orbitRefs.current[0] = el; }}
-            className="absolute top-[-300px] left-[-300px] w-[600px] h-[600px] pointer-events-none will-change-transform"
+            className="absolute top-[-300px] left-[-300px] w-[600px] h-[600px] pointer-events-none"
           >
             <div className="w-full h-full rounded-full border border-[#D6A066]/5 animate-orbit-slow" />
           </div>
@@ -343,7 +368,7 @@ export default function GlobalVisuals() {
 
           <div
             ref={(el) => { orbitRefs.current[1] = el; }}
-            className="absolute bottom-[-400px] right-[-400px] w-[800px] h-[800px] pointer-events-none will-change-transform"
+            className="absolute bottom-[-400px] right-[-400px] w-[800px] h-[800px] pointer-events-none"
           >
             <div className="w-full h-full rounded-full border border-[#D6A066]/5 animate-orbit-slow-reverse" />
           </div>
@@ -357,19 +382,19 @@ export default function GlobalVisuals() {
           {/* 2. Floating Light Nodes (copper-gold pulsing nodes) */}
           <div
             ref={(el) => { nodeRefs.current[0] = el; }}
-            className="absolute top-[25%] left-[15%] w-1.5 h-1.5 pointer-events-none will-change-transform"
+            className="absolute top-[25%] left-[15%] w-1.5 h-1.5 pointer-events-none"
           >
             <div className="w-full h-full rounded-full bg-[#D6A066] shadow-[0_0_10px_#D6A066] animate-pulse-stagger-1" />
           </div>
           <div
             ref={(el) => { nodeRefs.current[1] = el; }}
-            className="absolute top-[65%] right-[12%] w-1.5 h-1.5 pointer-events-none will-change-transform"
+            className="absolute top-[65%] right-[12%] w-1.5 h-1.5 pointer-events-none"
           >
             <div className="w-full h-full rounded-full bg-[#D6A066] shadow-[0_0_10px_#D6A066] animate-pulse-stagger-2" />
           </div>
           <div
             ref={(el) => { nodeRefs.current[2] = el; }}
-            className="absolute bottom-[20%] left-[25%] w-1.5 h-1.5 pointer-events-none will-change-transform"
+            className="absolute bottom-[20%] left-[25%] w-1.5 h-1.5 pointer-events-none"
           >
             <div className="w-full h-full rounded-full bg-[#D6A066] shadow-[0_0_10px_#D6A066] animate-pulse-stagger-3" />
           </div>
@@ -388,7 +413,6 @@ export default function GlobalVisuals() {
                   height: `${p.size}px`,
                   backgroundColor: p.color,
                   opacity: p.baseOpacity,
-                  willChange: "transform, opacity",
                 }}
               />
             ))}

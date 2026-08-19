@@ -106,7 +106,7 @@ export default function LoomGateVerification({
       ref={containerRef}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`relative w-full border rounded-xl p-5 sm:p-6 backdrop-blur-xl transition-all duration-500 overflow-hidden ${
+      className={`relative w-full border rounded-xl p-5 sm:p-6 md:backdrop-blur-sm transition-all duration-500 overflow-hidden ${
         status === "success"
           ? "border-emerald-500/30 bg-emerald-950/[0.04] shadow-[0_0_30px_rgba(16,185,129,0.05)]"
           : status === "invalid"
