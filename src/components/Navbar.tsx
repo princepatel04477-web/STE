@@ -114,7 +114,7 @@ export default function Navbar() {
       <div className="max-w-[1440px] mx-auto px-5 md:px-10 flex items-center justify-between relative w-full h-full">
         
         {/* Left Column: STE & AKAS Branding Logos */}
-        <div className="flex items-center z-10 select-none max-w-[120px] md:max-w-none">
+        <div className="flex items-center z-10 shrink-0 select-none max-w-[120px] md:max-w-none">
           <a href="#home" className="flex items-center gap-1.5 md:gap-3 group badge-tap">
             {/* STE Logo */}
             <div className="relative w-12 h-8 md:w-20 md:h-14 overflow-hidden">
@@ -156,7 +156,7 @@ export default function Navbar() {
         </div>
 
         {/* Center Column: Desktop Navigation Links */}
-        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center gap-4 lg:gap-8 text-xs uppercase tracking-[0.12em] font-medium select-none">
+        <nav className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-6 min-[1700px]:gap-4 text-xs uppercase tracking-[0.12em] font-medium select-none">
           {navItems.map((item) => {
             const isActive = activeSection === item.href;
             return (
@@ -164,7 +164,7 @@ export default function Navbar() {
                 key={item.name}
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`nav-link-hover-trace focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold ${
+                className={`nav-link-hover-trace whitespace-nowrap shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold ${
                   isActive ? "active text-expo-gold font-bold" : "text-expo-warm/60 hover:text-expo-warm"
                 } py-2.5 transition-colors duration-300 badge-tap`}
               >
@@ -175,7 +175,7 @@ export default function Navbar() {
         </nav>
 
         {/* Right Column: Action Button, Call Support & Mobile Toggle */}
-        <div className="flex items-center z-10 gap-4 xl:gap-8">
+        <div className="flex items-center z-10 shrink-0 gap-4 xl:gap-8">
           <div className="hidden md:flex items-center gap-6 xl:gap-8">
             <a 
               href={`tel:${PHONE_TEL}`}
@@ -223,10 +223,10 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Mobile Toggle Button (Visible below MD break) */}
+          {/* Mobile Toggle Button (Visible below XL break) */}
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="md:hidden text-expo-warm hover:text-expo-gold transition-colors p-3 z-modal relative w-11 h-11 flex items-center justify-center focus:outline-none badge-tap"
+            className="xl:hidden text-expo-warm hover:text-expo-gold transition-colors p-3 z-modal relative w-11 h-11 flex items-center justify-center focus:outline-none badge-tap"
             aria-label="Toggle Menu"
             aria-expanded={isMobileOpen}
           >
@@ -240,10 +240,10 @@ export default function Navbar() {
 
       </div>
 
-      {/* Mobile Navigation Panel (Visible below MD break) */}
+      {/* Mobile Navigation Panel (Visible below XL break) */}
       <div
         id="primary-mobile-menu"
-        className={`mobile-drawer md:hidden fixed inset-0 z-overlay bg-[#050505]/95 pt-20 pb-8 px-6 flex flex-col justify-between shadow-2xl overflow-y-auto mobile-menu-drawer ${
+        className={`mobile-drawer xl:hidden fixed inset-0 z-overlay bg-[#050505]/95 pt-20 pb-8 px-6 flex flex-col justify-between shadow-2xl overflow-y-auto mobile-menu-drawer ${
           isMobileOpen ? "open" : "closed"
         }`}
         style={{
