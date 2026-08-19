@@ -1013,11 +1013,18 @@ html.lenis, html.lenis body {
   opacity: 0;
   transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.1),
               opacity 0.6s ease;
+  /* The closed drawer is a full-screen inset-0 layer, and .mobile-drawer below
+     resets transform to translateZ(0) — so it is not parked off-screen, it is
+     sitting invisibly over the whole page swallowing every tap (verified with
+     elementFromPoint: taps on the hamburger landed on this element). Opacity
+     alone does not stop hit-testing; this does. */
+  pointer-events: none;
 }
 
 .mobile-menu-drawer.open {
   transform: translate3d(0, 0, 0);
   opacity: 1;
+  pointer-events: auto;
 }
 
 .mobile-nav-link {

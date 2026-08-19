@@ -62,7 +62,7 @@ export default function Home() {
           <BusinessEcosystem />
         </LazySection>
 
-        <LazySection minHeight="700px">
+        <LazySection id="fabric-in-motion" minHeight="700px">
           <FabricInMotion />
         </LazySection>
 

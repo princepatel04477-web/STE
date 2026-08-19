@@ -187,7 +187,6 @@ export default function FabricInMotion() {
   return (
     <section
       ref={containerRef}
-      id="fabric-in-motion"
       className="relative w-full py-14 px-5 md:py-32 md:px-8 bg-[#050505] overflow-hidden border-b border-white/5"
     >
       {/* Background aesthetics */}

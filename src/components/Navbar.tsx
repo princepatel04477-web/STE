@@ -16,6 +16,60 @@ const navItems = [
   { name: "Register", hiName: "पंजीकरण", href: "#buyer-registration" }
 ];
 
+/**
+ * Everything below the fold is a LazySection placeholder that expands from its
+ * reserved minHeight to its real height when it mounts. A default #anchor jump
+ * aims at an offset measured while the page is still collapsed, and the CSS
+ * smooth scroll then spends seconds travelling there — mounting sections and
+ * growing the document as it goes, so the destination retreats faster than the
+ * scroll arrives. Measured on production: clicking Register animated for 2.3s
+ * and stopped 4770px short of the section.
+ *
+ * Jump instantly instead — nothing in between crosses the observer margin, so
+ * the page barely grows — then re-aim whenever the layout actually changes, so
+ * a section that mounts late still gets corrected for. Watching for resizes
+ * rather than polling frames matters: the heaviest section lands its chunk
+ * around 2.3s, long after any "has it stopped moving yet" guess gives up.
+ */
+let cancelPendingAim: (() => void) | null = null;
+
+function scrollToSection(href: string) {
+  const el = document.getElementById(href.slice(1));
+  if (!el) return;
+
+  // A correction from an earlier click is still aiming at the old section for
+  // up to three seconds; leaving it running would drag us back off this one.
+  cancelPendingAim?.();
+
+  const aim = () => {
+    const header = document.querySelector("header");
+    const offset = header ? header.getBoundingClientRect().height : 0;
+    const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - offset);
+    // "instant", not "auto": auto defers to the computed scroll-behavior, which
+    // is smooth here, so each re-aim would restart the animation we are avoiding.
+    window.scrollTo({ top, behavior: "instant" });
+  };
+
+  aim();
+
+  // Give up on a deadline so a section that animates forever cannot hold the
+  // page hostage, and the moment the visitor scrolls for themselves — re-aiming
+  // under someone who has taken over is worse than landing slightly off.
+  const handOver = ["wheel", "touchstart", "keydown"];
+  const stop = () => {
+    resizes.disconnect();
+    clearTimeout(deadline);
+    handOver.forEach((evt) => window.removeEventListener(evt, stop));
+    if (cancelPendingAim === stop) cancelPendingAim = null;
+  };
+  const resizes = new ResizeObserver(aim);
+  const deadline = setTimeout(stop, 3000);
+
+  resizes.observe(document.body);
+  handOver.forEach((evt) => window.addEventListener(evt, stop, { passive: true }));
+  cancelPendingAim = stop;
+}
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -163,6 +217,11 @@ export default function Navbar() {
               <a
                 key={item.name}
                 href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  history.replaceState(null, "", item.href);
+                  scrollToSection(item.href);
+                }}
                 aria-current={isActive ? "page" : undefined}
                 className={`nav-link-hover-trace whitespace-nowrap shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold ${
                   isActive ? "active text-expo-gold font-bold" : "text-expo-warm/60 hover:text-expo-warm"
@@ -258,7 +317,12 @@ export default function Navbar() {
               <a
                 key={item.name}
                 href={item.href}
-                onClick={() => setIsMobileOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsMobileOpen(false);
+                  history.replaceState(null, "", item.href);
+                  scrollToSection(item.href);
+                }}
                 aria-current={isActive ? "page" : undefined}
                 className={`h-[64px] flex items-center font-cormorant text-[28px] text-[#F7F4EF] border-b border-[#D4AF37]/20 mobile-nav-link badge-tap ${
                   isActive ? "border-l-[4px] border-l-[#D4AF37] pl-3" : "pl-1 hover:border-l-[4px] hover:border-l-[#D4AF37] hover:pl-3"
