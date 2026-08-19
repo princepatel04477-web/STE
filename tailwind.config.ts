@@ -42,6 +42,17 @@ const config: Config = {
       transitionTimingFunction: {
         'luxury': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
+      // Flat, named z-index scale. The site previously mixed z-[9999],
+      // z-[10000] and z-[99999] on adjacent full-viewport layers, which is a
+      // stacking bug waiting to happen. Use these tokens, not raw numbers.
+      zIndex: {
+        'nav': '100',
+        'overlay': '200',
+        'modal': '300',
+        'cursor': '400',
+        'preloader': '500',
+        'transition': '600',
+      },
       keyframes: {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },

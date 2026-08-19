@@ -284,13 +284,14 @@ export default function CinematicHero() {
         ref={bgRef}
         className="absolute inset-0 w-full h-full overflow-hidden select-none pointer-events-none z-0"
       >
-        {isMounted && (
-          <BoomerangVideoBg
-            src="/assets/video/hero.mp4"
-            className="w-full h-full object-cover filter brightness-[0.45] contrast-[1.1] animate-canvas-zoom"
-            fallbackImage="/assets/images/f_kidswear.webp"
-          />
-        )}
+        {/* Not gated on isMounted: the poster inside must be in the SSR HTML so
+            it can be the LCP element. The video itself still loads lazily and
+            only on devices that should get it. */}
+        <BoomerangVideoBg
+          src="/assets/video/hero.mp4"
+          className="w-full h-full object-cover filter brightness-[0.45] contrast-[1.1] animate-canvas-zoom"
+          fallbackImage="/assets/images/f_kidswear.webp"
+        />
         {/* Cinematic dark linear gradient & noise texture */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/65 via-transparent to-[#050505] z-10 animate-bg-breathing" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-transparent to-[#050505] z-10" />

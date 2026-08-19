@@ -6,7 +6,24 @@ import { masterRAF } from "@/hooks/useMasterRAF";
 interface BoomerangVideoBgProps {
   src: string;
   className?: string;
+  /** Poster still. Rendered immediately and used as the LCP element. */
   fallbackImage?: string;
+}
+
+type Mode = "poster" | "video";
+
+/** requestIdleCallback with a setTimeout fallback for Safari. */
+function onIdle(cb: () => void, timeout = 2000): () => void {
+  const w = window as unknown as {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    cancelIdleCallback?: (h: number) => void;
+  };
+  if (typeof w.requestIdleCallback === "function") {
+    const handle = w.requestIdleCallback(cb, { timeout });
+    return () => w.cancelIdleCallback?.(handle);
+  }
+  const handle = window.setTimeout(cb, 200);
+  return () => window.clearTimeout(handle);
 }
 
 export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
@@ -14,14 +31,21 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
   className = "",
   fallbackImage = "",
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const framesRef = useRef<ImageBitmap[]>([]);
-  const [loadError, setLoadError] = useState(false);
   const [useNativeVideo, setUseNativeVideo] = useState(false);
 
+  // Nothing loads until the client has decided this device should get video at
+  // all. A background video is decorative; on a mid-range Android it is the
+  // single most expensive thing on the page, and the boomerang capture below
+  // decodes 90 frames into ImageBitmaps on top of that.
+  const [mode, setMode] = useState<Mode>("poster");
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
   const stateRef = useRef({
-    capturing: true,
+    capturing: false,
     framesReady: false,
     index: 0,
     direction: 1,
@@ -34,34 +58,46 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
   const MAX_WIDTH = 960;
   const MAX_FRAMES = 90; // max 3 seconds at 30fps
 
-  // Force play video natively on all devices
+  // ── Decide: poster-only, or video? ──
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const narrow = window.innerWidth < 768;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const saveData = Boolean(
+      (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
+        ?.saveData
+    );
 
-    const playVideo = () => {
-      video.muted = true;
-      video.play().catch((err) => {
-        console.warn("Autoplay attempt handled:", err);
-      });
-    };
+    if (coarse || narrow || reduced || saveData) return; // stay on the poster
+    setMode("video");
+  }, []);
 
-    playVideo();
+  // ── Load video bytes only once visible, and only when the main thread is idle ──
+  useEffect(() => {
+    if (mode !== "video") return;
+    const container = containerRef.current;
+    if (!container) return;
 
-    video.addEventListener("canplay", playVideo);
-    video.addEventListener("loadedmetadata", playVideo);
-    window.addEventListener("touchstart", playVideo, { once: true });
-    window.addEventListener("click", playVideo, { once: true });
+    let cancelIdle: (() => void) | undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        observer.disconnect();
+        cancelIdle = onIdle(() => setShouldLoadVideo(true));
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(container);
 
     return () => {
-      video.removeEventListener("canplay", playVideo);
-      video.removeEventListener("loadedmetadata", playVideo);
-      window.removeEventListener("touchstart", playVideo);
-      window.removeEventListener("click", playVideo);
+      observer.disconnect();
+      cancelIdle?.();
     };
-  }, [src]);
+  }, [mode]);
 
+  // ── CAPTURE PHASE ──
   useEffect(() => {
+    if (!shouldLoadVideo) return;
     const el = videoRef.current;
     if (!el) return;
 
@@ -150,13 +186,17 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
       }
     };
 
+    // We start playback ourselves, after first paint — the element carries
+    // neither autoplay nor preload="auto".
     const onLoaded = () => {
+      el.muted = true;
       el.play().catch(() => {});
       rafCapId = requestAnimationFrame(rafCapLoop);
     };
 
     el.addEventListener("loadedmetadata", onLoaded);
     el.addEventListener("ended", onEnded);
+    el.load();
     if (el.readyState >= 1) onLoaded();
 
     return () => {
@@ -167,10 +207,11 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
       framesRef.current.forEach((bm) => bm.close());
       framesRef.current = [];
     };
-  }, [src]);
+  }, [shouldLoadVideo, src]);
 
   // ── PLAYBACK PHASE via masterRAF ──
   useEffect(() => {
+    if (!shouldLoadVideo) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -203,35 +244,48 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
     });
 
     return unsubscribe;
-  }, [useNativeVideo]);
+  }, [shouldLoadVideo, useNativeVideo]);
 
   return (
-    <div className={`absolute inset-0 w-full h-full overflow-hidden ${className}`}>
-      <video
-        ref={videoRef}
-        src={src}
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ opacity: 1, display: useNativeVideo ? "block" : undefined }}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        onError={() => {
-          setLoadError(true);
-          setUseNativeVideo(true);
-        }}
-      />
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        style={{ display: "none" }}
-      />
-      {loadError && fallbackImage && (
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${fallbackImage}')` }}
+    <div
+      ref={containerRef}
+      className={`absolute inset-0 w-full h-full overflow-hidden ${className}`}
+    >
+      {/* The poster paints first and is the LCP candidate. It stays behind the
+          video so a failed/absent video degrades to a still, never to black. */}
+      {fallbackImage && (
+        <img
+          src={fallbackImage}
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
         />
+      )}
+
+      {shouldLoadVideo && (
+        <>
+          <video
+            ref={videoRef}
+            src={src}
+            poster={fallbackImage || undefined}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ display: useNativeVideo ? "block" : undefined }}
+            aria-hidden="true"
+            loop
+            muted
+            playsInline
+            preload="none"
+            onError={() => setUseNativeVideo(true)}
+          />
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            aria-hidden="true"
+            style={{ display: "none" }}
+          />
+        </>
       )}
     </div>
   );
