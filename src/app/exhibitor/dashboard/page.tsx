@@ -53,7 +53,9 @@ export default function ExhibitorDashboardPage() {
   // Profile State
   const [mobile, setMobile] = useState('');
   const [brandName, setBrandName] = useState('');
-  const [selectedSqftOption, setSelectedSqftOption] = useState<string>('100');
+  const [category, setCategory] = useState('');
+  const [market, setMarket] = useState('');
+  const [selectedSqftOption, setSelectedSqftOption] = useState<string>('200');
   const [customSqft, setCustomSqft] = useState<string>('');
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccessMsg, setProfileSuccessMsg] = useState('');
@@ -92,8 +94,10 @@ export default function ExhibitorDashboardPage() {
 
       setMobile(profData.mobile || '');
       setBrandName(profData.brand_name || '');
+      setCategory(profData.category || '');
+      setMarket(profData.market || '');
 
-      const existingSqft = profData.stall_sqft || '100';
+      const existingSqft = profData.stall_sqft || '200 sq ft';
       if (SQFT_PRESETS.includes(existingSqft)) {
         setSelectedSqftOption(existingSqft);
         setCustomSqft('');
@@ -293,135 +297,74 @@ export default function ExhibitorDashboardPage() {
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-8 space-y-8">
 
-        {/* Section 1: Exhibitor & Stall Profile Setup */}
+        {/* Section 1: Official Exhibitor Profile & Stall Allocation */}
         <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 md:backdrop-blur-sm relative overflow-hidden shadow-xl">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
               <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">1. Exhibitor Details & Stall Size</h2>
-              <p className="text-xs text-neutral-400">Enter your official brand name and select the size of your allocated stall</p>
+              <h2 className="text-xl font-bold text-white">1. Verified Exhibitor Profile & Stall Allocation</h2>
+              <p className="text-xs text-neutral-400">Official stall size and brand allocation registered with STE 2026 Organizers</p>
             </div>
           </div>
 
-          {profileError && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs">
-              {profileError}
-            </div>
-          )}
-
-          {profileSuccessMsg && (
-            <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4" />
-              {profileSuccessMsg}
-            </div>
-          )}
-
-          <form onSubmit={handleSaveProfile} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Brand Name Input */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Brand Name Card */}
+            <div className="bg-neutral-950/80 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-2">
-                  Brand Name / Company Name <span className="text-amber-500">*</span>
-                </label>
-                <div className="relative">
-                  <Building2 className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Royal Silks Pvt Ltd"
-                    value={brandName}
-                    onChange={(e) => setBrandName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all"
-                  />
-                </div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
+                  Registered Brand Name
+                </span>
+                <h3 className="text-lg font-bold text-white leading-snug">
+                  {brandName || 'Registered Exhibitor'}
+                </h3>
               </div>
-
-              {/* Mobile Number Read-Only */}
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-2">
-                  Registered Mobile Number (User ID)
-                </label>
-                <div className="relative">
-                  <Phone className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3.5" />
-                  <input
-                    type="text"
-                    disabled
-                    value={mobile}
-                    className="w-full pl-10 pr-4 py-2.5 bg-neutral-950/60 border border-neutral-800/60 rounded-xl text-neutral-400 text-sm cursor-not-allowed font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Stall Square Footage Selection */}
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-2 flex items-center gap-1.5">
-                <Ruler className="w-4 h-4 text-amber-400" />
-                Stall Size (Square Feet) <span className="text-amber-500">*</span>
-              </label>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
-                {SQFT_PRESETS.map((sqft) => (
-                  <button
-                    key={sqft}
-                    type="button"
-                    onClick={() => setSelectedSqftOption(sqft)}
-                    className={`py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all flex flex-col items-center justify-center gap-0.5 ${
-                      selectedSqftOption === sqft
-                        ? 'bg-gradient-to-b from-amber-500 to-amber-600 border-amber-400 text-neutral-950 shadow-md shadow-amber-500/20 scale-[1.02]'
-                        : 'bg-neutral-950 border-neutral-800 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-900'
-                    }`}
-                  >
-                    <span className="text-sm font-bold">{sqft}</span>
-                    <span className="text-xs opacity-75">sq ft</span>
-                  </button>
-                ))}
-
-                {/* Other Option */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedSqftOption('Other')}
-                  className={`py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all flex flex-col items-center justify-center gap-0.5 ${
-                    selectedSqftOption === 'Other'
-                      ? 'bg-gradient-to-b from-amber-500 to-amber-600 border-amber-400 text-neutral-950 shadow-md shadow-amber-500/20 scale-[1.02]'
-                      : 'bg-neutral-950 border-neutral-800 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-900'
-                  }`}
-                >
-                  <span className="text-sm font-bold">Other</span>
-                  <span className="text-xs opacity-75">Custom</span>
-                </button>
-              </div>
-
-              {/* Custom Sqft Field when 'Other' is selected */}
-              {selectedSqftOption === 'Other' && (
-                <div className="mt-3 p-4 bg-neutral-950 border border-amber-500/30 rounded-xl animate-fadeIn">
-                  <label className="block text-xs text-amber-400 font-medium mb-1.5">
-                    Specify Custom Stall Size:
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 500 sq ft or 1500 sq ft"
-                    value={customSqft}
-                    onChange={(e) => setCustomSqft(e.target.value)}
-                    className="w-full px-3.5 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
-                  />
+              {category && (
+                <div className="mt-3">
+                  <span className="inline-block px-2.5 py-1 rounded text-[11px] font-semibold bg-neutral-800 text-neutral-300">
+                    Category: {category}
+                  </span>
                 </div>
               )}
             </div>
 
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={profileSaving}
-                className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-amber-500/10 transition-all disabled:opacity-50"
-              >
-                <Save className="w-4 h-4" />
-                <span>{profileSaving ? 'Saving...' : 'Save Stall Profile'}</span>
-              </button>
+            {/* Stall Size Card */}
+            <div className="bg-neutral-950/80 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
+                  Allocated Stall Size
+                </span>
+                <h3 className="text-lg font-bold text-white font-mono leading-snug">
+                  {selectedSqftOption === 'Other' ? (customSqft || '200 sq ft') : (selectedSqftOption.includes('sq ft') ? selectedSqftOption : `${selectedSqftOption} sq ft`)}
+                </h3>
+              </div>
+              {market && (
+                <div className="mt-3">
+                  <span className="inline-block px-2.5 py-1 rounded text-[11px] font-semibold bg-neutral-800 text-amber-300 font-mono">
+                    Market: {market}
+                  </span>
+                </div>
+              )}
             </div>
-          </form>
+
+            {/* Registered Mobile Card */}
+            <div className="bg-neutral-950/80 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
+                  Registered Mobile (User ID)
+                </span>
+                <h3 className="text-lg font-bold text-white font-mono leading-snug">
+                  {mobile}
+                </h3>
+              </div>
+              <div className="mt-3">
+                <span className="inline-block px-2.5 py-1 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  ✓ Verified Exhibitor
+                </span>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Section 2: Exhibitor Entry Badges */}

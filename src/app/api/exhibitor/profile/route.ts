@@ -3,6 +3,8 @@ import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { syncToGoogleSheets } from '@/lib/googleSheets';
 
+import { findExhibitorByMobile } from '@/data/registeredExhibitors';
+
 export async function GET() {
   try {
     const session = await getAuthenticatedExhibitor();
@@ -14,14 +16,22 @@ export async function GET() {
       .prepare('SELECT mobile, brand_name, stall_sqft, updated_at FROM exhibitors WHERE mobile = ?')
       .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; updated_at: string } | undefined;
 
-    if (!exhibitor) {
-      return NextResponse.json(
-        { mobile: session.mobile, brand_name: '', stall_sqft: '' },
-        { status: 200 }
-      );
-    }
+    const reg = findExhibitorByMobile(session.mobile);
+    const brand_name = (exhibitor?.brand_name && exhibitor.brand_name.trim() !== '')
+      ? exhibitor.brand_name
+      : (reg?.brandName || 'Registered Exhibitor');
 
-    return NextResponse.json(exhibitor);
+    const stall_sqft = (exhibitor?.stall_sqft && exhibitor.stall_sqft.trim() !== '')
+      ? exhibitor.stall_sqft
+      : (reg?.stallSqft || '200 sq ft');
+
+    return NextResponse.json({
+      mobile: session.mobile,
+      brand_name,
+      stall_sqft,
+      category: reg?.category || '',
+      market: reg?.market || ''
+    });
   } catch (error) {
     console.error('Error fetching exhibitor profile:', error);
     return NextResponse.json({ error: 'Failed to load profile.' }, { status: 500 });
