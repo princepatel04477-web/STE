@@ -86,9 +86,11 @@ const defaultProducts = [
   { id: 'brochure-rack', name: 'Brochure Rack', category: 'Display & AV', description: 'Catalogue / Brochure rack', rate_inr: 1500, unit: 'per-day', icon_name: 'file-text', is_active: 1 },
   { id: 'glass-shelf', name: 'Glass Shelf', category: 'Display & AV', description: '1m × 0.25m wall mounted glass shelf', rate_inr: 600, unit: 'per-day', icon_name: 'layers', is_active: 1 },
   { id: 'wooden-shelf', name: 'Wooden Shelf', category: 'Display & AV', description: '1m × 0.25m wooden display shelf', rate_inr: 500, unit: 'per-day', icon_name: 'layers', is_active: 1 },
-  { id: 'spot-light', name: 'Spot Light', category: 'Electrical & Lighting', description: 'LED spotlight for product accenting', rate_inr: 450, unit: 'per-day', icon_name: 'zap', is_active: 1 },
-  { id: 'power-socket', name: 'Power Socket Connection', category: 'Electrical & Lighting', description: '5A / 15A power socket outlet', rate_inr: 800, unit: 'per-day', icon_name: 'zap', is_active: 1 },
-  { id: 'tv-screen', name: '55" 4K Smart TV', category: 'Display & AV', description: '55-inch 4K display screen with stand', rate_inr: 8500, unit: 'per-day', icon_name: 'tv', is_active: 1 }
+  { id: 'spot-light', name: 'Spot Light', category: 'Electrical & Lighting', description: 'LED spotlight / Metal halide light (50W)', rate_inr: 1500, unit: 'per-day', icon_name: 'zap', is_active: 1 },
+  { id: 'power-socket', name: 'Power Socket Connection', category: 'Electrical & Lighting', description: '5A / 15A single phase power socket outlet', rate_inr: 250, unit: 'per-day', icon_name: 'zap', is_active: 1 },
+  { id: 'tv-screen', name: '32" / 55" Plasma Smart TV', category: 'Display & AV', description: 'Plasma screen display with floor stand', rate_inr: 3500, unit: 'per-day', icon_name: 'tv', is_active: 1 },
+  { id: 'display-rack', name: 'Garment Stand / Display Rack', category: 'Display & AV', description: 'Fabric hangers / Garment display rack', rate_inr: 900, unit: 'per-day', icon_name: 'layers', is_active: 1 },
+  { id: 'pedestal-fan', name: 'Pedestal Fan', category: 'Electrical & Lighting', description: 'High power pedestal fan', rate_inr: 1500, unit: 'per-day', icon_name: 'zap', is_active: 1 }
 ];
 
 function readData(): Schema {
@@ -118,6 +120,8 @@ function readData(): Schema {
         created_at: new Date().toISOString()
       }));
     }
+    // Always update extra_products rates to match STE_EXTRAS.xlsx
+    parsed.extra_products = defaultProducts;
     return parsed;
   } catch {
     return {
