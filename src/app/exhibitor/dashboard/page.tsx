@@ -24,7 +24,8 @@ import {
   Contact,
   Crown,
   Users,
-  Wrench
+  Wrench,
+  AlertTriangle
 } from 'lucide-react';
 
 interface Product {
@@ -296,6 +297,31 @@ export default function ExhibitorDashboardPage() {
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-8 space-y-8">
+
+        {/* Deadline Caution Banner */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 text-amber-900 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-amber-500 text-slate-950 shadow-md flex-shrink-0">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <span>CRITICAL DEADLINE NOTICE</span>
+                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold bg-amber-500 text-slate-950">
+                  Strict Cutoff
+                </span>
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-700 font-semibold mt-0.5">
+                Exhibitor stall details, entry badges, and extra requirements <strong className="text-red-700 underline font-black">CANNOT be edited or modified after 5th September 2026 at 12:00 PM</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-amber-300 shadow-xs text-xs font-mono font-bold text-amber-900 self-stretch sm:self-auto justify-center whitespace-nowrap">
+            <Clock className="w-4 h-4 text-amber-600" />
+            <span>Cutoff: 05 Sept 2026, 12:00 PM</span>
+          </div>
+        </div>
 
         {/* Section 1: Official Exhibitor Profile & Stall Allocation */}
         <section className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 relative overflow-hidden shadow-sm">
