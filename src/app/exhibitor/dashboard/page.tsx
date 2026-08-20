@@ -730,15 +730,18 @@ export default function ExhibitorDashboardPage() {
             ))}
           </div>
 
-          {/* Product Image Reference Disclaimer Banner */}
+          {/* Product Image Reference & Rate Disclaimer Banner */}
           <div className="mb-6 p-4 bg-amber-50/80 border border-amber-300 rounded-xl flex items-start gap-3 text-amber-900 shadow-xs">
             <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-            <div className="text-xs">
-              <span className="font-extrabold block text-amber-950 mb-0.5 uppercase tracking-wide">
-                Product Image Notice:
+            <div className="text-xs space-y-1">
+              <span className="font-extrabold block text-amber-950 uppercase tracking-wide">
+                Product Image & GST Notice:
               </span>
               <p className="text-amber-900 font-bold">
-                Note: The images are for booking purpose only. The original product may change.
+                • Note: The images are for booking purpose only. The original product may change.
+              </p>
+              <p className="text-amber-950 font-extrabold">
+                • All rates shown are EXCLUDING GST. Applicable 18% GST will be added at final billing.
               </p>
             </div>
           </div>
@@ -776,9 +779,14 @@ export default function ExhibitorDashboardPage() {
                         {p.category}
                       </span>
                       {p.rate_inr ? (
-                        <span className="text-xs font-mono font-bold text-amber-700">
-                          ₹{p.rate_inr.toLocaleString('en-IN')} / day
-                        </span>
+                        <div className="text-right">
+                          <span className="text-xs font-mono font-extrabold text-amber-700 block">
+                            ₹{p.rate_inr.toLocaleString('en-IN')} / day
+                          </span>
+                          <span className="text-[9px] font-extrabold text-amber-800 uppercase tracking-tight block">
+                            + 18% GST Extra
+                          </span>
+                        </div>
                       ) : (
                         <span className="text-xs text-slate-500 font-mono">
                           Per {p.unit}

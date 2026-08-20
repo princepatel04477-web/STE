@@ -126,7 +126,7 @@ export default function EstimateBuilder() {
               Calculate Your Exhibition Extras Estimate
             </h2>
             <p className="text-xs md:text-sm text-neutral-400 max-w-xl">
-              Adjust item quantities and duration below. Live total includes per-day rates and 18% GST.
+              Adjust item quantities and duration below. Item rates are excluding GST (18% GST will be calculated at checkout).
             </p>
           </div>
 

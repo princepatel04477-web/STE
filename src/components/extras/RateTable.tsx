@@ -41,7 +41,9 @@ export default function RateTable({ items = EXTRAS_RATES }: RateTableProps) {
                   <tr className="border-b border-neutral-800 bg-neutral-950/80 text-xs font-bold uppercase tracking-wider text-neutral-400">
                     <th scope="col" className="py-4 px-6">Item</th>
                     <th scope="col" className="py-4 px-6">Specification</th>
-                    <th scope="col" className="py-4 px-6 text-right">Rate (INR)</th>
+                    <th scope="col" className="py-4 px-6 text-right">
+                      Rate (INR) <span className="text-[10px] text-amber-400 block font-normal normal-case">(Excl. GST — 18% GST Extra)</span>
+                    </th>
                     <th scope="col" className="py-4 px-6 text-center">Basis</th>
                   </tr>
                 </thead>
