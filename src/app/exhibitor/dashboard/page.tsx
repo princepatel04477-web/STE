@@ -424,7 +424,7 @@ export default function ExhibitorDashboardPage() {
                     <p className="text-[11px] text-slate-500">Directors / Stall Owners</p>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">Max 2</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
               </div>
               <p className="text-xs text-slate-600 mb-4">Official VIP exhibitor badge with full access to hall & VIP lounge</p>
               <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5">
@@ -438,7 +438,7 @@ export default function ExhibitorDashboardPage() {
                 <span className="text-base font-extrabold text-amber-700">{ownerBadges}</span>
                 <button
                   type="button"
-                  onClick={() => setOwnerBadges(Math.min(2, ownerBadges + 1))}
+                  onClick={() => setOwnerBadges(Math.min(5, ownerBadges + 1))}
                   className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
                 >
                   +
@@ -458,7 +458,7 @@ export default function ExhibitorDashboardPage() {
                     <p className="text-[11px] text-slate-500">Sales Team & Executives</p>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">Max 10</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
               </div>
               <p className="text-xs text-slate-600 mb-4">Exhibitor floor badges for your active sales team inside booth</p>
               <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5">
@@ -472,7 +472,7 @@ export default function ExhibitorDashboardPage() {
                 <span className="text-base font-extrabold text-amber-700">{salesBadges}</span>
                 <button
                   type="button"
-                  onClick={() => setSalesBadges(Math.min(10, salesBadges + 1))}
+                  onClick={() => setSalesBadges(Math.min(5, salesBadges + 1))}
                   className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
                 >
                   +
@@ -492,7 +492,7 @@ export default function ExhibitorDashboardPage() {
                     <p className="text-[11px] text-slate-500">Setup & Technical Team</p>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">Max 10</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
               </div>
               <p className="text-xs text-slate-600 mb-4">Work passes for booth setup, technical maintenance & logistics staff</p>
               <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5">
@@ -506,7 +506,7 @@ export default function ExhibitorDashboardPage() {
                 <span className="text-base font-extrabold text-amber-700">{supportBadges}</span>
                 <button
                   type="button"
-                  onClick={() => setSupportBadges(Math.min(10, supportBadges + 1))}
+                  onClick={() => setSupportBadges(Math.min(5, supportBadges + 1))}
                   className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
                 >
                   +
