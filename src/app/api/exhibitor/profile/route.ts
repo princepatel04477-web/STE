@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { syncToGoogleSheets } from '@/lib/googleSheets';
-
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 
 export async function GET() {
@@ -75,8 +74,8 @@ export async function POST(request: Request) {
 
     // Fetch existing order items for complete Google Sheet row sync
     const order = db
-      .prepare('SELECT items_json, special_notes FROM exhibitor_orders WHERE mobile = ?')
-      .get(session.mobile) as { items_json: string; special_notes: string } | undefined;
+      .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges FROM exhibitor_orders WHERE mobile = ?')
+      .get(session.mobile) as { items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number } | undefined;
 
     let items = [];
     if (order && order.items_json) {
@@ -90,7 +89,10 @@ export async function POST(request: Request) {
         brand_name: cleanBrand,
         stall_sqft: cleanSqft,
         items,
-        special_notes: order?.special_notes || ''
+        special_notes: order?.special_notes || '',
+        owner_badges: order?.owner_badges ?? 0,
+        sales_badges: order?.sales_badges ?? 0,
+        support_badges: order?.support_badges ?? 0
       });
     } catch (err) {
       console.error('Google Sheets background sync error:', err);

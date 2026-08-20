@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { syncToGoogleSheets } from '@/lib/googleSheets';
+import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 
 export async function GET() {
   try {
@@ -79,17 +80,25 @@ export async function POST(request: Request) {
       ).run(session.mobile, itemsJson, cleanNotes, oBadges, sBadges, supBadges);
     }
 
-    // Fetch exhibitor profile for complete Google Sheet row sync
+    // Fetch exhibitor profile or fallback to master registered list
     const profile = db
       .prepare('SELECT brand_name, stall_sqft FROM exhibitors WHERE mobile = ?')
       .get(session.mobile) as { brand_name: string; stall_sqft: string } | undefined;
+
+    const reg = findExhibitorByMobile(session.mobile);
+    const finalBrand = (profile?.brand_name && profile.brand_name.trim())
+      ? profile.brand_name
+      : (reg?.brandName || 'Registered Exhibitor');
+    const finalSqft = (profile?.stall_sqft && profile.stall_sqft.trim())
+      ? profile.stall_sqft
+      : (reg?.stallSqft || '200 sq ft');
 
     // Sync to Google Sheets and await completion for Vercel Serverless execution
     try {
       await syncToGoogleSheets({
         mobile: session.mobile,
-        brand_name: profile?.brand_name || '',
-        stall_sqft: profile?.stall_sqft || '',
+        brand_name: finalBrand,
+        stall_sqft: finalSqft,
         items,
         special_notes: cleanNotes,
         owner_badges: oBadges,
