@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getStallPackageBySqft, STALL_PACKAGES, StallPackage } from '@/data/stallPackages';
 import {
   Building2,
   Phone,
@@ -25,7 +26,15 @@ import {
   Crown,
   Users,
   Wrench,
-  AlertTriangle
+  AlertTriangle,
+  Package,
+  Gift,
+  Video,
+  Newspaper,
+  Radio,
+  Tv,
+  Check,
+  X
 } from 'lucide-react';
 
 interface Product {
@@ -391,6 +400,160 @@ export default function ExhibitorDashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* Included Stall Package & Amenities Breakdown */}
+          {(() => {
+            const effectiveSqft = selectedSqftOption === 'Other' ? (customSqft || '200') : selectedSqftOption;
+            const currentPackage = getStallPackageBySqft(effectiveSqft);
+            if (!currentPackage) return null;
+
+            return (
+              <div className="mt-8 pt-6 border-t border-slate-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-amber-100 text-amber-900 border border-amber-300">
+                      <Gift className="w-5 h-5 text-amber-800" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                        <span>Complimentary Stall Package: <span className="text-amber-800 font-bold underline underline-offset-2">{currentPackage.package_name} ({currentPackage.size_sqft} sq ft)</span></span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-500 text-slate-950 shadow-xs">
+                          Free Inclusions
+                        </span>
+                      </h3>
+                      <p className="text-xs text-slate-500 font-medium">Standard amenities & marketing assets provided by STE 2026 organizers for your stall</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {/* Group A: Furniture & Electrical Infrastructure */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-xs">
+                    <div className="flex items-center gap-2 mb-3.5 pb-2.5 border-b border-slate-200">
+                      <Package className="w-4 h-4 text-amber-700" />
+                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">Furniture & Electrical</h4>
+                    </div>
+                    <ul className="space-y-2 text-xs font-semibold text-slate-700">
+                      <li className="flex justify-between items-center">
+                        <span>Exhibition Chairs</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.exhibition_chairs} pcs</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Rectangular Table</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.rectangular_table} pcs</span>
+                      </li>
+                      {currentPackage.reception_table > 0 && (
+                        <li className="flex justify-between items-center">
+                          <span>Reception Table</span>
+                          <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.reception_table} pcs</span>
+                        </li>
+                      )}
+                      {currentPackage.sofa > 0 && (
+                        <li className="flex justify-between items-center">
+                          <span>Sofa Set</span>
+                          <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.sofa} set</span>
+                        </li>
+                      )}
+                      {currentPackage.mannequin > 0 && (
+                        <li className="flex justify-between items-center">
+                          <span>Display Mannequin</span>
+                          <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.mannequin} pcs</span>
+                        </li>
+                      )}
+                      <li className="flex justify-between items-center">
+                        <span>Hanger Stand</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.hanger_stand} pcs</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Metal Lights</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.metal_lights} units</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Power Plug Points</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.plug_points} points</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Dust Bin</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.dust_bin} pcs</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Group B: Marketing & Media Coverage */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-xs">
+                    <div className="flex items-center gap-2 mb-3.5 pb-2.5 border-b border-slate-200">
+                      <Newspaper className="w-4 h-4 text-amber-700" />
+                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">Marketing & Media</h4>
+                    </div>
+                    <ul className="space-y-2 text-xs font-semibold text-slate-700">
+                      <li className="flex justify-between items-center">
+                        <span>Physical Invitation Cards</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.invitation_cards} cards</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Digital Invite Creatives</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.digital_invitation_designs} designs</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Logo Animated Promo Video</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.logo_animated_videos} videos</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Newspaper Media Coverage</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.newspaper_coverage} edition</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Magazine Advertisement</span>
+                        <span className="font-extrabold text-amber-800 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">{currentPackage.magazine_advertisement} feature</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Group C: VIP & Media Special Perks */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-xs">
+                    <div className="flex items-center gap-2 mb-3.5 pb-2.5 border-b border-slate-200">
+                      <Crown className="w-4 h-4 text-amber-700" />
+                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">VIP Perks & Media</h4>
+                    </div>
+                    <ul className="space-y-2.5 text-xs font-semibold">
+                      <li className="flex justify-between items-center">
+                        <span>Corner Stall Allocation</span>
+                        {currentPackage.corner_stall ? (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Included</span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-200 text-slate-600">Standard</span>
+                        )}
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Video Interview Coverage</span>
+                        {currentPackage.video_interview ? (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Included</span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-200 text-slate-600">Not Included</span>
+                        )}
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Podcast Shoot Feature</span>
+                        {currentPackage.podcast_shoot ? (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Included</span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-200 text-slate-600">Not Included</span>
+                        )}
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>5 Social Media Reels</span>
+                        {currentPackage.reels_5 ? (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">✓ Included</span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-200 text-slate-600">Not Included</span>
+                        )}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </section>
 
         {/* Section 2: Exhibitor Entry Badges */}
