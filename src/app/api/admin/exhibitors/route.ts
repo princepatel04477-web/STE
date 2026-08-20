@@ -1,29 +1,48 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { REGISTERED_EXHIBITORS_LIST } from '@/data/registeredExhibitors';
 
 export async function GET() {
   try {
-    const exhibitors = db.prepare(`
+    // 1. Fetch saved orders from db
+    const dbOrders = db.prepare(`
       SELECT 
-        e.mobile, 
-        e.brand_name, 
-        e.stall_sqft, 
-        e.updated_at as profile_updated,
-        o.items_json, 
-        o.special_notes, 
-        o.updated_at as order_updated
-      FROM exhibitors e
-      LEFT JOIN exhibitor_orders o ON e.mobile = o.mobile
-      ORDER BY e.updated_at DESC
+        mobile, 
+        items_json, 
+        special_notes, 
+        owner_badges,
+        sales_badges,
+        support_badges,
+        updated_at as order_updated
+      FROM exhibitor_orders
     `).all() as Array<{
       mobile: string;
-      brand_name: string;
-      stall_sqft: string;
-      profile_updated: string;
       items_json: string | null;
       special_notes: string | null;
+      owner_badges?: number;
+      sales_badges?: number;
+      support_badges?: number;
       order_updated: string | null;
     }>;
+
+    const ordersMap: Record<string, any> = {};
+    dbOrders.forEach(o => {
+      ordersMap[o.mobile] = o;
+    });
+
+    // Also fetch any exhibitors saved dynamically in db
+    const dbExhibitors = db.prepare(`SELECT * FROM exhibitors`).all() as Array<any>;
+    const dbExhibitorsMap: Record<string, any> = {};
+    dbExhibitors.forEach(e => {
+      dbExhibitorsMap[e.mobile] = e;
+    });
+
+    // 2. Combine registered exhibitors list with db exhibitors & orders
+    const allMobiles = Array.from(new Set([
+      ...REGISTERED_EXHIBITORS_LIST.map(r => r.mobile),
+      ...Object.keys(dbExhibitorsMap),
+      ...Object.keys(ordersMap)
+    ]));
 
     // Item-wise totals catalog initialize
     const itemTotals: Record<string, { id: string; name: string; quantity: number; unit: string }> = {
@@ -46,11 +65,20 @@ export async function GET() {
     let totalSalesBadges = 0;
     let totalSupportBadges = 0;
 
-    const formatted = exhibitors.map((ex: any) => {
+    const formattedList: any[] = [];
+
+    allMobiles.forEach(mob => {
+      const reg = REGISTERED_EXHIBITORS_LIST.find(r => r.mobile === mob);
+      const dbEx = dbExhibitorsMap[mob];
+      const order = ordersMap[mob];
+
+      const brandName = reg?.brandName || dbEx?.brand_name || 'Registered Exhibitor';
+      const stallSqft = reg?.stallSqft || dbEx?.stall_sqft || '200 sq ft';
+
       let items: Array<{ id: string; name: string; quantity: number; unit: string }> = [];
-      if (ex.items_json) {
+      if (order && order.items_json) {
         try {
-          items = JSON.parse(ex.items_json);
+          items = JSON.parse(order.items_json);
           items.forEach(item => {
             if (itemTotals[item.id]) {
               itemTotals[item.id].quantity += (Number(item.quantity) || 0);
@@ -62,41 +90,43 @@ export async function GET() {
       }
 
       // Parse stall sqft
-      if (ex.stall_sqft) {
-        const sq = parseInt(ex.stall_sqft.replace(/\D/g, ''), 10);
+      if (stallSqft) {
+        const sq = parseInt(stallSqft.replace(/\D/g, ''), 10);
         if (!isNaN(sq)) totalSqftSum += sq;
       }
 
-      const oBadges = Number(ex.owner_badges || 0);
-      const sBadges = Number(ex.sales_badges || 0);
-      const supBadges = Number(ex.support_badges || 0);
+      const oBadges = Number(order?.owner_badges ?? (reg ? 1 : 0));
+      const sBadges = Number(order?.sales_badges ?? 0);
+      const supBadges = Number(order?.support_badges ?? 0);
 
       totalOwnerBadges += oBadges;
       totalSalesBadges += sBadges;
       totalSupportBadges += supBadges;
 
-      return {
-        mobile: ex.mobile,
-        brand_name: ex.brand_name || 'Not set',
-        stall_sqft: ex.stall_sqft || 'Not set',
+      formattedList.push({
+        mobile: mob,
+        brand_name: brandName,
+        stall_sqft: stallSqft,
+        category: reg?.category || '',
+        market: reg?.market || '',
         items,
-        special_notes: ex.special_notes || '',
+        special_notes: order?.special_notes || '',
         owner_badges: oBadges,
         sales_badges: sBadges,
         support_badges: supBadges,
-        last_updated: ex.order_updated || ex.profile_updated
-      };
+        last_updated: order?.order_updated || dbEx?.updated_at || new Date().toISOString()
+      });
     });
 
     return NextResponse.json({
       success: true,
-      count: formatted.length,
+      count: formattedList.length,
       totalSqftSum,
       totalOwnerBadges,
       totalSalesBadges,
       totalSupportBadges,
       itemTotals: Object.values(itemTotals),
-      exhibitors: formatted
+      exhibitors: formattedList
     });
   } catch (error) {
     console.error('Error fetching admin exhibitors data:', error);
