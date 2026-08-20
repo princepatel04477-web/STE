@@ -61,9 +61,9 @@ export async function POST(request: Request) {
     const itemsJson = JSON.stringify(items);
     const cleanNotes = typeof special_notes === 'string' ? special_notes.trim() : '';
 
-    const oBadges = Math.min(2, Math.max(0, Number(owner_badges || 0)));
-    const sBadges = Math.min(10, Math.max(0, Number(sales_badges || 0)));
-    const supBadges = Math.min(10, Math.max(0, Number(support_badges || 0)));
+    const oBadges = Math.min(5, Math.max(0, Number(owner_badges || 0)));
+    const sBadges = Math.min(5, Math.max(0, Number(sales_badges || 0)));
+    const supBadges = Math.min(5, Math.max(0, Number(support_badges || 0)));
 
     const existing = db
       .prepare('SELECT id FROM exhibitor_orders WHERE mobile = ?')
