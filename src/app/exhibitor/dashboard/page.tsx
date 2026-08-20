@@ -241,32 +241,32 @@ export default function ExhibitorDashboardPage() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin" />
-          <p className="text-sm text-neutral-400 font-medium">Loading Exhibitor Portal...</p>
+          <p className="text-sm text-slate-600 font-medium">Loading Exhibitor Portal...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans pb-20">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-28">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-30 bg-neutral-900/90 md:backdrop-blur-sm border-b border-neutral-800/80 px-4 lg:px-8 py-4">
+      <header className="sticky top-0 z-30 bg-white/95 md:backdrop-blur-sm border-b border-slate-200 shadow-sm px-4 lg:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/10 text-neutral-950 font-bold">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/20 text-slate-950 font-bold">
               STE
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
                 Exhibitor Portal
-                <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
                   2026
                 </span>
               </h1>
-              <p className="text-xs text-neutral-400">Surat Textile Expo — Exhibitor Extras & Requirements</p>
+              <p className="text-xs text-slate-500 font-medium">Surat Textile Expo — Exhibitor Extras & Requirements</p>
             </div>
           </div>
 
@@ -279,13 +279,13 @@ export default function ExhibitorDashboardPage() {
                 👑 Organizer Admin Console
               </a>
             )}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-950 border border-neutral-800 text-xs text-neutral-300">
-              <Phone className="w-3.5 h-3.5 text-amber-500" />
-              <span>User ID: <strong className="text-white">{mobile}</strong></span>
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-700 font-medium">
+              <Phone className="w-3.5 h-3.5 text-amber-600" />
+              <span>User ID: <strong className="text-slate-900 font-bold">{mobile}</strong></span>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-semibold transition-all border border-neutral-700"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all border border-slate-200"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Logout</span>
@@ -298,31 +298,31 @@ export default function ExhibitorDashboardPage() {
       <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-8 space-y-8">
 
         {/* Section 1: Official Exhibitor Profile & Stall Allocation */}
-        <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 md:backdrop-blur-sm relative overflow-hidden shadow-xl">
+        <section className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 relative overflow-hidden shadow-sm">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
               <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">1. Verified Exhibitor Profile & Stall Allocation</h2>
-              <p className="text-xs text-neutral-400">Official stall size and brand allocation registered with STE 2026 Organizers</p>
+              <h2 className="text-xl font-bold text-slate-900">1. Verified Exhibitor Profile & Stall Allocation</h2>
+              <p className="text-xs text-slate-500">Official stall size and brand allocation registered with STE 2026 Organizers</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Brand Name Card */}
-            <div className="bg-neutral-950/80 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-1">
                   Registered Brand Name
                 </span>
-                <h3 className="text-lg font-bold text-white leading-snug">
+                <h3 className="text-lg font-bold text-slate-900 leading-snug">
                   {brandName || 'Registered Exhibitor'}
                 </h3>
               </div>
               {category && (
                 <div className="mt-3">
-                  <span className="inline-block px-2.5 py-1 rounded text-[11px] font-semibold bg-neutral-800 text-neutral-300">
+                  <span className="inline-block px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-800">
                     Category: {category}
                   </span>
                 </div>
@@ -330,18 +330,18 @@ export default function ExhibitorDashboardPage() {
             </div>
 
             {/* Stall Size Card */}
-            <div className="bg-neutral-950/80 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-1">
                   Allocated Stall Size
                 </span>
-                <h3 className="text-lg font-bold text-white font-mono leading-snug">
+                <h3 className="text-lg font-bold text-slate-900 font-mono leading-snug">
                   {selectedSqftOption === 'Other' ? (customSqft || '200 sq ft') : (selectedSqftOption.includes('sq ft') ? selectedSqftOption : `${selectedSqftOption} sq ft`)}
                 </h3>
               </div>
               {market && (
                 <div className="mt-3">
-                  <span className="inline-block px-2.5 py-1 rounded text-[11px] font-semibold bg-neutral-800 text-amber-300 font-mono">
+                  <span className="inline-block px-2.5 py-1 rounded text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300 font-mono">
                     Market: {market}
                   </span>
                 </div>
@@ -349,17 +349,17 @@ export default function ExhibitorDashboardPage() {
             </div>
 
             {/* Registered Mobile Card */}
-            <div className="bg-neutral-950/80 border border-neutral-800/80 rounded-xl p-5 flex flex-col justify-between">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-1">
                   Registered Mobile (User ID)
                 </span>
-                <h3 className="text-lg font-bold text-white font-mono leading-snug">
+                <h3 className="text-lg font-bold text-slate-900 font-mono leading-snug">
                   {mobile}
                 </h3>
               </div>
               <div className="mt-3">
-                <span className="inline-block px-2.5 py-1 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                <span className="inline-block px-2.5 py-1 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300">
                   ✓ Verified Exhibitor
                 </span>
               </div>
@@ -368,52 +368,52 @@ export default function ExhibitorDashboardPage() {
         </section>
 
         {/* Section 2: Exhibitor Entry Badges */}
-        <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 md:backdrop-blur-sm shadow-xl">
+        <section className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
                 <Contact className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">2. Exhibitor Entry Badges Request</h2>
-                <p className="text-xs text-neutral-400">Request official hall entry badges for Owners, Sales Staff, and Support Team</p>
+                <h2 className="text-xl font-bold text-slate-900">2. Exhibitor Entry Badges Request</h2>
+                <p className="text-xs text-slate-500">Request official hall entry badges for Owners, Sales Staff, and Support Team</p>
               </div>
             </div>
 
-            <span className="self-start sm:self-center px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-semibold">
+            <span className="self-start sm:self-center px-3 py-1.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs font-extrabold">
               Total Badges: {ownerBadges + salesBadges + supportBadges}
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* For Owner */}
-            <div className="bg-neutral-950/80 border border-neutral-800 hover:border-amber-500/40 rounded-xl p-5 transition-all">
+            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                  <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
                     <Crown className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white">For Owner</h3>
-                    <p className="text-[11px] text-neutral-400">Directors / Stall Owners</p>
+                    <h3 className="text-sm font-bold text-slate-900">For Owner</h3>
+                    <p className="text-[11px] text-slate-500">Directors / Stall Owners</p>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-800 text-neutral-300">Max 2</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">Max 2</span>
               </div>
-              <p className="text-xs text-neutral-400 mb-4">Official VIP exhibitor badge with full access to hall & VIP lounge</p>
-              <div className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-lg p-1.5">
+              <p className="text-xs text-slate-600 mb-4">Official VIP exhibitor badge with full access to hall & VIP lounge</p>
+              <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5">
                 <button
                   type="button"
                   onClick={() => setOwnerBadges(Math.max(0, ownerBadges - 1))}
-                  className="w-8 h-8 rounded bg-neutral-800 hover:bg-neutral-700 text-white flex items-center justify-center font-bold"
+                  className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
                 >
                   -
                 </button>
-                <span className="text-base font-bold text-amber-400">{ownerBadges}</span>
+                <span className="text-base font-extrabold text-amber-700">{ownerBadges}</span>
                 <button
                   type="button"
                   onClick={() => setOwnerBadges(Math.min(2, ownerBadges + 1))}
-                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-neutral-950 flex items-center justify-center font-bold"
+                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
                 >
                   +
                 </button>
@@ -421,33 +421,33 @@ export default function ExhibitorDashboardPage() {
             </div>
 
             {/* For Sales Staff */}
-            <div className="bg-neutral-950/80 border border-neutral-800 hover:border-amber-500/40 rounded-xl p-5 transition-all">
+            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                  <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
                     <Users className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white">For Sales Staff</h3>
-                    <p className="text-[11px] text-neutral-400">Sales Team & Executives</p>
+                    <h3 className="text-sm font-bold text-slate-900">For Sales Staff</h3>
+                    <p className="text-[11px] text-slate-500">Sales Team & Executives</p>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-800 text-neutral-300">Max 10</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">Max 10</span>
               </div>
-              <p className="text-xs text-neutral-400 mb-4">Exhibitor floor badges for your active sales team inside booth</p>
-              <div className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-lg p-1.5">
+              <p className="text-xs text-slate-600 mb-4">Exhibitor floor badges for your active sales team inside booth</p>
+              <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5">
                 <button
                   type="button"
                   onClick={() => setSalesBadges(Math.max(0, salesBadges - 1))}
-                  className="w-8 h-8 rounded bg-neutral-800 hover:bg-neutral-700 text-white flex items-center justify-center font-bold"
+                  className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
                 >
                   -
                 </button>
-                <span className="text-base font-bold text-amber-400">{salesBadges}</span>
+                <span className="text-base font-extrabold text-amber-700">{salesBadges}</span>
                 <button
                   type="button"
                   onClick={() => setSalesBadges(Math.min(10, salesBadges + 1))}
-                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-neutral-950 flex items-center justify-center font-bold"
+                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
                 >
                   +
                 </button>
@@ -455,33 +455,33 @@ export default function ExhibitorDashboardPage() {
             </div>
 
             {/* For Support Staff */}
-            <div className="bg-neutral-950/80 border border-neutral-800 hover:border-amber-500/40 rounded-xl p-5 transition-all">
+            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                  <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
                     <Wrench className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white">For Support Staff</h3>
-                    <p className="text-[11px] text-neutral-400">Setup & Technical Team</p>
+                    <h3 className="text-sm font-bold text-slate-900">For Support Staff</h3>
+                    <p className="text-[11px] text-slate-500">Setup & Technical Team</p>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-800 text-neutral-300">Max 10</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">Max 10</span>
               </div>
-              <p className="text-xs text-neutral-400 mb-4">Work passes for booth setup, technical maintenance & logistics staff</p>
-              <div className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-lg p-1.5">
+              <p className="text-xs text-slate-600 mb-4">Work passes for booth setup, technical maintenance & logistics staff</p>
+              <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5">
                 <button
                   type="button"
                   onClick={() => setSupportBadges(Math.max(0, supportBadges - 1))}
-                  className="w-8 h-8 rounded bg-neutral-800 hover:bg-neutral-700 text-white flex items-center justify-center font-bold"
+                  className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
                 >
                   -
                 </button>
-                <span className="text-base font-bold text-amber-400">{supportBadges}</span>
+                <span className="text-base font-extrabold text-amber-700">{supportBadges}</span>
                 <button
                   type="button"
                   onClick={() => setSupportBadges(Math.min(10, supportBadges + 1))}
-                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-neutral-950 flex items-center justify-center font-bold"
+                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
                 >
                   +
                 </button>
@@ -491,15 +491,15 @@ export default function ExhibitorDashboardPage() {
         </section>
 
         {/* Section 3: Extras Catalog Store */}
-        <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 md:backdrop-blur-sm shadow-xl">
+        <section className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">3. Additional Requirements & Extras</h2>
-                <p className="text-xs text-neutral-400">Select extra furniture, display fixtures, audio-visual gear, and electrical connections needed for your booth</p>
+                <h2 className="text-xl font-bold text-slate-900">3. Additional Requirements & Extras</h2>
+                <p className="text-xs text-slate-500">Select extra furniture, display fixtures, audio-visual gear, and electrical connections needed for your booth</p>
               </div>
             </div>
 
@@ -508,15 +508,15 @@ export default function ExhibitorDashboardPage() {
                 href="/exhibitor-extras"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-bold transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
               >
-                <Layers className="w-4 h-4 text-amber-400" />
+                <Layers className="w-4 h-4 text-amber-700" />
                 <span>View Full Rate Card</span>
               </a>
 
               {totalSelectedItemsCount > 0 && (
-                <span className="px-3 py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span className="px-3 py-2 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-700" />
                   {totalSelectedItemsCount} Extra Item(s)
                 </span>
               )}
@@ -524,15 +524,15 @@ export default function ExhibitorDashboardPage() {
           </div>
 
           {/* Category Filter Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none border-b border-neutral-800">
+          <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none border-b border-slate-200">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                   selectedCategory === cat
-                    ? 'bg-neutral-100 text-neutral-950 font-bold shadow-md'
-                    : 'bg-neutral-950 text-neutral-400 hover:text-white border border-neutral-800'
+                    ? 'bg-slate-900 text-white font-bold shadow-md'
+                    : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                 }`}
               >
                 {cat}
@@ -549,48 +549,48 @@ export default function ExhibitorDashboardPage() {
                   key={p.id}
                   className={`p-4 rounded-xl border transition-all flex flex-col justify-between ${
                     qty > 0
-                      ? 'bg-neutral-900 border-amber-500/50 shadow-lg shadow-amber-500/5 ring-1 ring-amber-500/30'
-                      : 'bg-neutral-950/80 border-neutral-800/80 hover:border-neutral-700'
+                      ? 'bg-amber-50/70 border-amber-400 shadow-md ring-1 ring-amber-400/40'
+                      : 'bg-slate-50 border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-md">
+                      <span className="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">
                         {p.category}
                       </span>
                       {p.rate_inr ? (
-                        <span className="text-xs font-mono font-bold text-amber-400">
+                        <span className="text-xs font-mono font-bold text-amber-700">
                           ₹{p.rate_inr.toLocaleString('en-IN')} / day
                         </span>
                       ) : (
-                        <span className="text-xs text-neutral-400 font-mono">
+                        <span className="text-xs text-slate-500 font-mono">
                           Per {p.unit}
                         </span>
                       )}
                     </div>
-                    <h3 className="text-sm font-bold text-white mb-1">{p.name}</h3>
-                    <p className="text-xs text-neutral-400 mb-4">{p.description}</p>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1">{p.name}</h3>
+                    <p className="text-xs text-slate-600 mb-4">{p.description}</p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-neutral-800/60">
-                    <span className="text-xs font-medium text-neutral-400">
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+                    <span className="text-xs font-semibold text-slate-600">
                       Quantity:
                     </span>
-                    <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-800 rounded-lg p-1">
+                    <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-lg p-1">
                       <button
                         type="button"
                         onClick={() => updateQuantity(p.id, -1)}
-                        className="w-7 h-7 rounded-md bg-neutral-900 hover:bg-neutral-800 flex items-center justify-center text-neutral-300 transition-colors active:scale-95"
+                        className="w-7 h-7 rounded-md bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-800 border border-slate-200 transition-colors active:scale-95 font-bold"
                       >
                         <Minus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="w-8 text-center text-sm font-bold text-white font-mono">
+                      <span className="w-8 text-center text-sm font-extrabold text-slate-900 font-mono">
                         {qty}
                       </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(p.id, 1)}
-                        className="w-7 h-7 rounded-md bg-amber-500 hover:bg-amber-400 flex items-center justify-center text-neutral-950 font-bold transition-colors active:scale-95"
+                        className="w-7 h-7 rounded-md bg-amber-500 hover:bg-amber-400 flex items-center justify-center text-slate-950 font-extrabold transition-colors active:scale-95 shadow-sm"
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </button>
@@ -602,8 +602,8 @@ export default function ExhibitorDashboardPage() {
           </div>
 
           {/* Special Instructions & Notes */}
-          <div className="mt-8 pt-6 border-t border-neutral-800">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-2">
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-2">
               Special Requests or Custom Requirements
             </label>
             <textarea
@@ -611,21 +611,21 @@ export default function ExhibitorDashboardPage() {
               placeholder="Mention any specific color preferences, dimensions, positioning notes, or unlisted extras you need..."
               value={specialNotes}
               onChange={(e) => setSpecialNotes(e.target.value)}
-              className="w-full p-3.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500"
+              className="w-full p-3.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:bg-white transition-all"
             />
           </div>
 
           {/* Save Extras Submission */}
           {extrasSuccessMsg && (
-            <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4" />
+            <div className="mt-4 p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-800 text-xs flex items-center gap-2 font-medium">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               {extrasSuccessMsg}
             </div>
           )}
 
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-xs text-neutral-400 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-500" />
+            <div className="text-xs text-slate-500 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
               <span>
                 {lastSubmittedAt ? `Last submitted at ${lastSubmittedAt}` : 'No extra items submitted yet'}
               </span>
@@ -634,7 +634,7 @@ export default function ExhibitorDashboardPage() {
             <button
               onClick={handleSaveExtras}
               disabled={extrasSaving}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-neutral-950 font-bold rounded-xl text-xs uppercase tracking-wider shadow-xl shadow-amber-500/10 transition-all active:scale-95 disabled:opacity-50"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs uppercase tracking-wider shadow-md shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
               <span>{extrasSaving ? 'Submitting...' : 'Submit Extra Requirements'}</span>
@@ -643,51 +643,51 @@ export default function ExhibitorDashboardPage() {
         </section>
 
         {/* Section 3: Summary of Submitted Requirements */}
-        <section className="bg-neutral-900/40 border border-neutral-800 rounded-2xl p-6 lg:p-8">
+        <section className="bg-slate-100/80 border border-slate-200 rounded-2xl p-6 lg:p-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-neutral-800 text-neutral-300">
+            <div className="p-2 rounded-lg bg-slate-200 text-slate-700">
               <Layers className="w-4 h-4" />
             </div>
-            <h3 className="text-lg font-bold text-white">Submitted Summary Overview</h3>
+            <h3 className="text-lg font-bold text-slate-900">Submitted Summary Overview</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-800">
-              <span className="text-xs text-neutral-400 font-semibold uppercase">Brand Name</span>
-              <p className="text-base font-bold text-white mt-1">{brandName || 'Not saved yet'}</p>
+            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+              <span className="text-xs text-slate-500 font-semibold uppercase">Brand Name</span>
+              <p className="text-base font-bold text-slate-900 mt-1">{brandName || 'Not saved yet'}</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-800">
-              <span className="text-xs text-neutral-400 font-semibold uppercase">Stall Size</span>
-              <p className="text-base font-bold text-amber-400 mt-1">
+            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+              <span className="text-xs text-slate-500 font-semibold uppercase">Stall Size</span>
+              <p className="text-base font-bold text-amber-800 mt-1">
                 {selectedSqftOption === 'Other'
                   ? customSqft ? `${customSqft} sq ft` : 'Custom (Other)'
                   : `${selectedSqftOption} sq ft`}
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-800">
-              <span className="text-xs text-neutral-400 font-semibold uppercase">Total Requested Extras</span>
-              <p className="text-base font-bold text-emerald-400 mt-1">{totalSelectedItemsCount} item(s)</p>
+            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+              <span className="text-xs text-slate-500 font-semibold uppercase">Total Requested Extras</span>
+              <p className="text-base font-bold text-emerald-700 mt-1">{totalSelectedItemsCount} item(s)</p>
             </div>
           </div>
 
           {totalSelectedItemsCount > 0 && (
-            <div className="bg-neutral-950 border border-neutral-800 rounded-xl overflow-hidden">
-              <div className="px-4 py-3 bg-neutral-900 border-b border-neutral-800 text-xs font-semibold text-neutral-300 uppercase tracking-wider flex justify-between">
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+              <div className="px-4 py-3 bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-700 uppercase tracking-wider flex justify-between">
                 <span>Selected Item</span>
                 <span>Quantity</span>
               </div>
-              <div className="divide-y divide-neutral-900">
+              <div className="divide-y divide-slate-100">
                 {products
                   .filter((p) => (quantities[p.id] || 0) > 0)
                   .map((p) => (
-                    <div key={p.id} className="px-4 py-3 text-xs flex justify-between items-center text-neutral-300">
+                    <div key={p.id} className="px-4 py-3 text-xs flex justify-between items-center text-slate-700">
                       <div>
-                        <span className="font-semibold text-white">{p.name}</span>
-                        <span className="text-neutral-500 ml-2">({p.category})</span>
+                        <span className="font-bold text-slate-900">{p.name}</span>
+                        <span className="text-slate-500 ml-2">({p.category})</span>
                       </div>
-                      <span className="font-mono font-bold text-amber-400">
+                      <span className="font-mono font-bold text-amber-700">
                         {quantities[p.id]} {p.unit}
                       </span>
                     </div>
@@ -700,15 +700,15 @@ export default function ExhibitorDashboardPage() {
       </main>
 
       {/* Sticky Floating Bottom Submit Bar for Easy Mobile & Desktop Access */}
-      <div className="fixed bottom-0 inset-x-0 z-40 bg-neutral-900/95 md:backdrop-blur-sm border-t border-amber-500/30 p-4 shadow-2xl">
+      <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 md:backdrop-blur-sm border-t border-amber-300 p-4 shadow-2xl">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
             <div className="text-xs">
-              <span className="text-white font-bold block sm:inline">
+              <span className="text-slate-900 font-extrabold block sm:inline">
                 {brandName ? brandName : 'Stall Profile'}: {selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : 'Custom') : `${selectedSqftOption} sq ft`}
               </span>
-              <span className="text-neutral-400 sm:ml-2">
+              <span className="text-slate-600 sm:ml-2">
                 ({totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'}, {ownerBadges + salesBadges + supportBadges} badge{ownerBadges + salesBadges + supportBadges === 1 ? '' : 's'})
               </span>
             </div>
@@ -716,20 +716,12 @@ export default function ExhibitorDashboardPage() {
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
-              onClick={handleSaveProfile}
-              disabled={profileSaving}
-              className="flex-1 sm:flex-initial px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold rounded-xl text-xs border border-neutral-700 transition-all disabled:opacity-50"
-            >
-              {profileSaving ? 'Saving...' : '1. Save Details'}
-            </button>
-
-            <button
               onClick={handleSaveExtras}
               disabled={extrasSaving}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-neutral-950 font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all transform active:scale-95 disabled:opacity-50"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all transform active:scale-95 disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
-              <span>{extrasSaving ? 'Submitting...' : '2. Submit All Requirements'}</span>
+              <span>{extrasSaving ? 'Submitting...' : 'Submit All Requirements'}</span>
             </button>
           </div>
         </div>

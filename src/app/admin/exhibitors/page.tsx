@@ -108,37 +108,68 @@ export default function AdminExhibitorsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans p-4 sm:p-6 lg:p-12">
-      <div className="max-w-7xl mx-auto space-y-8">
-        
-        {/* Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-800 pb-6">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
+      {/* Top Navbar */}
+      <header className="sticky top-0 z-30 bg-white/95 md:backdrop-blur-sm border-b border-slate-200 shadow-sm px-4 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/20 text-slate-950 font-bold">
+              STE
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                Organizer Admin Console
+                <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                  STE 2026
+                </span>
+              </h1>
+              <p className="text-xs text-slate-500 font-medium">Exhibitor Management & Extra Amenities Reports</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/exhibitor/dashboard"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-bold transition-all"
+            >
+              <Store className="w-4 h-4 text-amber-800" />
+              <span>Exhibitor Portal</span>
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all border border-slate-200"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-8 space-y-8">
+
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-                👑 Organizer Master Admin Console
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold uppercase tracking-wider">
+                Live Organizers Control
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-serif mt-1">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-serif mt-1">
               Exhibitors & Total Quantities Overview
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
               Real-time aggregate product demand summary and exhibitor requirements report
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Link
-              href="/exhibitor/dashboard"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent hover:bg-amber-500/20 border border-amber-500/40 text-xs font-bold text-amber-300 transition-all shadow-sm"
-            >
-              <Store className="w-4 h-4 text-amber-400" />
-              <span>Exhibitor Portal</span>
-            </Link>
-
             <button
               onClick={fetchExhibitors}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs font-semibold text-neutral-300 transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-800 transition-all shadow-xs"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh Live Data</span>
@@ -147,7 +178,7 @@ export default function AdminExhibitorsPage() {
             <button
               onClick={exportCSV}
               disabled={filteredExhibitors.length === 0}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-bold transition-all shadow-lg shadow-amber-500/10 disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
             >
               <Download className="w-4 h-4" />
               <span>Export CSV</span>
@@ -157,45 +188,45 @@ export default function AdminExhibitorsPage() {
 
         {/* KPI Top Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-neutral-900/80 border border-neutral-800 p-5 rounded-2xl flex items-center gap-4">
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400">
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700">
               <Building2 className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-xs text-neutral-400 font-medium block">Total Exhibitor Profiles</span>
-              <span className="text-2xl font-black text-white font-mono">{exhibitors.length}</span>
+              <span className="text-xs text-slate-500 font-semibold block">Total Exhibitor Profiles</span>
+              <span className="text-2xl font-black text-slate-900 font-mono">{exhibitors.length}</span>
             </div>
           </div>
 
-          <div className="bg-neutral-900/80 border border-neutral-800 p-5 rounded-2xl flex items-center gap-4">
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400">
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700">
               <Layers className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-xs text-neutral-400 font-medium block">Total Stall Space Booked</span>
-              <span className="text-2xl font-black text-amber-400 font-mono">{totalSqftSum.toLocaleString()} sq ft</span>
+              <span className="text-xs text-slate-500 font-semibold block">Total Stall Space Booked</span>
+              <span className="text-2xl font-black text-amber-700 font-mono">{totalSqftSum.toLocaleString()} sq ft</span>
             </div>
           </div>
 
-          <div className="bg-neutral-900/80 border border-neutral-800 p-5 rounded-2xl flex items-center gap-4">
-            <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400">
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700">
               <PackageCheck className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-xs text-neutral-400 font-medium block">Total Extra Amenities Ordered</span>
-              <span className="text-2xl font-black text-white font-mono">
+              <span className="text-xs text-slate-500 font-semibold block">Total Extra Amenities Ordered</span>
+              <span className="text-2xl font-black text-slate-900 font-mono">
                 {itemTotals.reduce((sum, item) => sum + item.quantity, 0)} items
               </span>
             </div>
           </div>
 
-          <div className="bg-neutral-900/80 border border-amber-500/30 p-5 rounded-2xl flex items-center gap-4 shadow-lg shadow-amber-500/5">
-            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400">
+          <div className="bg-white border border-amber-300 p-5 rounded-2xl flex items-center gap-4 shadow-sm bg-gradient-to-br from-amber-50/50 to-white">
+            <div className="p-3 bg-amber-100 border border-amber-300 rounded-xl text-amber-800">
               <Award className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-xs text-amber-400 font-medium block">Total Entry Badges Requested</span>
-              <span className="text-2xl font-black text-white font-mono">
+              <span className="text-xs text-amber-900 font-bold block">Total Entry Badges Requested</span>
+              <span className="text-2xl font-black text-slate-900 font-mono">
                 {totalOwnerBadges + totalSalesBadges + totalSupportBadges} badges
               </span>
             </div>
@@ -205,58 +236,58 @@ export default function AdminExhibitorsPage() {
         {/* Item-wise Total Quantities & Badges Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2 font-serif">
-              <Award className="w-5 h-5 text-amber-400" />
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 font-serif">
+              <Award className="w-5 h-5 text-amber-700" />
               Total Quantities & Badges Summary
             </h2>
-            <span className="text-xs text-neutral-400">Aggregated across all exhibitors</span>
+            <span className="text-xs text-slate-500 font-medium">Aggregated across all exhibitors</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {/* Badges Summary Cards */}
-            <div className="bg-neutral-950 border border-amber-500/40 p-4 rounded-xl flex flex-col justify-between shadow-md">
-              <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-2">
+            <div className="bg-white border border-amber-300 p-4 rounded-xl flex flex-col justify-between shadow-xs">
+              <span className="text-xs font-extrabold text-amber-800 flex items-center gap-1.5 mb-2">
                 👑 Owner Badges
               </span>
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-black text-white font-mono">{totalOwnerBadges}</span>
-                <span className="text-xs font-mono uppercase text-amber-400">passes</span>
+                <span className="text-2xl font-black text-slate-900 font-mono">{totalOwnerBadges}</span>
+                <span className="text-xs font-mono uppercase font-bold text-amber-700">passes</span>
               </div>
             </div>
 
-            <div className="bg-neutral-950 border border-amber-500/40 p-4 rounded-xl flex flex-col justify-between shadow-md">
-              <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-2">
+            <div className="bg-white border border-amber-300 p-4 rounded-xl flex flex-col justify-between shadow-xs">
+              <span className="text-xs font-extrabold text-amber-800 flex items-center gap-1.5 mb-2">
                 👥 Sales Staff Badges
               </span>
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-black text-white font-mono">{totalSalesBadges}</span>
-                <span className="text-xs font-mono uppercase text-amber-400">passes</span>
+                <span className="text-2xl font-black text-slate-900 font-mono">{totalSalesBadges}</span>
+                <span className="text-xs font-mono uppercase font-bold text-amber-700">passes</span>
               </div>
             </div>
 
-            <div className="bg-neutral-950 border border-amber-500/40 p-4 rounded-xl flex flex-col justify-between shadow-md">
-              <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-2">
+            <div className="bg-white border border-amber-300 p-4 rounded-xl flex flex-col justify-between shadow-xs">
+              <span className="text-xs font-extrabold text-amber-800 flex items-center gap-1.5 mb-2">
                 🛠️ Support Staff Badges
               </span>
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-black text-white font-mono">{totalSupportBadges}</span>
-                <span className="text-xs font-mono uppercase text-amber-400">passes</span>
+                <span className="text-2xl font-black text-slate-900 font-mono">{totalSupportBadges}</span>
+                <span className="text-xs font-mono uppercase font-bold text-amber-700">passes</span>
               </div>
             </div>
 
             {itemTotals.map((item) => (
               <div
                 key={item.id}
-                className="bg-neutral-900/60 border border-neutral-800/80 p-4 rounded-xl flex flex-col justify-between hover:border-amber-500/40 transition-colors"
+                className="bg-white border border-slate-200 p-4 rounded-xl flex flex-col justify-between hover:border-amber-400 transition-colors shadow-xs"
               >
-                <span className="text-xs font-semibold text-neutral-300 line-clamp-2 mb-2">
+                <span className="text-xs font-bold text-slate-800 line-clamp-2 mb-2">
                   {item.name}
                 </span>
                 <div className="flex items-baseline justify-between">
-                  <span className="text-2xl font-black text-amber-400 font-mono">
+                  <span className="text-2xl font-black text-amber-700 font-mono">
                     {item.quantity}
                   </span>
-                  <span className="text-xs font-mono uppercase text-neutral-500">
+                  <span className="text-xs font-mono uppercase text-slate-500">
                     {item.unit}
                   </span>
                 </div>
@@ -267,34 +298,34 @@ export default function AdminExhibitorsPage() {
 
         {/* Search & Submissions Table */}
         <div className="space-y-4 pt-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
             <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-3" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
                 type="text"
                 placeholder="Search brand, mobile, stall size..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-white text-xs placeholder-neutral-500 focus:outline-none focus:border-amber-500"
+                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white transition-all"
               />
             </div>
 
-            <div className="text-xs text-neutral-400 font-medium self-end sm:self-center">
-              Showing Exhibitor Entries: <strong className="text-white font-mono">{filteredExhibitors.length}</strong>
+            <div className="text-xs text-slate-600 font-medium self-end sm:self-center">
+              Showing Exhibitor Entries: <strong className="text-slate-900 font-mono">{filteredExhibitors.length}</strong>
             </div>
           </div>
 
           {loading ? (
-            <div className="py-20 text-center text-xs text-neutral-400">Loading exhibitor submissions...</div>
+            <div className="py-20 text-center text-xs text-slate-500 font-medium">Loading exhibitor submissions...</div>
           ) : filteredExhibitors.length === 0 ? (
-            <div className="py-16 text-center bg-neutral-900/40 rounded-2xl border border-neutral-800 text-neutral-500 text-sm">
+            <div className="py-16 text-center bg-white rounded-2xl border border-slate-200 text-slate-500 text-sm">
               No exhibitor submissions found.
             </div>
           ) : (
-            <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-neutral-300">
-                  <thead className="bg-neutral-950 border-b border-neutral-800 text-xs font-bold uppercase tracking-wider text-neutral-400">
+                <table className="w-full text-left text-xs text-slate-800">
+                  <thead className="bg-slate-100 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-700">
                     <tr>
                       <th className="py-3.5 px-4">Mobile (ID)</th>
                       <th className="py-3.5 px-4">Brand Name</th>
@@ -305,25 +336,25 @@ export default function AdminExhibitorsPage() {
                       <th className="py-3.5 px-4">Last Updated</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-800/60">
+                  <tbody className="divide-y divide-slate-100">
                     {filteredExhibitors.map((ex, idx) => (
-                      <tr key={idx} className="hover:bg-neutral-800/30 transition-colors">
-                        <td className="py-4 px-4 font-mono font-bold text-amber-400 whitespace-nowrap">
+                      <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                        <td className="py-4 px-4 font-mono font-bold text-amber-700 whitespace-nowrap">
                           {ex.mobile}
                         </td>
-                        <td className="py-4 px-4 font-semibold text-white whitespace-nowrap">
+                        <td className="py-4 px-4 font-bold text-slate-900 whitespace-nowrap">
                           {ex.brand_name}
                         </td>
                         <td className="py-4 px-4 whitespace-nowrap">
-                          <span className="px-2.5 py-1 rounded-md bg-neutral-950 border border-neutral-800 font-mono text-amber-300 text-xs">
+                          <span className="px-2.5 py-1 rounded-md bg-amber-50 border border-amber-300 font-mono text-amber-900 font-bold text-xs">
                             {ex.stall_sqft}
                           </span>
                         </td>
                         <td className="py-4 px-4 whitespace-nowrap">
                           <div className="flex flex-col gap-1 text-[11px]">
-                            <span className="text-amber-400 font-semibold">👑 Owner: <strong className="text-white font-mono">{ex.owner_badges || 0}</strong></span>
-                            <span className="text-neutral-300 font-medium">👥 Sales: <strong className="text-white font-mono">{ex.sales_badges || 0}</strong></span>
-                            <span className="text-neutral-400">🛠️ Support: <strong className="text-white font-mono">{ex.support_badges || 0}</strong></span>
+                            <span className="text-amber-800 font-bold">👑 Owner: <strong className="text-slate-900 font-mono">{ex.owner_badges || 0}</strong></span>
+                            <span className="text-slate-700 font-semibold">👥 Sales: <strong className="text-slate-900 font-mono">{ex.sales_badges || 0}</strong></span>
+                            <span className="text-slate-600 font-medium">🛠️ Support: <strong className="text-slate-900 font-mono">{ex.support_badges || 0}</strong></span>
                           </div>
                         </td>
                         <td className="py-4 px-4">
@@ -331,20 +362,20 @@ export default function AdminExhibitorsPage() {
                             <div className="space-y-1">
                               {ex.items.map((item, i) => (
                                 <div key={i} className="flex items-center gap-1.5 text-xs">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                                  <span className="font-medium text-white">{item.name}</span>
-                                  <span className="text-neutral-500 font-mono">({item.quantity} {item.unit})</span>
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                                  <span className="font-bold text-slate-900">{item.name}</span>
+                                  <span className="text-slate-500 font-mono">({item.quantity} {item.unit})</span>
                                 </div>
                               ))}
                             </div>
                           ) : (
-                            <span className="text-neutral-500 italic">None selected</span>
+                            <span className="text-slate-400 italic">None selected</span>
                           )}
                         </td>
-                        <td className="py-4 px-4 max-w-xs text-neutral-400 truncate">
+                        <td className="py-4 px-4 max-w-xs text-slate-600 truncate">
                           {ex.special_notes || '—'}
                         </td>
-                        <td className="py-4 px-4 text-neutral-500 whitespace-nowrap text-xs">
+                        <td className="py-4 px-4 text-slate-500 whitespace-nowrap text-xs">
                           {ex.last_updated ? new Date(ex.last_updated).toLocaleString() : '—'}
                         </td>
                       </tr>
@@ -356,7 +387,7 @@ export default function AdminExhibitorsPage() {
           )}
         </div>
 
-      </div>
+      </main>
     </div>
   );
 }

@@ -113,41 +113,41 @@ export default function ExhibitorLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
       {/* Background Glow Accents */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-amber-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[400px] h-[300px] bg-emerald-600/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-amber-400/20 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[400px] h-[300px] bg-emerald-400/15 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="flex justify-center items-center gap-2 mb-2">
-          <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold uppercase tracking-wider rounded-full flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" />
+          <span className="px-3 py-1 bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold uppercase tracking-wider rounded-full flex items-center gap-1.5 shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-amber-700" />
             STE 2026 Portal
           </span>
         </div>
-        <h2 className="mt-2 text-center text-3xl font-extrabold tracking-tight text-white font-serif">
+        <h2 className="mt-2 text-center text-3xl font-extrabold tracking-tight text-slate-900 font-serif">
           Exhibitor Portal Login
         </h2>
-        <p className="mt-2 text-center text-sm text-neutral-400">
+        <p className="mt-2 text-center text-sm text-slate-600 font-medium">
           Access your stall details & request additional exhibition extras
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4">
-        <div className="bg-neutral-900/80 md:backdrop-blur-sm border border-neutral-800/80 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
+        <div className="bg-white border border-slate-200 py-8 px-6 shadow-xl rounded-2xl sm:px-10">
           {error && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm flex items-start gap-2">
-              <span className="font-semibold">Error:</span> {error}
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-start gap-2 font-medium">
+              <span className="font-bold">Error:</span> {error}
             </div>
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="mobile" className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-2">
+              <label htmlFor="mobile" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                 Mobile Number (User ID)
               </label>
-              <div className="relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
+              <div className="relative rounded-xl shadow-xs">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Phone className="h-5 w-5" />
                 </div>
                 <input
@@ -158,17 +158,17 @@ export default function ExhibitorLoginPage() {
                   placeholder="Enter 10-digit mobile number"
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm"
+                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:bg-white transition-all text-sm font-medium"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-2">
+              <label htmlFor="password" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                 Exhibitor Password
               </label>
-              <div className="relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
+              <div className="relative rounded-xl shadow-xs">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                   <Lock className="h-5 w-5" />
                 </div>
                 <input
@@ -179,18 +179,18 @@ export default function ExhibitorLoginPage() {
                   placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm"
+                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:bg-white transition-all text-sm font-medium"
                 />
               </div>
               <div className="mt-2 flex items-center justify-between text-xs">
-                <p className="text-neutral-500 flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-                  Default pass: <span className="font-mono text-amber-400 font-semibold">ste@2026</span>
+                <p className="text-slate-500 flex items-center gap-1 font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                  Default pass: <span className="font-mono text-amber-800 font-bold">ste@2026</span>
                 </p>
                 <button
                   type="button"
                   onClick={handleOpenReset}
-                  className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 flex items-center gap-1 transition-colors"
+                  className="text-amber-700 hover:text-amber-800 font-bold underline underline-offset-2 flex items-center gap-1 transition-colors"
                 >
                   <KeyRound className="w-3.5 h-3.5" />
                   <span>Set / Forgot Password?</span>
