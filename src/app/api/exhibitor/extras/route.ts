@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const products = db
-      .prepare('SELECT id, name, category, description, unit, icon_name FROM extra_products WHERE is_active = 1')
+      .prepare('SELECT id, name, category, description, unit, rate_inr, icon_name FROM extra_products WHERE is_active = 1')
       .all();
 
     const order = db

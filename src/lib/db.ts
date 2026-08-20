@@ -42,23 +42,27 @@ export const REGISTERED_EXHIBITOR_MOBILES = [
 interface Schema {
   allowed_exhibitors: Array<{ id: number; mobile: string; notes: string; created_at: string }>;
   exhibitors: Array<{ id: number; mobile: string; brand_name: string; stall_sqft: string; custom_password?: string; updated_at: string }>;
-  extra_products: Array<{ id: string; name: string; category: string; description: string; unit: string; icon_name: string; is_active: number }>;
+  extra_products: Array<{ id: string; name: string; category: string; description: string; unit: string; rate_inr?: number; icon_name: string; is_active: number }>;
   exhibitor_orders: Array<{ id: number; mobile: string; items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; updated_at: string }>;
 }
 
 const defaultProducts = [
-  { id: 'sofa-2seater', name: 'VIP 2-Seater Leather Sofa', category: 'Furniture', description: 'Luxury black/white leather sofa for lounge area', unit: 'pcs', icon_name: 'sofa', is_active: 1 },
-  { id: 'sofa-single', name: 'Single Seater Armchair', category: 'Furniture', description: 'Comfortable plush lounge chair', unit: 'pcs', icon_name: 'chair', is_active: 1 },
-  { id: 'exhibition-chair', name: 'Standard Visitor Chair', category: 'Furniture', description: 'Cushioned stackable chair for meeting tables', unit: 'pcs', icon_name: 'chair', is_active: 1 },
-  { id: 'glass-table', name: 'Round Glass Meeting Table', category: 'Furniture', description: 'High-end glass top table for discussion', unit: 'pcs', icon_name: 'table', is_active: 1 },
-  { id: 'reception-counter', name: 'Lockable Counter Table', category: 'Furniture', description: 'Wooden reception counter with lockable storage', unit: 'pcs', icon_name: 'table', is_active: 1 },
-  { id: 'female-model', name: 'Promotional Female Model / Hostess', category: 'Manpower & Models', description: 'Professional booth host for greeting & assisting visitors (Per Day)', unit: 'person/day', icon_name: 'user', is_active: 1 },
-  { id: 'male-model', name: 'Promotional Male Model / Host', category: 'Manpower & Models', description: 'Professional booth host for greeting & product demo (Per Day)', unit: 'person/day', icon_name: 'user', is_active: 1 },
-  { id: 'spot-light', name: 'LED Yellow/White Spotlight (50W)', category: 'Lighting & Electric', description: 'High brightness spotlight for highlighting fabric displays', unit: 'pcs', icon_name: 'lightbulb', is_active: 1 },
-  { id: 'power-socket', name: '5A / 15A Power Socket Connection', category: 'Lighting & Electric', description: 'Multi-plug electrical power extension point', unit: 'point', icon_name: 'zap', is_active: 1 },
-  { id: 'tv-screen', name: '55" 4K Smart TV with Floor Stand', category: 'Audio & Visual', description: 'For brand video loops & digital presentation', unit: 'pcs', icon_name: 'tv', is_active: 1 },
-  { id: 'display-rack', name: 'Fabric Hangers / Garment Display Rack', category: 'Exhibition Props', description: 'Sturdy metallic garment hanging rack', unit: 'pcs', icon_name: 'hanger', is_active: 1 },
-  { id: 'brochure-stand', name: 'Acrylic Catalogue / Brochure Stand', category: 'Exhibition Props', description: 'Zig-zag portable brochure holder', unit: 'pcs', icon_name: 'file-text', is_active: 1 }
+  { id: 'desk-table', name: 'Desk Table', category: 'Furniture & Seating', description: '1m × 0.5m × 0.75m desk table', rate_inr: 600, unit: 'per-day', icon_name: 'table', is_active: 1 },
+  { id: 'glass-round-table', name: 'Glass Round Table', category: 'Furniture & Seating', description: '1m dia × 0.75m glass table', rate_inr: 1400, unit: 'per-day', icon_name: 'table', is_active: 1 },
+  { id: 'white-chair', name: 'White Chair', category: 'Furniture & Seating', description: 'Standard white seating chair', rate_inr: 700, unit: 'per-day', icon_name: 'chair', is_active: 1 },
+  { id: 'cushioned-chair', name: 'Cushioned Chair', category: 'Furniture & Seating', description: 'Comfortable cushioned meeting chair', rate_inr: 700, unit: 'per-day', icon_name: 'chair', is_active: 1 },
+  { id: 'sofa-single', name: 'Sofa — Single Seat', category: 'Furniture & Seating', description: 'Single seat plush sofa armchair', rate_inr: 3000, unit: 'per-day', icon_name: 'sofa', is_active: 1 },
+  { id: 'sofa-double', name: 'Sofa — Double Seat', category: 'Furniture & Seating', description: '2-seater luxury lounge sofa', rate_inr: 5000, unit: 'per-day', icon_name: 'sofa', is_active: 1 },
+  { id: 'sofa-three', name: 'Sofa — Three Seat', category: 'Furniture & Seating', description: '3-seater spacious lounge sofa', rate_inr: 6000, unit: 'per-day', icon_name: 'sofa', is_active: 1 },
+  { id: 'glass-centre-table', name: 'Glass Centre Table', category: 'Furniture & Seating', description: 'Glass top lounge center table', rate_inr: 1200, unit: 'per-day', icon_name: 'table', is_active: 1 },
+  { id: 'brochure-rack', name: 'Brochure Rack', category: 'Display & AV', description: 'Catalogue / Brochure rack', rate_inr: 1500, unit: 'per-day', icon_name: 'file-text', is_active: 1 },
+  { id: 'glass-shelf', name: 'Glass Shelf', category: 'Display & AV', description: '1m × 0.25m wall mounted glass shelf', rate_inr: 600, unit: 'per-day', icon_name: 'layers', is_active: 1 },
+  { id: 'wooden-shelf', name: 'Wooden Shelf', category: 'Display & AV', description: '1m × 0.25m wooden display shelf', rate_inr: 500, unit: 'per-day', icon_name: 'layers', is_active: 1 },
+  { id: 'garment-stand', name: 'Garment Stand', category: 'Display & AV', description: 'Garment hanging rack', rate_inr: 900, unit: 'per-day', icon_name: 'hanger', is_active: 1 },
+  { id: 'plasma-32', name: 'Plasma Screen with Stand — 32"', category: 'Display & AV', description: '32" HD Plasma display screen with floor stand', rate_inr: 3500, unit: 'per-day', icon_name: 'tv', is_active: 1 },
+  { id: 'plug-point', name: 'Plug Point', category: 'Electrical & Utilities', description: '5 / 15 amp, single phase electrical point', rate_inr: 250, unit: 'per-day', icon_name: 'zap', is_active: 1 },
+  { id: 'metal-halide', name: 'Metal Halide Light', category: 'Electrical & Utilities', description: 'High power metal halide stall spotlight', rate_inr: 1500, unit: 'per-day', icon_name: 'lightbulb', is_active: 1 },
+  { id: 'pedestal-fan', name: 'Pedestal Fan', category: 'Electrical & Utilities', description: 'High speed portable pedestal fan', rate_inr: 1500, unit: 'per-day', icon_name: 'wind', is_active: 1 }
 ];
 
 function readData(): Schema {

@@ -33,6 +33,7 @@ interface Product {
   category: string;
   description: string;
   unit: string;
+  rate_inr?: number;
   icon_name: string;
 }
 
@@ -555,16 +556,28 @@ export default function ExhibitorDashboardPage() {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">3. Additional Requirements & Extras</h2>
-                <p className="text-xs text-neutral-400">Select extra furniture, models, lighting, and props needed for your booth</p>
+                <p className="text-xs text-neutral-400">Select extra furniture, display fixtures, audio-visual gear, and electrical connections needed for your booth</p>
               </div>
             </div>
 
-            {totalSelectedItemsCount > 0 && (
-              <span className="self-start sm:self-center px-3 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                {totalSelectedItemsCount} Extra Item(s) Selected
-              </span>
-            )}
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href="/exhibitor-extras"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-bold transition-all flex items-center gap-1.5"
+              >
+                <Layers className="w-4 h-4 text-amber-400" />
+                <span>View Full Rate Card</span>
+              </a>
+
+              {totalSelectedItemsCount > 0 && (
+                <span className="px-3 py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  {totalSelectedItemsCount} Extra Item(s)
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Category Filter Tabs */}
@@ -602,9 +615,15 @@ export default function ExhibitorDashboardPage() {
                       <span className="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 bg-neutral-800 text-neutral-300 rounded-md">
                         {p.category}
                       </span>
-                      <span className="text-xs text-neutral-400 font-mono">
-                        Per {p.unit}
-                      </span>
+                      {p.rate_inr ? (
+                        <span className="text-xs font-mono font-bold text-amber-400">
+                          ₹{p.rate_inr.toLocaleString('en-IN')} / day
+                        </span>
+                      ) : (
+                        <span className="text-xs text-neutral-400 font-mono">
+                          Per {p.unit}
+                        </span>
+                      )}
                     </div>
                     <h3 className="text-sm font-bold text-white mb-1">{p.name}</h3>
                     <p className="text-xs text-neutral-400 mb-4">{p.description}</p>
