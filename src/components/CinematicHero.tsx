@@ -281,7 +281,7 @@ export default function CinematicHero() {
               animationDelay: "220ms"
             }}
           >
-            <h1 className="font-serif text-hero-mobile md:text-7xl lg:text-8xl tracking-[-0.02em] md:tracking-[-0.035em] text-white mb-6 leading-[1.15] md:leading-[0.9] uppercase max-w-4xl flex flex-wrap justify-center gap-x-3 gap-y-1 gold-shimmer-text">
+            <h1 className="font-serif text-hero-mobile md:text-7xl lg:text-8xl tracking-[-0.02em] md:tracking-[-0.035em] text-white mb-6 leading-[1.15] md:leading-[0.9] uppercase max-w-4xl text-center">
               <TextReveal
                 text={language === "en" ? "INDIA'S BIGGEST Textile B2B OPPORTUNITY" : "भारत का सबसे बड़ा टेक्सटाइल B2B अवसर"}
                 highlightWords={["Textile", "B2B", "टेक्सटाइल"]}

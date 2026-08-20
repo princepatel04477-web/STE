@@ -679,26 +679,10 @@ html.lenis, html.lenis body {
   background-clip: text;
 }
 
-.gold-shimmer-text * {
-  background: linear-gradient(
-    120deg,
-    #B87333 0%,
-    #D6A066 25%,
-    #E5A96A 50%,
-    #D6A066 75%,
-    #B87333 100%
-  ) !important;
-  background-size: 100% auto !important;
-  background-clip: text !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
 @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .gold-shimmer-text,
-  .gold-shimmer-text * {
-    background-size: 250% auto !important;
-    animation: goldTextFlow 4s linear infinite !important;
+  .gold-shimmer-text {
+    background-size: 250% auto;
+    animation: goldTextFlow 4s linear infinite;
   }
 }
 

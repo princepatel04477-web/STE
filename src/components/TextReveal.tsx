@@ -40,17 +40,13 @@ export default function TextReveal({
   const wordVariants = {
     hidden: {
       opacity: 0,
-      y: "110%",
-      rotateX: -45,
-      filter: "blur(8px)",
+      y: 18,
     },
     visible: {
       opacity: 1,
-      y: "0%",
-      rotateX: 0,
-      filter: "blur(0px)",
+      y: 0,
       transition: {
-        duration: 0.85,
+        duration: 0.65,
         ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
       },
     },
