@@ -58,94 +58,59 @@ const defaultProducts = [
   { id: 'brochure-rack', name: 'Brochure Rack', category: 'Display & AV', description: 'Catalogue / Brochure rack', rate_inr: 1500, unit: 'per-day', icon_name: 'file-text', is_active: 1 },
   { id: 'glass-shelf', name: 'Glass Shelf', category: 'Display & AV', description: '1m × 0.25m wall mounted glass shelf', rate_inr: 600, unit: 'per-day', icon_name: 'layers', is_active: 1 },
   { id: 'wooden-shelf', name: 'Wooden Shelf', category: 'Display & AV', description: '1m × 0.25m wooden display shelf', rate_inr: 500, unit: 'per-day', icon_name: 'layers', is_active: 1 },
-  { id: 'garment-stand', name: 'Garment Stand', category: 'Display & AV', description: 'Garment hanging rack', rate_inr: 900, unit: 'per-day', icon_name: 'hanger', is_active: 1 },
-  { id: 'plasma-32', name: 'Plasma Screen with Stand — 32"', category: 'Display & AV', description: '32" HD Plasma display screen with floor stand', rate_inr: 3500, unit: 'per-day', icon_name: 'tv', is_active: 1 },
-  { id: 'plug-point', name: 'Plug Point', category: 'Electrical & Utilities', description: '5 / 15 amp, single phase electrical point', rate_inr: 250, unit: 'per-day', icon_name: 'zap', is_active: 1 },
-  { id: 'metal-halide', name: 'Metal Halide Light', category: 'Electrical & Utilities', description: 'High power metal halide stall spotlight', rate_inr: 1500, unit: 'per-day', icon_name: 'lightbulb', is_active: 1 },
-  { id: 'pedestal-fan', name: 'Pedestal Fan', category: 'Electrical & Utilities', description: 'High speed portable pedestal fan', rate_inr: 1500, unit: 'per-day', icon_name: 'wind', is_active: 1 }
+  { id: 'spot-light', name: 'Spot Light', category: 'Electrical & Lighting', description: 'LED spotlight for product accenting', rate_inr: 450, unit: 'per-day', icon_name: 'zap', is_active: 1 },
+  { id: 'power-socket', name: 'Power Socket Connection', category: 'Electrical & Lighting', description: '5A / 15A power socket outlet', rate_inr: 800, unit: 'per-day', icon_name: 'zap', is_active: 1 },
+  { id: 'tv-screen', name: '55" 4K Smart TV', category: 'Display & AV', description: '55-inch 4K display screen with stand', rate_inr: 8500, unit: 'per-day', icon_name: 'tv', is_active: 1 }
 ];
 
 function readData(): Schema {
-  const allowedList = REGISTERED_EXHIBITOR_MOBILES.map((m, idx) => ({
-    id: idx + 1,
-    mobile: m,
-    notes: m === '9106139666' ? 'Demo Exhibitor Account' : 'Registered Exhibitor',
-    created_at: new Date().toISOString()
-  }));
-
+  if (!fs.existsSync(dbFile)) {
+    const initial: Schema = {
+      allowed_exhibitors: REGISTERED_EXHIBITOR_MOBILES.map((mob, idx) => ({
+        id: idx + 1,
+        mobile: mob,
+        notes: 'Pre-whitelisted exhibitor from master list',
+        created_at: new Date().toISOString()
+      })),
+      exhibitors: [],
+      extra_products: defaultProducts,
+      exhibitor_orders: []
+    };
+    saveData(initial);
+    return initial;
+  }
   try {
-    if (fs.existsSync(dbFile)) {
-      const content = fs.readFileSync(dbFile, 'utf8');
-      const parsed = JSON.parse(content);
-      if (parsed.exhibitors && parsed.extra_products && parsed.exhibitor_orders) {
-        return {
-          allowed_exhibitors: allowedList,
-          exhibitors: parsed.exhibitors,
-          extra_products: parsed.extra_products,
-          exhibitor_orders: parsed.exhibitor_orders
-        };
-      }
+    const raw = fs.readFileSync(dbFile, 'utf-8');
+    const parsed = JSON.parse(raw);
+    if (!parsed.allowed_exhibitors) {
+      parsed.allowed_exhibitors = REGISTERED_EXHIBITOR_MOBILES.map((mob, idx) => ({
+        id: idx + 1,
+        mobile: mob,
+        notes: 'Pre-whitelisted exhibitor from master list',
+        created_at: new Date().toISOString()
+      }));
     }
-  } catch {}
-
-  // Initial Seed
-  const initial: Schema = {
-    allowed_exhibitors: allowedList,
-    exhibitors: [],
-    extra_products: defaultProducts,
-    exhibitor_orders: []
-  };
-
-  saveData(initial);
-  return initial;
+    return parsed;
+  } catch {
+    return {
+      allowed_exhibitors: REGISTERED_EXHIBITOR_MOBILES.map((mob, idx) => ({
+        id: idx + 1,
+        mobile: mob,
+        notes: 'Pre-whitelisted exhibitor from master list',
+        created_at: new Date().toISOString()
+      })),
+      exhibitors: [],
+      extra_products: defaultProducts,
+      exhibitor_orders: []
+    };
+  }
 }
 
 function saveData(data: Schema) {
   try {
-    fs.writeFileSync(dbFile, JSON.stringify(data, null, 2), 'utf8');
-  } catch (e) {
-    console.error('Failed to persist store JSON:', e);
-  }
-}
-
-const STORE_ID = 'ff8081819f7e10ae019fd336b0567bfa';
-const STORE_URL = `https://api.restful-api.dev/objects/${STORE_ID}`;
-let remotePassMapCache: Record<string, string> | null = null;
-
-export async function fetchRemotePasswords(): Promise<Record<string, string>> {
-  try {
-    const res = await fetch(STORE_URL, { cache: 'no-store' });
-    if (res.ok) {
-      const json = await res.json();
-      if (json.data && json.data.pass_map) {
-        remotePassMapCache = json.data.pass_map;
-        return json.data.pass_map;
-      }
-    }
-  } catch (e) {
-    console.error('Error fetching remote passwords:', e);
-  }
-  return remotePassMapCache || {};
-}
-
-export async function saveRemotePassword(mobile: string, customPass: string): Promise<boolean> {
-  try {
-    const currentMap = await fetchRemotePasswords();
-    currentMap[mobile] = customPass;
-    remotePassMapCache = currentMap;
-
-    await fetch(STORE_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'ste_passwords',
-        data: { pass_map: currentMap }
-      })
-    });
-    return true;
-  } catch (e) {
-    console.error('Error saving remote password:', e);
-    return false;
+    fs.writeFileSync(dbFile, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Failed to write db store:', err);
   }
 }
 
@@ -176,7 +141,7 @@ export const db = {
           const target = String(args[0]);
           return data.exhibitors.find(e => e.mobile === target);
         }
-        if (q.includes('select items_json, special_notes')) {
+        if (q.includes('select items_json, special_notes') || q.includes('select * from exhibitor_orders where mobile = ?')) {
           const target = String(args[0]);
           return data.exhibitor_orders.find(o => o.mobile === target);
         }
@@ -192,6 +157,14 @@ export const db = {
 
         if (q.includes('from extra_products')) {
           return data.extra_products.filter(p => p.is_active === 1);
+        }
+
+        if (q.includes('from exhibitor_orders')) {
+          return data.exhibitor_orders;
+        }
+
+        if (q.includes('from exhibitors')) {
+          return data.exhibitors;
         }
 
         if (q.includes('from exhibitors e left join exhibitor_orders')) {
@@ -228,8 +201,8 @@ export const db = {
               stall_sqft: '',
               updated_at: new Date().toISOString()
             });
-            saveData(data);
           }
+          saveData(data);
           return { changes: 1 };
         }
 
@@ -291,13 +264,13 @@ export const db = {
           return { changes: 1 };
         }
 
-        if (q.includes('update exhibitor_orders set items_json = ?, special_notes = ?')) {
+        if (q.includes('update exhibitor_orders')) {
           const items_json = String(args[0]);
           const special_notes = String(args[1]);
           const owner_badges = Number(args[2] ?? 0);
           const sales_badges = Number(args[3] ?? 0);
           const support_badges = Number(args[4] ?? 0);
-          const mobile = String(args[5] || args[2]);
+          const mobile = String(args[5] || args[0]);
           const order = data.exhibitor_orders.find(o => o.mobile === mobile);
           if (order) {
             order.items_json = items_json;
@@ -322,23 +295,33 @@ export const db = {
           return { changes: 1 };
         }
 
-        if (q.includes('insert into exhibitor_orders (mobile, items_json, special_notes)')) {
+        if (q.includes('insert into exhibitor_orders')) {
           const mobile = String(args[0]);
           const items_json = String(args[1]);
           const special_notes = String(args[2]);
           const owner_badges = Number(args[3] ?? 0);
           const sales_badges = Number(args[4] ?? 0);
           const support_badges = Number(args[5] ?? 0);
-          data.exhibitor_orders.push({
-            id: data.exhibitor_orders.length + 1,
-            mobile,
-            items_json,
-            special_notes,
-            owner_badges,
-            sales_badges,
-            support_badges,
-            updated_at: new Date().toISOString()
-          });
+          const existing = data.exhibitor_orders.find(o => o.mobile === mobile);
+          if (existing) {
+            existing.items_json = items_json;
+            existing.special_notes = special_notes;
+            existing.owner_badges = owner_badges;
+            existing.sales_badges = sales_badges;
+            existing.support_badges = support_badges;
+            existing.updated_at = new Date().toISOString();
+          } else {
+            data.exhibitor_orders.push({
+              id: data.exhibitor_orders.length + 1,
+              mobile,
+              items_json,
+              special_notes,
+              owner_badges,
+              sales_badges,
+              support_badges,
+              updated_at: new Date().toISOString()
+            });
+          }
           saveData(data);
           return { changes: 1 };
         }

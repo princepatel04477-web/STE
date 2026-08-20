@@ -15,7 +15,7 @@ export async function GET() {
       .all();
 
     const order = db
-      .prepare('SELECT items_json, special_notes, updated_at FROM exhibitor_orders WHERE mobile = ?')
+      .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, updated_at FROM exhibitor_orders WHERE mobile = ?')
       .get(session.mobile) as { items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; updated_at: string } | undefined;
 
     let items = [];
@@ -71,11 +71,11 @@ export async function POST(request: Request) {
 
     if (existing) {
       db.prepare(
-        'UPDATE exhibitor_orders SET items_json = ?, special_notes = ? WHERE mobile = ?'
+        'UPDATE exhibitor_orders SET items_json = ?, special_notes = ?, owner_badges = ?, sales_badges = ?, support_badges = ? WHERE mobile = ?'
       ).run(itemsJson, cleanNotes, oBadges, sBadges, supBadges, session.mobile);
     } else {
       db.prepare(
-        'INSERT INTO exhibitor_orders (mobile, items_json, special_notes) VALUES (?, ?, ?)'
+        'INSERT INTO exhibitor_orders (mobile, items_json, special_notes, owner_badges, sales_badges, support_badges) VALUES (?, ?, ?, ?, ?, ?)'
       ).run(session.mobile, itemsJson, cleanNotes, oBadges, sBadges, supBadges);
     }
 
