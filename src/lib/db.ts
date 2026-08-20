@@ -11,6 +11,34 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const dbFile = path.join(dataDir, 'ste_store.json');
+const passFile = path.join(dataDir, 'ste_passwords.json');
+
+// Helper password functions
+export async function fetchRemotePasswords(): Promise<Record<string, string>> {
+  try {
+    if (!fs.existsSync(passFile)) return {};
+    const raw = fs.readFileSync(passFile, 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+export async function saveRemotePassword(mobile: string, customPass: string): Promise<boolean> {
+  try {
+    let map: Record<string, string> = {};
+    try {
+      if (fs.existsSync(passFile)) {
+        map = JSON.parse(fs.readFileSync(passFile, 'utf-8'));
+      }
+    } catch {}
+    map[mobile] = customPass;
+    fs.writeFileSync(passFile, JSON.stringify(map, null, 2), 'utf-8');
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 // Hardcoded whitelist of all registered exhibitor mobile numbers from STE-Registerd-Mobile-Numbers.md + demo number
 export const REGISTERED_EXHIBITOR_MOBILES = [
@@ -163,7 +191,7 @@ export const db = {
           return data.exhibitor_orders;
         }
 
-        if (q.includes('from exhibitors')) {
+        if (q.includes('from exhibitors') && !q.includes('left join')) {
           return data.exhibitors;
         }
 
