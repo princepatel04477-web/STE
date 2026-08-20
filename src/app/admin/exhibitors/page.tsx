@@ -4,7 +4,8 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store, LogOut } from 'lucide-react';
 
 interface ExhibitorItem {
   id: string;
@@ -34,7 +35,13 @@ interface ExhibitorRecord {
 }
 
 export default function AdminExhibitorsPage() {
+  const router = useRouter();
   const [exhibitors, setExhibitors] = useState<ExhibitorRecord[]>([]);
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/exhibitor/login');
+  };
   const [itemTotals, setItemTotals] = useState<ItemTotal[]>([]);
   const [totalSqftSum, setTotalSqftSum] = useState<number>(0);
   const [totalOwnerBadges, setTotalOwnerBadges] = useState<number>(0);
