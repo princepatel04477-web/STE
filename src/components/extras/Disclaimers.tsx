@@ -19,18 +19,18 @@ export default function Disclaimers() {
 
       <div className="flex items-center gap-2.5 text-slate-400">
         <Info className="w-4 h-4 text-amber-400 shrink-0" />
-        <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400">Important Terms & Disclaimers</h4>
+        <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400">Important Terms & Product Image Disclaimers</h4>
       </div>
 
-      <ol className="list-decimal list-inside space-y-2 text-xs text-slate-300 leading-relaxed font-sans">
+      <ol className="list-decimal list-inside space-y-2.5 text-xs text-slate-300 leading-relaxed font-sans">
+        <li>
+          <strong className="text-amber-300 font-bold">Product Image Notice:</strong> The images are for booking purpose only. The original product design, color, or model may change.
+        </li>
         <li>
           All rates are in Indian Rupees, <strong className="text-white">per item per day</strong>, and are <strong className="text-white">exclusive of 18% GST</strong>.
         </li>
         <li>
           Rates are approximate and subject to final confirmation at the time of order booking.
-        </li>
-        <li>
-          Product images are reference only — the item supplied may differ in exact finish, color, or model.
         </li>
         <li>
           Orders are subject to stock availability; place extras requests prior to the stall handover date.

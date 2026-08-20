@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getStallPackageBySqft, STALL_PACKAGES, StallPackage } from '@/data/stallPackages';
+import { getProductImage, DISCLAIMER_TEXT } from '@/data/productImages';
 import {
   Building2,
   Phone,
@@ -729,10 +730,24 @@ export default function ExhibitorDashboardPage() {
             ))}
           </div>
 
+          {/* Product Image Reference Disclaimer Banner */}
+          <div className="mb-6 p-4 bg-amber-50/80 border border-amber-300 rounded-xl flex items-start gap-3 text-amber-900 shadow-xs">
+            <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+            <div className="text-xs">
+              <span className="font-extrabold block text-amber-950 mb-0.5 uppercase tracking-wide">
+                Product Image Notice:
+              </span>
+              <p className="text-amber-900 font-semibold">
+                The images shown are for booking purpose only. The original product design, finish, or color may change upon delivery.
+              </p>
+            </div>
+          </div>
+
           {/* Product Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredProducts.map((p) => {
               const qty = quantities[p.id] || 0;
+              const imgUrl = getProductImage(p.id);
               return (
                 <div
                   key={p.id}
@@ -743,6 +758,19 @@ export default function ExhibitorDashboardPage() {
                   }`}
                 >
                   <div>
+                    {/* Reference Product Image */}
+                    <div className="relative w-full h-44 mb-3 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group shadow-xs">
+                      <img
+                        src={imgUrl}
+                        alt={p.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                      <div className="absolute bottom-0 inset-x-0 bg-slate-900/85 backdrop-blur-xs text-[10px] text-amber-300 px-2 py-1 font-semibold text-center leading-tight">
+                        ⚠️ Image for booking purpose only. Original product may change.
+                      </div>
+                    </div>
+
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <span className="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">
                         {p.category}
@@ -758,10 +786,10 @@ export default function ExhibitorDashboardPage() {
                       )}
                     </div>
                     <h3 className="text-sm font-bold text-slate-900 mb-1">{p.name}</h3>
-                    <p className="text-xs text-slate-600 mb-4">{p.description}</p>
+                    <p className="text-xs text-slate-600 mb-3">{p.description}</p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-200 mt-2">
                     <span className="text-xs font-semibold text-slate-600">
                       Quantity:
                     </span>
