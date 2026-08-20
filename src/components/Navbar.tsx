@@ -287,6 +287,14 @@ export default function Navbar() {
             </a>
           </div>
 
+          {/* Mobile Exhibitor Portal Quick Button */}
+          <a
+            href="/exhibitor/login"
+            className="md:hidden px-3.5 py-1.5 rounded-full bg-gold-gradient text-black font-extrabold text-[11px] uppercase tracking-wider shadow-md whitespace-nowrap active:scale-95 transition-transform"
+          >
+            <Translate en="Portal" hi="पोर्टल" />
+          </a>
+
           {/* Mobile Toggle Button (Visible below XL break) */}
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}

@@ -419,7 +419,7 @@ export default function EstimateBuilder() {
                         placeholder="e.g. 98250XXXXX"
                         value={mobileNumber}
                         onChange={(e) => setMobileNumber(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500"
+                        className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white text-base md:text-xs focus:outline-none focus:border-amber-500 font-mono"
                       />
                     </div>
                     <button

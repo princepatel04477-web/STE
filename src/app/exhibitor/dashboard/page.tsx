@@ -306,7 +306,7 @@ export default function ExhibitorDashboardPage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-6 sm:pt-8 pb-32 sm:pb-28 space-y-6 sm:space-y-8">
 
         {/* Deadline Caution Banner */}
         <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 text-amber-900 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
