@@ -9,11 +9,12 @@ const PHONE_TEL = "+919950787787";
 const PHONE_DISPLAY = "+91 99507 87787";
 
 const navItems = [
-  { name: "Home", hiName: "होम", href: "#home" },
-  { name: "Couture", hiName: "वस्त्र कला", href: "#fabric-in-motion" },
-  { name: "Exhibition", hiName: "प्रदर्शनी", href: "#exhibition-experience" },
-  { name: "Digital Commerce", hiName: "डिजिटल वाणिज्य", href: "#future-of-commerce" },
-  { name: "Register", hiName: "पंजीकरण", href: "#buyer-registration" }
+  { name: "Home", hiName: "होम", href: "/#home" },
+  { name: "Couture", hiName: "वस्त्र कला", href: "/#fabric-in-motion" },
+  { name: "Exhibition", hiName: "प्रदर्शनी", href: "/#exhibition-experience" },
+  { name: "Extras Rates", hiName: "रेंटल दरें", href: "/exhibitor-extras" },
+  { name: "Digital Commerce", hiName: "डिजिटल वाणिज्य", href: "/#future-of-commerce" },
+  { name: "Register", hiName: "पंजीकरण", href: "/#buyer-registration" }
 ];
 
 /**
@@ -218,9 +219,14 @@ export default function Navbar() {
                 key={item.name}
                 href={item.href}
                 onClick={(e) => {
-                  e.preventDefault();
-                  history.replaceState(null, "", item.href);
-                  scrollToSection(item.href);
+                  if (item.href.includes('#')) {
+                    const id = item.href.split('#')[1];
+                    if (document.getElementById(id)) {
+                      e.preventDefault();
+                      history.replaceState(null, "", `#${id}`);
+                      scrollToSection(`#${id}`);
+                    }
+                  }
                 }}
                 aria-current={isActive ? "page" : undefined}
                 className={`nav-link-hover-trace whitespace-nowrap shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold ${
@@ -318,10 +324,15 @@ export default function Navbar() {
                 key={item.name}
                 href={item.href}
                 onClick={(e) => {
-                  e.preventDefault();
                   setIsMobileOpen(false);
-                  history.replaceState(null, "", item.href);
-                  scrollToSection(item.href);
+                  if (item.href.includes('#')) {
+                    const id = item.href.split('#')[1];
+                    if (document.getElementById(id)) {
+                      e.preventDefault();
+                      history.replaceState(null, "", `#${id}`);
+                      scrollToSection(`#${id}`);
+                    }
+                  }
                 }}
                 aria-current={isActive ? "page" : undefined}
                 className={`h-[64px] flex items-center font-cormorant text-[28px] text-[#F7F4EF] border-b border-[#D4AF37]/20 mobile-nav-link badge-tap ${

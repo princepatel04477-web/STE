@@ -132,6 +132,10 @@ export default function Footer() {
                 <Translate en="Exhibitor's Portal" hi="प्रदर्शक पोर्टल" />
                 <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-expo-gold transition-all duration-300 group-hover:w-full" />
               </a>
+              <a href="/exhibitor-extras" className="hover:text-expo-gold transition-colors duration-300 w-max relative group py-0.5 badge-tap">
+                <Translate en="Extras & Rental Rates" hi="रेंटल दरें" />
+                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-expo-gold transition-all duration-300 group-hover:w-full" />
+              </a>
             </nav>
           </StaggerChild>
 
