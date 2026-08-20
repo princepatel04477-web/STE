@@ -27,6 +27,9 @@ interface ExhibitorRecord {
   stall_sqft: string;
   items: ExhibitorItem[];
   special_notes: string;
+  owner_badges?: number;
+  sales_badges?: number;
+  support_badges?: number;
   last_updated: string;
 }
 
@@ -34,6 +37,9 @@ export default function AdminExhibitorsPage() {
   const [exhibitors, setExhibitors] = useState<ExhibitorRecord[]>([]);
   const [itemTotals, setItemTotals] = useState<ItemTotal[]>([]);
   const [totalSqftSum, setTotalSqftSum] = useState<number>(0);
+  const [totalOwnerBadges, setTotalOwnerBadges] = useState<number>(0);
+  const [totalSalesBadges, setTotalSalesBadges] = useState<number>(0);
+  const [totalSupportBadges, setTotalSupportBadges] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -55,6 +61,9 @@ export default function AdminExhibitorsPage() {
       if (data.totalSqftSum) {
         setTotalSqftSum(data.totalSqftSum);
       }
+      setTotalOwnerBadges(data.totalOwnerBadges || 0);
+      setTotalSalesBadges(data.totalSalesBadges || 0);
+      setTotalSupportBadges(data.totalSupportBadges || 0);
     } catch (err) {
       console.error('Failed to load admin exhibitors:', err);
     } finally {
@@ -72,13 +81,16 @@ export default function AdminExhibitorsPage() {
   });
 
   const exportCSV = () => {
-    const headers = ['Mobile Number', 'Brand Name', 'Stall Size (Sq Ft)', 'Extras Requested', 'Special Notes', 'Last Updated'];
+    const headers = ['Mobile Number', 'Brand Name', 'Stall Size (Sq Ft)', 'Owner Badges', 'Sales Staff Badges', 'Support Staff Badges', 'Extras Requested', 'Special Notes', 'Last Updated'];
     const rows = filteredExhibitors.map((ex) => {
       const extrasStr = ex.items.map((i) => `${i.name} x${i.quantity}`).join('; ');
       return [
         `"${ex.mobile}"`,
         `"${ex.brand_name.replace(/"/g, '""')}"`,
         `"${ex.stall_sqft.replace(/"/g, '""')}"`,
+        `"${ex.owner_badges || 0}"`,
+        `"${ex.sales_badges || 0}"`,
+        `"${ex.support_badges || 0}"`,
         `"${extrasStr.replace(/"/g, '""')}"`,
         `"${(ex.special_notes || '').replace(/"/g, '""')}"`,
         `"${ex.last_updated || ''}"`
@@ -144,7 +156,7 @@ export default function AdminExhibitorsPage() {
         </div>
 
         {/* KPI Top Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-neutral-900/80 border border-neutral-800 p-5 rounded-2xl flex items-center gap-4">
             <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400">
               <Building2 className="w-6 h-6" />
@@ -176,19 +188,62 @@ export default function AdminExhibitorsPage() {
               </span>
             </div>
           </div>
+
+          <div className="bg-neutral-900/80 border border-amber-500/30 p-5 rounded-2xl flex items-center gap-4 shadow-lg shadow-amber-500/5">
+            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400">
+              <Award className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="text-xs text-amber-400 font-medium block">Total Entry Badges Requested</span>
+              <span className="text-2xl font-black text-white font-mono">
+                {totalOwnerBadges + totalSalesBadges + totalSupportBadges} badges
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Item-wise Total Quantities Section */}
+        {/* Item-wise Total Quantities & Badges Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white flex items-center gap-2 font-serif">
               <Award className="w-5 h-5 text-amber-400" />
-              Total Quantities Ordered (Item-wise Summary)
+              Total Quantities & Badges Summary
             </h2>
             <span className="text-xs text-neutral-400">Aggregated across all exhibitors</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {/* Badges Summary Cards */}
+            <div className="bg-neutral-950 border border-amber-500/40 p-4 rounded-xl flex flex-col justify-between shadow-md">
+              <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-2">
+                👑 Owner Badges
+              </span>
+              <div className="flex items-baseline justify-between">
+                <span className="text-2xl font-black text-white font-mono">{totalOwnerBadges}</span>
+                <span className="text-xs font-mono uppercase text-amber-400">passes</span>
+              </div>
+            </div>
+
+            <div className="bg-neutral-950 border border-amber-500/40 p-4 rounded-xl flex flex-col justify-between shadow-md">
+              <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-2">
+                👥 Sales Staff Badges
+              </span>
+              <div className="flex items-baseline justify-between">
+                <span className="text-2xl font-black text-white font-mono">{totalSalesBadges}</span>
+                <span className="text-xs font-mono uppercase text-amber-400">passes</span>
+              </div>
+            </div>
+
+            <div className="bg-neutral-950 border border-amber-500/40 p-4 rounded-xl flex flex-col justify-between shadow-md">
+              <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-2">
+                🛠️ Support Staff Badges
+              </span>
+              <div className="flex items-baseline justify-between">
+                <span className="text-2xl font-black text-white font-mono">{totalSupportBadges}</span>
+                <span className="text-xs font-mono uppercase text-amber-400">passes</span>
+              </div>
+            </div>
+
             {itemTotals.map((item) => (
               <div
                 key={item.id}
@@ -244,6 +299,7 @@ export default function AdminExhibitorsPage() {
                       <th className="py-3.5 px-4">Mobile (ID)</th>
                       <th className="py-3.5 px-4">Brand Name</th>
                       <th className="py-3.5 px-4">Stall Size</th>
+                      <th className="py-3.5 px-4">Entry Badges</th>
                       <th className="py-3.5 px-4">Requested Extras</th>
                       <th className="py-3.5 px-4">Special Notes</th>
                       <th className="py-3.5 px-4">Last Updated</th>
@@ -262,6 +318,13 @@ export default function AdminExhibitorsPage() {
                           <span className="px-2.5 py-1 rounded-md bg-neutral-950 border border-neutral-800 font-mono text-amber-300 text-xs">
                             {ex.stall_sqft}
                           </span>
+                        </td>
+                        <td className="py-4 px-4 whitespace-nowrap">
+                          <div className="flex flex-col gap-1 text-[11px]">
+                            <span className="text-amber-400 font-semibold">👑 Owner: <strong className="text-white font-mono">{ex.owner_badges || 0}</strong></span>
+                            <span className="text-neutral-300 font-medium">👥 Sales: <strong className="text-white font-mono">{ex.sales_badges || 0}</strong></span>
+                            <span className="text-neutral-400">🛠️ Support: <strong className="text-white font-mono">{ex.support_badges || 0}</strong></span>
+                          </div>
                         </td>
                         <td className="py-4 px-4">
                           {ex.items && ex.items.length > 0 ? (

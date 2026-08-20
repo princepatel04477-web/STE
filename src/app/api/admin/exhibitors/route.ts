@@ -42,8 +42,11 @@ export async function GET() {
     };
 
     let totalSqftSum = 0;
+    let totalOwnerBadges = 0;
+    let totalSalesBadges = 0;
+    let totalSupportBadges = 0;
 
-    const formatted = exhibitors.map((ex) => {
+    const formatted = exhibitors.map((ex: any) => {
       let items: Array<{ id: string; name: string; quantity: number; unit: string }> = [];
       if (ex.items_json) {
         try {
@@ -64,12 +67,23 @@ export async function GET() {
         if (!isNaN(sq)) totalSqftSum += sq;
       }
 
+      const oBadges = Number(ex.owner_badges || 0);
+      const sBadges = Number(ex.sales_badges || 0);
+      const supBadges = Number(ex.support_badges || 0);
+
+      totalOwnerBadges += oBadges;
+      totalSalesBadges += sBadges;
+      totalSupportBadges += supBadges;
+
       return {
         mobile: ex.mobile,
         brand_name: ex.brand_name || 'Not set',
         stall_sqft: ex.stall_sqft || 'Not set',
         items,
         special_notes: ex.special_notes || '',
+        owner_badges: oBadges,
+        sales_badges: sBadges,
+        support_badges: supBadges,
         last_updated: ex.order_updated || ex.profile_updated
       };
     });
@@ -78,6 +92,9 @@ export async function GET() {
       success: true,
       count: formatted.length,
       totalSqftSum,
+      totalOwnerBadges,
+      totalSalesBadges,
+      totalSupportBadges,
       itemTotals: Object.values(itemTotals),
       exhibitors: formatted
     });

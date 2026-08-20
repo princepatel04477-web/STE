@@ -42,12 +42,15 @@ export function isAdminMobile(mobile: string): boolean {
   return ADMIN_MOBILES.includes(clean);
 }
 
-export function validatePassword(password: string, customPassword?: string): boolean {
+export function validatePassword(password: string, customPassword?: string, mobile?: string): boolean {
   const p = password.trim();
+  const isAdmin = mobile ? isAdminMobile(mobile) : false;
+  if (isAdmin && p.toLowerCase() === 'admin') return true;
+
   if (customPassword && customPassword.trim() !== '') {
     return p === customPassword.trim();
   }
   const pLower = p.toLowerCase();
   const envPass = DEFAULT_PASSWORD.trim().toLowerCase();
-  return pLower === envPass || pLower === 'ste@2026' || pLower === 'ste2026' || pLower === 'admin';
+  return pLower === envPass || pLower === 'ste@2026' || pLower === 'ste2026';
 }

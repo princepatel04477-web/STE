@@ -20,7 +20,11 @@ import {
   Clock,
   Layers,
   ChevronRight,
-  Info
+  Info,
+  IdCard,
+  Crown,
+  Users,
+  Wrench
 } from 'lucide-react';
 
 interface Product {
@@ -62,6 +66,11 @@ export default function ExhibitorDashboardPage() {
   const [extrasSaving, setExtrasSaving] = useState(false);
   const [extrasSuccessMsg, setExtrasSuccessMsg] = useState('');
   const [lastSubmittedAt, setLastSubmittedAt] = useState<string | null>(null);
+
+  // Exhibitor Entry Badges State (Owner, Sales Staff, Support Staff)
+  const [ownerBadges, setOwnerBadges] = useState<number>(1);
+  const [salesBadges, setSalesBadges] = useState<number>(0);
+  const [supportBadges, setSupportBadges] = useState<number>(0);
 
   // General Loading & Auth check
   const [initialLoading, setInitialLoading] = useState(true);
@@ -111,6 +120,9 @@ export default function ExhibitorDashboardPage() {
         }
         setQuantities(qMap);
         setSpecialNotes(catData.existingOrder.special_notes || '');
+        setOwnerBadges(catData.existingOrder.owner_badges ?? 1);
+        setSalesBadges(catData.existingOrder.sales_badges ?? 0);
+        setSupportBadges(catData.existingOrder.support_badges ?? 0);
         setLastSubmittedAt(catData.existingOrder.updated_at || null);
       }
     } catch (err) {
@@ -184,7 +196,13 @@ export default function ExhibitorDashboardPage() {
       const res = await fetch('/api/exhibitor/extras', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: selectedItems, special_notes: specialNotes })
+        body: JSON.stringify({
+          items: selectedItems,
+          special_notes: specialNotes,
+          owner_badges: ownerBadges,
+          sales_badges: salesBadges,
+          support_badges: supportBadges
+        })
       });
 
       const data = await res.json();
@@ -405,7 +423,130 @@ export default function ExhibitorDashboardPage() {
           </form>
         </section>
 
-        {/* Section 2: Extras Catalog Store */}
+        {/* Section 2: Exhibitor Entry Badges */}
+        <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 md:backdrop-blur-sm shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <IdCard className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">2. Exhibitor Entry Badges Request</h2>
+                <p className="text-xs text-neutral-400">Request official hall entry badges for Owners, Sales Staff, and Support Team</p>
+              </div>
+            </div>
+
+            <span className="self-start sm:self-center px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-semibold">
+              Total Badges: {ownerBadges + salesBadges + supportBadges}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* For Owner */}
+            <div className="bg-neutral-950/80 border border-neutral-800 hover:border-amber-500/40 rounded-xl p-5 transition-all">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                    <Crown className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">For Owner</h3>
+                    <p className="text-[11px] text-neutral-400">Directors / Stall Owners</p>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-800 text-neutral-300">Max 2</span>
+              </div>
+              <p className="text-xs text-neutral-400 mb-4">Official VIP exhibitor badge with full access to hall & VIP lounge</p>
+              <div className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-lg p-1.5">
+                <button
+                  type="button"
+                  onClick={() => setOwnerBadges(Math.max(0, ownerBadges - 1))}
+                  className="w-8 h-8 rounded bg-neutral-800 hover:bg-neutral-700 text-white flex items-center justify-center font-bold"
+                >
+                  -
+                </button>
+                <span className="text-base font-bold text-amber-400">{ownerBadges}</span>
+                <button
+                  type="button"
+                  onClick={() => setOwnerBadges(Math.min(2, ownerBadges + 1))}
+                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-neutral-950 flex items-center justify-center font-bold"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* For Sales Staff */}
+            <div className="bg-neutral-950/80 border border-neutral-800 hover:border-amber-500/40 rounded-xl p-5 transition-all">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">For Sales Staff</h3>
+                    <p className="text-[11px] text-neutral-400">Sales Team & Executives</p>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-800 text-neutral-300">Max 10</span>
+              </div>
+              <p className="text-xs text-neutral-400 mb-4">Exhibitor floor badges for your active sales team inside booth</p>
+              <div className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-lg p-1.5">
+                <button
+                  type="button"
+                  onClick={() => setSalesBadges(Math.max(0, salesBadges - 1))}
+                  className="w-8 h-8 rounded bg-neutral-800 hover:bg-neutral-700 text-white flex items-center justify-center font-bold"
+                >
+                  -
+                </button>
+                <span className="text-base font-bold text-amber-400">{salesBadges}</span>
+                <button
+                  type="button"
+                  onClick={() => setSalesBadges(Math.min(10, salesBadges + 1))}
+                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-neutral-950 flex items-center justify-center font-bold"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* For Support Staff */}
+            <div className="bg-neutral-950/80 border border-neutral-800 hover:border-amber-500/40 rounded-xl p-5 transition-all">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                    <Wrench className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">For Support Staff</h3>
+                    <p className="text-[11px] text-neutral-400">Setup & Technical Team</p>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-800 text-neutral-300">Max 10</span>
+              </div>
+              <p className="text-xs text-neutral-400 mb-4">Work passes for booth setup, technical maintenance & logistics staff</p>
+              <div className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-lg p-1.5">
+                <button
+                  type="button"
+                  onClick={() => setSupportBadges(Math.max(0, supportBadges - 1))}
+                  className="w-8 h-8 rounded bg-neutral-800 hover:bg-neutral-700 text-white flex items-center justify-center font-bold"
+                >
+                  -
+                </button>
+                <span className="text-base font-bold text-amber-400">{supportBadges}</span>
+                <button
+                  type="button"
+                  onClick={() => setSupportBadges(Math.min(10, supportBadges + 1))}
+                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-neutral-950 flex items-center justify-center font-bold"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 3: Extras Catalog Store */}
         <section className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6 lg:p-8 md:backdrop-blur-sm shadow-xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
@@ -413,7 +554,7 @@ export default function ExhibitorDashboardPage() {
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">2. Additional Requirements & Extras</h2>
+                <h2 className="text-xl font-bold text-white">3. Additional Requirements & Extras</h2>
                 <p className="text-xs text-neutral-400">Select extra furniture, models, lighting, and props needed for your booth</p>
               </div>
             </div>
@@ -606,7 +747,7 @@ export default function ExhibitorDashboardPage() {
                 {brandName ? brandName : 'Stall Profile'}: {selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : 'Custom') : `${selectedSqftOption} sq ft`}
               </span>
               <span className="text-neutral-400 sm:ml-2">
-                ({totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'} selected)
+                ({totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'}, {ownerBadges + salesBadges + supportBadges} badge{ownerBadges + salesBadges + supportBadges === 1 ? '' : 's'})
               </span>
             </div>
           </div>

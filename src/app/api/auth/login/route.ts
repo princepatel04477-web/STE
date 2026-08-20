@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
     const customPass = existing?.custom_password || cookiePass || remotePass;
     const inputPass = String(password).trim();
-    const isValidPassword = validatePassword(inputPass, customPass);
+    const isValidPassword = validatePassword(inputPass, customPass, cleanMobile);
 
     if (!isValidPassword) {
       return NextResponse.json(

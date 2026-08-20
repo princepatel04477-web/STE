@@ -4,6 +4,9 @@ export interface SyncPayload {
   stall_sqft?: string;
   items?: Array<{ id: string; name: string; quantity: number; unit: string }>;
   special_notes?: string;
+  owner_badges?: number;
+  sales_badges?: number;
+  support_badges?: number;
   updated_at?: string;
 }
 
@@ -58,6 +61,10 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
       tv_screen: itemMap['tv-screen'] || 0,
       display_rack: itemMap['display-rack'] || 0,
       brochure_stand: itemMap['brochure-stand'] || 0,
+      // Exhibitor Entry Badges
+      owner_badges: payload.owner_badges || 0,
+      sales_badges: payload.sales_badges || 0,
+      support_badges: payload.support_badges || 0,
       // Summary & Notes
       items_summary: formattedItemsSummary,
       special_notes: payload.special_notes || ''
