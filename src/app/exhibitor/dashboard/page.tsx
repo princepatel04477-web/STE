@@ -737,8 +737,8 @@ export default function ExhibitorDashboardPage() {
               <span className="font-extrabold block text-amber-950 mb-0.5 uppercase tracking-wide">
                 Product Image Notice:
               </span>
-              <p className="text-amber-900 font-semibold">
-                The images shown are for booking purpose only. The original product design, finish, or color may change upon delivery.
+              <p className="text-amber-900 font-bold">
+                Note: The images are for booking purpose only. The original product may change.
               </p>
             </div>
           </div>
@@ -766,8 +766,8 @@ export default function ExhibitorDashboardPage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"
                       />
-                      <div className="absolute bottom-0 inset-x-0 bg-slate-900/85 backdrop-blur-xs text-[10px] text-amber-300 px-2 py-1 font-semibold text-center leading-tight">
-                        ⚠️ Image for booking purpose only. Original product may change.
+                      <div className="absolute bottom-0 inset-x-0 bg-slate-900/90 backdrop-blur-xs text-[10px] text-amber-300 px-2 py-1 font-bold text-center leading-tight">
+                        ⚠️ Note: The images are for booking purpose only. The original product may change.
                       </div>
                     </div>
 
