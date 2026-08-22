@@ -58,6 +58,8 @@ interface OrderItem {
   category: string;
   unit: string;
   quantity: number;
+  days?: number;
+  rate_inr?: number;
 }
 
 const SQFT_PRESETS = ['100', '200', '300', '400', '600', '800', '1000'];
@@ -80,7 +82,7 @@ export default function ExhibitorDashboardPage() {
   // Extras Catalog State
   const [products, setProducts] = useState<Product[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [rentalDays, setRentalDays] = useState<number>(2); // Default 2 exhibition days
+  const [itemDays, setItemDays] = useState<Record<string, number>>({}); // per-item rental duration in days (default 2)
   const [specialNotes, setSpecialNotes] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [extrasSaving, setExtrasSaving] = useState(false);
@@ -178,18 +180,20 @@ export default function ExhibitorDashboardPage() {
 
       if (catData.existingOrder) {
         const qMap: Record<string, number> = {};
+        const dMap: Record<string, number> = {};
         if (Array.isArray(catData.existingOrder.items)) {
-          catData.existingOrder.items.forEach((item: OrderItem) => {
-            if (item.id && item.quantity > 0) {
-              qMap[item.id] = item.quantity;
+          catData.existingOrder.items.forEach((item: any) => {
+            if (item.id) {
+              if (item.quantity > 0) {
+                qMap[item.id] = item.quantity;
+              }
+              dMap[item.id] = Number(item.days) || 2;
             }
           });
         }
         setQuantities(qMap);
+        setItemDays(dMap);
         setSpecialNotes(catData.existingOrder.special_notes || '');
-        if (catData.existingOrder.rental_days) {
-          setRentalDays(Number(catData.existingOrder.rental_days) || 2);
-        }
         const oCount = catData.existingOrder.owner_badges ?? 1;
         const sCount = catData.existingOrder.sales_badges ?? 0;
         const supCount = catData.existingOrder.support_badges ?? 0;
@@ -276,6 +280,13 @@ export default function ExhibitorDashboardPage() {
     });
   };
 
+  const updateItemDays = (id: string, days: number) => {
+    setItemDays((prev) => ({
+      ...prev,
+      [id]: Math.max(1, Math.min(30, days))
+    }));
+  };
+
   const handleSaveExtras = async () => {
     setExtrasSaving(true);
     setExtrasSuccessMsg('');
@@ -287,7 +298,9 @@ export default function ExhibitorDashboardPage() {
         name: p.name,
         category: p.category,
         unit: p.unit,
-        quantity: quantities[p.id]
+        rate_inr: p.rate_inr || 0,
+        quantity: quantities[p.id],
+        days: itemDays[p.id] || 2
       }));
 
     try {
@@ -307,18 +320,15 @@ export default function ExhibitorDashboardPage() {
             owner: ownerBadgeNames.slice(0, ownerBadges),
             sales: salesBadgeNames.slice(0, salesBadges),
             support: supportBadgeNames.slice(0, supportBadges)
-          },
-          rental_days: rentalDays
+          }
         })
       });
 
       const data = await res.json();
       if (res.ok) {
-        setExtrasSuccessMsg('Your requirements have been submitted successfully! Redirecting to homepage...');
+        setExtrasSuccessMsg('Your requirements have been submitted successfully!');
         setLastSubmittedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-        setTimeout(() => {
-          router.push('/');
-        }, 1500);
+        setTimeout(() => setExtrasSuccessMsg(''), 5000);
       }
     } catch (err) {
       console.error(err);
@@ -1079,75 +1089,6 @@ export default function ExhibitorDashboardPage() {
             ))}
           </div>
 
-          {/* Rental Duration (Days) Selector */}
-          <div className="mb-6 p-4 sm:p-5 bg-gradient-to-r from-amber-50 via-orange-50/70 to-amber-50 border border-amber-300 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
-            <div className="flex items-start sm:items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-500 text-slate-950 font-black shrink-0 shadow-xs">
-                <Calendar className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black text-slate-950 uppercase tracking-wider">
-                    Rental Duration (Exhibition Days)
-                  </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 border border-amber-300">
-                    Sept 12–13, 2026
-                  </span>
-                </div>
-                <p className="text-xs text-slate-600 font-medium mt-0.5">
-                  Select the number of exhibition days you want to rent additional furniture, display items, or electrical fixtures.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
-              {/* Quick Preset Buttons */}
-              <div className="flex items-center gap-1.5">
-                {[1, 2, 3, 4].map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => setRentalDays(d)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      rentalDays === d
-                        ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
-                        : 'bg-white text-slate-700 hover:bg-amber-100/60 border border-slate-300'
-                    }`}
-                  >
-                    {d} {d === 1 ? 'Day' : 'Days'} {d === 2 && '⭐'}
-                  </button>
-                ))}
-              </div>
-
-              {/* Stepper Input */}
-              <div className="flex items-center gap-2 bg-white border border-amber-400 rounded-xl p-1 shadow-xs">
-                <button
-                  type="button"
-                  onClick={() => setRentalDays((d) => Math.max(1, d - 1))}
-                  disabled={rentalDays <= 1}
-                  className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-black border border-slate-200 disabled:opacity-40 active:scale-95 transition-all text-sm"
-                  aria-label="Decrease rental days"
-                >
-                  -
-                </button>
-                <div className="px-2 text-center min-w-[70px]">
-                  <span className="text-sm font-mono font-black text-amber-800 block leading-tight">
-                    {rentalDays} {rentalDays === 1 ? 'Day' : 'Days'}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setRentalDays((d) => Math.min(30, d + 1))}
-                  disabled={rentalDays >= 30}
-                  className="w-8 h-8 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-xs disabled:opacity-40 active:scale-95 transition-all text-sm"
-                  aria-label="Increase rental days"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          </div>
-
           {/* Product Image Reference & Rate Disclaimer Banner */}
           <div className="mb-6 p-4 bg-amber-50/80 border border-amber-300 rounded-xl flex items-start gap-3 text-amber-900 shadow-xs">
             <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
@@ -1168,8 +1109,9 @@ export default function ExhibitorDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredProducts.map((p) => {
               const qty = quantities[p.id] || 0;
+              const d = itemDays[p.id] || 2;
               const imgUrl = getProductImage(p.id);
-              const lineTotal = (p.rate_inr || 0) * qty * rentalDays;
+              const lineTotal = (p.rate_inr || 0) * qty * d;
               return (
                 <div
                   key={p.id}
@@ -1202,11 +1144,6 @@ export default function ExhibitorDashboardPage() {
                           <span className="text-xs font-mono font-extrabold text-amber-700 block">
                             ₹{p.rate_inr.toLocaleString('en-IN')} / day
                           </span>
-                          {qty > 0 && (
-                            <span className="text-[11px] font-mono font-black text-slate-900 block">
-                              Total: ₹{lineTotal.toLocaleString('en-IN')} ({rentalDays} {rentalDays === 1 ? 'day' : 'days'})
-                            </span>
-                          )}
                           <span className="text-[9px] font-extrabold text-amber-800 uppercase tracking-tight block">
                             + 18% GST Extra
                           </span>
@@ -1221,29 +1158,98 @@ export default function ExhibitorDashboardPage() {
                     <p className="text-xs text-slate-600 mb-3">{p.description}</p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-slate-200 mt-2">
-                    <span className="text-xs font-semibold text-slate-600">
-                      Quantity:
-                    </span>
-                    <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-lg p-1">
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(p.id, -1)}
-                        className="w-7 h-7 rounded-md bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-800 border border-slate-200 transition-colors active:scale-95 font-bold"
-                      >
-                        <Minus className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="w-8 text-center text-sm font-extrabold text-slate-900 font-mono">
-                        {qty}
+                  <div className="space-y-2 pt-2 border-t border-slate-200 mt-2">
+                    {/* Rental Days Selector per Item */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Rental Days:</span>
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => updateQuantity(p.id, 1)}
-                        className="w-7 h-7 rounded-md bg-amber-500 hover:bg-amber-400 flex items-center justify-center text-slate-950 font-extrabold transition-colors active:scale-95 shadow-sm"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
+
+                      <div className="flex items-center gap-1.5">
+                        {/* Quick Days Pills */}
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3].map((num) => (
+                            <button
+                              key={num}
+                              type="button"
+                              onClick={() => updateItemDays(p.id, num)}
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                                (itemDays[p.id] || 2) === num
+                                  ? 'bg-slate-900 text-amber-400 font-black shadow-2xs'
+                                  : 'bg-white text-slate-600 hover:bg-amber-50 border border-slate-200'
+                              }`}
+                            >
+                              {num}D
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Stepper */}
+                        <div className="flex items-center gap-1 bg-white border border-slate-300 rounded-lg p-0.5 shadow-2xs">
+                          <button
+                            type="button"
+                            onClick={() => updateItemDays(p.id, (itemDays[p.id] || 2) - 1)}
+                            disabled={(itemDays[p.id] || 2) <= 1}
+                            className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center font-bold text-xs disabled:opacity-30 active:scale-95"
+                            title="Decrease days"
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center text-[11px] font-mono font-black text-amber-900">
+                            {itemDays[p.id] || 2}d
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateItemDays(p.id, (itemDays[p.id] || 2) + 1)}
+                            disabled={(itemDays[p.id] || 2) >= 30}
+                            className="w-5 h-5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-xs disabled:opacity-30 active:scale-95 shadow-2xs"
+                            title="Increase days"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Quantity Selector */}
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+                      <span className="text-xs font-semibold text-slate-600">
+                        Quantity:
+                      </span>
+                      <div className="flex items-center gap-2 bg-white border border-slate-300 rounded-lg p-1">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(p.id, -1)}
+                          className="w-7 h-7 rounded-md bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-800 border border-slate-200 transition-colors active:scale-95 font-bold"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="w-8 text-center text-sm font-extrabold text-slate-900 font-mono">
+                          {qty}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(p.id, 1)}
+                          className="w-7 h-7 rounded-md bg-amber-500 hover:bg-amber-400 flex items-center justify-center text-slate-950 font-extrabold transition-colors active:scale-95 shadow-sm"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Live Line Total when Quantity > 0 */}
+                    {qty > 0 && p.rate_inr ? (
+                      <div className="mt-2 p-2 bg-amber-100/80 border border-amber-300 rounded-lg flex items-center justify-between text-xs">
+                        <span className="text-amber-950 font-bold">Item Total:</span>
+                        <span className="font-mono font-black text-amber-900">
+                          ₹{lineTotal.toLocaleString('en-IN')}{' '}
+                          <span className="text-[10px] text-slate-600 font-medium font-sans">
+                            ({qty} {p.unit} × {d}d)
+                          </span>
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               );
@@ -1260,7 +1266,7 @@ export default function ExhibitorDashboardPage() {
               placeholder="Mention any specific color preferences, dimensions, positioning notes, or unlisted extras you need..."
               value={specialNotes}
               onChange={(e) => setSpecialNotes(e.target.value)}
-              className="w-full p-3.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:bg-white transition-all"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
             />
           </div>
 
@@ -1291,80 +1297,74 @@ export default function ExhibitorDashboardPage() {
           </div>
         </section>
 
-        {/* Section 3: Summary of Submitted Requirements */}
-        <section className="bg-slate-100/80 border border-slate-200 rounded-2xl p-6 lg:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-slate-200 text-slate-700">
-                <Layers className="w-4 h-4" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900">Submitted Summary Overview</h3>
+        {/* Section 4: Live Order & Badges Summary */}
+        <section className="bg-slate-50 border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">4. Overall Requisition Summary</h2>
+              <p className="text-xs text-slate-500">Review your booth configuration, fascia details, entry badges, and extra amenities</p>
             </div>
-
-            {totalSelectedItemsCount > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowBillModal(true)}
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider shadow-sm flex items-center gap-1.5 transition-all self-start sm:self-center"
-              >
-                <FileText className="w-4 h-4" />
-                <span>View / Print Official Tax Invoice Bill</span>
-              </button>
+            {lastSubmittedAt && (
+              <span className="text-xs text-emerald-700 font-medium flex items-center gap-1.5 self-start sm:self-auto bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Last saved at {lastSubmittedAt}</span>
+              </span>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
-              <span className="text-xs text-slate-500 font-semibold uppercase">Brand Name</span>
-              <p className="text-base font-bold text-slate-900 mt-1">{brandName || 'Not saved yet'}</p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
-              <span className="text-xs text-slate-500 font-semibold uppercase">Stall Size</span>
-              <p className="text-base font-bold text-amber-800 mt-1">
-                {selectedSqftOption === 'Other'
-                  ? customSqft ? `${customSqft} sq ft` : 'Custom (Other)'
-                  : `${selectedSqftOption} sq ft`}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">
+                Stall & Booth Details
+              </span>
+              <p className="text-base font-black text-slate-900">{brandName || 'Not configured'}</p>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Stall Size:{' '}
+                <span className="font-bold text-slate-900">
+                  {selectedSqftOption === 'Other'
+                    ? customSqft ? `${customSqft} sq ft` : 'Custom'
+                    : `${selectedSqftOption} sq ft`}
+                </span>
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
-              <span className="text-xs text-slate-500 font-semibold uppercase">Total Requested Extras</span>
-              <p className="text-base font-bold text-emerald-700 mt-1">{totalSelectedItemsCount} item(s)</p>
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">
+                Fascia / Main Header (4 Options)
+              </span>
+              <div className="space-y-1 text-xs">
+                <p className="text-slate-800">
+                  <span className="font-bold text-amber-800">1.</span> {fasciaNames[0]?.trim() || <span className="text-slate-400 italic">Same as Firm Name</span>}
+                </p>
+                {fasciaNames[1]?.trim() && (
+                  <p className="text-slate-800">
+                    <span className="font-bold text-amber-800">2.</span> {fasciaNames[1].trim()}
+                  </p>
+                )}
+                {fasciaNames[2]?.trim() && (
+                  <p className="text-slate-800">
+                    <span className="font-bold text-amber-800">3.</span> {fasciaNames[2].trim()}
+                  </p>
+                )}
+                {fasciaNames[3]?.trim() && (
+                  <p className="text-slate-800">
+                    <span className="font-bold text-amber-800">4.</span> {fasciaNames[3].trim()}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Facia / Banner Board Names Summary */}
-          {fasciaNames.some((n) => n && n.trim()) && (
-            <div className="mb-6 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
-              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-2">
-                Fascia / Banner Board Main Header Options (To be printed):
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                {fasciaNames.map((fn, idx) => (
-                  <div key={idx} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
-                    <span className="text-[10px] font-bold text-amber-700 block uppercase">
-                      Main Header Option {idx + 1}:
-                    </span>
-                    <p className="font-bold text-slate-900 mt-0.5 truncate">
-                      {fn.trim() ? fn : <span className="text-slate-400 font-normal italic">Not specified</span>}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Badges Breakdown Summary */}
+          {/* Badges Summary */}
           {(ownerBadges > 0 || salesBadges > 0 || supportBadges > 0) && (
-            <div className="mb-6 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
-              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-3">
-                Requested Badges ({ownerBadges + salesBadges + supportBadges} Total):
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block">
+                Exhibitor Entry Badges Allocation ({ownerBadges + salesBadges + supportBadges} Total Badges)
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {ownerBadges > 0 && (
                   <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-lg text-xs">
-                    <div className="flex items-center justify-between font-bold text-amber-900 mb-1">
+                    <div className="flex items-center justify-between font-bold text-amber-950 mb-1">
                       <span>👑 Owner Badges:</span>
                       <span>{ownerBadges}</span>
                     </div>
@@ -1379,7 +1379,7 @@ export default function ExhibitorDashboardPage() {
                 {salesBadges > 0 && (
                   <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs">
                     <div className="flex items-center justify-between font-bold text-slate-900 mb-1">
-                      <span>👥 Sales Staff:</span>
+                      <span>💼 Sales Staff:</span>
                       <span>{salesBadges}</span>
                     </div>
                     <ul className="text-[11px] text-slate-700 space-y-0.5 mt-1 list-disc list-inside">
@@ -1407,30 +1407,19 @@ export default function ExhibitorDashboardPage() {
             </div>
           )}
 
-          {/* Rental Duration Summary Badge */}
-          {totalSelectedItemsCount > 0 && (
-            <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-xl flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 text-amber-950 font-bold">
-                <Calendar className="w-4 h-4 text-amber-700" />
-                <span>Selected Rental Duration:</span>
-              </div>
-              <span className="font-mono font-black text-amber-900 bg-amber-200/80 px-2.5 py-1 rounded-lg border border-amber-300">
-                {rentalDays} Exhibition {rentalDays === 1 ? 'Day' : 'Days'}
-              </span>
-            </div>
-          )}
-
+          {/* Selected Extra Items Breakdown */}
           {totalSelectedItemsCount > 0 && (
             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
               <div className="px-4 py-3 bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-700 uppercase tracking-wider flex justify-between">
-                <span>Selected Item</span>
+                <span>Selected Extra Item</span>
                 <span>Qty & Duration</span>
               </div>
               <div className="divide-y divide-slate-100">
                 {products
                   .filter((p) => (quantities[p.id] || 0) > 0)
                   .map((p) => {
-                    const lineTot = (p.rate_inr || 0) * (quantities[p.id] || 0) * rentalDays;
+                    const d = itemDays[p.id] || 2;
+                    const lineTot = (p.rate_inr || 0) * (quantities[p.id] || 0) * d;
                     return (
                       <div key={p.id} className="px-4 py-3 text-xs flex justify-between items-center text-slate-700">
                         <div>
@@ -1439,7 +1428,7 @@ export default function ExhibitorDashboardPage() {
                         </div>
                         <div className="text-right font-mono">
                           <span className="font-bold text-amber-700 block">
-                            {quantities[p.id]} {p.unit} × {rentalDays} {rentalDays === 1 ? 'day' : 'days'}
+                            {quantities[p.id]} {p.unit} × {d} {d === 1 ? 'day' : 'days'}
                           </span>
                           {p.rate_inr ? (
                             <span className="text-[11px] text-slate-500 font-medium">
@@ -1467,7 +1456,7 @@ export default function ExhibitorDashboardPage() {
                 {brandName ? brandName : 'Stall Profile'}: {selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : 'Custom') : `${selectedSqftOption} sq ft`}
               </span>
               <span className="text-slate-600 sm:ml-2">
-                ({totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'} • {rentalDays} {rentalDays === 1 ? 'day' : 'days'} rental, {ownerBadges + salesBadges + supportBadges} badge{ownerBadges + salesBadges + supportBadges === 1 ? '' : 's'})
+                ({totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'}, {ownerBadges + salesBadges + supportBadges} badge{ownerBadges + salesBadges + supportBadges === 1 ? '' : 's'})
               </span>
             </div>
           </div>
@@ -1480,7 +1469,7 @@ export default function ExhibitorDashboardPage() {
                 className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-900 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-xs"
               >
                 <FileText className="w-4 h-4 text-amber-700" />
-                <span>View Bill ({rentalDays} {rentalDays === 1 ? 'Day' : 'Days'})</span>
+                <span>View Tax Bill</span>
               </button>
             )}
 
@@ -1504,7 +1493,6 @@ export default function ExhibitorDashboardPage() {
         mobile={mobile}
         stallSqft={selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : '200 sq ft') : `${selectedSqftOption} sq ft`}
         fasciaNames={fasciaNames}
-        days={rentalDays}
         items={products
           .filter((p) => (quantities[p.id] || 0) > 0)
           .map((p) => ({
@@ -1512,6 +1500,7 @@ export default function ExhibitorDashboardPage() {
             name: p.name,
             rateInr: p.rate_inr || 0,
             quantity: quantities[p.id],
+            days: itemDays[p.id] || 2,
           }))}
       />
     </div>

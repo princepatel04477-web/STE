@@ -19,6 +19,7 @@ export interface InvoiceItem {
   rateInr?: number;
   rate_inr?: number;
   quantity: number;
+  days?: number;
 }
 
 interface BillModalProps {
@@ -39,20 +40,14 @@ export default function BillModal({
   mobile = "",
   stallSqft = "200 sq ft",
   fasciaNames,
-  days = 2,
   items = [],
 }: BillModalProps) {
   const [mounted, setMounted] = useState(false);
   const [downloadingDocx, setDownloadingDocx] = useState(false);
-  const [currentDays, setCurrentDays] = useState<number>(days || 2);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (days) setCurrentDays(days);
-  }, [days]);
 
   if (!isOpen) return null;
 
@@ -65,7 +60,8 @@ export default function BillModal({
 
   const subtotal = items.reduce((sum, item) => {
     const rate = item.rateInr || item.rate_inr || 0;
-    return sum + rate * item.quantity * currentDays;
+    const itemDayCount = item.days || 2;
+    return sum + rate * item.quantity * itemDayCount;
   }, 0);
 
   const cgst = Math.round(subtotal * 0.09);
@@ -86,13 +82,13 @@ export default function BillModal({
         mobile,
         stall_sqft: stallSqft,
         fascia_names: fasciaNames || [],
-        days: currentDays,
         items: items.map((i) => ({
           code: i.code || "DP",
           name: i.name,
           spec: i.spec || "",
           rateInr: i.rateInr || i.rate_inr || 0,
           quantity: i.quantity,
+          days: i.days || 2,
         })),
       };
 
@@ -218,30 +214,6 @@ export default function BillModal({
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Quick Days Selector in Modal Header */}
-              <div className="hidden sm:flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-lg p-1 text-xs">
-                <span className="text-[11px] text-slate-400 font-bold px-1.5">Days:</span>
-                <button
-                  type="button"
-                  onClick={() => setCurrentDays((d) => Math.max(1, d - 1))}
-                  disabled={currentDays <= 1}
-                  className="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center justify-center disabled:opacity-40"
-                  aria-label="Decrease days"
-                >
-                  -
-                </button>
-                <span className="font-mono font-bold text-amber-300 px-1 text-xs">{currentDays}</span>
-                <button
-                  type="button"
-                  onClick={() => setCurrentDays((d) => Math.min(30, d + 1))}
-                  disabled={currentDays >= 30}
-                  className="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center justify-center disabled:opacity-40"
-                  aria-label="Increase days"
-                >
-                  +
-                </button>
-              </div>
-
               <button
                 type="button"
                 onClick={handleDownloadDocx}
@@ -363,8 +335,8 @@ export default function BillModal({
                     <strong>{STE_COMPANY_DETAILS.eventDetails.dates}</strong>
                   </p>
                   <p>
-                    <span className="text-slate-500">Rental Duration:</span>{" "}
-                    <strong className="font-mono text-amber-800 font-bold">{currentDays} Exhibition {currentDays === 1 ? 'Day' : 'Days'}</strong>
+                    <span className="text-slate-500">Event Duration:</span>{" "}
+                    <strong className="font-mono text-amber-800 font-bold">2 Exhibition Days (Sept 12–13)</strong>
                   </p>
                   <p className="text-slate-600">
                     <span className="text-slate-500">Venue:</span>{" "}
@@ -397,7 +369,8 @@ export default function BillModal({
                   ) : (
                     items.map((item, idx) => {
                       const rate = item.rateInr || item.rate_inr || 0;
-                      const lineTotal = rate * item.quantity * currentDays;
+                      const itemDays = item.days || 2;
+                      const lineTotal = rate * item.quantity * itemDays;
                       return (
                         <tr
                           key={item.id || idx}
@@ -425,7 +398,7 @@ export default function BillModal({
                             ₹{rate.toLocaleString("en-IN")}
                           </td>
                           <td className="py-1.5 px-2.5 text-center font-mono font-medium text-slate-700">
-                            {currentDays}
+                            {itemDays}
                           </td>
                           <td className="py-1.5 px-2.5 text-center font-mono font-bold text-slate-900">
                             {item.quantity}
@@ -470,7 +443,7 @@ export default function BillModal({
               {/* Tax Computation Table */}
               <div className="w-full sm:w-72 bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1.5 font-mono text-[11px] shadow-xs shrink-0">
                 <div className="flex justify-between text-slate-700">
-                  <span>Subtotal ({currentDays} {currentDays === 1 ? 'Day' : 'Days'}):</span>
+                  <span>Subtotal (Taxable Value):</span>
                   <span className="font-bold text-slate-900">₹{subtotal.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between text-slate-600 text-[10px]">

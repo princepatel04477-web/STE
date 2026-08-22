@@ -152,11 +152,12 @@ def generate_invoice_docx(data, output_file):
 
         qty = int(item.get("quantity", item.get("qty", 1)))
         rate = float(item.get("rateInr", item.get("rate_inr", item.get("rate", 0))))
+        item_days = int(item.get("days", data.get("days", 2)))
         code = item.get("code", "")
         name = item.get("name", "Extra Item")
         spec = item.get("spec", "")
         
-        line_total = rate * qty * days
+        line_total = rate * qty * item_days
         subtotal += line_total
 
         row_cells[0].text = str(idx + 1)
@@ -179,7 +180,7 @@ def generate_invoice_docx(data, output_file):
         row_cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
         row_cells[2].paragraphs[0].runs[0].font.size = Pt(8)
 
-        row_cells[3].text = str(days)
+        row_cells[3].text = str(item_days)
         row_cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         row_cells[3].paragraphs[0].runs[0].font.size = Pt(8)
 

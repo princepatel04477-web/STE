@@ -3,7 +3,7 @@ export interface SyncPayload {
   brand_name?: string;
   stall_sqft?: string;
   fascia_names?: string[];
-  items?: Array<{ id: string; name: string; quantity: number; unit: string }>;
+  items?: Array<{ id: string; name: string; quantity: number; unit: string; days?: number }>;
   special_notes?: string;
   owner_badges?: number;
   sales_badges?: number;
@@ -43,7 +43,7 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
     }
 
     const formattedItemsSummary = Array.isArray(payload.items) && payload.items.length > 0
-      ? payload.items.map(i => `${i.name} (${i.quantity} ${i.unit})`).join('; ')
+      ? payload.items.map(i => `${i.name} (${i.quantity} ${i.unit || 'unit'}${i.days ? `, ${i.days}d` : ''})`).join('; ')
       : 'None';
 
     const timestamp = payload.updated_at

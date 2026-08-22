@@ -15,6 +15,7 @@ interface ExhibitorItem {
   category: string;
   quantity: number;
   unit: string;
+  days?: number;
 }
 
 interface ItemTotal {
@@ -126,7 +127,7 @@ export default function AdminExhibitorsPage() {
       'Last Updated'
     ];
     const rows = filteredExhibitors.map((ex) => {
-      const extrasStr = ex.items.map((i) => `${i.name} x${i.quantity}`).join('; ');
+      const extrasStr = ex.items.map((i) => `${i.name} x${i.quantity} (${i.days || 2}d)`).join('; ');
       const ownerNamesStr = (ex.badge_names?.owner || []).filter(Boolean).join(', ');
       const salesNamesStr = (ex.badge_names?.sales || []).filter(Boolean).join(', ');
       const supportNamesStr = (ex.badge_names?.support || []).filter(Boolean).join(', ');
@@ -454,7 +455,9 @@ export default function AdminExhibitorsPage() {
                                 <div key={i} className="flex items-center gap-1.5 text-xs">
                                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                   <span className="font-bold text-slate-900">{item.name}</span>
-                                  <span className="text-slate-500 font-mono">({item.quantity} {item.unit})</span>
+                                  <span className="text-slate-500 font-mono">
+                                    ({item.quantity} {item.unit || 'unit'}{item.days ? ` • ${item.days}d` : ''})
+                                  </span>
                                 </div>
                               ))}
                             </div>
@@ -499,7 +502,6 @@ export default function AdminExhibitorsPage() {
           mobile={selectedExhibitorForBill.mobile}
           stallSqft={selectedExhibitorForBill.stall_sqft || '200 sq ft'}
           fasciaNames={selectedExhibitorForBill.fascia_names}
-          days={selectedExhibitorForBill.rental_days || 2}
           items={selectedExhibitorForBill.items.map((it) => {
             const master = EXTRAS_RATES.find((m) => m.id === it.id || m.name.toLowerCase() === it.name.toLowerCase());
             return {
@@ -509,6 +511,7 @@ export default function AdminExhibitorsPage() {
               spec: master?.spec || null,
               rateInr: master?.rateInr || 600,
               quantity: it.quantity,
+              days: it.days || 2,
             };
           })}
         />
