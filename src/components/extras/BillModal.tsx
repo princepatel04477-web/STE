@@ -465,44 +465,72 @@ export default function BillModal({
               </div>
             </div>
 
-            {/* 5. Company Bank Account Details Card */}
-            <div className="bg-slate-900 text-white rounded-lg p-3.5 border border-amber-500/30 space-y-2 shadow-sm print-avoid-break print:bg-slate-100 print:text-slate-900 print:border-slate-300">
-              <div className="flex items-center gap-1.5 border-b border-slate-800 print:border-slate-300 pb-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-amber-400 print:text-amber-800" />
-                <h4 className="text-[10px] font-black uppercase tracking-wider text-amber-400 print:text-amber-900">
-                  Official Company Bank Account Details (Payment Transfer)
-                </h4>
+            {/* 5. Company Bank Account Details Card & UPI QR Code */}
+            <div className="bg-slate-900 text-white rounded-lg p-3 border border-amber-500/30 shadow-sm print-avoid-break print:bg-slate-100 print:text-slate-900 print:border-slate-300">
+              <div className="flex items-center justify-between border-b border-slate-800 print:border-slate-300 pb-1 mb-2">
+                <div className="flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5 text-amber-400 print:text-amber-800" />
+                  <h4 className="text-[10px] font-black uppercase tracking-wider text-amber-400 print:text-amber-900">
+                    Official Payment Transfer Details (NEFT / RTGS / IMPS / UPI)
+                  </h4>
+                </div>
+                <span className="text-[8.5px] font-mono text-amber-300 print:text-amber-900 font-bold hidden sm:inline">
+                  Instant Verification
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-[11px]">
-                <div>
-                  <span className="text-[9px] uppercase text-slate-400 print:text-slate-600 font-sans block">
-                    Account Name
-                  </span>
-                  <p className="font-bold text-white print:text-slate-950 text-xs">
-                    {STE_COMPANY_DETAILS.bankDetails.accountName}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-[9px] uppercase text-slate-400 print:text-slate-600 font-sans block">
-                    Account Number
-                  </span>
-                  <p className="font-black text-amber-400 print:text-amber-900 text-xs tracking-wider">
-                    {STE_COMPANY_DETAILS.bankDetails.accountNumber}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-[9px] uppercase text-slate-400 print:text-slate-600 font-sans block">
-                    IFSC Code & Bank
-                  </span>
-                  <p className="font-bold text-white print:text-slate-950 text-xs">
-                    {STE_COMPANY_DETAILS.bankDetails.ifscCode}
-                    <span className="text-[10px] text-slate-400 print:text-slate-600 font-sans ml-1">
-                      ({STE_COMPANY_DETAILS.bankDetails.bankName})
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                {/* Bank Account Details */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-[11px] flex-1 w-full">
+                  <div>
+                    <span className="text-[8.5px] uppercase text-slate-400 print:text-slate-600 font-sans block">
+                      Account Name
                     </span>
-                  </p>
+                    <p className="font-bold text-white print:text-slate-950 text-[11.5px] leading-tight">
+                      {STE_COMPANY_DETAILS.bankDetails.accountName}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[8.5px] uppercase text-slate-400 print:text-slate-600 font-sans block">
+                      Account Number
+                    </span>
+                    <p className="font-black text-amber-400 print:text-amber-900 text-xs tracking-wider leading-tight">
+                      {STE_COMPANY_DETAILS.bankDetails.accountNumber}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[8.5px] uppercase text-slate-400 print:text-slate-600 font-sans block">
+                      IFSC Code & Bank
+                    </span>
+                    <p className="font-bold text-white print:text-slate-950 text-[11.5px] leading-tight">
+                      {STE_COMPANY_DETAILS.bankDetails.ifscCode}
+                      <span className="text-[9.5px] text-slate-400 print:text-slate-600 font-sans block sm:inline sm:ml-1">
+                        ({STE_COMPANY_DETAILS.bankDetails.bankName})
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* UPI QR Code Box */}
+                <div className="flex items-center gap-2.5 bg-white p-1.5 rounded-lg border border-amber-300 shadow-2xs shrink-0 self-center">
+                  <img
+                    src="/upi_qr.png"
+                    alt="Surat Textile Exhibition UPI QR Code"
+                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded"
+                  />
+                  <div className="text-left font-sans pr-1">
+                    <span className="text-[9.5px] font-black text-slate-950 block uppercase tracking-tight leading-tight">
+                      Scan to Pay via UPI
+                    </span>
+                    <span className="text-[8.5px] font-bold text-amber-800 block leading-tight mt-0.5">
+                      GPay • PhonePe • Paytm
+                    </span>
+                    <span className="text-[7.5px] text-slate-500 font-mono block mt-0.5">
+                      A/C: Surat Textile Exhibition
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

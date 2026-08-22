@@ -244,31 +244,53 @@ def generate_invoice_docx(data, output_file):
     r_w2.font.size = Pt(8.5)
     r_w2.font.color.rgb = RGBColor(180, 83, 9)
 
-    # 6. BANK ACCOUNT DETAILS BOX (Exact required company account details)
-    bank_table = doc.add_table(rows=1, cols=1)
+    # 6. BANK ACCOUNT DETAILS & UPI QR CODE
+    bank_table = doc.add_table(rows=1, cols=2)
     bank_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     b_cell = bank_table.cell(0, 0)
+    qr_cell = bank_table.cell(0, 1)
+    
     set_cell_background(b_cell, "F3F4F6")
-    set_cell_margins(b_cell, top=100, bottom=100, left=140, right=140)
+    set_cell_margins(b_cell, top=80, bottom=80, left=120, right=120)
+    set_cell_background(qr_cell, "FFFFFF")
+    set_cell_margins(qr_cell, top=60, bottom=60, left=80, right=80)
 
     p_bh = b_cell.paragraphs[0]
-    r_bh = p_bh.add_run("COMPANY BANK ACCOUNT DETAILS (FOR NEFT / RTGS / IMPS PAYMENT):\n")
+    r_bh = p_bh.add_run("COMPANY BANK ACCOUNT DETAILS (NEFT / RTGS / IMPS):\n")
     r_bh.font.bold = True
-    r_bh.font.size = Pt(8.5)
+    r_bh.font.size = Pt(8)
     r_bh.font.color.rgb = RGBColor(17, 24, 39)
 
     p_bi = b_cell.add_paragraph()
     r_bi = p_bi.add_run(
-        "A/C NAME:      SURAT TEXTILE EXHIBITION\n"
-        "A/C NO:          183805503938\n"
-        "IFSC CODE:     ICIC0001838\n"
-        "BANK:            ICICI Bank (Surat Branch)"
+        "A/C NAME:   SURAT TEXTILE EXHIBITION\n"
+        "A/C NO:       183805503938\n"
+        "IFSC CODE:  ICIC0001838\n"
+        "BANK:         ICICI Bank (Surat Branch)"
     )
     r_bi.font.name = "Courier New"
     r_bi.font.bold = True
-    r_bi.font.size = Pt(8.5)
+    r_bi.font.size = Pt(8)
 
-    doc.add_paragraph().paragraph_format.space_after = Pt(4)
+    # Embed QR Code if present
+    qr_paths = [
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "public", "upi_qr.png"),
+        os.path.join(os.getcwd(), "public", "upi_qr.png"),
+    ]
+    qr_file = next((p for p in qr_paths if os.path.exists(p)), None)
+    if qr_file:
+        p_qr = qr_cell.paragraphs[0]
+        p_qr.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run_qr = p_qr.add_run()
+        run_qr.add_picture(qr_file, width=Inches(0.95))
+        p_lbl = qr_cell.add_paragraph()
+        p_lbl.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        r_lbl = p_lbl.add_run("Scan to Pay via UPI\n(GPay / PhonePe / Paytm)")
+        r_lbl.font.bold = True
+        r_lbl.font.size = Pt(6.5)
+        r_lbl.font.color.rgb = RGBColor(180, 83, 9)
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(2)
 
     # 7. SIGNATORY & TERMS
     sig_table = doc.add_table(rows=1, cols=2)

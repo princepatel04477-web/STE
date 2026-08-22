@@ -74,6 +74,33 @@ export async function POST(request: Request) {
     const oBadges = Math.min(5, Math.max(0, Number(owner_badges || 0)));
     const sBadges = Math.min(5, Math.max(0, Number(sales_badges || 0)));
     const supBadges = Math.min(5, Math.max(0, Number(support_badges || 0)));
+
+    // Validate compulsory badge names
+    if (oBadges > 0) {
+      const oNames = Array.isArray(badge_names?.owner) ? badge_names.owner : [];
+      for (let i = 0; i < oBadges; i++) {
+        if (!oNames[i] || !oNames[i].trim()) {
+          return NextResponse.json({ error: `Owner Badge #${i + 1} name is compulsory.` }, { status: 400 });
+        }
+      }
+    }
+    if (sBadges > 0) {
+      const sNames = Array.isArray(badge_names?.sales) ? badge_names.sales : [];
+      for (let i = 0; i < sBadges; i++) {
+        if (!sNames[i] || !sNames[i].trim()) {
+          return NextResponse.json({ error: `Sales Staff Badge #${i + 1} name is compulsory.` }, { status: 400 });
+        }
+      }
+    }
+    if (supBadges > 0) {
+      const supNames = Array.isArray(badge_names?.support) ? badge_names.support : [];
+      for (let i = 0; i < supBadges; i++) {
+        if (!supNames[i] || !supNames[i].trim()) {
+          return NextResponse.json({ error: `Support Staff Badge #${i + 1} name is compulsory.` }, { status: 400 });
+        }
+      }
+    }
+
     const badgeNamesJson = badge_names ? JSON.stringify(badge_names) : '';
     const rDays = Math.max(1, Math.min(30, Number(rental_days || days || 2)));
 

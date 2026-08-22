@@ -29,6 +29,7 @@ import {
   Users,
   Wrench,
   AlertTriangle,
+  AlertCircle,
   Package,
   Gift,
   Video,
@@ -97,6 +98,8 @@ export default function ExhibitorDashboardPage() {
   const [ownerBadgeNames, setOwnerBadgeNames] = useState<string[]>(['']);
   const [salesBadgeNames, setSalesBadgeNames] = useState<string[]>([]);
   const [supportBadgeNames, setSupportBadgeNames] = useState<string[]>([]);
+  const [badgeErrors, setBadgeErrors] = useState<string[]>([]);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   // General Loading & Auth check
   const [initialLoading, setInitialLoading] = useState(true);
@@ -113,6 +116,7 @@ export default function ExhibitorDashboardPage() {
       while (copy.length < val) copy.push('');
       return copy.slice(0, val);
     });
+    if (badgeErrors.length > 0) setBadgeErrors([]);
   };
 
   const handleSalesBadgesChange = (count: number) => {
@@ -123,6 +127,7 @@ export default function ExhibitorDashboardPage() {
       while (copy.length < val) copy.push('');
       return copy.slice(0, val);
     });
+    if (badgeErrors.length > 0) setBadgeErrors([]);
   };
 
   const handleSupportBadgesChange = (count: number) => {
@@ -133,6 +138,33 @@ export default function ExhibitorDashboardPage() {
       while (copy.length < val) copy.push('');
       return copy.slice(0, val);
     });
+    if (badgeErrors.length > 0) setBadgeErrors([]);
+  };
+
+  const validateBadgeNames = (): string[] => {
+    const errs: string[] = [];
+    if (ownerBadges > 0) {
+      for (let i = 0; i < ownerBadges; i++) {
+        if (!ownerBadgeNames[i] || !ownerBadgeNames[i].trim()) {
+          errs.push(`Owner Badge #${i + 1} Name is required`);
+        }
+      }
+    }
+    if (salesBadges > 0) {
+      for (let i = 0; i < salesBadges; i++) {
+        if (!salesBadgeNames[i] || !salesBadgeNames[i].trim()) {
+          errs.push(`Sales Staff Badge #${i + 1} Name is required`);
+        }
+      }
+    }
+    if (supportBadges > 0) {
+      for (let i = 0; i < supportBadges; i++) {
+        if (!supportBadgeNames[i] || !supportBadgeNames[i].trim()) {
+          errs.push(`Support Staff Badge #${i + 1} Name is required`);
+        }
+      }
+    }
+    return errs;
   };
 
   const fetchInitialData = async () => {
@@ -288,8 +320,21 @@ export default function ExhibitorDashboardPage() {
   };
 
   const handleSaveExtras = async () => {
-    setExtrasSaving(true);
+    setHasAttemptedSubmit(true);
     setExtrasSuccessMsg('');
+
+    const errs = validateBadgeNames();
+    if (errs.length > 0) {
+      setBadgeErrors(errs);
+      const section = document.getElementById('section-badges');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+    setBadgeErrors([]);
+
+    setExtrasSaving(true);
 
     const selectedItems: OrderItem[] = products
       .filter((p) => (quantities[p.id] || 0) > 0)
@@ -830,14 +875,19 @@ export default function ExhibitorDashboardPage() {
         </section>
 
         {/* Section 2: Exhibitor Entry Badges */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <section id="section-badges" className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm scroll-mt-24">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
                 <Contact className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">2. Exhibitor Entry Badges Request</h2>
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <span>2. Exhibitor Entry Badges Request</span>
+                  <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-amber-200 text-amber-900 border border-amber-300">
+                    Names Compulsory *
+                  </span>
+                </h2>
                 <p className="text-xs text-slate-500">Request official hall entry badges for Owners, Sales Staff, and Support Team</p>
               </div>
             </div>
@@ -846,6 +896,29 @@ export default function ExhibitorDashboardPage() {
               Total Badges: {ownerBadges + salesBadges + supportBadges}
             </span>
           </div>
+
+          {/* Compulsory Badges Notice Banner */}
+          <div className="mb-6 p-3.5 bg-amber-50/80 border border-amber-300 rounded-xl flex items-center justify-between gap-3 text-xs shadow-2xs">
+            <div className="flex items-center gap-2 text-amber-950 font-bold">
+              <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
+              <span>Full Name is <strong>COMPULSORY</strong> for each requested badge. Badges will be printed with these exact names.</span>
+            </div>
+          </div>
+
+          {/* Validation Errors Banner */}
+          {badgeErrors.length > 0 && (
+            <div className="mb-6 p-4 bg-red-50 border-2 border-red-400 rounded-xl text-red-800 text-xs space-y-1.5 shadow-sm">
+              <div className="flex items-center gap-2 font-black text-red-950 text-sm">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                <span>Please enter names for all requested badges:</span>
+              </div>
+              <ul className="list-disc list-inside pl-1 text-[11.5px] text-red-700 font-bold space-y-0.5">
+                {badgeErrors.map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* For Owner */}
@@ -886,27 +959,46 @@ export default function ExhibitorDashboardPage() {
               {/* Owner Badge Holder Names */}
               {ownerBadges > 0 && (
                 <div className="pt-3 border-t border-slate-200 space-y-2 mt-2">
-                  <span className="text-[11px] font-bold text-slate-700 block uppercase tracking-wide">
-                    Owner Name(s) to be printed:
-                  </span>
-                  {Array.from({ length: ownerBadges }).map((_, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 shrink-0">
-                        #{idx + 1}
-                      </span>
-                      <input
-                        type="text"
-                        placeholder={`Owner / Director Full Name ${idx + 1}`}
-                        value={ownerBadgeNames[idx] || ''}
-                        onChange={(e) => {
-                          const copy = [...ownerBadgeNames];
-                          copy[idx] = e.target.value;
-                          setOwnerBadgeNames(copy);
-                        }}
-                        className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                      />
-                    </div>
-                  ))}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">
+                      Owner Name(s) to be printed:
+                    </span>
+                    <span className="text-[10px] text-red-600 font-extrabold">* Compulsory</span>
+                  </div>
+                  {Array.from({ length: ownerBadges }).map((_, idx) => {
+                    const isMissing = hasAttemptedSubmit && (!ownerBadgeNames[idx] || !ownerBadgeNames[idx].trim());
+                    return (
+                      <div key={idx} className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 shrink-0">
+                            #{idx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            placeholder={`Owner / Director Full Name #${idx + 1} *`}
+                            value={ownerBadgeNames[idx] || ''}
+                            onChange={(e) => {
+                              const copy = [...ownerBadgeNames];
+                              copy[idx] = e.target.value;
+                              setOwnerBadgeNames(copy);
+                              if (badgeErrors.length > 0) setBadgeErrors([]);
+                            }}
+                            className={`w-full px-3 py-1.5 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
+                              isMissing
+                                ? 'border-red-500 ring-2 ring-red-400/40 bg-red-50/40 placeholder-red-400'
+                                : 'border-slate-300 focus:border-amber-500 focus:ring-amber-500'
+                            }`}
+                            required
+                          />
+                        </div>
+                        {isMissing && (
+                          <p className="text-[10px] text-red-600 font-bold ml-7">
+                            ⚠️ Owner name is compulsory
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -949,27 +1041,46 @@ export default function ExhibitorDashboardPage() {
               {/* Sales Badge Holder Names */}
               {salesBadges > 0 && (
                 <div className="pt-3 border-t border-slate-200 space-y-2 mt-2">
-                  <span className="text-[11px] font-bold text-slate-700 block uppercase tracking-wide">
-                    Sales Person Name(s):
-                  </span>
-                  {Array.from({ length: salesBadges }).map((_, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-200 px-1.5 py-0.5 rounded border border-slate-300 shrink-0">
-                        #{idx + 1}
-                      </span>
-                      <input
-                        type="text"
-                        placeholder={`Sales Staff Full Name ${idx + 1}`}
-                        value={salesBadgeNames[idx] || ''}
-                        onChange={(e) => {
-                          const copy = [...salesBadgeNames];
-                          copy[idx] = e.target.value;
-                          setSalesBadgeNames(copy);
-                        }}
-                        className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                      />
-                    </div>
-                  ))}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">
+                      Sales Person Name(s):
+                    </span>
+                    <span className="text-[10px] text-red-600 font-extrabold">* Compulsory</span>
+                  </div>
+                  {Array.from({ length: salesBadges }).map((_, idx) => {
+                    const isMissing = hasAttemptedSubmit && (!salesBadgeNames[idx] || !salesBadgeNames[idx].trim());
+                    return (
+                      <div key={idx} className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-200 px-1.5 py-0.5 rounded border border-slate-300 shrink-0">
+                            #{idx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            placeholder={`Sales Staff Full Name #${idx + 1} *`}
+                            value={salesBadgeNames[idx] || ''}
+                            onChange={(e) => {
+                              const copy = [...salesBadgeNames];
+                              copy[idx] = e.target.value;
+                              setSalesBadgeNames(copy);
+                              if (badgeErrors.length > 0) setBadgeErrors([]);
+                            }}
+                            className={`w-full px-3 py-1.5 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
+                              isMissing
+                                ? 'border-red-500 ring-2 ring-red-400/40 bg-red-50/40 placeholder-red-400'
+                                : 'border-slate-300 focus:border-amber-500 focus:ring-amber-500'
+                            }`}
+                            required
+                          />
+                        </div>
+                        {isMissing && (
+                          <p className="text-[10px] text-red-600 font-bold ml-7">
+                            ⚠️ Sales staff name is compulsory
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -1012,27 +1123,46 @@ export default function ExhibitorDashboardPage() {
               {/* Support Badge Holder Names */}
               {supportBadges > 0 && (
                 <div className="pt-3 border-t border-slate-200 space-y-2 mt-2">
-                  <span className="text-[11px] font-bold text-slate-700 block uppercase tracking-wide">
-                    Support Person Name(s):
-                  </span>
-                  {Array.from({ length: supportBadges }).map((_, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-200 px-1.5 py-0.5 rounded border border-slate-300 shrink-0">
-                        #{idx + 1}
-                      </span>
-                      <input
-                        type="text"
-                        placeholder={`Support Staff Full Name ${idx + 1}`}
-                        value={supportBadgeNames[idx] || ''}
-                        onChange={(e) => {
-                          const copy = [...supportBadgeNames];
-                          copy[idx] = e.target.value;
-                          setSupportBadgeNames(copy);
-                        }}
-                        className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                      />
-                    </div>
-                  ))}
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">
+                      Support Person Name(s):
+                    </span>
+                    <span className="text-[10px] text-red-600 font-extrabold">* Compulsory</span>
+                  </div>
+                  {Array.from({ length: supportBadges }).map((_, idx) => {
+                    const isMissing = hasAttemptedSubmit && (!supportBadgeNames[idx] || !supportBadgeNames[idx].trim());
+                    return (
+                      <div key={idx} className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-200 px-1.5 py-0.5 rounded border border-slate-300 shrink-0">
+                            #{idx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            placeholder={`Support Staff Full Name #${idx + 1} *`}
+                            value={supportBadgeNames[idx] || ''}
+                            onChange={(e) => {
+                              const copy = [...supportBadgeNames];
+                              copy[idx] = e.target.value;
+                              setSupportBadgeNames(copy);
+                              if (badgeErrors.length > 0) setBadgeErrors([]);
+                            }}
+                            className={`w-full px-3 py-1.5 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
+                              isMissing
+                                ? 'border-red-500 ring-2 ring-red-400/40 bg-red-50/40 placeholder-red-400'
+                                : 'border-slate-300 focus:border-amber-500 focus:ring-amber-500'
+                            }`}
+                            required
+                          />
+                        </div>
+                        {isMissing && (
+                          <p className="text-[10px] text-red-600 font-bold ml-7">
+                            ⚠️ Support staff name is compulsory
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
