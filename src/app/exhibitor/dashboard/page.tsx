@@ -515,13 +515,13 @@ export default function ExhibitorDashboardPage() {
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                     <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">1</span>
-                    <span>Option 1 (Primary Firm Name)</span>
+                    <span>Option 1 (Main Header Firm Name)</span>
                   </label>
                   <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">Main Header</span>
                 </div>
                 <input
                   type="text"
-                  placeholder="e.g. Ambika Silk Mills (Main Company Name)"
+                  placeholder="e.g. Ambika Silk Mills (Main Header Option 1)"
                   value={fasciaNames[0] || ''}
                   onChange={(e) => {
                     const copy = [...fasciaNames];
@@ -530,21 +530,21 @@ export default function ExhibitorDashboardPage() {
                   }}
                   className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">Primary firm name printed in large bold on booth header</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">Main header firm name option 1 for booth fascia board</span>
               </div>
 
               {/* Option 2 */}
               <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 text-[11px] font-black flex items-center justify-center">2</span>
-                    <span>Option 2 (Sister Concern / Associate)</span>
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">2</span>
+                    <span>Option 2 (Main Header Firm Name)</span>
                   </label>
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-700">Optional</span>
+                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">Main Header</span>
                 </div>
                 <input
                   type="text"
-                  placeholder="e.g. Ambika Tex Fab (Sister Company Name)"
+                  placeholder="e.g. Ambika Tex Fab (Main Header Option 2)"
                   value={fasciaNames[1] || ''}
                   onChange={(e) => {
                     const copy = [...fasciaNames];
@@ -553,21 +553,21 @@ export default function ExhibitorDashboardPage() {
                   }}
                   className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">Sister concern or second brand name for fascia panel</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">Main header firm name option 2 for booth fascia board</span>
               </div>
 
               {/* Option 3 */}
               <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 text-[11px] font-black flex items-center justify-center">3</span>
-                    <span>Option 3 (Group / Subsidiary Firm)</span>
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">3</span>
+                    <span>Option 3 (Main Header Firm Name)</span>
                   </label>
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-700">Optional</span>
+                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">Main Header</span>
                 </div>
                 <input
                   type="text"
-                  placeholder="e.g. Ambika Digital Prints (Associate Group Name)"
+                  placeholder="e.g. Ambika Digital Prints (Main Header Option 3)"
                   value={fasciaNames[2] || ''}
                   onChange={(e) => {
                     const copy = [...fasciaNames];
@@ -576,21 +576,21 @@ export default function ExhibitorDashboardPage() {
                   }}
                   className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">Third firm/brand name for hanging banners and directory</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">Main header firm name option 3 for booth fascia board</span>
               </div>
 
               {/* Option 4 */}
               <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 text-[11px] font-black flex items-center justify-center">4</span>
-                    <span>Option 4 (Brand Label / Trade Mark)</span>
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">4</span>
+                    <span>Option 4 (Main Header Firm Name)</span>
                   </label>
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-700">Optional</span>
+                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">Main Header</span>
                 </div>
                 <input
                   type="text"
-                  placeholder="e.g. Ambika Festive Collection (Label / Brand)"
+                  placeholder="e.g. Ambika Fabrics (Main Header Option 4)"
                   value={fasciaNames[3] || ''}
                   onChange={(e) => {
                     const copy = [...fasciaNames];
@@ -599,7 +599,7 @@ export default function ExhibitorDashboardPage() {
                   }}
                   className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">Fourth brand/label name option for promotional banners</span>
+                <span className="text-[10px] text-slate-500 mt-1 block">Main header firm name option 4 for booth fascia board</span>
               </div>
             </div>
 
@@ -608,22 +608,28 @@ export default function ExhibitorDashboardPage() {
               <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-neutral-800">
                 <span className="text-[10px] uppercase tracking-widest text-amber-400 font-bold flex items-center gap-1.5">
                   <Store className="w-3.5 h-3.5" />
-                  <span>Stall Entrance Facia Board Mockup Preview:</span>
+                  <span>Stall Entrance Facia Board Mockup Preview (Main Header):</span>
                 </span>
                 <span className="text-[10px] text-neutral-400 font-mono">STE 2026 SURAT</span>
               </div>
               <div className="py-3 px-4 bg-neutral-900/90 rounded-lg border border-amber-400/20 text-center">
-                <h4 className="text-base sm:text-lg font-black text-amber-400 uppercase tracking-wide font-sans">
-                  {fasciaNames[0]?.trim() || brandName || 'YOUR PRIMARY COMPANY NAME'}
-                </h4>
-                {fasciaNames.slice(1).some((n) => n && n.trim()) && (
-                  <div className="flex flex-wrap items-center justify-center gap-2 mt-1.5 pt-1.5 border-t border-neutral-800 text-[11px] text-neutral-300">
-                    {fasciaNames.slice(1).map((n, i) => n && n.trim() ? (
-                      <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-neutral-800 text-amber-200 border border-neutral-700">
-                        • {n}
-                      </span>
+                {fasciaNames.some((n) => n && n.trim()) ? (
+                  <div className="space-y-2">
+                    {fasciaNames.map((n, i) => n && n.trim() ? (
+                      <div key={i} className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2.5">
+                        <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold uppercase tracking-wider">
+                          Main Header Option {i + 1}
+                        </span>
+                        <span className="text-sm sm:text-base font-black text-amber-400 uppercase tracking-wide font-sans">
+                          {n}
+                        </span>
+                      </div>
                     ) : null)}
                   </div>
+                ) : (
+                  <h4 className="text-base sm:text-lg font-black text-amber-400 uppercase tracking-wide font-sans">
+                    {brandName || 'YOUR MAIN HEADER FIRM NAME'}
+                  </h4>
                 )}
               </div>
             </div>
@@ -1251,13 +1257,13 @@ export default function ExhibitorDashboardPage() {
           {fasciaNames.some((n) => n && n.trim()) && (
             <div className="mb-6 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
               <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-2">
-                Fascia / Banner Board Firm Names (To be printed):
+                Fascia / Banner Board Main Header Options (To be printed):
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                 {fasciaNames.map((fn, idx) => (
                   <div key={idx} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
                     <span className="text-[10px] font-bold text-amber-700 block uppercase">
-                      Option {idx + 1} {idx === 0 ? '(Primary)' : ''}:
+                      Main Header Option {idx + 1}:
                     </span>
                     <p className="font-bold text-slate-900 mt-0.5 truncate">
                       {fn.trim() ? fn : <span className="text-slate-400 font-normal italic">Not specified</span>}

@@ -109,10 +109,10 @@ export default function AdminExhibitorsPage() {
       'Mobile Number',
       'Brand Name',
       'Stall Size (Sq Ft)',
-      'Fascia Option 1 (Primary)',
-      'Fascia Option 2',
-      'Fascia Option 3',
-      'Fascia Option 4',
+      'Fascia Main Header (Option 1)',
+      'Fascia Main Header (Option 2)',
+      'Fascia Main Header (Option 3)',
+      'Fascia Main Header (Option 4)',
       'Owner Badges Count',
       'Owner Badge Names',
       'Sales Badges Count',
@@ -404,8 +404,8 @@ export default function AdminExhibitorsPage() {
                           {ex.fascia_names && ex.fascia_names.some((n) => n && n.trim()) && (
                             <div className="mt-1 flex flex-col gap-0.5 max-w-[220px]">
                               {ex.fascia_names.map((n, i) => n && n.trim() ? (
-                                <span key={i} className="text-[10px] text-amber-900 bg-amber-50/80 px-1.5 py-0.5 rounded border border-amber-200/60 truncate" title={`Option ${i + 1}: ${n}`}>
-                                  🏷️ Op{i + 1}: <strong className="font-semibold">{n}</strong>
+                                <span key={i} className="text-[10px] text-amber-900 bg-amber-50/80 px-1.5 py-0.5 rounded border border-amber-200/60 truncate" title={`Main Header Option ${i + 1}: ${n}`}>
+                                  🏷️ Main Header {i + 1}: <strong className="font-semibold">{n}</strong>
                                 </span>
                               ) : null)}
                             </div>
