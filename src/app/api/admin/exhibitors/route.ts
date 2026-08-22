@@ -14,6 +14,7 @@ export async function GET() {
         sales_badges,
         support_badges,
         badge_names_json,
+        rental_days,
         updated_at as order_updated
       FROM exhibitor_orders
     `).all() as Array<{
@@ -24,6 +25,7 @@ export async function GET() {
       sales_badges?: number;
       support_badges?: number;
       badge_names_json?: string | null;
+      rental_days?: number;
       order_updated: string | null;
     }>;
 
@@ -137,6 +139,7 @@ export async function GET() {
         sales_badges: sBadges,
         support_badges: supBadges,
         badge_names: badgeNames,
+        rental_days: order?.rental_days ?? 2,
         last_updated: order?.order_updated || dbEx?.updated_at || new Date().toISOString()
       });
     });

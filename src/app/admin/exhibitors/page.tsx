@@ -39,6 +39,7 @@ interface ExhibitorRecord {
     sales?: string[];
     support?: string[];
   };
+  rental_days?: number;
   last_updated: string;
 }
 
@@ -119,6 +120,7 @@ export default function AdminExhibitorsPage() {
       'Sales Badge Names',
       'Support Badges Count',
       'Support Badge Names',
+      'Rental Duration (Days)',
       'Extras Requested',
       'Special Notes',
       'Last Updated'
@@ -147,6 +149,7 @@ export default function AdminExhibitorsPage() {
         `"${salesNamesStr.replace(/"/g, '""')}"`,
         `"${ex.support_badges || 0}"`,
         `"${supportNamesStr.replace(/"/g, '""')}"`,
+        `"${ex.rental_days || 2}"`,
         `"${extrasStr.replace(/"/g, '""')}"`,
         `"${(ex.special_notes || '').replace(/"/g, '""')}"`,
         `"${ex.last_updated || ''}"`
@@ -496,7 +499,7 @@ export default function AdminExhibitorsPage() {
           mobile={selectedExhibitorForBill.mobile}
           stallSqft={selectedExhibitorForBill.stall_sqft || '200 sq ft'}
           fasciaNames={selectedExhibitorForBill.fascia_names}
-          days={2}
+          days={selectedExhibitorForBill.rental_days || 2}
           items={selectedExhibitorForBill.items.map((it) => {
             const master = EXTRAS_RATES.find((m) => m.id === it.id || m.name.toLowerCase() === it.name.toLowerCase());
             return {

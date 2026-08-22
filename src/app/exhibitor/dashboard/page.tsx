@@ -38,7 +38,8 @@ import {
   Check,
   X,
   FileText,
-  Store
+  Store,
+  Calendar
 } from 'lucide-react';
 
 interface Product {
@@ -79,6 +80,7 @@ export default function ExhibitorDashboardPage() {
   // Extras Catalog State
   const [products, setProducts] = useState<Product[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [rentalDays, setRentalDays] = useState<number>(2); // Default 2 exhibition days
   const [specialNotes, setSpecialNotes] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [extrasSaving, setExtrasSaving] = useState(false);
@@ -185,6 +187,9 @@ export default function ExhibitorDashboardPage() {
         }
         setQuantities(qMap);
         setSpecialNotes(catData.existingOrder.special_notes || '');
+        if (catData.existingOrder.rental_days) {
+          setRentalDays(Number(catData.existingOrder.rental_days) || 2);
+        }
         const oCount = catData.existingOrder.owner_badges ?? 1;
         const sCount = catData.existingOrder.sales_badges ?? 0;
         const supCount = catData.existingOrder.support_badges ?? 0;
@@ -302,7 +307,8 @@ export default function ExhibitorDashboardPage() {
             owner: ownerBadgeNames.slice(0, ownerBadges),
             sales: salesBadgeNames.slice(0, salesBadges),
             support: supportBadgeNames.slice(0, supportBadges)
-          }
+          },
+          rental_days: rentalDays
         })
       });
 
@@ -1073,6 +1079,75 @@ export default function ExhibitorDashboardPage() {
             ))}
           </div>
 
+          {/* Rental Duration (Days) Selector */}
+          <div className="mb-6 p-4 sm:p-5 bg-gradient-to-r from-amber-50 via-orange-50/70 to-amber-50 border border-amber-300 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500 text-slate-950 font-black shrink-0 shadow-xs">
+                <Calendar className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-black text-slate-950 uppercase tracking-wider">
+                    Rental Duration (Exhibition Days)
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 border border-amber-300">
+                    Sept 12–13, 2026
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 font-medium mt-0.5">
+                  Select the number of exhibition days you want to rent additional furniture, display items, or electrical fixtures.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
+              {/* Quick Preset Buttons */}
+              <div className="flex items-center gap-1.5">
+                {[1, 2, 3, 4].map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setRentalDays(d)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      rentalDays === d
+                        ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
+                        : 'bg-white text-slate-700 hover:bg-amber-100/60 border border-slate-300'
+                    }`}
+                  >
+                    {d} {d === 1 ? 'Day' : 'Days'} {d === 2 && '⭐'}
+                  </button>
+                ))}
+              </div>
+
+              {/* Stepper Input */}
+              <div className="flex items-center gap-2 bg-white border border-amber-400 rounded-xl p-1 shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setRentalDays((d) => Math.max(1, d - 1))}
+                  disabled={rentalDays <= 1}
+                  className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-black border border-slate-200 disabled:opacity-40 active:scale-95 transition-all text-sm"
+                  aria-label="Decrease rental days"
+                >
+                  -
+                </button>
+                <div className="px-2 text-center min-w-[70px]">
+                  <span className="text-sm font-mono font-black text-amber-800 block leading-tight">
+                    {rentalDays} {rentalDays === 1 ? 'Day' : 'Days'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setRentalDays((d) => Math.min(30, d + 1))}
+                  disabled={rentalDays >= 30}
+                  className="w-8 h-8 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-xs disabled:opacity-40 active:scale-95 transition-all text-sm"
+                  aria-label="Increase rental days"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Product Image Reference & Rate Disclaimer Banner */}
           <div className="mb-6 p-4 bg-amber-50/80 border border-amber-300 rounded-xl flex items-start gap-3 text-amber-900 shadow-xs">
             <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
@@ -1094,6 +1169,7 @@ export default function ExhibitorDashboardPage() {
             {filteredProducts.map((p) => {
               const qty = quantities[p.id] || 0;
               const imgUrl = getProductImage(p.id);
+              const lineTotal = (p.rate_inr || 0) * qty * rentalDays;
               return (
                 <div
                   key={p.id}
@@ -1126,6 +1202,11 @@ export default function ExhibitorDashboardPage() {
                           <span className="text-xs font-mono font-extrabold text-amber-700 block">
                             ₹{p.rate_inr.toLocaleString('en-IN')} / day
                           </span>
+                          {qty > 0 && (
+                            <span className="text-[11px] font-mono font-black text-slate-900 block">
+                              Total: ₹{lineTotal.toLocaleString('en-IN')} ({rentalDays} {rentalDays === 1 ? 'day' : 'days'})
+                            </span>
+                          )}
                           <span className="text-[9px] font-extrabold text-amber-800 uppercase tracking-tight block">
                             + 18% GST Extra
                           </span>
@@ -1326,26 +1407,49 @@ export default function ExhibitorDashboardPage() {
             </div>
           )}
 
+          {/* Rental Duration Summary Badge */}
+          {totalSelectedItemsCount > 0 && (
+            <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-xl flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 text-amber-950 font-bold">
+                <Calendar className="w-4 h-4 text-amber-700" />
+                <span>Selected Rental Duration:</span>
+              </div>
+              <span className="font-mono font-black text-amber-900 bg-amber-200/80 px-2.5 py-1 rounded-lg border border-amber-300">
+                {rentalDays} Exhibition {rentalDays === 1 ? 'Day' : 'Days'}
+              </span>
+            </div>
+          )}
+
           {totalSelectedItemsCount > 0 && (
             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
               <div className="px-4 py-3 bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-700 uppercase tracking-wider flex justify-between">
                 <span>Selected Item</span>
-                <span>Quantity</span>
+                <span>Qty & Duration</span>
               </div>
               <div className="divide-y divide-slate-100">
                 {products
                   .filter((p) => (quantities[p.id] || 0) > 0)
-                  .map((p) => (
-                    <div key={p.id} className="px-4 py-3 text-xs flex justify-between items-center text-slate-700">
-                      <div>
-                        <span className="font-bold text-slate-900">{p.name}</span>
-                        <span className="text-slate-500 ml-2">({p.category})</span>
+                  .map((p) => {
+                    const lineTot = (p.rate_inr || 0) * (quantities[p.id] || 0) * rentalDays;
+                    return (
+                      <div key={p.id} className="px-4 py-3 text-xs flex justify-between items-center text-slate-700">
+                        <div>
+                          <span className="font-bold text-slate-900">{p.name}</span>
+                          <span className="text-slate-500 ml-2">({p.category})</span>
+                        </div>
+                        <div className="text-right font-mono">
+                          <span className="font-bold text-amber-700 block">
+                            {quantities[p.id]} {p.unit} × {rentalDays} {rentalDays === 1 ? 'day' : 'days'}
+                          </span>
+                          {p.rate_inr ? (
+                            <span className="text-[11px] text-slate-500 font-medium">
+                              ₹{lineTot.toLocaleString('en-IN')} (+ GST)
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
-                      <span className="font-mono font-bold text-amber-700">
-                        {quantities[p.id]} {p.unit}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
               </div>
             </div>
           )}
@@ -1363,7 +1467,7 @@ export default function ExhibitorDashboardPage() {
                 {brandName ? brandName : 'Stall Profile'}: {selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : 'Custom') : `${selectedSqftOption} sq ft`}
               </span>
               <span className="text-slate-600 sm:ml-2">
-                ({totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'}, {ownerBadges + salesBadges + supportBadges} badge{ownerBadges + salesBadges + supportBadges === 1 ? '' : 's'})
+                ({totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'} • {rentalDays} {rentalDays === 1 ? 'day' : 'days'} rental, {ownerBadges + salesBadges + supportBadges} badge{ownerBadges + salesBadges + supportBadges === 1 ? '' : 's'})
               </span>
             </div>
           </div>
@@ -1376,7 +1480,7 @@ export default function ExhibitorDashboardPage() {
                 className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-900 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-xs"
               >
                 <FileText className="w-4 h-4 text-amber-700" />
-                <span>View Bill</span>
+                <span>View Bill ({rentalDays} {rentalDays === 1 ? 'Day' : 'Days'})</span>
               </button>
             )}
 
@@ -1400,7 +1504,7 @@ export default function ExhibitorDashboardPage() {
         mobile={mobile}
         stallSqft={selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : '200 sq ft') : `${selectedSqftOption} sq ft`}
         fasciaNames={fasciaNames}
-        days={2}
+        days={rentalDays}
         items={products
           .filter((p) => (quantities[p.id] || 0) > 0)
           .map((p) => ({

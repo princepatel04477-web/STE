@@ -13,6 +13,7 @@ export interface SyncPayload {
     sales?: string[];
     support?: string[];
   };
+  rental_days?: number;
   updated_at?: string;
 }
 
@@ -70,6 +71,7 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
       fascia_name_3: fascia3,
       fascia_name_4: fascia4,
       fascia_names_summary: fasciaAll,
+      rental_days: payload.rental_days || 2,
       // Dedicated product column quantities
       sofa_2seater: itemMap['sofa-2seater'] || 0,
       sofa_single: itemMap['sofa-single'] || 0,

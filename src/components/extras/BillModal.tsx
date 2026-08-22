@@ -44,10 +44,15 @@ export default function BillModal({
 }: BillModalProps) {
   const [mounted, setMounted] = useState(false);
   const [downloadingDocx, setDownloadingDocx] = useState(false);
+  const [currentDays, setCurrentDays] = useState<number>(days || 2);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (days) setCurrentDays(days);
+  }, [days]);
 
   if (!isOpen) return null;
 
@@ -60,7 +65,7 @@ export default function BillModal({
 
   const subtotal = items.reduce((sum, item) => {
     const rate = item.rateInr || item.rate_inr || 0;
-    return sum + rate * item.quantity * days;
+    return sum + rate * item.quantity * currentDays;
   }, 0);
 
   const cgst = Math.round(subtotal * 0.09);
@@ -81,7 +86,7 @@ export default function BillModal({
         mobile,
         stall_sqft: stallSqft,
         fascia_names: fasciaNames || [],
-        days,
+        days: currentDays,
         items: items.map((i) => ({
           code: i.code || "DP",
           name: i.name,
@@ -213,6 +218,30 @@ export default function BillModal({
             </div>
 
             <div className="flex items-center gap-2">
+              {/* Quick Days Selector in Modal Header */}
+              <div className="hidden sm:flex items-center gap-1.5 bg-slate-800 border border-slate-700 rounded-lg p-1 text-xs">
+                <span className="text-[11px] text-slate-400 font-bold px-1.5">Days:</span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentDays((d) => Math.max(1, d - 1))}
+                  disabled={currentDays <= 1}
+                  className="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center justify-center disabled:opacity-40"
+                  aria-label="Decrease days"
+                >
+                  -
+                </button>
+                <span className="font-mono font-bold text-amber-300 px-1 text-xs">{currentDays}</span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentDays((d) => Math.min(30, d + 1))}
+                  disabled={currentDays >= 30}
+                  className="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center justify-center disabled:opacity-40"
+                  aria-label="Increase days"
+                >
+                  +
+                </button>
+              </div>
+
               <button
                 type="button"
                 onClick={handleDownloadDocx}
@@ -231,7 +260,7 @@ export default function BillModal({
                 title="Print Tax Invoice (A4 Size)"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span>Print / Save as PDF (1 Page)</span>
+                <span>Print / Save as PDF</span>
               </button>
 
               <button
@@ -335,7 +364,7 @@ export default function BillModal({
                   </p>
                   <p>
                     <span className="text-slate-500">Rental Duration:</span>{" "}
-                    <strong className="font-mono text-amber-800 font-bold">{days} Exhibition Days</strong>
+                    <strong className="font-mono text-amber-800 font-bold">{currentDays} Exhibition {currentDays === 1 ? 'Day' : 'Days'}</strong>
                   </p>
                   <p className="text-slate-600">
                     <span className="text-slate-500">Venue:</span>{" "}
@@ -368,7 +397,7 @@ export default function BillModal({
                   ) : (
                     items.map((item, idx) => {
                       const rate = item.rateInr || item.rate_inr || 0;
-                      const lineTotal = rate * item.quantity * days;
+                      const lineTotal = rate * item.quantity * currentDays;
                       return (
                         <tr
                           key={item.id || idx}
@@ -396,7 +425,7 @@ export default function BillModal({
                             ₹{rate.toLocaleString("en-IN")}
                           </td>
                           <td className="py-1.5 px-2.5 text-center font-mono font-medium text-slate-700">
-                            {days}
+                            {currentDays}
                           </td>
                           <td className="py-1.5 px-2.5 text-center font-mono font-bold text-slate-900">
                             {item.quantity}
@@ -441,7 +470,7 @@ export default function BillModal({
               {/* Tax Computation Table */}
               <div className="w-full sm:w-72 bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1.5 font-mono text-[11px] shadow-xs shrink-0">
                 <div className="flex justify-between text-slate-700">
-                  <span>Subtotal ({days} Days):</span>
+                  <span>Subtotal ({currentDays} {currentDays === 1 ? 'Day' : 'Days'}):</span>
                   <span className="font-bold text-slate-900">₹{subtotal.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="flex justify-between text-slate-600 text-[10px]">
