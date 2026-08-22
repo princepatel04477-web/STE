@@ -13,6 +13,7 @@ export async function GET() {
         owner_badges,
         sales_badges,
         support_badges,
+        badge_names_json,
         updated_at as order_updated
       FROM exhibitor_orders
     `).all() as Array<{
@@ -22,6 +23,7 @@ export async function GET() {
       owner_badges?: number;
       sales_badges?: number;
       support_badges?: number;
+      badge_names_json?: string | null;
       order_updated: string | null;
     }>;
 
@@ -99,6 +101,13 @@ export async function GET() {
       const sBadges = Number(order?.sales_badges ?? 0);
       const supBadges = Number(order?.support_badges ?? 0);
 
+      let badgeNames = { owner: [] as string[], sales: [] as string[], support: [] as string[] };
+      if (order && order.badge_names_json) {
+        try {
+          badgeNames = JSON.parse(order.badge_names_json);
+        } catch {}
+      }
+
       totalOwnerBadges += oBadges;
       totalSalesBadges += sBadges;
       totalSupportBadges += supBadges;
@@ -114,6 +123,7 @@ export async function GET() {
         owner_badges: oBadges,
         sales_badges: sBadges,
         support_badges: supBadges,
+        badge_names: badgeNames,
         last_updated: order?.order_updated || dbEx?.updated_at || new Date().toISOString()
       });
     });

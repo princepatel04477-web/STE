@@ -7,6 +7,11 @@ export interface SyncPayload {
   owner_badges?: number;
   sales_badges?: number;
   support_badges?: number;
+  badge_names?: {
+    owner?: string[];
+    sales?: string[];
+    support?: string[];
+  };
   updated_at?: string;
 }
 
@@ -43,6 +48,10 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
       ? new Date(payload.updated_at).toLocaleString()
       : new Date().toLocaleString();
 
+    const ownerNamesStr = (payload.badge_names?.owner || []).filter(Boolean).join(', ');
+    const salesNamesStr = (payload.badge_names?.sales || []).filter(Boolean).join(', ');
+    const supportNamesStr = (payload.badge_names?.support || []).filter(Boolean).join(', ');
+
     const bodyData = {
       timestamp,
       mobile: payload.mobile,
@@ -63,8 +72,11 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
       brochure_stand: itemMap['brochure-stand'] || 0,
       // Exhibitor Entry Badges
       owner_badges: payload.owner_badges || 0,
+      owner_badge_names: ownerNamesStr,
       sales_badges: payload.sales_badges || 0,
+      sales_badge_names: salesNamesStr,
       support_badges: payload.support_badges || 0,
+      support_badge_names: supportNamesStr,
       // Summary & Notes
       items_summary: formattedItemsSummary,
       special_notes: payload.special_notes || ''

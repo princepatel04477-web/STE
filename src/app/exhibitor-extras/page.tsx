@@ -6,6 +6,7 @@ import RateTable from "@/components/extras/RateTable";
 import EstimateBuilder from "@/components/extras/EstimateBuilder";
 import Disclaimers from "@/components/extras/Disclaimers";
 import { EXTRAS_RATES } from "@/data/extras-rates";
+import { Download, FileText } from "lucide-react";
 
 export const metadata = {
   title: "Exhibitor Extras & Rentals — Rates | STE 2026 Surat",
@@ -46,6 +47,25 @@ export default function ExhibitorExtrasPage() {
           <p className="text-sm sm:text-base text-neutral-400 leading-relaxed font-sans">
             Transparent per-day pricing for additional booth furniture, display fixtures, audio-visual gear, and electrical connections for STE 2026 Surat.
           </p>
+
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="/downloads/STE_Extra_Items_Rate_Card_and_Order_Form.docx"
+              download="STE_Extra_Items_Official_Catalogue_2026.docx"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download Official Docs (.docx)</span>
+            </a>
+
+            <a
+              href="#estimate-builder"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white font-semibold text-xs uppercase tracking-wider transition-all"
+            >
+              <FileText className="w-4 h-4 text-amber-400" />
+              <span>Generate Tax Bill / Estimate</span>
+            </a>
+          </div>
         </div>
 
         {/* Server Rendered Rate Table */}

@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getStallPackageBySqft, STALL_PACKAGES, StallPackage } from '@/data/stallPackages';
 import { getProductImage, DISCLAIMER_TEXT } from '@/data/productImages';
+import BillModal from '@/components/extras/BillModal';
 import {
   Building2,
   Phone,
@@ -35,7 +36,8 @@ import {
   Radio,
   Tv,
   Check,
-  X
+  X,
+  FileText
 } from 'lucide-react';
 
 interface Product {
@@ -80,11 +82,15 @@ export default function ExhibitorDashboardPage() {
   const [extrasSaving, setExtrasSaving] = useState(false);
   const [extrasSuccessMsg, setExtrasSuccessMsg] = useState('');
   const [lastSubmittedAt, setLastSubmittedAt] = useState<string | null>(null);
+  const [showBillModal, setShowBillModal] = useState(false);
 
-  // Exhibitor Entry Badges State (Owner, Sales Staff, Support Staff)
+  // Exhibitor Entry Badges State (Owner, Sales Staff, Support Staff & Names)
   const [ownerBadges, setOwnerBadges] = useState<number>(1);
   const [salesBadges, setSalesBadges] = useState<number>(0);
   const [supportBadges, setSupportBadges] = useState<number>(0);
+  const [ownerBadgeNames, setOwnerBadgeNames] = useState<string[]>(['']);
+  const [salesBadgeNames, setSalesBadgeNames] = useState<string[]>([]);
+  const [supportBadgeNames, setSupportBadgeNames] = useState<string[]>([]);
 
   // General Loading & Auth check
   const [initialLoading, setInitialLoading] = useState(true);
@@ -92,6 +98,36 @@ export default function ExhibitorDashboardPage() {
   useEffect(() => {
     fetchInitialData();
   }, []);
+
+  const handleOwnerBadgesChange = (count: number) => {
+    const val = Math.min(5, Math.max(0, count));
+    setOwnerBadges(val);
+    setOwnerBadgeNames((prev) => {
+      const copy = [...prev];
+      while (copy.length < val) copy.push('');
+      return copy.slice(0, val);
+    });
+  };
+
+  const handleSalesBadgesChange = (count: number) => {
+    const val = Math.min(5, Math.max(0, count));
+    setSalesBadges(val);
+    setSalesBadgeNames((prev) => {
+      const copy = [...prev];
+      while (copy.length < val) copy.push('');
+      return copy.slice(0, val);
+    });
+  };
+
+  const handleSupportBadgesChange = (count: number) => {
+    const val = Math.min(5, Math.max(0, count));
+    setSupportBadges(val);
+    setSupportBadgeNames((prev) => {
+      const copy = [...prev];
+      while (copy.length < val) copy.push('');
+      return copy.slice(0, val);
+    });
+  };
 
   const fetchInitialData = async () => {
     try {
@@ -136,9 +172,36 @@ export default function ExhibitorDashboardPage() {
         }
         setQuantities(qMap);
         setSpecialNotes(catData.existingOrder.special_notes || '');
-        setOwnerBadges(catData.existingOrder.owner_badges ?? 1);
-        setSalesBadges(catData.existingOrder.sales_badges ?? 0);
-        setSupportBadges(catData.existingOrder.support_badges ?? 0);
+        const oCount = catData.existingOrder.owner_badges ?? 1;
+        const sCount = catData.existingOrder.sales_badges ?? 0;
+        const supCount = catData.existingOrder.support_badges ?? 0;
+        setOwnerBadges(oCount);
+        setSalesBadges(sCount);
+        setSupportBadges(supCount);
+
+        if (catData.existingOrder.badge_names) {
+          const bn = catData.existingOrder.badge_names;
+          if (Array.isArray(bn.owner)) {
+            const arr = [...bn.owner];
+            while (arr.length < oCount) arr.push('');
+            setOwnerBadgeNames(arr.slice(0, oCount));
+          }
+          if (Array.isArray(bn.sales)) {
+            const arr = [...bn.sales];
+            while (arr.length < sCount) arr.push('');
+            setSalesBadgeNames(arr.slice(0, sCount));
+          }
+          if (Array.isArray(bn.support)) {
+            const arr = [...bn.support];
+            while (arr.length < supCount) arr.push('');
+            setSupportBadgeNames(arr.slice(0, supCount));
+          }
+        } else {
+          setOwnerBadgeNames(Array(oCount).fill(''));
+          setSalesBadgeNames(Array(sCount).fill(''));
+          setSupportBadgeNames(Array(supCount).fill(''));
+        }
+
         setLastSubmittedAt(catData.existingOrder.updated_at || null);
       }
     } catch (err) {
@@ -217,7 +280,12 @@ export default function ExhibitorDashboardPage() {
           special_notes: specialNotes,
           owner_badges: ownerBadges,
           sales_badges: salesBadges,
-          support_badges: supportBadges
+          support_badges: supportBadges,
+          badge_names: {
+            owner: ownerBadgeNames.slice(0, ownerBadges),
+            sales: salesBadgeNames.slice(0, salesBadges),
+            support: supportBadgeNames.slice(0, supportBadges)
+          }
         })
       });
 
@@ -577,105 +645,192 @@ export default function ExhibitorDashboardPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* For Owner */}
-            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
-                    <Crown className="w-4 h-4" />
+            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
+                      <Crown className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">For Owner</h3>
+                      <p className="text-[11px] text-slate-500">Directors / Stall Owners</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">For Owner</h3>
-                    <p className="text-[11px] text-slate-500">Directors / Stall Owners</p>
-                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
+                <p className="text-xs text-slate-600 mb-4">Official VIP exhibitor badge with full access to hall & VIP lounge</p>
+                <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => handleOwnerBadgesChange(ownerBadges - 1)}
+                    className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
+                  >
+                    -
+                  </button>
+                  <span className="text-base font-extrabold text-amber-700">{ownerBadges}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleOwnerBadgesChange(ownerBadges + 1)}
+                    className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-              <p className="text-xs text-slate-600 mb-4">Official VIP exhibitor badge with full access to hall & VIP lounge</p>
-              <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5">
-                <button
-                  type="button"
-                  onClick={() => setOwnerBadges(Math.max(0, ownerBadges - 1))}
-                  className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
-                >
-                  -
-                </button>
-                <span className="text-base font-extrabold text-amber-700">{ownerBadges}</span>
-                <button
-                  type="button"
-                  onClick={() => setOwnerBadges(Math.min(5, ownerBadges + 1))}
-                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
-                >
-                  +
-                </button>
-              </div>
+
+              {/* Owner Badge Holder Names */}
+              {ownerBadges > 0 && (
+                <div className="pt-3 border-t border-slate-200 space-y-2 mt-2">
+                  <span className="text-[11px] font-bold text-slate-700 block uppercase tracking-wide">
+                    Owner Name(s) to be printed:
+                  </span>
+                  {Array.from({ length: ownerBadges }).map((_, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 shrink-0">
+                        #{idx + 1}
+                      </span>
+                      <input
+                        type="text"
+                        placeholder={`Owner / Director Full Name ${idx + 1}`}
+                        value={ownerBadgeNames[idx] || ''}
+                        onChange={(e) => {
+                          const copy = [...ownerBadgeNames];
+                          copy[idx] = e.target.value;
+                          setOwnerBadgeNames(copy);
+                        }}
+                        className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* For Sales Staff */}
-            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
-                    <Users className="w-4 h-4" />
+            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">For Sales Staff</h3>
+                      <p className="text-[11px] text-slate-500">Sales Team & Executives</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">For Sales Staff</h3>
-                    <p className="text-[11px] text-slate-500">Sales Team & Executives</p>
-                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
+                <p className="text-xs text-slate-600 mb-4">Exhibitor floor badges for your active sales team inside booth</p>
+                <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => handleSalesBadgesChange(salesBadges - 1)}
+                    className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
+                  >
+                    -
+                  </button>
+                  <span className="text-base font-extrabold text-amber-700">{salesBadges}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleSalesBadgesChange(salesBadges + 1)}
+                    className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-              <p className="text-xs text-slate-600 mb-4">Exhibitor floor badges for your active sales team inside booth</p>
-              <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5">
-                <button
-                  type="button"
-                  onClick={() => setSalesBadges(Math.max(0, salesBadges - 1))}
-                  className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
-                >
-                  -
-                </button>
-                <span className="text-base font-extrabold text-amber-700">{salesBadges}</span>
-                <button
-                  type="button"
-                  onClick={() => setSalesBadges(Math.min(5, salesBadges + 1))}
-                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
-                >
-                  +
-                </button>
-              </div>
+
+              {/* Sales Badge Holder Names */}
+              {salesBadges > 0 && (
+                <div className="pt-3 border-t border-slate-200 space-y-2 mt-2">
+                  <span className="text-[11px] font-bold text-slate-700 block uppercase tracking-wide">
+                    Sales Person Name(s):
+                  </span>
+                  {Array.from({ length: salesBadges }).map((_, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-200 px-1.5 py-0.5 rounded border border-slate-300 shrink-0">
+                        #{idx + 1}
+                      </span>
+                      <input
+                        type="text"
+                        placeholder={`Sales Staff Full Name ${idx + 1}`}
+                        value={salesBadgeNames[idx] || ''}
+                        onChange={(e) => {
+                          const copy = [...salesBadgeNames];
+                          copy[idx] = e.target.value;
+                          setSalesBadgeNames(copy);
+                        }}
+                        className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* For Support Staff */}
-            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
-                    <Wrench className="w-4 h-4" />
+            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
+                      <Wrench className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">For Support Staff</h3>
+                      <p className="text-[11px] text-slate-500">Setup & Technical Team</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">For Support Staff</h3>
-                    <p className="text-[11px] text-slate-500">Setup & Technical Team</p>
-                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
+                <p className="text-xs text-slate-600 mb-4">Work passes for booth setup, technical maintenance & logistics staff</p>
+                <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => handleSupportBadgesChange(supportBadges - 1)}
+                    className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
+                  >
+                    -
+                  </button>
+                  <span className="text-base font-extrabold text-amber-700">{supportBadges}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleSupportBadgesChange(supportBadges + 1)}
+                    className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-              <p className="text-xs text-slate-600 mb-4">Work passes for booth setup, technical maintenance & logistics staff</p>
-              <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5">
-                <button
-                  type="button"
-                  onClick={() => setSupportBadges(Math.max(0, supportBadges - 1))}
-                  className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
-                >
-                  -
-                </button>
-                <span className="text-base font-extrabold text-amber-700">{supportBadges}</span>
-                <button
-                  type="button"
-                  onClick={() => setSupportBadges(Math.min(5, supportBadges + 1))}
-                  className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
-                >
-                  +
-                </button>
-              </div>
+
+              {/* Support Badge Holder Names */}
+              {supportBadges > 0 && (
+                <div className="pt-3 border-t border-slate-200 space-y-2 mt-2">
+                  <span className="text-[11px] font-bold text-slate-700 block uppercase tracking-wide">
+                    Support Person Name(s):
+                  </span>
+                  {Array.from({ length: supportBadges }).map((_, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-200 px-1.5 py-0.5 rounded border border-slate-300 shrink-0">
+                        #{idx + 1}
+                      </span>
+                      <input
+                        type="text"
+                        placeholder={`Support Staff Full Name ${idx + 1}`}
+                        value={supportBadgeNames[idx] || ''}
+                        onChange={(e) => {
+                          const copy = [...supportBadgeNames];
+                          copy[idx] = e.target.value;
+                          setSupportBadgeNames(copy);
+                        }}
+                        className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -869,11 +1024,24 @@ export default function ExhibitorDashboardPage() {
 
         {/* Section 3: Summary of Submitted Requirements */}
         <section className="bg-slate-100/80 border border-slate-200 rounded-2xl p-6 lg:p-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-slate-200 text-slate-700">
-              <Layers className="w-4 h-4" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-slate-200 text-slate-700">
+                <Layers className="w-4 h-4" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">Submitted Summary Overview</h3>
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Submitted Summary Overview</h3>
+
+            {totalSelectedItemsCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowBillModal(true)}
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider shadow-sm flex items-center gap-1.5 transition-all self-start sm:self-center"
+              >
+                <FileText className="w-4 h-4" />
+                <span>View / Print Official Tax Invoice Bill</span>
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -896,6 +1064,58 @@ export default function ExhibitorDashboardPage() {
               <p className="text-base font-bold text-emerald-700 mt-1">{totalSelectedItemsCount} item(s)</p>
             </div>
           </div>
+
+          {/* Badges Breakdown Summary */}
+          {(ownerBadges > 0 || salesBadges > 0 || supportBadges > 0) && (
+            <div className="mb-6 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-3">
+                Requested Badges ({ownerBadges + salesBadges + supportBadges} Total):
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {ownerBadges > 0 && (
+                  <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-lg text-xs">
+                    <div className="flex items-center justify-between font-bold text-amber-900 mb-1">
+                      <span>👑 Owner Badges:</span>
+                      <span>{ownerBadges}</span>
+                    </div>
+                    <ul className="text-[11px] text-slate-700 space-y-0.5 mt-1 list-disc list-inside">
+                      {ownerBadgeNames.slice(0, ownerBadges).map((n, i) => (
+                        <li key={i}>{n.trim() ? n : `Owner ${i + 1} (Name not set)`}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {salesBadges > 0 && (
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                    <div className="flex items-center justify-between font-bold text-slate-900 mb-1">
+                      <span>👥 Sales Staff:</span>
+                      <span>{salesBadges}</span>
+                    </div>
+                    <ul className="text-[11px] text-slate-700 space-y-0.5 mt-1 list-disc list-inside">
+                      {salesBadgeNames.slice(0, salesBadges).map((n, i) => (
+                        <li key={i}>{n.trim() ? n : `Sales Staff ${i + 1} (Name not set)`}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {supportBadges > 0 && (
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                    <div className="flex items-center justify-between font-bold text-slate-900 mb-1">
+                      <span>🔧 Support Staff:</span>
+                      <span>{supportBadges}</span>
+                    </div>
+                    <ul className="text-[11px] text-slate-700 space-y-0.5 mt-1 list-disc list-inside">
+                      {supportBadgeNames.slice(0, supportBadges).map((n, i) => (
+                        <li key={i}>{n.trim() ? n : `Support Staff ${i + 1} (Name not set)`}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {totalSelectedItemsCount > 0 && (
             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
@@ -940,6 +1160,17 @@ export default function ExhibitorDashboardPage() {
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">
+            {totalSelectedItemsCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowBillModal(true)}
+                className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-900 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-xs"
+              >
+                <FileText className="w-4 h-4 text-amber-700" />
+                <span>View Bill</span>
+              </button>
+            )}
+
             <button
               onClick={handleSaveExtras}
               disabled={extrasSaving}
@@ -951,6 +1182,24 @@ export default function ExhibitorDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Official Tax Invoice / Bill Modal */}
+      <BillModal
+        isOpen={showBillModal}
+        onClose={() => setShowBillModal(false)}
+        brandName={brandName || "Registered Exhibitor"}
+        mobile={mobile}
+        stallSqft={selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : '200 sq ft') : `${selectedSqftOption} sq ft`}
+        days={3}
+        items={products
+          .filter((p) => (quantities[p.id] || 0) > 0)
+          .map((p) => ({
+            id: p.id,
+            name: p.name,
+            rateInr: p.rate_inr || 0,
+            quantity: quantities[p.id],
+          }))}
+      />
     </div>
   );
 }

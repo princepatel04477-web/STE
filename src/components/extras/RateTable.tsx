@@ -63,7 +63,16 @@ export default function RateTable({ items = EXTRAS_RATES }: RateTableProps) {
                               />
                             </div>
                           ) : null}
-                          <span className="group-hover:text-amber-400 transition-colors">{item.name}</span>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              {item.code && (
+                                <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-mono font-bold">
+                                  {item.code}
+                                </span>
+                              )}
+                              <span className="group-hover:text-amber-400 transition-colors font-bold">{item.name}</span>
+                            </div>
+                          </div>
                         </div>
                       </th>
                       <td className="py-4 px-6 text-neutral-400 font-mono text-xs">
@@ -104,7 +113,14 @@ export default function RateTable({ items = EXTRAS_RATES }: RateTableProps) {
                         </div>
                       ) : null}
                       <div>
-                        <h4 className="font-bold text-white text-base leading-snug">{item.name}</h4>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          {item.code && (
+                            <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-mono font-bold">
+                              {item.code}
+                            </span>
+                          )}
+                          <h4 className="font-bold text-white text-sm leading-snug">{item.name}</h4>
+                        </div>
                         <p className="text-xs font-mono text-neutral-400 mt-0.5">
                           {item.spec ? item.spec : "—"}
                         </p>

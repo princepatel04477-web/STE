@@ -71,7 +71,7 @@ interface Schema {
   allowed_exhibitors: Array<{ id: number; mobile: string; notes: string; created_at: string }>;
   exhibitors: Array<{ id: number; mobile: string; brand_name: string; stall_sqft: string; custom_password?: string; updated_at: string }>;
   extra_products: Array<{ id: string; name: string; category: string; description: string; unit: string; rate_inr?: number; icon_name: string; is_active: number }>;
-  exhibitor_orders: Array<{ id: number; mobile: string; items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; updated_at: string }>;
+  exhibitor_orders: Array<{ id: number; mobile: string; items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string; updated_at: string }>;
 }
 
 const defaultProducts = [
@@ -212,6 +212,7 @@ export const db = {
               owner_badges: order ? (order.owner_badges ?? 0) : 0,
               sales_badges: order ? (order.sales_badges ?? 0) : 0,
               support_badges: order ? (order.support_badges ?? 0) : 0,
+              badge_names_json: order ? (order.badge_names_json ?? null) : null,
               order_updated: order ? order.updated_at : null
             };
           });
@@ -302,7 +303,8 @@ export const db = {
           const owner_badges = Number(args[2] ?? 0);
           const sales_badges = Number(args[3] ?? 0);
           const support_badges = Number(args[4] ?? 0);
-          const mobile = String(args[5] || args[0]);
+          const badge_names_json = typeof args[5] === 'string' ? args[5] : (typeof args[6] === 'string' ? args[6] : '');
+          const mobile = String(args[6] || args[5] || args[0]);
           const order = data.exhibitor_orders.find(o => o.mobile === mobile);
           if (order) {
             order.items_json = items_json;
@@ -310,6 +312,7 @@ export const db = {
             order.owner_badges = owner_badges;
             order.sales_badges = sales_badges;
             order.support_badges = support_badges;
+            if (badge_names_json) order.badge_names_json = badge_names_json;
             order.updated_at = new Date().toISOString();
           } else {
             data.exhibitor_orders.push({
@@ -320,6 +323,7 @@ export const db = {
               owner_badges,
               sales_badges,
               support_badges,
+              badge_names_json: badge_names_json || undefined,
               updated_at: new Date().toISOString()
             });
           }
@@ -334,6 +338,7 @@ export const db = {
           const owner_badges = Number(args[3] ?? 0);
           const sales_badges = Number(args[4] ?? 0);
           const support_badges = Number(args[5] ?? 0);
+          const badge_names_json = typeof args[6] === 'string' ? args[6] : undefined;
           const existing = data.exhibitor_orders.find(o => o.mobile === mobile);
           if (existing) {
             existing.items_json = items_json;
@@ -341,6 +346,7 @@ export const db = {
             existing.owner_badges = owner_badges;
             existing.sales_badges = sales_badges;
             existing.support_badges = support_badges;
+            if (badge_names_json) existing.badge_names_json = badge_names_json;
             existing.updated_at = new Date().toISOString();
           } else {
             data.exhibitor_orders.push({
@@ -351,6 +357,7 @@ export const db = {
               owner_badges,
               sales_badges,
               support_badges,
+              badge_names_json,
               updated_at: new Date().toISOString()
             });
           }

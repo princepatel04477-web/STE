@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Minus, Calculator, Send, Copy, Check, MessageSquare, Sparkles, X } from "lucide-react";
+import { Plus, Minus, Calculator, Send, Copy, Check, MessageSquare, Sparkles, X, FileText, Printer } from "lucide-react";
 import { EXTRAS_RATES, GST_RATE, formatInr, ExtraCategory, CATEGORY_LABELS } from "@/data/extras-rates";
+import BillModal from "./BillModal";
+import { STE_COMPANY_DETAILS } from "@/data/company-details";
 
 const CATEGORY_ORDER: ExtraCategory[] = ["furniture", "display-av", "electrical"];
 
@@ -10,6 +12,7 @@ export default function EstimateBuilder() {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [days, setDays] = useState<number>(3); // Default 3 days
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showBillModal, setShowBillModal] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [mobileNumber, setMobileNumber] = useState<string>("");
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -52,17 +55,26 @@ export default function EstimateBuilder() {
     const lines = selectedItems.map((item) => {
       const qty = quantities[item.id];
       const lineTotal = item.rateInr * qty * days;
-      return `${qty} × ${item.name} (${days} day${days > 1 ? "s" : ""}) — ${formatInr(lineTotal)}`;
+      return `${qty} × [${item.code}] ${item.name} (${days} day${days > 1 ? "s" : ""}) — ${formatInr(lineTotal)}`;
     });
 
     return [
-      "📋 STE 2026 EXHIBITOR EXTRAS REQUEST",
+      `🏛️ ${STE_COMPANY_DETAILS.name.toUpperCase()}`,
+      `Address: ${STE_COMPANY_DETAILS.address}`,
+      `Phone: ${STE_COMPANY_DETAILS.phone} | GSTIN: ${STE_COMPANY_DETAILS.gstin}`,
+      `------------------------------------`,
+      "📋 EXHIBITOR EXTRAS ESTIMATE",
       "------------------------------------",
       ...lines,
       "------------------------------------",
       `Subtotal (${days} days): ${formatInr(subtotal)}`,
       `GST @ 18%: ${formatInr(gstAmount)}`,
-      `Grand Total: ${formatInr(grandTotal)}`,
+      `Grand Total (Incl. GST): ${formatInr(grandTotal)}`,
+      "------------------------------------",
+      "🏦 COMPANY BANK DETAILS FOR PAYMENT:",
+      `A/C NAME: ${STE_COMPANY_DETAILS.bankDetails.accountName}`,
+      `A/C NO: ${STE_COMPANY_DETAILS.bankDetails.accountNumber}`,
+      `IFSC CODE: ${STE_COMPANY_DETAILS.bankDetails.ifscCode}`,
     ].join("\n");
   };
 
@@ -301,20 +313,29 @@ export default function EstimateBuilder() {
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <button
                 type="button"
-                onClick={() => setShowModal(true)}
-                className="w-full sm:flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+                onClick={() => setShowBillModal(true)}
+                className="w-full sm:flex-1 py-3.5 px-5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
               >
-                <Send className="w-4 h-4" />
-                <span>Request This List</span>
+                <FileText className="w-4 h-4" />
+                <span>Generate Official Bill / Tax Invoice</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowModal(true)}
+                className="w-full sm:w-auto py-3.5 px-6 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs uppercase tracking-wider border border-neutral-700 transition-all flex items-center justify-center gap-2"
+              >
+                <Send className="w-4 h-4 text-amber-400" />
+                <span>Submit Request</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleCopySummary}
-                className="w-full sm:w-auto py-3.5 px-5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white font-semibold text-xs transition-all flex items-center justify-center gap-2"
+                className="w-full sm:w-auto py-3.5 px-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 font-semibold text-xs transition-all flex items-center justify-center gap-2"
               >
                 {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                <span>{copied ? "Copied List!" : "Copy List"}</span>
+                <span>{copied ? "Copied!" : "Copy"}</span>
               </button>
             </div>
           </div>
@@ -326,26 +347,56 @@ export default function EstimateBuilder() {
       </div>
 
       {/* Sticky Mobile Summary Bar (<768px) */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-neutral-950/95 backdrop-blur-md border-t border-amber-500/30 p-4 shadow-2xl">
-        <div className="flex items-center justify-between gap-3">
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-neutral-950/95 backdrop-blur-md border-t border-amber-500/30 p-3.5 shadow-2xl">
+        <div className="flex items-center justify-between gap-2">
           <div>
             <span className="text-[10px] uppercase font-bold text-neutral-400 block">Grand Total (GST Incl.)</span>
-            <span className="text-lg font-black text-amber-400 font-mono">
+            <span className="text-base font-black text-amber-400 font-mono">
               {formatInr(grandTotal)}
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowModal(true)}
-            disabled={selectedItems.length === 0}
-            className="py-2.5 px-5 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-neutral-950 font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-2"
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span>Request List</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowBillModal(true)}
+              disabled={selectedItems.length === 0}
+              className="py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-neutral-950 font-bold text-xs uppercase tracking-wider shadow-md flex items-center gap-1.5"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Bill</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowModal(true)}
+              disabled={selectedItems.length === 0}
+              className="py-2.5 px-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider border border-neutral-700 shadow-md flex items-center gap-1.5"
+            >
+              <Send className="w-3.5 h-3.5 text-amber-400" />
+              <span>Request</span>
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Official Tax Invoice / Bill Modal */}
+      <BillModal
+        isOpen={showBillModal}
+        onClose={() => setShowBillModal(false)}
+        brandName="Valued Exhibitor"
+        mobile={mobileNumber || "9950787787"}
+        stallSqft="200 sq ft"
+        days={days}
+        items={selectedItems.map((it) => ({
+          id: it.id,
+          code: it.code,
+          name: it.name,
+          spec: it.spec,
+          rateInr: it.rateInr,
+          quantity: quantities[it.id] || 0,
+        }))}
+      />
 
       {/* Handoff Modal */}
       {showModal && (

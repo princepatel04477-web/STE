@@ -5,7 +5,9 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store, LogOut } from 'lucide-react';
+import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store, LogOut, Printer } from 'lucide-react';
+import BillModal from '@/components/extras/BillModal';
+import { EXTRAS_RATES } from '@/data/extras-rates';
 
 interface ExhibitorItem {
   id: string;
@@ -31,6 +33,11 @@ interface ExhibitorRecord {
   owner_badges?: number;
   sales_badges?: number;
   support_badges?: number;
+  badge_names?: {
+    owner?: string[];
+    sales?: string[];
+    support?: string[];
+  };
   last_updated: string;
 }
 
@@ -49,6 +56,7 @@ export default function AdminExhibitorsPage() {
   const [totalSupportBadges, setTotalSupportBadges] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedExhibitorForBill, setSelectedExhibitorForBill] = useState<ExhibitorRecord | null>(null);
 
   useEffect(() => {
     fetchExhibitors();
@@ -80,24 +88,50 @@ export default function AdminExhibitorsPage() {
 
   const filteredExhibitors = exhibitors.filter((ex) => {
     const q = searchQuery.toLowerCase();
+    const ownerNames = (ex.badge_names?.owner || []).join(' ').toLowerCase();
+    const salesNames = (ex.badge_names?.sales || []).join(' ').toLowerCase();
+    const supportNames = (ex.badge_names?.support || []).join(' ').toLowerCase();
     return (
       ex.brand_name.toLowerCase().includes(q) ||
       ex.mobile.includes(q) ||
-      ex.stall_sqft.toLowerCase().includes(q)
+      ex.stall_sqft.toLowerCase().includes(q) ||
+      ownerNames.includes(q) ||
+      salesNames.includes(q) ||
+      supportNames.includes(q)
     );
   });
 
   const exportCSV = () => {
-    const headers = ['Mobile Number', 'Brand Name', 'Stall Size (Sq Ft)', 'Owner Badges', 'Sales Staff Badges', 'Support Staff Badges', 'Extras Requested', 'Special Notes', 'Last Updated'];
+    const headers = [
+      'Mobile Number',
+      'Brand Name',
+      'Stall Size (Sq Ft)',
+      'Owner Badges Count',
+      'Owner Badge Names',
+      'Sales Badges Count',
+      'Sales Badge Names',
+      'Support Badges Count',
+      'Support Badge Names',
+      'Extras Requested',
+      'Special Notes',
+      'Last Updated'
+    ];
     const rows = filteredExhibitors.map((ex) => {
       const extrasStr = ex.items.map((i) => `${i.name} x${i.quantity}`).join('; ');
+      const ownerNamesStr = (ex.badge_names?.owner || []).filter(Boolean).join(', ');
+      const salesNamesStr = (ex.badge_names?.sales || []).filter(Boolean).join(', ');
+      const supportNamesStr = (ex.badge_names?.support || []).filter(Boolean).join(', ');
+
       return [
         `"${ex.mobile}"`,
         `"${ex.brand_name.replace(/"/g, '""')}"`,
         `"${ex.stall_sqft.replace(/"/g, '""')}"`,
         `"${ex.owner_badges || 0}"`,
+        `"${ownerNamesStr.replace(/"/g, '""')}"`,
         `"${ex.sales_badges || 0}"`,
+        `"${salesNamesStr.replace(/"/g, '""')}"`,
         `"${ex.support_badges || 0}"`,
+        `"${supportNamesStr.replace(/"/g, '""')}"`,
         `"${extrasStr.replace(/"/g, '""')}"`,
         `"${(ex.special_notes || '').replace(/"/g, '""')}"`,
         `"${ex.last_updated || ''}"`
@@ -341,6 +375,7 @@ export default function AdminExhibitorsPage() {
                       <th className="py-3.5 px-4">Requested Extras</th>
                       <th className="py-3.5 px-4">Special Notes</th>
                       <th className="py-3.5 px-4">Last Updated</th>
+                      <th className="py-3.5 px-4 text-center">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -357,11 +392,32 @@ export default function AdminExhibitorsPage() {
                             {ex.stall_sqft}
                           </span>
                         </td>
-                        <td className="py-4 px-4 whitespace-nowrap">
-                          <div className="flex flex-col gap-1 text-[11px]">
-                            <span className="text-amber-800 font-bold">👑 Owner: <strong className="text-slate-900 font-mono">{ex.owner_badges || 0}</strong></span>
-                            <span className="text-slate-700 font-semibold">👥 Sales: <strong className="text-slate-900 font-mono">{ex.sales_badges || 0}</strong></span>
-                            <span className="text-slate-600 font-medium">🛠️ Support: <strong className="text-slate-900 font-mono">{ex.support_badges || 0}</strong></span>
+                        <td className="py-4 px-4 min-w-[200px]">
+                          <div className="flex flex-col gap-1.5 text-[11px]">
+                            <div>
+                              <span className="text-amber-800 font-bold">👑 Owner: <strong className="text-slate-900 font-mono">{ex.owner_badges || 0}</strong></span>
+                              {ex.badge_names?.owner && ex.badge_names.owner.filter(Boolean).length > 0 && (
+                                <p className="text-[10px] text-slate-600 font-medium truncate max-w-[200px]">
+                                  {ex.badge_names.owner.filter(Boolean).join(', ')}
+                                </p>
+                              )}
+                            </div>
+                            <div>
+                              <span className="text-slate-700 font-semibold">👥 Sales: <strong className="text-slate-900 font-mono">{ex.sales_badges || 0}</strong></span>
+                              {ex.badge_names?.sales && ex.badge_names.sales.filter(Boolean).length > 0 && (
+                                <p className="text-[10px] text-slate-600 font-medium truncate max-w-[200px]">
+                                  {ex.badge_names.sales.filter(Boolean).join(', ')}
+                                </p>
+                              )}
+                            </div>
+                            <div>
+                              <span className="text-slate-600 font-medium">🛠️ Support: <strong className="text-slate-900 font-mono">{ex.support_badges || 0}</strong></span>
+                              {ex.badge_names?.support && ex.badge_names.support.filter(Boolean).length > 0 && (
+                                <p className="text-[10px] text-slate-600 font-medium truncate max-w-[200px]">
+                                  {ex.badge_names.support.filter(Boolean).join(', ')}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </td>
                         <td className="py-4 px-4">
@@ -385,6 +441,17 @@ export default function AdminExhibitorsPage() {
                         <td className="py-4 px-4 text-slate-500 whitespace-nowrap text-xs">
                           {ex.last_updated ? new Date(ex.last_updated).toLocaleString() : '—'}
                         </td>
+                        <td className="py-4 px-4 text-center whitespace-nowrap">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedExhibitorForBill(ex)}
+                            className="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold text-[11px] transition-all flex items-center gap-1 mx-auto shadow-xs"
+                            title="Generate Official Tax Invoice / Bill"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-amber-800" />
+                            <span>Tax Bill</span>
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -395,6 +462,29 @@ export default function AdminExhibitorsPage() {
         </div>
 
       </main>
+
+      {/* Bill Modal for Selected Exhibitor */}
+      {selectedExhibitorForBill && (
+        <BillModal
+          isOpen={true}
+          onClose={() => setSelectedExhibitorForBill(null)}
+          brandName={selectedExhibitorForBill.brand_name || 'Registered Exhibitor'}
+          mobile={selectedExhibitorForBill.mobile}
+          stallSqft={selectedExhibitorForBill.stall_sqft || '200 sq ft'}
+          days={3}
+          items={selectedExhibitorForBill.items.map((it) => {
+            const master = EXTRAS_RATES.find((m) => m.id === it.id || m.name.toLowerCase() === it.name.toLowerCase());
+            return {
+              id: it.id,
+              code: master?.code || 'DP',
+              name: it.name,
+              spec: master?.spec || null,
+              rateInr: master?.rateInr || 600,
+              quantity: it.quantity,
+            };
+          })}
+        />
+      )}
     </div>
   );
 }

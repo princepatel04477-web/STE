@@ -16,8 +16,8 @@ export async function GET() {
       .all();
 
     const order = db
-      .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, updated_at FROM exhibitor_orders WHERE mobile = ?')
-      .get(session.mobile) as { items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; updated_at: string } | undefined;
+      .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json, updated_at FROM exhibitor_orders WHERE mobile = ?')
+      .get(session.mobile) as { items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string; updated_at: string } | undefined;
 
     let items = [];
     if (order && order.items_json) {
@@ -28,6 +28,13 @@ export async function GET() {
       }
     }
 
+    let badgeNames = { owner: [] as string[], sales: [] as string[], support: [] as string[] };
+    if (order && order.badge_names_json) {
+      try {
+        badgeNames = JSON.parse(order.badge_names_json);
+      } catch {}
+    }
+
     return NextResponse.json({
       products,
       existingOrder: {
@@ -36,6 +43,7 @@ export async function GET() {
         owner_badges: order?.owner_badges ?? 0,
         sales_badges: order?.sales_badges ?? 0,
         support_badges: order?.support_badges ?? 0,
+        badge_names: badgeNames,
         updated_at: order?.updated_at || null
       }
     });
@@ -53,7 +61,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { items, special_notes, owner_badges, sales_badges, support_badges } = body;
+    const { items, special_notes, owner_badges, sales_badges, support_badges, badge_names } = body;
 
     if (!Array.isArray(items)) {
       return NextResponse.json({ error: 'Invalid items payload' }, { status: 400 });
@@ -65,6 +73,7 @@ export async function POST(request: Request) {
     const oBadges = Math.min(5, Math.max(0, Number(owner_badges || 0)));
     const sBadges = Math.min(5, Math.max(0, Number(sales_badges || 0)));
     const supBadges = Math.min(5, Math.max(0, Number(support_badges || 0)));
+    const badgeNamesJson = badge_names ? JSON.stringify(badge_names) : '';
 
     const existing = db
       .prepare('SELECT id FROM exhibitor_orders WHERE mobile = ?')
@@ -72,12 +81,12 @@ export async function POST(request: Request) {
 
     if (existing) {
       db.prepare(
-        'UPDATE exhibitor_orders SET items_json = ?, special_notes = ?, owner_badges = ?, sales_badges = ?, support_badges = ? WHERE mobile = ?'
-      ).run(itemsJson, cleanNotes, oBadges, sBadges, supBadges, session.mobile);
+        'UPDATE exhibitor_orders SET items_json = ?, special_notes = ?, owner_badges = ?, sales_badges = ?, support_badges = ?, badge_names_json = ? WHERE mobile = ?'
+      ).run(itemsJson, cleanNotes, oBadges, sBadges, supBadges, badgeNamesJson, session.mobile);
     } else {
       db.prepare(
-        'INSERT INTO exhibitor_orders (mobile, items_json, special_notes, owner_badges, sales_badges, support_badges) VALUES (?, ?, ?, ?, ?, ?)'
-      ).run(session.mobile, itemsJson, cleanNotes, oBadges, sBadges, supBadges);
+        'INSERT INTO exhibitor_orders (mobile, items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      ).run(session.mobile, itemsJson, cleanNotes, oBadges, sBadges, supBadges, badgeNamesJson);
     }
 
     // Fetch exhibitor profile or fallback to master registered list
@@ -103,7 +112,8 @@ export async function POST(request: Request) {
         special_notes: cleanNotes,
         owner_badges: oBadges,
         sales_badges: sBadges,
-        support_badges: supBadges
+        support_badges: supBadges,
+        badge_names: badge_names || undefined
       });
     } catch (err) {
       console.error('Google Sheets background sync error:', err);

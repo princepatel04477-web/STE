@@ -37,6 +37,6 @@ next-env.d.ts
 
 .vercel
 
-# sqlite database
-data/
+# sqlite database & local data store
+/data/
 
