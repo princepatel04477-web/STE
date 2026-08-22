@@ -10,7 +10,7 @@ const CATEGORY_ORDER: ExtraCategory[] = ["furniture", "display-av", "electrical"
 
 export default function EstimateBuilder() {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [days, setDays] = useState<number>(3); // Default 3 days
+  const [days, setDays] = useState<number>(2); // Default 2 exhibition days
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showBillModal, setShowBillModal] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);

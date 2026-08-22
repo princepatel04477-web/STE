@@ -1394,7 +1394,7 @@ export default function ExhibitorDashboardPage() {
         mobile={mobile}
         stallSqft={selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : '200 sq ft') : `${selectedSqftOption} sq ft`}
         fasciaNames={fasciaNames}
-        days={3}
+        days={2}
         items={products
           .filter((p) => (quantities[p.id] || 0) > 0)
           .map((p) => ({

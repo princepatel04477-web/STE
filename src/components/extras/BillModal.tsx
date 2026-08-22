@@ -46,7 +46,7 @@ export default function BillModal({
   mobile = "",
   stallSqft = "200 sq ft",
   fasciaNames,
-  days = 3,
+  days = 2,
   items = [],
 }: BillModalProps) {
   const [copied, setCopied] = useState(false);

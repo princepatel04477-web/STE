@@ -496,7 +496,7 @@ export default function AdminExhibitorsPage() {
           mobile={selectedExhibitorForBill.mobile}
           stallSqft={selectedExhibitorForBill.stall_sqft || '200 sq ft'}
           fasciaNames={selectedExhibitorForBill.fascia_names}
-          days={3}
+          days={2}
           items={selectedExhibitorForBill.items.map((it) => {
             const master = EXTRAS_RATES.find((m) => m.id === it.id || m.name.toLowerCase() === it.name.toLowerCase());
             return {
