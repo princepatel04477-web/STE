@@ -10,7 +10,7 @@ const execFileAsync = promisify(execFile);
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { brand_name = 'Registered Exhibitor', mobile = '', stall_sqft = '200 sq ft', items = [], days = 3 } = body;
+    const { brand_name = 'Registered Exhibitor', mobile = '', stall_sqft = '200 sq ft', fascia_names = [], items = [], days = 3 } = body;
 
     const tmpDir = os.tmpdir();
     const randId = Math.random().toString(36).substring(2, 9);
@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       brand_name,
       mobile,
       stall_sqft,
+      fascia_names,
       days,
       date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
       invoice_no: `STE/INV/2026/${mobile ? mobile.slice(-4) : '0001'}`,

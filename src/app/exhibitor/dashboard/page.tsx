@@ -37,7 +37,8 @@ import {
   Tv,
   Check,
   X,
-  FileText
+  FileText,
+  Store
 } from 'lucide-react';
 
 interface Product {
@@ -70,6 +71,7 @@ export default function ExhibitorDashboardPage() {
   const [market, setMarket] = useState('');
   const [selectedSqftOption, setSelectedSqftOption] = useState<string>('200');
   const [customSqft, setCustomSqft] = useState<string>('');
+  const [fasciaNames, setFasciaNames] = useState<string[]>(['', '', '', '']);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccessMsg, setProfileSuccessMsg] = useState('');
   const [profileError, setProfileError] = useState('');
@@ -153,6 +155,17 @@ export default function ExhibitorDashboardPage() {
         setCustomSqft(existingSqft.replace(/^Other:\s*/i, ''));
       }
 
+      if (Array.isArray(profData.fascia_names)) {
+        setFasciaNames([
+          profData.fascia_names[0] || '',
+          profData.fascia_names[1] || '',
+          profData.fascia_names[2] || '',
+          profData.fascia_names[3] || ''
+        ]);
+      } else if (profData.brand_name) {
+        setFasciaNames([profData.brand_name, '', '', '']);
+      }
+
       // 2. Fetch Extras Catalog & existing order
       const catRes = await fetch('/api/exhibitor/extras');
       const catData = await catRes.json();
@@ -228,14 +241,18 @@ export default function ExhibitorDashboardPage() {
       const res = await fetch('/api/exhibitor/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brand_name: brandName, stall_sqft: finalSqft })
+        body: JSON.stringify({
+          brand_name: brandName,
+          stall_sqft: finalSqft,
+          fascia_names: fasciaNames
+        })
       });
 
       const data = await res.json();
       if (!res.ok) {
         setProfileError(data.error || 'Failed to save profile.');
       } else {
-        setProfileSuccessMsg('Stall details saved successfully!');
+        setProfileSuccessMsg('Stall and Fascia details saved successfully!');
         setTimeout(() => setProfileSuccessMsg(''), 4000);
       }
     } catch (err) {
@@ -467,6 +484,171 @@ export default function ExhibitorDashboardPage() {
                   ✓ Verified Exhibitor
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* Facia / Banner Name of Companies (4 Options) */}
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-amber-100 text-amber-900 border border-amber-300">
+                  <Store className="w-5 h-5 text-amber-800" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <span>Stall Facia & Banner Names</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-500 text-slate-950">
+                      4 Firm Name Options
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Enter up to 4 company / firm name options to be printed on your booth fascia board header and promotional banners
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 4 Firm Name Inputs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              {/* Option 1 */}
+              <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">1</span>
+                    <span>Option 1 (Primary Firm Name)</span>
+                  </label>
+                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">Main Header</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. Ambika Silk Mills (Main Company Name)"
+                  value={fasciaNames[0] || ''}
+                  onChange={(e) => {
+                    const copy = [...fasciaNames];
+                    copy[0] = e.target.value;
+                    setFasciaNames(copy);
+                  }}
+                  className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                />
+                <span className="text-[10px] text-slate-500 mt-1 block">Primary firm name printed in large bold on booth header</span>
+              </div>
+
+              {/* Option 2 */}
+              <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 text-[11px] font-black flex items-center justify-center">2</span>
+                    <span>Option 2 (Sister Concern / Associate)</span>
+                  </label>
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-700">Optional</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. Ambika Tex Fab (Sister Company Name)"
+                  value={fasciaNames[1] || ''}
+                  onChange={(e) => {
+                    const copy = [...fasciaNames];
+                    copy[1] = e.target.value;
+                    setFasciaNames(copy);
+                  }}
+                  className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                />
+                <span className="text-[10px] text-slate-500 mt-1 block">Sister concern or second brand name for fascia panel</span>
+              </div>
+
+              {/* Option 3 */}
+              <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 text-[11px] font-black flex items-center justify-center">3</span>
+                    <span>Option 3 (Group / Subsidiary Firm)</span>
+                  </label>
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-700">Optional</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. Ambika Digital Prints (Associate Group Name)"
+                  value={fasciaNames[2] || ''}
+                  onChange={(e) => {
+                    const copy = [...fasciaNames];
+                    copy[2] = e.target.value;
+                    setFasciaNames(copy);
+                  }}
+                  className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                />
+                <span className="text-[10px] text-slate-500 mt-1 block">Third firm/brand name for hanging banners and directory</span>
+              </div>
+
+              {/* Option 4 */}
+              <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 text-[11px] font-black flex items-center justify-center">4</span>
+                    <span>Option 4 (Brand Label / Trade Mark)</span>
+                  </label>
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-700">Optional</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. Ambika Festive Collection (Label / Brand)"
+                  value={fasciaNames[3] || ''}
+                  onChange={(e) => {
+                    const copy = [...fasciaNames];
+                    copy[3] = e.target.value;
+                    setFasciaNames(copy);
+                  }}
+                  className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                />
+                <span className="text-[10px] text-slate-500 mt-1 block">Fourth brand/label name option for promotional banners</span>
+              </div>
+            </div>
+
+            {/* Live Facia Board Mockup Preview */}
+            <div className="p-4 bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-950 rounded-xl border border-amber-500/30 text-white shadow-md mb-4">
+              <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-neutral-800">
+                <span className="text-[10px] uppercase tracking-widest text-amber-400 font-bold flex items-center gap-1.5">
+                  <Store className="w-3.5 h-3.5" />
+                  <span>Stall Entrance Facia Board Mockup Preview:</span>
+                </span>
+                <span className="text-[10px] text-neutral-400 font-mono">STE 2026 SURAT</span>
+              </div>
+              <div className="py-3 px-4 bg-neutral-900/90 rounded-lg border border-amber-400/20 text-center">
+                <h4 className="text-base sm:text-lg font-black text-amber-400 uppercase tracking-wide font-sans">
+                  {fasciaNames[0]?.trim() || brandName || 'YOUR PRIMARY COMPANY NAME'}
+                </h4>
+                {fasciaNames.slice(1).some((n) => n && n.trim()) && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 mt-1.5 pt-1.5 border-t border-neutral-800 text-[11px] text-neutral-300">
+                    {fasciaNames.slice(1).map((n, i) => n && n.trim() ? (
+                      <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-neutral-800 text-amber-200 border border-neutral-700">
+                        • {n}
+                      </span>
+                    ) : null)}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Save Button for Profile & Facia */}
+            <div className="flex items-center justify-between">
+              {profileSuccessMsg ? (
+                <span className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  {profileSuccessMsg}
+                </span>
+              ) : profileError ? (
+                <span className="text-xs font-bold text-red-600">{profileError}</span>
+              ) : (
+                <span className="text-xs text-slate-500">Make sure spellings are exact as they will be printed on physical boards.</span>
+              )}
+
+              <button
+                type="button"
+                onClick={() => handleSaveProfile()}
+                disabled={profileSaving}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-xs flex items-center gap-2"
+              >
+                {profileSaving ? 'Saving...' : 'Save Facia & Stall Details'}
+              </button>
             </div>
           </div>
 
@@ -1065,6 +1247,27 @@ export default function ExhibitorDashboardPage() {
             </div>
           </div>
 
+          {/* Facia / Banner Board Names Summary */}
+          {fasciaNames.some((n) => n && n.trim()) && (
+            <div className="mb-6 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-2">
+                Fascia / Banner Board Firm Names (To be printed):
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                {fasciaNames.map((fn, idx) => (
+                  <div key={idx} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+                    <span className="text-[10px] font-bold text-amber-700 block uppercase">
+                      Option {idx + 1} {idx === 0 ? '(Primary)' : ''}:
+                    </span>
+                    <p className="font-bold text-slate-900 mt-0.5 truncate">
+                      {fn.trim() ? fn : <span className="text-slate-400 font-normal italic">Not specified</span>}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Badges Breakdown Summary */}
           {(ownerBadges > 0 || salesBadges > 0 || supportBadges > 0) && (
             <div className="mb-6 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
@@ -1190,6 +1393,7 @@ export default function ExhibitorDashboardPage() {
         brandName={brandName || "Registered Exhibitor"}
         mobile={mobile}
         stallSqft={selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : '200 sq ft') : `${selectedSqftOption} sq ft`}
+        fasciaNames={fasciaNames}
         days={3}
         items={products
           .filter((p) => (quantities[p.id] || 0) > 0)

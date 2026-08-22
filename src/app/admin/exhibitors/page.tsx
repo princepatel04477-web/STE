@@ -28,6 +28,7 @@ interface ExhibitorRecord {
   mobile: string;
   brand_name: string;
   stall_sqft: string;
+  fascia_names?: string[];
   items: ExhibitorItem[];
   special_notes: string;
   owner_badges?: number;
@@ -91,10 +92,12 @@ export default function AdminExhibitorsPage() {
     const ownerNames = (ex.badge_names?.owner || []).join(' ').toLowerCase();
     const salesNames = (ex.badge_names?.sales || []).join(' ').toLowerCase();
     const supportNames = (ex.badge_names?.support || []).join(' ').toLowerCase();
+    const fasciaStr = (ex.fascia_names || []).join(' ').toLowerCase();
     return (
       ex.brand_name.toLowerCase().includes(q) ||
       ex.mobile.includes(q) ||
       ex.stall_sqft.toLowerCase().includes(q) ||
+      fasciaStr.includes(q) ||
       ownerNames.includes(q) ||
       salesNames.includes(q) ||
       supportNames.includes(q)
@@ -106,6 +109,10 @@ export default function AdminExhibitorsPage() {
       'Mobile Number',
       'Brand Name',
       'Stall Size (Sq Ft)',
+      'Fascia Option 1 (Primary)',
+      'Fascia Option 2',
+      'Fascia Option 3',
+      'Fascia Option 4',
       'Owner Badges Count',
       'Owner Badge Names',
       'Sales Badges Count',
@@ -121,11 +128,19 @@ export default function AdminExhibitorsPage() {
       const ownerNamesStr = (ex.badge_names?.owner || []).filter(Boolean).join(', ');
       const salesNamesStr = (ex.badge_names?.sales || []).filter(Boolean).join(', ');
       const supportNamesStr = (ex.badge_names?.support || []).filter(Boolean).join(', ');
+      const f1 = ex.fascia_names?.[0] || ex.brand_name || '';
+      const f2 = ex.fascia_names?.[1] || '';
+      const f3 = ex.fascia_names?.[2] || '';
+      const f4 = ex.fascia_names?.[3] || '';
 
       return [
         `"${ex.mobile}"`,
         `"${ex.brand_name.replace(/"/g, '""')}"`,
         `"${ex.stall_sqft.replace(/"/g, '""')}"`,
+        `"${f1.replace(/"/g, '""')}"`,
+        `"${f2.replace(/"/g, '""')}"`,
+        `"${f3.replace(/"/g, '""')}"`,
+        `"${f4.replace(/"/g, '""')}"`,
         `"${ex.owner_badges || 0}"`,
         `"${ownerNamesStr.replace(/"/g, '""')}"`,
         `"${ex.sales_badges || 0}"`,
@@ -384,8 +399,17 @@ export default function AdminExhibitorsPage() {
                         <td className="py-4 px-4 font-mono font-bold text-amber-700 whitespace-nowrap">
                           {ex.mobile}
                         </td>
-                        <td className="py-4 px-4 font-bold text-slate-900 whitespace-nowrap">
-                          {ex.brand_name}
+                        <td className="py-4 px-4 whitespace-nowrap">
+                          <div className="font-bold text-slate-900">{ex.brand_name}</div>
+                          {ex.fascia_names && ex.fascia_names.some((n) => n && n.trim()) && (
+                            <div className="mt-1 flex flex-col gap-0.5 max-w-[220px]">
+                              {ex.fascia_names.map((n, i) => n && n.trim() ? (
+                                <span key={i} className="text-[10px] text-amber-900 bg-amber-50/80 px-1.5 py-0.5 rounded border border-amber-200/60 truncate" title={`Option ${i + 1}: ${n}`}>
+                                  🏷️ Op{i + 1}: <strong className="font-semibold">{n}</strong>
+                                </span>
+                              ) : null)}
+                            </div>
+                          )}
                         </td>
                         <td className="py-4 px-4 whitespace-nowrap">
                           <span className="px-2.5 py-1 rounded-md bg-amber-50 border border-amber-300 font-mono text-amber-900 font-bold text-xs">
@@ -471,6 +495,7 @@ export default function AdminExhibitorsPage() {
           brandName={selectedExhibitorForBill.brand_name || 'Registered Exhibitor'}
           mobile={selectedExhibitorForBill.mobile}
           stallSqft={selectedExhibitorForBill.stall_sqft || '200 sq ft'}
+          fasciaNames={selectedExhibitorForBill.fascia_names}
           days={3}
           items={selectedExhibitorForBill.items.map((it) => {
             const master = EXTRAS_RATES.find((m) => m.id === it.id || m.name.toLowerCase() === it.name.toLowerCase());

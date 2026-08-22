@@ -69,7 +69,7 @@ export const REGISTERED_EXHIBITOR_MOBILES = [
 
 interface Schema {
   allowed_exhibitors: Array<{ id: number; mobile: string; notes: string; created_at: string }>;
-  exhibitors: Array<{ id: number; mobile: string; brand_name: string; stall_sqft: string; custom_password?: string; updated_at: string }>;
+  exhibitors: Array<{ id: number; mobile: string; brand_name: string; stall_sqft: string; custom_password?: string; fascia_names_json?: string; updated_at: string }>;
   extra_products: Array<{ id: string; name: string; category: string; description: string; unit: string; rate_inr?: number; icon_name: string; is_active: number }>;
   exhibitor_orders: Array<{ id: number; mobile: string; items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string; updated_at: string }>;
 }
@@ -206,6 +206,7 @@ export const db = {
               mobile: ex.mobile,
               brand_name: ex.brand_name,
               stall_sqft: ex.stall_sqft,
+              fascia_names_json: ex.fascia_names_json ?? null,
               profile_updated: ex.updated_at,
               items_json: order ? order.items_json : null,
               special_notes: order ? order.special_notes : null,
@@ -242,11 +243,19 @@ export const db = {
         if (q.includes('update exhibitors set brand_name = ?, stall_sqft = ?')) {
           const brand_name = String(args[0]);
           const stall_sqft = String(args[1]);
-          const mobile = String(args[2]);
+          let fascia_names_json: string | undefined = undefined;
+          let mobile = '';
+          if (args.length >= 4) {
+            fascia_names_json = String(args[2]);
+            mobile = String(args[3]);
+          } else {
+            mobile = String(args[2]);
+          }
           const ex = data.exhibitors.find(e => e.mobile === mobile);
           if (ex) {
             ex.brand_name = brand_name;
             ex.stall_sqft = stall_sqft;
+            if (fascia_names_json !== undefined) ex.fascia_names_json = fascia_names_json;
             ex.updated_at = new Date().toISOString();
           } else {
             data.exhibitors.push({
@@ -254,6 +263,7 @@ export const db = {
               mobile,
               brand_name,
               stall_sqft,
+              fascia_names_json,
               updated_at: new Date().toISOString()
             });
           }
@@ -282,15 +292,17 @@ export const db = {
           return { changes: 1 };
         }
 
-        if (q.includes('insert into exhibitors (mobile, brand_name, stall_sqft)')) {
+        if (q.includes('insert into exhibitors (mobile, brand_name, stall_sqft')) {
           const mobile = String(args[0]);
           const brand_name = String(args[1]);
           const stall_sqft = String(args[2]);
+          const fascia_names_json = args[3] ? String(args[3]) : undefined;
           data.exhibitors.push({
             id: data.exhibitors.length + 1,
             mobile,
             brand_name,
             stall_sqft,
+            fascia_names_json,
             updated_at: new Date().toISOString()
           });
           saveData(data);

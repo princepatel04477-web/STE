@@ -2,6 +2,7 @@ export interface SyncPayload {
   mobile: string;
   brand_name?: string;
   stall_sqft?: string;
+  fascia_names?: string[];
   items?: Array<{ id: string; name: string; quantity: number; unit: string }>;
   special_notes?: string;
   owner_badges?: number;
@@ -52,11 +53,23 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
     const salesNamesStr = (payload.badge_names?.sales || []).filter(Boolean).join(', ');
     const supportNamesStr = (payload.badge_names?.support || []).filter(Boolean).join(', ');
 
+    const fascia1 = payload.fascia_names?.[0] || payload.brand_name || '';
+    const fascia2 = payload.fascia_names?.[1] || '';
+    const fascia3 = payload.fascia_names?.[2] || '';
+    const fascia4 = payload.fascia_names?.[3] || '';
+    const fasciaAll = (payload.fascia_names || [payload.brand_name]).filter(Boolean).join(' | ');
+
     const bodyData = {
       timestamp,
       mobile: payload.mobile,
       brand_name: payload.brand_name || '',
       stall_sqft: payload.stall_sqft || '',
+      // Facia / Banner Firm Name Options
+      fascia_name_1: fascia1,
+      fascia_name_2: fascia2,
+      fascia_name_3: fascia3,
+      fascia_name_4: fascia4,
+      fascia_names_summary: fasciaAll,
       // Dedicated product column quantities
       sofa_2seater: itemMap['sofa-2seater'] || 0,
       sofa_single: itemMap['sofa-single'] || 0,

@@ -205,23 +205,27 @@ def create_extras_document(output_path):
 
     # 5. EXHIBITOR REQUISITION FORM SECTION
     p_ex_title = doc.add_paragraph()
-    r_ext = p_ex_title.add_run("EXHIBITOR BOOKING DETAILS / ORDER FORM:")
+    r_ext = p_ex_title.add_run("EXHIBITOR BOOKING & FASCIA / BANNER DETAILS:")
     r_ext.font.bold = True
     r_ext.font.size = Pt(10.5)
     r_ext.font.color.rgb = RGBColor(17, 24, 39)
 
-    order_table = doc.add_table(rows=3, cols=2)
+    order_table = doc.add_table(rows=5, cols=2)
     order_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     for r in order_table.rows:
         for c in r.cells:
-            set_cell_margins(c, top=80, bottom=80, left=100, right=100)
+            set_cell_margins(c, top=70, bottom=70, left=100, right=100)
 
-    order_table.cell(0, 0).paragraphs[0].add_run("Exhibitor Brand Name: _______________________").font.size = Pt(9)
-    order_table.cell(0, 1).paragraphs[0].add_run("Registered Mobile No: _______________________").font.size = Pt(9)
-    order_table.cell(1, 0).paragraphs[0].add_run("Allocated Stall Size (Sq Ft): _________________").font.size = Pt(9)
-    order_table.cell(1, 1).paragraphs[0].add_run("Contact Person Name: _______________________").font.size = Pt(9)
-    order_table.cell(2, 0).paragraphs[0].add_run("Owner Entry Badges Required: ______________").font.size = Pt(9)
-    order_table.cell(2, 1).paragraphs[0].add_run("Staff Badges Required: ______________________").font.size = Pt(9)
+    order_table.cell(0, 0).paragraphs[0].add_run("Exhibitor Brand Name: _______________________").font.size = Pt(8.5)
+    order_table.cell(0, 1).paragraphs[0].add_run("Registered Mobile No: _______________________").font.size = Pt(8.5)
+    order_table.cell(1, 0).paragraphs[0].add_run("Allocated Stall Size (Sq Ft): _________________").font.size = Pt(8.5)
+    order_table.cell(1, 1).paragraphs[0].add_run("Contact Person Name: _______________________").font.size = Pt(8.5)
+    order_table.cell(2, 0).paragraphs[0].add_run("Fascia Option 1 (Primary): ____________________").font.size = Pt(8.5)
+    order_table.cell(2, 1).paragraphs[0].add_run("Fascia Option 2 (Associate): __________________").font.size = Pt(8.5)
+    order_table.cell(3, 0).paragraphs[0].add_run("Fascia Option 3 (Group): _____________________").font.size = Pt(8.5)
+    order_table.cell(3, 1).paragraphs[0].add_run("Fascia Option 4 (Brand): ______________________").font.size = Pt(8.5)
+    order_table.cell(4, 0).paragraphs[0].add_run("Owner Entry Badges: ________________________").font.size = Pt(8.5)
+    order_table.cell(4, 1).paragraphs[0].add_run("Staff Badges Required: ______________________").font.size = Pt(8.5)
 
     doc.add_paragraph().paragraph_format.space_after = Pt(4)
 

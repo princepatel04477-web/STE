@@ -34,6 +34,7 @@ interface BillModalProps {
   brandName?: string;
   mobile?: string;
   stallSqft?: string;
+  fasciaNames?: string[];
   days?: number;
   items: InvoiceItem[];
 }
@@ -44,6 +45,7 @@ export default function BillModal({
   brandName = "Registered Exhibitor",
   mobile = "",
   stallSqft = "200 sq ft",
+  fasciaNames,
   days = 3,
   items = [],
 }: BillModalProps) {
@@ -59,7 +61,6 @@ export default function BillModal({
     year: "numeric",
   });
 
-  // Calculate totals
   const subtotal = items.reduce((sum, item) => {
     const rate = item.rateInr || item.rate_inr || 0;
     return sum + rate * item.quantity * days;
@@ -98,144 +99,88 @@ export default function BillModal({
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to download DOCX");
+      if (!res.ok) throw new Error("Failed to generate Word document");
 
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `STE_Invoice_${brandName.replace(/[^a-zA-Z0-9]/g, "_") || "Bill"}_2026.docx`;
+      a.download = `STE_Invoice_${mobile || "bill"}.docx`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error(err);
-      alert("Unable to generate Word document. Please try printing to PDF instead.");
+      alert("Failed to download DOCX bill.");
     } finally {
       setDownloadingDocx(false);
     }
   };
 
-  const handleCopySummary = () => {
-    const summary = [
-      `🧾 SURAT TEXTILE EXHIBITION (STE) 2026 — TAX INVOICE`,
-      `Header: ${STE_COMPANY_DETAILS.name}`,
-      `Address: ${STE_COMPANY_DETAILS.address}`,
-      `Phone: ${STE_COMPANY_DETAILS.phone} | Email: ${STE_COMPANY_DETAILS.email}`,
-      `GSTIN: ${STE_COMPANY_DETAILS.gstin} | State: ${STE_COMPANY_DETAILS.state}`,
-      `--------------------------------------------------`,
-      `Invoice No: ${invoiceNo} | Date: ${currentDate}`,
-      `Billed To: ${brandName} (${mobile}) | Stall: ${stallSqft}`,
-      `Rental Duration: ${days} Days`,
-      `--------------------------------------------------`,
-      ...items.map(
-        (it) =>
-          `• ${it.quantity} × ${it.name} (${it.code || ""}) @ ₹${it.rateInr || it.rate_inr}/day × ${days}d = ${formatInr(
-            (it.rateInr || it.rate_inr || 0) * it.quantity * days
-          )}`
-      ),
-      `--------------------------------------------------`,
-      `Subtotal (Taxable): ${formatInr(subtotal)}`,
-      `CGST @ 9%: ${formatInr(cgst)}`,
-      `SGST @ 9%: ${formatInr(sgst)}`,
-      `Total GST @ 18%: ${formatInr(totalGst)}`,
-      `Grand Total: ${formatInr(grandTotal)}`,
-      `Amount in Words: ${amountInWords}`,
-      `--------------------------------------------------`,
-      `COMPANY BANK ACCOUNT DETAILS:`,
-      `A/C NAME: ${STE_COMPANY_DETAILS.bankDetails.accountName}`,
-      `A/C NO: ${STE_COMPANY_DETAILS.bankDetails.accountNumber}`,
-      `IFSC CODE: ${STE_COMPANY_DETAILS.bankDetails.ifscCode}`,
-      `BANK: ${STE_COMPANY_DETAILS.bankDetails.bankName}`,
-    ].join("\n");
-
-    navigator.clipboard.writeText(summary);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const bank = STE_COMPANY_DETAILS.bankDetails;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto print:p-0 print:bg-white print:static print:inset-auto">
-      <div className="bg-white text-slate-900 rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 print:shadow-none print:border-none print:max-h-none print:w-full print:rounded-none">
-        {/* Action Header Bar (Hidden in Print) */}
-        <div className="sticky top-0 z-20 bg-slate-900 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 print:hidden">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 print:p-0 print:bg-white">
+      <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] print:max-h-none print:border-none print:shadow-none print:rounded-none">
+        {/* Modal Action Bar (Hidden in Print) */}
+        <div className="flex items-center justify-between px-6 py-3.5 bg-slate-900 text-white print:hidden border-b border-slate-800">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold">
-              <FileText className="w-4 h-4" />
+            <FileText className="w-5 h-5 text-amber-400" />
+            <span className="font-bold text-sm">Official Tax Invoice & Requisition Summary</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 font-mono">
+              Original For Recipient
             </span>
-            <div>
-              <h3 className="text-sm font-bold text-white leading-none">
-                Official Bill / Tax Invoice
-              </h3>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Surat Textile Exhibition 2026 — Extra Requirements
-              </p>
-            </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
-              onClick={handlePrint}
               type="button"
-              className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
-              title="Print or Save as PDF"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Print / Save PDF</span>
-            </button>
-
-            <button
               onClick={handleDownloadDocx}
               disabled={downloadingDocx}
-              type="button"
-              className="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5 disabled:opacity-50"
-              title="Download Word Document (.docx)"
+              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all border border-slate-700 disabled:opacity-50"
+              title="Download editable Microsoft Word format"
             >
               <Download className="w-3.5 h-3.5 text-amber-400" />
-              <span>{downloadingDocx ? "Generating..." : "Download Docs (.docx)"}</span>
+              <span>{downloadingDocx ? "Generating Word..." : "Download .DOCX"}</span>
             </button>
 
             <button
-              onClick={handleCopySummary}
               type="button"
-              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium transition-all flex items-center gap-1.5"
+              onClick={handlePrint}
+              className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+              title="Print Tax Invoice (A4 Size)"
             >
-              {copied ? (
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-              ) : (
-                <Copy className="w-3.5 h-3.5" />
-              )}
-              <span className="hidden sm:inline">{copied ? "Copied" : "Copy Text"}</span>
+              <Printer className="w-3.5 h-3.5" />
+              <span>Print / Save as PDF</span>
             </button>
 
             <button
-              onClick={onClose}
               type="button"
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
-              aria-label="Close"
+              onClick={onClose}
+              className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all ml-1"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Printable Bill Canvas */}
-        <div id="invoice-printable-area" className="p-6 sm:p-10 space-y-6 text-slate-900 bg-white">
-          {/* 1. Official Header Section */}
+        {/* Printable Tax Invoice Content */}
+        <div id="printable-bill" className="p-6 sm:p-8 overflow-y-auto space-y-6 print:p-0 print:overflow-visible">
+          {/* 1. Official Header & Company Info */}
           <div className="border-b-2 border-slate-900 pb-5">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-              <div className="space-y-1">
-                <div className="inline-block px-2.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-extrabold uppercase tracking-wider mb-1">
-                  Tax Invoice / Estimate Bill
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-black font-serif text-slate-950 tracking-tight">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-amber-800 font-extrabold block mb-0.5">
+                  TAX INVOICE / OFFICIAL PROFORMA BILL
+                </span>
+                <h1 className="text-2xl font-black text-slate-950 uppercase tracking-tight font-serif">
                   {STE_COMPANY_DETAILS.name}
                 </h1>
-                <p className="text-xs text-slate-700 font-medium leading-relaxed max-w-lg">
+                <p className="text-xs text-slate-600 mt-1 max-w-md font-medium">
                   {STE_COMPANY_DETAILS.address}
                 </p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-800 font-medium pt-1">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600 mt-1 font-mono">
                   <span>
                     <strong>Phone no.:</strong> {STE_COMPANY_DETAILS.phone}
                   </span>
@@ -249,10 +194,6 @@ export default function BillModal({
                 <div className="text-xs font-mono font-bold text-slate-900">
                   <span className="text-slate-500 font-normal">GSTIN: </span>
                   <span className="text-amber-800 font-black">{STE_COMPANY_DETAILS.gstin}</span>
-                </div>
-                <div className="text-xs font-mono text-slate-700">
-                  <span className="text-slate-500">State: </span>
-                  <strong>{STE_COMPANY_DETAILS.state}</strong>
                 </div>
                 <div className="text-xs font-mono text-slate-700">
                   <span className="text-slate-500">Invoice No: </span>
@@ -275,6 +216,12 @@ export default function BillModal({
               <p className="text-base font-extrabold text-slate-950 leading-tight">
                 {brandName || "Registered Exhibitor"}
               </p>
+              {fasciaNames && fasciaNames.some((n) => n && n.trim()) && (
+                <p className="text-[11px] text-amber-900 font-bold mt-0.5">
+                  <span className="text-slate-500 font-normal">Fascia: </span>
+                  {fasciaNames.filter(Boolean).join(" | ")}
+                </p>
+              )}
               <div className="mt-1 space-y-0.5 text-slate-700">
                 {mobile && (
                   <p>

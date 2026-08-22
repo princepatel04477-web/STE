@@ -108,6 +108,18 @@ export async function GET() {
         } catch {}
       }
 
+      let fasciaNames = ['', '', '', ''];
+      if (dbEx?.fascia_names_json) {
+        try {
+          const parsed = JSON.parse(dbEx.fascia_names_json);
+          if (Array.isArray(parsed)) {
+            fasciaNames = [parsed[0] || '', parsed[1] || '', parsed[2] || '', parsed[3] || ''];
+          }
+        } catch {}
+      } else {
+        fasciaNames = [brandName, '', '', ''];
+      }
+
       totalOwnerBadges += oBadges;
       totalSalesBadges += sBadges;
       totalSupportBadges += supBadges;
@@ -118,6 +130,7 @@ export async function GET() {
         stall_sqft: stallSqft,
         category: reg?.category || '',
         market: reg?.market || '',
+        fascia_names: fasciaNames,
         items,
         special_notes: order?.special_notes || '',
         owner_badges: oBadges,
