@@ -1,12 +1,11 @@
 import React from "react";
-import Metadata from "next";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RateTable from "@/components/extras/RateTable";
-import EstimateBuilder from "@/components/extras/EstimateBuilder";
 import Disclaimers from "@/components/extras/Disclaimers";
 import { EXTRAS_RATES } from "@/data/extras-rates";
-import { Download, FileText } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 
 export const metadata = {
   title: "Exhibitor Extras & Rentals — Rates | STE 2026 Surat",
@@ -47,16 +46,22 @@ export default function ExhibitorExtrasPage() {
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-sans font-medium">
             Transparent per-day pricing for additional booth furniture, display fixtures, audio-visual gear, and electrical connections for STE 2026 Surat.
           </p>
+
+          <div className="pt-2">
+            <Link
+              href="/exhibitor/login"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-sm transition-all"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Login to Exhibitor Portal to Book Extras</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
 
         {/* Server Rendered Rate Table */}
         <section aria-label="Rate Table Catalog">
           <RateTable items={EXTRAS_RATES} />
-        </section>
-
-        {/* Interactive Estimate Calculator */}
-        <section aria-label="Estimate Calculator">
-          <EstimateBuilder />
         </section>
 
         {/* Mandatory Disclaimers */}
