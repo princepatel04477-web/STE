@@ -70,7 +70,11 @@ function scrollToSection(href: string) {
   cancelPendingAim = stop;
 }
 
-export default function Navbar() {
+interface NavbarProps {
+  theme?: "dark" | "light";
+}
+
+export default function Navbar({ theme = "dark" }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("#home");
@@ -127,38 +131,59 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, []);
 
-  const headerStyle = isMobile
-    ? (isScrolled
+  const headerStyle = theme === "light"
+    ? (isMobile
       ? {
-          backgroundColor: "rgba(5, 5, 5, 0.97)",
-          borderBottom: "1px solid rgba(212, 175, 55, 0.25)",
+          backgroundColor: isScrolled ? "rgba(255, 255, 255, 0.98)" : "rgba(255, 255, 255, 0.94)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid #e2e8f0",
+          boxShadow: isScrolled ? "0 4px 20px rgba(0, 0, 0, 0.06)" : "0 1px 3px rgba(0, 0, 0, 0.04)",
           height: "56px",
           transition: "all 0.2s ease"
         }
       : {
-          backgroundColor: "transparent",
-          borderBottom: "1px solid transparent",
-          height: "56px",
-          transition: "all 0.2s ease"
+          backgroundColor: isScrolled ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.98)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderBottom: "1px solid #e2e8f0",
+          boxShadow: isScrolled ? "0 10px 30px rgba(0, 0, 0, 0.06)" : "0 1px 3px rgba(0, 0, 0, 0.04)",
+          paddingTop: isScrolled ? "0.875rem" : "1.25rem",
+          paddingBottom: isScrolled ? "0.875rem" : "1.25rem",
+          transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)"
         })
-    : (isScrolled
-      ? {
-          backgroundColor: "rgba(5, 5, 5, 0.88)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          borderBottom: "1px solid rgba(212, 175, 55, 0.3)",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
-          paddingTop: "0.875rem",
-          paddingBottom: "0.875rem",
-          transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)"
-        }
-      : {
-          backgroundColor: "transparent",
-          borderBottom: "1px solid transparent",
-          paddingTop: "1.5rem",
-          paddingBottom: "1.5rem",
-          transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)"
-        });
+    : (isMobile
+      ? (isScrolled
+        ? {
+            backgroundColor: "rgba(5, 5, 5, 0.97)",
+            borderBottom: "1px solid rgba(212, 175, 55, 0.25)",
+            height: "56px",
+            transition: "all 0.2s ease"
+          }
+        : {
+            backgroundColor: "transparent",
+            borderBottom: "1px solid transparent",
+            height: "56px",
+            transition: "all 0.2s ease"
+          })
+      : (isScrolled
+        ? {
+            backgroundColor: "rgba(5, 5, 5, 0.88)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            borderBottom: "1px solid rgba(212, 175, 55, 0.3)",
+            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.6)",
+            paddingTop: "0.875rem",
+            paddingBottom: "0.875rem",
+            transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)"
+          }
+        : {
+            backgroundColor: "transparent",
+            borderBottom: "1px solid transparent",
+            paddingTop: "1.5rem",
+            paddingBottom: "1.5rem",
+            transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)"
+          }));
 
   return (
     <header
@@ -169,7 +194,7 @@ export default function Navbar() {
         
         {/* Left Column: STE & AKAS Branding Logos */}
         <div className="flex items-center z-10 shrink-0 select-none max-w-[120px] md:max-w-none">
-          <a href="#home" className="flex items-center gap-1.5 md:gap-3 group badge-tap">
+          <a href="/#home" className="flex items-center gap-1.5 md:gap-3 group badge-tap">
             {/* STE Logo */}
             <div className="relative w-12 h-8 md:w-20 md:h-14 overflow-hidden">
               <Image
@@ -183,10 +208,14 @@ export default function Navbar() {
             </div>
 
             {/* Premium Divider */}
-            <div className="h-4 md:h-8 w-px bg-white/10 mx-0.5 md:mx-1.5" />
+            <div className={`h-4 md:h-8 w-px mx-0.5 md:mx-1.5 ${
+              theme === "light" ? "bg-slate-300" : "bg-white/10"
+            }`} />
 
             {/* AKAS Circular Logo */}
-            <div className="relative w-8 h-8 md:w-18 md:h-18 overflow-hidden rounded-full bg-white flex items-center justify-center border border-white/10 shadow-md group-hover:border-expo-gold/40 transition-all duration-300">
+            <div className={`relative w-8 h-8 md:w-18 md:h-18 overflow-hidden rounded-full bg-white flex items-center justify-center transition-all duration-300 ${
+              theme === "light" ? "border border-slate-300 shadow-xs group-hover:border-amber-500" : "border border-white/10 shadow-md group-hover:border-expo-gold/40"
+            }`}>
               <Image
                 src="/assets/logo_AKAS.webp"
                 alt="AKAS Logo"
@@ -199,10 +228,14 @@ export default function Navbar() {
 
             {/* Brand Text */}
             <div className="hidden md:flex flex-col select-none ml-2">
-              <span className="text-xs uppercase tracking-[0.2em] text-expo-warm/55 leading-tight font-semibold">
+              <span className={`text-xs uppercase tracking-[0.2em] leading-tight font-bold ${
+                theme === "light" ? "text-slate-700" : "text-expo-warm/55"
+              }`}>
                 <Translate en="Surat Textile" hi="सूरत टेक्सटाइल" />
               </span>
-              <span className="text-xs sm:text-sm font-display tracking-widest text-expo-gold font-black leading-none gold-shimmer-text">
+              <span className={`text-xs sm:text-sm font-display tracking-widest font-black leading-none ${
+                theme === "light" ? "text-amber-800" : "text-expo-gold font-black gold-shimmer-text"
+              }`}>
                 <Translate en="EXHIBITION" hi="प्रदर्शनी" />
               </span>
             </div>
@@ -229,7 +262,9 @@ export default function Navbar() {
                 }}
                 aria-current={isActive ? "page" : undefined}
                 className={`nav-link-hover-trace whitespace-nowrap shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold ${
-                  isActive ? "active text-expo-gold font-bold" : "text-expo-warm/60 hover:text-expo-warm"
+                  isActive
+                    ? (theme === "light" ? "active text-amber-800 font-extrabold" : "active text-expo-gold font-bold")
+                    : (theme === "light" ? "text-slate-700 hover:text-amber-800 font-bold" : "text-expo-warm/60 hover:text-expo-warm")
                 } py-2.5 transition-colors duration-300 badge-tap`}
               >
                 <Translate en={item.name} hi={item.hiName} />
@@ -243,18 +278,24 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-6 xl:gap-8">
             <a 
               href={`tel:${PHONE_TEL}`}
-              className="hidden min-[1700px]:flex items-center gap-2.5 text-expo-warm/75 hover:text-expo-gold transition-colors duration-300 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold badge-tap"
+              className={`hidden min-[1700px]:flex items-center gap-2.5 transition-colors duration-300 font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-expo-gold badge-tap ${
+                theme === "light" ? "text-slate-700 hover:text-amber-800" : "text-expo-warm/75 hover:text-expo-gold"
+              }`}
             >
-              <PhoneCall className="w-3.5 h-3.5 text-expo-gold/80" />
+              <PhoneCall className={`w-3.5 h-3.5 ${theme === "light" ? "text-amber-700" : "text-expo-gold/80"}`} />
               <span className="text-xs tracking-[0.18em] font-sans uppercase">
                 <Translate en={`Call: ${PHONE_DISPLAY}`} hi={`कॉल: ${PHONE_DISPLAY}`} />
               </span>
             </a>
 
             {/* Language Toggle Pill */}
-            <div className="relative flex items-center bg-black/40 border border-white/10 rounded-full p-0.5 select-none w-[80px] h-[32px] overflow-hidden">
+            <div className={`relative flex items-center rounded-full p-0.5 select-none w-[80px] h-[32px] overflow-hidden ${
+              theme === "light" ? "bg-slate-200/80 border border-slate-300 shadow-xs" : "bg-black/40 border border-white/10"
+            }`}>
               <div
-                className="absolute top-0.5 bottom-0.5 rounded-full bg-expo-gold/25 border border-expo-gold/45 transition-all duration-300 ease-out"
+                className={`absolute top-0.5 bottom-0.5 rounded-full transition-all duration-300 ease-out ${
+                  theme === "light" ? "bg-amber-500 border border-amber-400 shadow-xs" : "bg-expo-gold/25 border border-expo-gold/45"
+                }`}
                 style={{
                   left: language === "en" ? "2px" : "40px",
                   width: "36px"
@@ -263,7 +304,9 @@ export default function Navbar() {
               <button
                 onClick={() => setLanguage("en")}
                 className={`relative z-10 w-1/2 text-center text-xs font-bold tracking-wider transition-colors duration-300 badge-tap ${
-                  language === "en" ? "text-expo-gold" : "text-expo-warm/50"
+                  language === "en"
+                    ? (theme === "light" ? "text-slate-950 font-black" : "text-expo-gold")
+                    : (theme === "light" ? "text-slate-600" : "text-expo-warm/50")
                 }`}
               >
                 EN
@@ -271,7 +314,9 @@ export default function Navbar() {
               <button
                 onClick={() => setLanguage("hi")}
                 className={`relative z-10 w-1/2 text-center text-xs font-bold tracking-wider transition-colors duration-300 badge-tap ${
-                  language === "hi" ? "text-expo-gold" : "text-expo-warm/50"
+                  language === "hi"
+                    ? (theme === "light" ? "text-slate-950 font-black" : "text-expo-gold")
+                    : (theme === "light" ? "text-slate-600" : "text-expo-warm/50")
                 }`}
               >
                 हिं
@@ -281,7 +326,7 @@ export default function Navbar() {
             <a 
               href="/exhibitor/login"
               data-cursor="cta"
-              className="px-6 py-2.5 rounded-full bg-gold-gradient text-black font-bold text-xs uppercase tracking-[0.2em] transition-all duration-300 hover:scale-105 active:scale-95 shadow-md flex items-center justify-center"
+              className="px-6 py-2.5 rounded-full bg-gold-gradient text-black font-extrabold text-xs uppercase tracking-[0.2em] transition-all duration-300 hover:scale-105 active:scale-95 shadow-md flex items-center justify-center"
             >
               <Translate en="Exhibitor's Portal" hi="प्रदर्शक पोर्टल" />
             </a>
@@ -298,14 +343,22 @@ export default function Navbar() {
           {/* Mobile Toggle Button (Visible below XL break) */}
           <button
             onClick={() => setIsMobileOpen(!isMobileOpen)}
-            className="xl:hidden text-expo-warm hover:text-expo-gold transition-colors p-3 z-modal relative w-11 h-11 flex items-center justify-center focus:outline-none badge-tap"
+            className={`xl:hidden transition-colors p-3 z-modal relative w-11 h-11 flex items-center justify-center focus:outline-none badge-tap ${
+              theme === "light" ? "text-slate-900" : "text-expo-warm hover:text-expo-gold"
+            }`}
             aria-label="Toggle Menu"
             aria-expanded={isMobileOpen}
           >
             <div className="flex flex-col justify-between w-5 h-3 relative">
-              <span className={`w-5 h-[2px] bg-[#B87333] block transition-all duration-300 origin-center ${isMobileOpen ? 'rotate-45 translate-y-[5px]' : ''}`} />
-              <span className={`w-5 h-[2px] bg-[#B87333] block transition-all duration-300 ${isMobileOpen ? 'scale-x-0 opacity-0' : 'opacity-100'}`} />
-              <span className={`w-5 h-[2px] bg-[#B87333] block transition-all duration-300 origin-center ${isMobileOpen ? '-rotate-45 -translate-y-[5px]' : ''}`} />
+              <span className={`w-5 h-[2px] block transition-all duration-300 origin-center ${
+                theme === "light" ? "bg-slate-900" : "bg-[#B87333]"
+              } ${isMobileOpen ? 'rotate-45 translate-y-[5px]' : ''}`} />
+              <span className={`w-5 h-[2px] block transition-all duration-300 ${
+                theme === "light" ? "bg-slate-900" : "bg-[#B87333]"
+              } ${isMobileOpen ? 'scale-x-0 opacity-0' : 'opacity-100'}`} />
+              <span className={`w-5 h-[2px] block transition-all duration-300 origin-center ${
+                theme === "light" ? "bg-slate-900" : "bg-[#B87333]"
+              } ${isMobileOpen ? '-rotate-45 -translate-y-[5px]' : ''}`} />
             </div>
           </button>
         </div>
@@ -315,12 +368,14 @@ export default function Navbar() {
       {/* Mobile Navigation Panel (Visible below XL break) */}
       <div
         id="primary-mobile-menu"
-        className={`mobile-drawer xl:hidden fixed inset-0 z-overlay bg-[#050505]/95 pt-20 pb-8 px-6 flex flex-col justify-between shadow-2xl overflow-y-auto mobile-menu-drawer ${
+        className={`mobile-drawer xl:hidden fixed inset-0 z-overlay pt-20 pb-8 px-6 flex flex-col justify-between shadow-2xl overflow-y-auto mobile-menu-drawer ${
+          theme === "light" ? "bg-white/98 text-slate-900" : "bg-[#050505]/95 text-[#F7F4EF]"
+        } ${
           isMobileOpen ? "open" : "closed"
         }`}
         style={{
           height: "100svh",
-          backgroundImage: "radial-gradient(circle at top, rgba(184, 115, 51, 0.15) 0%, transparent 70%)"
+          backgroundImage: theme === "light" ? "none" : "radial-gradient(circle at top, rgba(184, 115, 51, 0.15) 0%, transparent 70%)"
         }}
       >
         <nav className="flex flex-col w-full mt-6">
@@ -342,8 +397,10 @@ export default function Navbar() {
                   }
                 }}
                 aria-current={isActive ? "page" : undefined}
-                className={`h-[64px] flex items-center font-cormorant text-[28px] text-[#F7F4EF] border-b border-[#D4AF37]/20 mobile-nav-link badge-tap ${
-                  isActive ? "border-l-[4px] border-l-[#D4AF37] pl-3" : "pl-1 hover:border-l-[4px] hover:border-l-[#D4AF37] hover:pl-3"
+                className={`h-[64px] flex items-center font-cormorant text-[28px] border-b mobile-nav-link badge-tap ${
+                  theme === "light"
+                    ? (isActive ? "text-amber-800 font-bold border-b-slate-200 border-l-[4px] border-l-amber-500 pl-3" : "text-slate-800 border-b-slate-200 pl-1 hover:border-l-[4px] hover:border-l-amber-500 hover:pl-3")
+                    : (isActive ? "text-[#F7F4EF] border-b-[#D4AF37]/20 border-l-[4px] border-l-[#D4AF37] pl-3" : "text-[#F7F4EF] border-b-[#D4AF37]/20 pl-1 hover:border-l-[4px] hover:border-l-[#D4AF37] hover:pl-3")
                 } ${isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
                 style={{
                   transitionDelay: `${index * 50}ms`
@@ -365,9 +422,13 @@ export default function Navbar() {
               transitionDelay: "400ms"
             }}
           >
-            <div className="relative flex items-center bg-black/40 border border-white/10 rounded-full p-0.5 select-none w-[120px] h-[36px] overflow-hidden">
+            <div className={`relative flex items-center rounded-full p-0.5 select-none w-[120px] h-[36px] overflow-hidden ${
+              theme === "light" ? "bg-slate-200 border border-slate-300" : "bg-black/40 border border-white/10"
+            }`}>
               <div
-                className="absolute top-0.5 bottom-0.5 rounded-full bg-expo-gold/25 border border-expo-gold/45 transition-all duration-300 ease-out"
+                className={`absolute top-0.5 bottom-0.5 rounded-full transition-all duration-300 ease-out ${
+                  theme === "light" ? "bg-amber-500 border border-amber-400" : "bg-expo-gold/25 border border-expo-gold/45"
+                }`}
                 style={{
                   left: language === "en" ? "2px" : "60px",
                   width: "56px"
@@ -376,7 +437,9 @@ export default function Navbar() {
               <button
                 onClick={() => setLanguage("en")}
                 className={`relative z-10 w-1/2 text-center text-xs font-bold tracking-wider transition-colors duration-300 badge-tap ${
-                  language === "en" ? "text-expo-gold" : "text-expo-warm/50"
+                  language === "en"
+                    ? (theme === "light" ? "text-slate-950 font-black" : "text-expo-gold")
+                    : (theme === "light" ? "text-slate-600 font-bold" : "text-expo-warm/50")
                 }`}
               >
                 EN
@@ -384,7 +447,9 @@ export default function Navbar() {
               <button
                 onClick={() => setLanguage("hi")}
                 className={`relative z-10 w-1/2 text-center text-xs font-bold tracking-wider transition-colors duration-300 badge-tap ${
-                  language === "hi" ? "text-expo-gold" : "text-expo-warm/50"
+                  language === "hi"
+                    ? (theme === "light" ? "text-slate-950 font-black" : "text-expo-gold")
+                    : (theme === "light" ? "text-slate-600 font-bold" : "text-expo-warm/50")
                 }`}
               >
                 हिं

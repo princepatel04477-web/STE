@@ -30,7 +30,7 @@ export const metadata = {
 export default function ExhibitorExtrasPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-amber-500/20 selection:text-amber-900">
-      <Navbar />
+      <Navbar theme="light" />
 
       <main className="pt-28 pb-20 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto space-y-12">
         {/* Page Hero Header */}
