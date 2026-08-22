@@ -30,42 +30,23 @@ export const metadata = {
 
 export default function ExhibitorExtrasPage() {
   return (
-    <div className="min-h-screen bg-[#050505] text-neutral-100 font-sans selection:bg-amber-500/30 selection:text-amber-200">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-amber-500/20 selection:text-amber-900">
       <Navbar />
 
       <main className="pt-28 pb-20 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto space-y-12">
         {/* Page Hero Header */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto border-b border-neutral-800/80 pb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-widest">
+        <div className="text-center space-y-4 max-w-3xl mx-auto border-b border-slate-200 pb-10">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold uppercase tracking-widest shadow-xs">
             <span>Official Rental Rate Card</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-white font-serif tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-black text-slate-950 font-serif tracking-tight leading-tight">
             Exhibitor Extras & Rental Rates
           </h1>
 
-          <p className="text-sm sm:text-base text-neutral-400 leading-relaxed font-sans">
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-sans font-medium">
             Transparent per-day pricing for additional booth furniture, display fixtures, audio-visual gear, and electrical connections for STE 2026 Surat.
           </p>
-
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="/downloads/STE_Extra_Items_Rate_Card_and_Order_Form.docx"
-              download="STE_Extra_Items_Official_Catalogue_2026.docx"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all"
-            >
-              <Download className="w-4 h-4" />
-              <span>Download Official Docs (.docx)</span>
-            </a>
-
-            <a
-              href="#estimate-builder"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-white font-semibold text-xs uppercase tracking-wider transition-all"
-            >
-              <FileText className="w-4 h-4 text-amber-400" />
-              <span>Generate Tax Bill / Estimate</span>
-            </a>
-          </div>
         </div>
 
         {/* Server Rendered Rate Table */}
