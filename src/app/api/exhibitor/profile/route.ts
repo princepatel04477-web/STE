@@ -96,7 +96,7 @@ export async function POST(request: Request) {
 
     if (existing) {
       db.prepare(
-        'UPDATE exhibitors SET brand_name = ?, stall_sqft = ?, updated_at = CURRENT_TIMESTAMP WHERE mobile = ?'
+        'UPDATE exhibitors SET brand_name = ?, stall_sqft = ?, fascia_names_json = ?, updated_at = CURRENT_TIMESTAMP WHERE mobile = ?'
       ).run(cleanBrand, cleanSqft, fasciaNamesJson, session.mobile);
     } else {
       db.prepare(
@@ -106,8 +106,8 @@ export async function POST(request: Request) {
 
     // Fetch existing order items for complete Google Sheet row sync
     const order = db
-      .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json FROM exhibitor_orders WHERE mobile = ?')
-      .get(session.mobile) as { items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string } | undefined;
+      .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json, rental_days FROM exhibitor_orders WHERE mobile = ?')
+      .get(session.mobile) as { items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string; rental_days?: number } | undefined;
 
     let items = [];
     if (order && order.items_json) {
@@ -131,7 +131,8 @@ export async function POST(request: Request) {
         owner_badges: order?.owner_badges ?? 0,
         sales_badges: order?.sales_badges ?? 0,
         support_badges: order?.support_badges ?? 0,
-        badge_names: badgeNames
+        badge_names: badgeNames,
+        rental_days: order?.rental_days ?? 2
       });
     } catch (err) {
       console.error('Google Sheets background sync error:', err);
