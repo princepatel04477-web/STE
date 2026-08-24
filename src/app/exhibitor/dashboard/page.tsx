@@ -430,6 +430,13 @@ export default function ExhibitorDashboardPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/stall-allocation"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black uppercase tracking-wider transition-all shadow-sm"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Stall Lottery</span>
+            </Link>
             {(mobile === '9106139666' || mobile === '9950787787') && (
               <a
                 href="/admin/exhibitors"
