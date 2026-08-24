@@ -1,0 +1,57 @@
+import { NextResponse } from 'next/server';
+import { getAuthenticatedExhibitor } from '@/lib/auth';
+import { findExhibitorByMobile } from '@/data/registeredExhibitors';
+import db, { LotteryAllocationRecord } from '@/lib/db';
+import { getAllocatedStallForMobile } from '@/lib/lotteryEngine';
+import { normalizeSqftCategory } from '@/data/stallInventory';
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const queryMobile = searchParams.get('mobile');
+
+    let mobile = '';
+    const session = await getAuthenticatedExhibitor();
+    if (session?.mobile) {
+      mobile = session.mobile;
+    } else if (queryMobile) {
+      mobile = queryMobile.replace(/\D/g, '').slice(-10);
+    }
+
+    if (!mobile || mobile.length < 10) {
+      return NextResponse.json(
+        { error: 'Mobile number is required or user must be logged in.' },
+        { status: 400 }
+      );
+    }
+
+    // 1. Get registered exhibitor profile
+    const registeredMaster = findExhibitorByMobile(mobile);
+    const dbExhibitor = db.prepare('SELECT * FROM exhibitors WHERE mobile = ?').get(mobile) as any;
+
+    const brandName = dbExhibitor?.brand_name || registeredMaster?.brandName || 'STE Exhibitor';
+    const rawSqft = dbExhibitor?.stall_sqft || registeredMaster?.stallSqft || '200 sq ft';
+    const categorySqft = normalizeSqftCategory(rawSqft);
+    const market = registeredMaster?.market || '';
+
+    // 2. Check allocation status
+    const allocation = getAllocatedStallForMobile(mobile);
+
+    return NextResponse.json({
+      success: true,
+      mobile,
+      brandName,
+      rawSqft,
+      categorySqft: `${categorySqft} sq ft`,
+      market,
+      hasDrawn: Boolean(allocation),
+      allocation: allocation || null
+    });
+  } catch (error) {
+    console.error('Lottery status error:', error);
+    return NextResponse.json(
+      { error: 'Failed to retrieve lottery status.' },
+      { status: 500 }
+    );
+  }
+}

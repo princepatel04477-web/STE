@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getStallPackageBySqft, STALL_PACKAGES, StallPackage } from '@/data/stallPackages';
 import { getProductImage, DISCLAIMER_TEXT } from '@/data/productImages';
@@ -40,7 +41,8 @@ import {
   X,
   FileText,
   Store,
-  Calendar
+  Calendar,
+  ArrowRight
 } from 'lucide-react';
 
 interface Product {
@@ -477,6 +479,34 @@ export default function ExhibitorDashboardPage() {
             <Clock className="w-4 h-4 text-amber-600" />
             <span>Cutoff: 05 Sept 2026, 12:00 PM</span>
           </div>
+        </div>
+
+        {/* Lucky Draw / Stall Allocation Banner */}
+        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-2 border-amber-500/40 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl relative overflow-hidden">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+              <Sparkles className="w-6 h-6 animate-pulse" />
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-1">
+                <span>Official Lucky Draw System Live</span>
+              </div>
+              <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">
+                Participate in Stall Allocation & Lucky Draw
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Open your digital Lucky Box to claim your allocated booth on the SIECC floor plan.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/stall-allocation"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+          >
+            <span>Open Lucky Box</span>
+            <ArrowRight className="w-4 h-4 text-slate-950" />
+          </Link>
         </div>
 
         {/* Section 1: Official Exhibitor Profile & Stall Allocation */}

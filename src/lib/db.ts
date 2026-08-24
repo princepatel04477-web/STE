@@ -67,11 +67,27 @@ export const REGISTERED_EXHIBITOR_MOBILES = [
   '9537420562', '9545612026'
 ];
 
+export interface LotteryAllocationRecord {
+  id: number;
+  mobile: string;
+  brand_name: string;
+  stall_sqft: string;
+  stall_number: string;
+  is_corner: number;
+  shape: 'L-Shape' | 'Linear';
+  hall: string;
+  zone: string;
+  dimensions: string;
+  slip_id: string;
+  allocated_at: string;
+}
+
 interface Schema {
   allowed_exhibitors: Array<{ id: number; mobile: string; notes: string; created_at: string }>;
   exhibitors: Array<{ id: number; mobile: string; brand_name: string; stall_sqft: string; custom_password?: string; fascia_names_json?: string; updated_at: string }>;
   extra_products: Array<{ id: string; name: string; category: string; description: string; unit: string; rate_inr?: number; icon_name: string; is_active: number }>;
   exhibitor_orders: Array<{ id: number; mobile: string; items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string; rental_days?: number; updated_at: string }>;
+  lottery_allocations: Array<LotteryAllocationRecord>;
 }
 
 const defaultProducts = [
@@ -104,7 +120,8 @@ function readData(): Schema {
       })),
       exhibitors: [],
       extra_products: defaultProducts,
-      exhibitor_orders: []
+      exhibitor_orders: [],
+      lottery_allocations: []
     };
     saveData(initial);
     return initial;
@@ -120,6 +137,9 @@ function readData(): Schema {
         created_at: new Date().toISOString()
       }));
     }
+    if (!parsed.lottery_allocations) {
+      parsed.lottery_allocations = [];
+    }
     // Always update extra_products rates to match STE_EXTRAS.xlsx
     parsed.extra_products = defaultProducts;
     return parsed;
@@ -133,7 +153,8 @@ function readData(): Schema {
       })),
       exhibitors: [],
       extra_products: defaultProducts,
-      exhibitor_orders: []
+      exhibitor_orders: [],
+      lottery_allocations: []
     };
   }
 }
@@ -181,6 +202,13 @@ export const db = {
           const target = String(args[0]);
           return data.exhibitor_orders.find(o => o.mobile === target);
         }
+        if (q.includes('from lottery_allocations where mobile = ?')) {
+          const target = String(args[0]);
+          return (data.lottery_allocations || []).find(l => l.mobile === target);
+        }
+        if (q.includes('count(*) as count from lottery_allocations')) {
+          return { count: (data.lottery_allocations || []).length };
+        }
         return undefined;
       },
 
@@ -193,6 +221,13 @@ export const db = {
 
         if (q.includes('from exhibitor_orders')) {
           return data.exhibitor_orders;
+        }
+
+        if (q.includes('from lottery_allocations')) {
+          if (q.includes('select stall_number')) {
+            return (data.lottery_allocations || []).map(l => ({ stall_number: l.stall_number }));
+          }
+          return data.lottery_allocations || [];
         }
 
         if (q.includes('from exhibitors') && !q.includes('left join')) {
@@ -428,6 +463,60 @@ export const db = {
             });
             saveData(data);
           }
+          return { changes: 1 };
+        }
+
+        if (q.includes('insert into lottery_allocations')) {
+          const mobile = String(args[0]);
+          const brand_name = String(args[1] || '');
+          const stall_sqft = String(args[2] || '');
+          const stall_number = String(args[3] || '');
+          const is_corner = Number(args[4] || 0);
+          const shape = (args[5] || 'Linear') as 'L-Shape' | 'Linear';
+          const hall = String(args[6] || '');
+          const zone = String(args[7] || '');
+          const dimensions = String(args[8] || '');
+          const slip_id = String(args[9] || '');
+          const allocated_at = String(args[10] || new Date().toISOString());
+
+          if (!data.lottery_allocations) data.lottery_allocations = [];
+          const existingIdx = data.lottery_allocations.findIndex(l => l.mobile === mobile);
+          const record: LotteryAllocationRecord = {
+            id: existingIdx >= 0 ? data.lottery_allocations[existingIdx].id : data.lottery_allocations.length + 1,
+            mobile,
+            brand_name,
+            stall_sqft,
+            stall_number,
+            is_corner,
+            shape,
+            hall,
+            zone,
+            dimensions,
+            slip_id,
+            allocated_at
+          };
+
+          if (existingIdx >= 0) {
+            data.lottery_allocations[existingIdx] = record;
+          } else {
+            data.lottery_allocations.push(record);
+          }
+          saveData(data);
+          return { changes: 1 };
+        }
+
+        if (q.includes('delete from lottery_allocations where mobile = ?')) {
+          const target = String(args[0]);
+          if (!data.lottery_allocations) data.lottery_allocations = [];
+          const initialLen = data.lottery_allocations.length;
+          data.lottery_allocations = data.lottery_allocations.filter(l => l.mobile !== target);
+          saveData(data);
+          return { changes: initialLen - data.lottery_allocations.length };
+        }
+
+        if (q.includes('delete from lottery_allocations')) {
+          data.lottery_allocations = [];
+          saveData(data);
           return { changes: 1 };
         }
 

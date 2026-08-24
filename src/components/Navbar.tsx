@@ -13,7 +13,8 @@ const navItems = [
   { name: "Couture", hiName: "वस्त्र कला", href: "/#fabric-in-motion" },
   { name: "Exhibition", hiName: "प्रदर्शनी", href: "/#exhibition-experience" },
   { name: "Digital Commerce", hiName: "डिजिटल वाणिज्य", href: "/#future-of-commerce" },
-  { name: "Register", hiName: "पंजीकरण", href: "/#buyer-registration" }
+  { name: "Register", hiName: "पंजीकरण", href: "/#buyer-registration" },
+  { name: "Stall Lottery", hiName: "स्टॉल लकी ड्रा", href: "/stall-allocation" }
 ];
 
 /**
@@ -470,6 +471,20 @@ export default function Navbar({ theme = "dark" }: NavbarProps) {
             }}
           >
             <span>📲 WhatsApp Us</span>
+          </a>
+
+          {/* Stall Allocation Button */}
+          <a
+            href="/stall-allocation"
+            onClick={() => setIsMobileOpen(false)}
+            className={`w-full h-[52px] bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-amber-500/20 border border-amber-400/50 text-amber-300 flex items-center justify-center rounded-xl font-extrabold text-[15px] uppercase tracking-wider btn-shimmer tap-feedback mobile-menu-cta ${
+              isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+            style={{
+              transitionDelay: "480ms"
+            }}
+          >
+            <Translate en="Stall Lottery / Lucky Draw" hi="स्टॉल लकी ड्रा" />
           </a>
 
           {/* Exhibitor's Portal Button */}
