@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import db, { LotteryAllocationRecord } from '@/lib/db';
-import { MASTER_STALL_INVENTORY } from '@/data/stallInventory';
+import { MASTER_STALL_INVENTORY, STALL_CATEGORY_LADDER, normalizeSqftCategory } from '@/data/stallInventory';
 
 export async function GET(request: Request) {
   try {
@@ -10,22 +10,15 @@ export async function GET(request: Request) {
     const allocations = (db.prepare('SELECT * FROM lottery_allocations').all() as LotteryAllocationRecord[]) || [];
     
     // Category Breakdown Stats
-    const categories = ['100', '200', '300', '400', '600', '800', '1000'];
-    const categoryStats = categories.map((cat) => {
+    const categoryStats = STALL_CATEGORY_LADDER.map((cat) => {
       const totalInInventory = MASTER_STALL_INVENTORY.filter((s) => s.categorySqft === cat).length;
       const cornerInInventory = MASTER_STALL_INVENTORY.filter((s) => s.categorySqft === cat && s.isCorner).length;
-      
-      const allocatedInCat = allocations.filter((a) => {
-        const digits = a.stall_sqft.replace(/\D/g, '');
-        const num = parseInt(digits, 10);
-        if (cat === '1000') return num >= 1000;
-        if (cat === '800') return num === 800;
-        if (cat === '600') return num === 600;
-        if (cat === '400') return num === 400;
-        if (cat === '300') return num === 300;
-        if (cat === '200') return num === 200;
-        return num === 100;
-      });
+
+      // Match on the stall actually allotted, so an upgraded exhibitor is counted
+      // against the category they were physically given.
+      const allocatedInCat = allocations.filter(
+        (a) => normalizeSqftCategory(a.stall_sqft) === cat
+      );
 
       return {
         category: `${cat} sq ft`,

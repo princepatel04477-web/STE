@@ -2,8 +2,7 @@ import {
   MASTER_STALL_INVENTORY,
   StallItem,
   normalizeSqftCategory,
-  getStallByNumber,
-  StallCategory
+  STALL_CATEGORY_LADDER
 } from '@/data/stallInventory';
 import db, { LotteryAllocationRecord } from '@/lib/db';
 
@@ -57,7 +56,7 @@ export function performLuckyDraw(
 
   // 2. Determine category & fetch master inventory
   const category = normalizeSqftCategory(rawSqft);
-  const isLargeStall = ['600', '800', '1000'].includes(category);
+  const isLargeStall = parseInt(category, 10) >= 600;
 
   // 3. Fetch all currently occupied stall numbers
   const allAllocations = (db.prepare(
@@ -98,19 +97,29 @@ export function performLuckyDraw(
     }
   }
 
-  // Graceful fallback if category pool is completely filled
+  // Graceful fallback if the paid-for category is sold out: step UP the ladder to
+  // the next larger size. Never downgrade — an exhibitor must not receive less
+  // floor area than they booked.
   if (candidatePool.length === 0) {
-    const allAvailable = MASTER_STALL_INVENTORY.filter(
-      (s) => !occupiedSet.has(s.stallNumber.toUpperCase())
-    );
-    if (allAvailable.length === 0) {
-      return {
-        success: false,
-        isExisting: false,
-        error: 'All stalls in the master floor plan have been fully allocated.'
-      };
+    const startIdx = STALL_CATEGORY_LADDER.indexOf(category);
+    for (let i = startIdx + 1; i < STALL_CATEGORY_LADDER.length; i++) {
+      const upgrade = STALL_CATEGORY_LADDER[i];
+      const pool = MASTER_STALL_INVENTORY.filter(
+        (s) => s.categorySqft === upgrade && !occupiedSet.has(s.stallNumber.toUpperCase())
+      );
+      if (pool.length > 0) {
+        candidatePool = pool;
+        break;
+      }
     }
-    candidatePool = allAvailable;
+  }
+
+  if (candidatePool.length === 0) {
+    return {
+      success: false,
+      isExisting: false,
+      error: `No ${category} sq ft stall (or larger) remains on the STE 2026 floor plan. Please contact the organiser.`
+    };
   }
 
   // 5. Select uniformly at random from eligible candidates
