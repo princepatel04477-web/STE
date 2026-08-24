@@ -79,22 +79,18 @@ export function performLuckyDraw(
   let candidatePool: StallItem[] = [];
 
   if (isLargeStall) {
-    // Priority 1: 2-side open L-Shape Corner stalls
-    const cornerCandidates = availableStalls.filter((s) => s.isCorner);
-    if (cornerCandidates.length > 0) {
-      candidatePool = cornerCandidates;
-    } else {
-      // Fallback: Any available stall in this category
-      candidatePool = availableStalls;
-    }
+    // Bookings of 600 sq ft and above always take a corner. The floor plan only
+    // ever cuts a >= 600 sq ft stall at a block end, so this filter is a guard
+    // against a future layout change rather than a preference.
+    candidatePool = availableStalls.filter((s) => s.isCorner);
   } else {
-    // For smaller stalls (100, 200, 300, 400), prefer standard in-line stalls
-    const standardCandidates = availableStalls.filter((s) => !s.isCorner);
-    if (standardCandidates.length > 0) {
-      candidatePool = standardCandidates;
-    } else {
-      candidatePool = availableStalls;
-    }
+    // Smaller bookings sit in the middle of a block, stepping down from the
+    // corners (400 next to a corner, then 300, 200, 100). A small stall only
+    // takes an end position in blocks that hold no large stall at all — the
+    // single-column perimeter rows and the north gallery — and even then only
+    // once the middle of those runs is full.
+    const middleCandidates = availableStalls.filter((s) => !s.isCorner);
+    candidatePool = middleCandidates.length > 0 ? middleCandidates : availableStalls;
   }
 
   // Graceful fallback if the paid-for category is sold out: step UP the ladder to
