@@ -117,7 +117,7 @@ export default function AllotmentSlipModal({
 
             <div className="p-4 rounded-xl bg-white/5 border border-white/10 print:border-slate-300 print:bg-slate-50">
               <span className="text-slate-400 print:text-slate-500 text-[10px] uppercase font-bold block mb-1">Event Dates & Timings</span>
-              <p className="font-bold text-white print:text-black">10th – 12th July, 2026</p>
+              <p className="font-bold text-white print:text-black">12th – 13th September, 2026</p>
               <p className="text-slate-400 print:text-slate-600 mt-1">SIECC, Sarsana, Surat, Gujarat</p>
             </div>
 
