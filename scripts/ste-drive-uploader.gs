@@ -64,7 +64,9 @@ function doPost(e) {
       return jsonOut({ error: 'Unsupported action: ' + payload.action });
     }
 
-    if (SHARED_TOKEN && SHARED_TOKEN !== 'CHANGE_ME_TO_A_LONG_RANDOM_STRING') {
+    // The token guard is active as soon as SHARED_TOKEN has been replaced with
+    // a real value (npm run drive:setup does this for you).
+    if (SHARED_TOKEN && SHARED_TOKEN.indexOf('CHANGE_ME') !== 0) {
       if (payload.token !== SHARED_TOKEN) {
         return jsonOut({ error: 'Invalid or missing token.' });
       }

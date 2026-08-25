@@ -41,3 +41,6 @@ next-env.d.ts
 /data/
 
 .claude/
+
+# Generated Apps Script copy (contains the deployment token)
+scripts/*.generated.gs
