@@ -189,8 +189,10 @@ export async function syncExhibitorFileToDrive(
     try {
       console.log(`[GoogleDrive] Attempting upload via Google Apps Script Web App...`);
       const base64Data = fileBuffer.toString('base64');
+      const parentFolderId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID || '1_6t-lfH0ha4BF1MxP2nsry6zmjmUFFcm';
       const payload = {
         action: 'upload_file',
+        parentFolderId,
         parentFolderName: 'STE Logos',
         exhibitorFolderName: folderName,
         mobile,
