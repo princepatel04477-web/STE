@@ -10,6 +10,7 @@ export interface StallPackage {
   metal_lights: number;
   plug_points: number;
   dust_bin: number;
+  corner_stall: boolean;
 }
 
 export const STALL_PACKAGES: StallPackage[] = [
@@ -24,7 +25,8 @@ export const STALL_PACKAGES: StallPackage[] = [
     rectangular_table: 1,
     metal_lights: 2,
     plug_points: 1,
-    dust_bin: 1
+    dust_bin: 1,
+    corner_stall: false
   },
   {
     size_sqft: 200,
@@ -37,7 +39,8 @@ export const STALL_PACKAGES: StallPackage[] = [
     rectangular_table: 2,
     metal_lights: 4,
     plug_points: 1,
-    dust_bin: 1
+    dust_bin: 1,
+    corner_stall: false
   },
   {
     size_sqft: 300,
@@ -50,7 +53,8 @@ export const STALL_PACKAGES: StallPackage[] = [
     rectangular_table: 3,
     metal_lights: 6,
     plug_points: 1,
-    dust_bin: 1
+    dust_bin: 1,
+    corner_stall: false
   },
   {
     size_sqft: 400,
@@ -63,7 +67,8 @@ export const STALL_PACKAGES: StallPackage[] = [
     rectangular_table: 4,
     metal_lights: 8,
     plug_points: 2,
-    dust_bin: 1
+    dust_bin: 1,
+    corner_stall: false
   },
   {
     size_sqft: 600,
@@ -76,7 +81,8 @@ export const STALL_PACKAGES: StallPackage[] = [
     rectangular_table: 8,
     metal_lights: 12,
     plug_points: 3,
-    dust_bin: 2
+    dust_bin: 2,
+    corner_stall: true
   },
   {
     size_sqft: 800,
@@ -89,7 +95,8 @@ export const STALL_PACKAGES: StallPackage[] = [
     rectangular_table: 8,
     metal_lights: 16,
     plug_points: 4,
-    dust_bin: 2
+    dust_bin: 2,
+    corner_stall: true
   },
   {
     size_sqft: 1000,
@@ -102,7 +109,8 @@ export const STALL_PACKAGES: StallPackage[] = [
     rectangular_table: 10,
     metal_lights: 20,
     plug_points: 4,
-    dust_bin: 2
+    dust_bin: 2,
+    corner_stall: true
   }
 ];
 
@@ -159,6 +167,7 @@ export function getStallPackageBySqft(sqftInput: string | number | undefined): S
     rectangular_table: pkg1000.rectangular_table * thousandBlocks + (remainderPkg ? remainderPkg.rectangular_table : 0),
     metal_lights: pkg1000.metal_lights * thousandBlocks + (remainderPkg ? remainderPkg.metal_lights : 0),
     plug_points: pkg1000.plug_points * thousandBlocks + (remainderPkg ? remainderPkg.plug_points : 0),
-    dust_bin: pkg1000.dust_bin * thousandBlocks + (remainderPkg ? remainderPkg.dust_bin : 0)
+    dust_bin: pkg1000.dust_bin * thousandBlocks + (remainderPkg ? remainderPkg.dust_bin : 0),
+    corner_stall: numericSqft >= 600
   };
 }

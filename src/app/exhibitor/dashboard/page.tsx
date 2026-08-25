@@ -907,6 +907,15 @@ export default function ExhibitorDashboardPage() {
                       <span className="text-xs font-semibold text-slate-700">Dust Bin</span>
                       <span className="font-extrabold text-amber-800 font-mono bg-amber-50 px-2 py-0.5 rounded border border-amber-200 text-xs">{currentPackage.dust_bin} pcs</span>
                     </div>
+                    {currentPackage.corner_stall && (
+                      <div className="p-3 bg-emerald-50/70 rounded-lg border border-emerald-300 flex items-center justify-between shadow-2xs">
+                        <span className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                          <Crown className="w-3.5 h-3.5 text-emerald-700" />
+                          <span>Corner Stall Allocation</span>
+                        </span>
+                        <span className="font-extrabold text-emerald-800 font-mono bg-white px-2 py-0.5 rounded border border-emerald-300 text-xs">✓ Included</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
