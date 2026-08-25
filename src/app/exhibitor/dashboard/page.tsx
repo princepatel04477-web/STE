@@ -160,29 +160,7 @@ export default function ExhibitorDashboardPage() {
   };
 
   const validateBadgeNames = (): string[] => {
-    const errs: string[] = [];
-    if (ownerBadges > 0) {
-      for (let i = 0; i < ownerBadges; i++) {
-        if (!ownerBadgeNames[i] || !ownerBadgeNames[i].trim()) {
-          errs.push(`Owner Badge #${i + 1} Name is required`);
-        }
-      }
-    }
-    if (salesBadges > 0) {
-      for (let i = 0; i < salesBadges; i++) {
-        if (!salesBadgeNames[i] || !salesBadgeNames[i].trim()) {
-          errs.push(`Sales Staff Badge #${i + 1} Name is required`);
-        }
-      }
-    }
-    if (supportBadges > 0) {
-      for (let i = 0; i < supportBadges; i++) {
-        if (!supportBadgeNames[i] || !supportBadgeNames[i].trim()) {
-          errs.push(`Support Staff Badge #${i + 1} Name is required`);
-        }
-      }
-    }
-    return errs;
+    return [];
   };
 
   const fetchInitialData = async () => {
@@ -1084,298 +1062,47 @@ export default function ExhibitorDashboardPage() {
           </div>
         </section>
 
-        {/* Section 3: Exhibitor Entry Badges */}
+        {/* Section 3: Exhibitor Entry Badges Registration */}
         <section id="section-badges" className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm scroll-mt-24">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
                 <Contact className="w-5 h-5" />
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <span>3. Exhibitor Entry Badges Request</span>
+                  <span>3. Exhibitor & Staff Badges Registration</span>
                   <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-amber-200 text-amber-900 border border-amber-300">
-                    Names Compulsory *
+                    Official Form
                   </span>
                 </h2>
-                <p className="text-xs text-slate-500">Request official hall entry badges for Owners, Sales Staff, and Support Team</p>
+                <p className="text-xs text-slate-500">Register owner, sales staff, and support team badges for official STE 2026 entry passes</p>
               </div>
-            </div>
-
-            <span className="self-start sm:self-center px-3 py-1.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs font-extrabold">
-              Total Badges: {ownerBadges + salesBadges + supportBadges}
-            </span>
-          </div>
-
-          {/* Compulsory Badges Notice Banner */}
-          <div className="mb-6 p-3.5 bg-amber-50/80 border border-amber-300 rounded-xl flex items-center justify-between gap-3 text-xs shadow-2xs">
-            <div className="flex items-center gap-2 text-amber-950 font-bold">
-              <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
-              <span>Full Name is <strong>COMPULSORY</strong> for each requested badge. Badges will be printed with these exact names.</span>
             </div>
           </div>
 
-          {/* Validation Errors Banner */}
-          {badgeErrors.length > 0 && (
-            <div className="mb-6 p-4 bg-red-50 border-2 border-red-400 rounded-xl text-red-800 text-xs space-y-1.5 shadow-sm">
-              <div className="flex items-center gap-2 font-black text-red-950 text-sm">
-                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-                <span>Please enter names for all requested badges:</span>
-              </div>
-              <ul className="list-disc list-inside pl-1 text-[11.5px] text-red-700 font-bold space-y-0.5">
-                {badgeErrors.map((err, i) => (
-                  <li key={i}>{err}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* For Owner */}
-            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
-                      <Crown className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-slate-900">For Owner</h3>
-                      <p className="text-[11px] text-slate-500">Directors / Stall Owners</p>
-                    </div>
-                  </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
-                </div>
-                <p className="text-xs text-slate-600 mb-4">Official VIP exhibitor badge with full access to hall & VIP lounge</p>
-                <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5 mb-3">
-                  <button
-                    type="button"
-                    onClick={() => handleOwnerBadgesChange(ownerBadges - 1)}
-                    className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
-                  >
-                    -
-                  </button>
-                  <span className="text-base font-extrabold text-amber-700">{ownerBadges}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleOwnerBadgesChange(ownerBadges + 1)}
-                    className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* Owner Badge Holder Names */}
-              {ownerBadges > 0 && (
-                <div className="pt-3 border-t border-slate-200 space-y-2 mt-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">
-                      Owner Name(s) to be printed:
-                    </span>
-                    <span className="text-[10px] text-red-600 font-extrabold">* Compulsory</span>
-                  </div>
-                  {Array.from({ length: ownerBadges }).map((_, idx) => {
-                    const isMissing = hasAttemptedSubmit && (!ownerBadgeNames[idx] || !ownerBadgeNames[idx].trim());
-                    return (
-                      <div key={idx} className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 shrink-0">
-                            #{idx + 1}
-                          </span>
-                          <input
-                            type="text"
-                            placeholder={`Owner / Director Full Name #${idx + 1} *`}
-                            value={ownerBadgeNames[idx] || ''}
-                            onChange={(e) => {
-                              const copy = [...ownerBadgeNames];
-                              copy[idx] = e.target.value;
-                              setOwnerBadgeNames(copy);
-                              if (badgeErrors.length > 0) setBadgeErrors([]);
-                            }}
-                            className={`w-full px-3 py-1.5 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
-                              isMissing
-                                ? 'border-red-500 ring-2 ring-red-400/40 bg-red-50/40 placeholder-red-400'
-                                : 'border-slate-300 focus:border-amber-500 focus:ring-amber-500'
-                            }`}
-                            required
-                          />
-                        </div>
-                        {isMissing && (
-                          <p className="text-[10px] text-red-600 font-bold ml-7">
-                            ⚠️ Owner name is compulsory
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+          <div className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-xl">
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 inline-block shadow-xs">
+                Online Registration Required
+              </span>
+              <h3 className="text-lg sm:text-xl font-extrabold text-white">
+                Submit Your Exhibitor & Staff Badges
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Please complete your team’s badge registration on the official STE 2026 registration portal for your digital and physical entry passes.
+              </p>
             </div>
 
-            {/* For Sales Staff */}
-            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
-                      <Users className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-slate-900">For Sales Staff</h3>
-                      <p className="text-[11px] text-slate-500">Sales Team & Executives</p>
-                    </div>
-                  </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
-                </div>
-                <p className="text-xs text-slate-600 mb-4">Exhibitor floor badges for your active sales team inside booth</p>
-                <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5 mb-3">
-                  <button
-                    type="button"
-                    onClick={() => handleSalesBadgesChange(salesBadges - 1)}
-                    className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
-                  >
-                    -
-                  </button>
-                  <span className="text-base font-extrabold text-amber-700">{salesBadges}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleSalesBadgesChange(salesBadges + 1)}
-                    className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* Sales Badge Holder Names */}
-              {salesBadges > 0 && (
-                <div className="pt-3 border-t border-slate-200 space-y-2 mt-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">
-                      Sales Person Name(s):
-                    </span>
-                    <span className="text-[10px] text-red-600 font-extrabold">* Compulsory</span>
-                  </div>
-                  {Array.from({ length: salesBadges }).map((_, idx) => {
-                    const isMissing = hasAttemptedSubmit && (!salesBadgeNames[idx] || !salesBadgeNames[idx].trim());
-                    return (
-                      <div key={idx} className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-200 px-1.5 py-0.5 rounded border border-slate-300 shrink-0">
-                            #{idx + 1}
-                          </span>
-                          <input
-                            type="text"
-                            placeholder={`Sales Staff Full Name #${idx + 1} *`}
-                            value={salesBadgeNames[idx] || ''}
-                            onChange={(e) => {
-                              const copy = [...salesBadgeNames];
-                              copy[idx] = e.target.value;
-                              setSalesBadgeNames(copy);
-                              if (badgeErrors.length > 0) setBadgeErrors([]);
-                            }}
-                            className={`w-full px-3 py-1.5 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
-                              isMissing
-                                ? 'border-red-500 ring-2 ring-red-400/40 bg-red-50/40 placeholder-red-400'
-                                : 'border-slate-300 focus:border-amber-500 focus:ring-amber-500'
-                            }`}
-                            required
-                          />
-                        </div>
-                        {isMissing && (
-                          <p className="text-[10px] text-red-600 font-bold ml-7">
-                            ⚠️ Sales staff name is compulsory
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* For Support Staff */}
-            <div className="bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl p-5 transition-all shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-lg bg-amber-100 text-amber-800">
-                      <Wrench className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-slate-900">For Support Staff</h3>
-                      <p className="text-[11px] text-slate-500">Setup & Technical Team</p>
-                    </div>
-                  </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Max 5</span>
-                </div>
-                <p className="text-xs text-slate-600 mb-4">Work passes for booth setup, technical maintenance & logistics staff</p>
-                <div className="flex items-center justify-between bg-white border border-slate-300 rounded-lg p-1.5 mb-3">
-                  <button
-                    type="button"
-                    onClick={() => handleSupportBadgesChange(supportBadges - 1)}
-                    className="w-8 h-8 rounded bg-slate-100 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-bold border border-slate-200"
-                  >
-                    -
-                  </button>
-                  <span className="text-base font-extrabold text-amber-700">{supportBadges}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleSupportBadgesChange(supportBadges + 1)}
-                    className="w-8 h-8 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold shadow-sm"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* Support Badge Holder Names */}
-              {supportBadges > 0 && (
-                <div className="pt-3 border-t border-slate-200 space-y-2 mt-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">
-                      Support Person Name(s):
-                    </span>
-                    <span className="text-[10px] text-red-600 font-extrabold">* Compulsory</span>
-                  </div>
-                  {Array.from({ length: supportBadges }).map((_, idx) => {
-                    const isMissing = hasAttemptedSubmit && (!supportBadgeNames[idx] || !supportBadgeNames[idx].trim());
-                    return (
-                      <div key={idx} className="space-y-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-200 px-1.5 py-0.5 rounded border border-slate-300 shrink-0">
-                            #{idx + 1}
-                          </span>
-                          <input
-                            type="text"
-                            placeholder={`Support Staff Full Name #${idx + 1} *`}
-                            value={supportBadgeNames[idx] || ''}
-                            onChange={(e) => {
-                              const copy = [...supportBadgeNames];
-                              copy[idx] = e.target.value;
-                              setSupportBadgeNames(copy);
-                              if (badgeErrors.length > 0) setBadgeErrors([]);
-                            }}
-                            className={`w-full px-3 py-1.5 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 transition-all ${
-                              isMissing
-                                ? 'border-red-500 ring-2 ring-red-400/40 bg-red-50/40 placeholder-red-400'
-                                : 'border-slate-300 focus:border-amber-500 focus:ring-amber-500'
-                            }`}
-                            required
-                          />
-                        </div>
-                        {isMissing && (
-                          <p className="text-[10px] text-red-600 font-bold ml-7">
-                            ⚠️ Support staff name is compulsory
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            <a
+              href="https://eventmanagement.isavgo.com/ste2026-registration"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 shrink-0"
+            >
+              <span>Fill Badge Form</span>
+              <ExternalLink className="w-4 h-4 text-slate-950" />
+            </a>
           </div>
         </section>
 
