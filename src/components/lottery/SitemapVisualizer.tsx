@@ -18,10 +18,10 @@ interface SitemapVisualizerProps {
 }
 
 /** px per 10ft module in the SVG user space */
-const U = 14;
-const PAD_X = 44;
-const PAD_TOP = 54;
-const PAD_BOTTOM = 34;
+const U = 20;
+const PAD_X = 52;
+const PAD_TOP = 62;
+const PAD_BOTTOM = 38;
 const VIEW_W = GRID_COLS * U + PAD_X * 2;
 const VIEW_H = GRID_ROWS * U + PAD_TOP + PAD_BOTTOM;
 
@@ -42,7 +42,7 @@ export default function SitemapVisualizer({
     [mine]
   );
 
-  const handleZoom = (delta: number) => setZoom((z) => Math.min(3, Math.max(0.8, +(z + delta).toFixed(2))));
+  const handleZoom = (delta: number) => setZoom((z) => Math.min(3, Math.max(0.6, +(z + delta).toFixed(2))));
 
   const focusMyStall = () => {
     if (!myStall) return;
@@ -69,7 +69,7 @@ export default function SitemapVisualizer({
             <h3 className="text-base sm:text-lg font-bold text-white">Exhibition Sitemap — STE 2026</h3>
           </div>
           <p className="text-xs text-slate-400">
-            {MASTER_STALL_INVENTORY.length} stalls across {SITEMAP_BLOCKS.length} blocks · drawn to the official SIECC floor plan
+            {MASTER_STALL_INVENTORY.length} stalls · every stall one line deep · each square is 100 sq ft
           </p>
         </div>
 
@@ -97,12 +97,12 @@ export default function SitemapVisualizer({
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] mb-3">
-        <LegendSwatch className="bg-[#FDF082] border-amber-500" label="In-line stall" tone="text-slate-300" />
-        <LegendSwatch className="bg-amber-400 border-amber-600" label="Twin-aisle island" tone="text-slate-300" />
-        <LegendSwatch className="bg-orange-400 border-orange-700" label="L-shape corner (2–3 sides open)" tone="text-amber-300" />
+        <LegendSwatch className="bg-[#FDF082] border-amber-600" label="In-line stall" tone="text-slate-300" />
+        <LegendSwatch className="bg-orange-400 border-orange-700" label="Corner stall (2-side open, 600 sq ft +)" tone="text-amber-300" />
         {mine && (
           <LegendSwatch className="bg-emerald-400 border-emerald-200 animate-pulse" label={`Your stall (${allocatedStallNumber})`} tone="text-emerald-400 font-bold" />
         )}
+        <span className="text-slate-500">Thin lines inside a stall mark each 100 sq ft module.</span>
       </div>
 
       {/* Inspector */}
@@ -143,23 +143,23 @@ export default function SitemapVisualizer({
           {/* Hall shell */}
           <rect x={0} y={0} width={VIEW_W} height={VIEW_H} fill="#FAF8F5" />
           <rect
-            x={px(0) - 18}
-            y={py(0) - 18}
-            width={GRID_COLS * U + 36}
-            height={GRID_ROWS * U + 36}
+            x={px(0) - 22}
+            y={py(0) - 22}
+            width={GRID_COLS * U + 44}
+            height={GRID_ROWS * U + 44}
             fill="#EFEBE3"
             stroke="#94a3b8"
             strokeWidth={2}
             rx={4}
           />
           {/* Central cross aisle between the north and south halls */}
-          <rect x={px(0) - 18} y={py(16)} width={GRID_COLS * U + 36} height={U * 2} fill="#F7F4EE" />
+          <rect x={px(0) - 22} y={py(16)} width={GRID_COLS * U + 44} height={U * 2} fill="#F7F4EE" />
 
           {/* Landmarks */}
           {SITEMAP_LANDMARKS.washrooms.map((w, i) => (
             <g key={`wr-${i}`}>
-              <rect x={px(w.col) - 20} y={py(w.row) - 4} width={U + 40} height={16} fill="#e2e8f0" stroke="#94a3b8" rx={2} />
-              <text x={px(w.col) + U / 2} y={py(w.row) + 8} textAnchor="middle" fontSize={9} fontWeight={700} fill="#334155">
+              <rect x={px(w.col) - 24} y={py(w.row) - 2} width={U + 48} height={17} fill="#e2e8f0" stroke="#94a3b8" rx={2} />
+              <text x={px(w.col) + U / 2} y={py(w.row) + 11} textAnchor="middle" fontSize={10} fontWeight={700} fill="#334155">
                 Washroom
               </text>
             </g>
@@ -167,20 +167,20 @@ export default function SitemapVisualizer({
           {SITEMAP_LANDMARKS.emergencyGates.map((g, i) => (
             <g key={`gate-${i}`}>
               <rect
-                x={g.orient === 'h' ? px(g.col) : px(g.col) + 4}
-                y={g.orient === 'h' ? py(g.row) + 4 : py(g.row)}
-                width={g.orient === 'h' ? U * 2 : 6}
-                height={g.orient === 'h' ? 6 : U * 2}
+                x={g.orient === 'h' ? px(g.col) : px(g.col) + 6}
+                y={g.orient === 'h' ? py(g.row) + 6 : py(g.row)}
+                width={g.orient === 'h' ? U * 2 : 7}
+                height={g.orient === 'h' ? 7 : U * 2}
                 fill="#dc2626"
               />
               <text
-                x={g.orient === 'h' ? px(g.col) + U : px(g.col) + 7}
-                y={g.orient === 'h' ? py(g.row) : py(g.row) - 4}
+                x={g.orient === 'h' ? px(g.col) + U : px(g.col) + 9}
+                y={g.orient === 'h' ? py(g.row) + 1 : py(g.row) - 5}
                 textAnchor="middle"
-                fontSize={8}
+                fontSize={9}
                 fontWeight={700}
                 fill="#b91c1c"
-                transform={g.orient === 'v' ? `rotate(-90 ${px(g.col) + 7} ${py(g.row) - 4})` : undefined}
+                transform={g.orient === 'v' ? `rotate(-90 ${px(g.col) + 9} ${py(g.row) - 5})` : undefined}
               >
                 Emergency gate
               </text>
@@ -194,23 +194,23 @@ export default function SitemapVisualizer({
             x={px(21)}
             y={py(24)}
             textAnchor="middle"
-            fontSize={22}
+            fontSize={26}
             fontWeight={900}
             fill="#1d4ed8"
-            opacity={0.28}
+            opacity={0.25}
             letterSpacing="1"
           >
             SIECC MAIN LOBBY
           </text>
 
-          {/* Block labels — the gallery runs sit under the washrooms, so they stay unlabelled */}
+          {/* Block labels */}
           {SITEMAP_BLOCKS.filter((b) => b.wing !== 'north-gallery').map((b) => (
             <text
               key={`lbl-${b.id}`}
-              x={px(b.cols[0]) + (b.cols.length > 1 ? U : U / 2)}
-              y={py(b.rowStart) - 4}
+              x={px(b.cols[0]) + (b.cols.length * U) / 2}
+              y={py(b.rowStart) - 5}
               textAnchor="middle"
-              fontSize={8}
+              fontSize={10}
               fontWeight={800}
               fill="#92400e"
             >
@@ -222,44 +222,58 @@ export default function SitemapVisualizer({
           {MASTER_STALL_INVENTORY.map((s) => {
             const isMine = s.stallNumber.toUpperCase() === mine;
             const isSelected = selected?.stallNumber === s.stallNumber;
+            const x = px(s.col);
+            const y = py(s.row);
             const w = s.colSpan * U;
             const h = s.rowSpan * U;
-            const fill = isMine
-              ? '#34d399'
-              : s.isCorner
-                ? '#fb923c'
-                : s.colSpan > 1
-                  ? '#fbbf24'
-                  : '#FDF082';
+            const fill = isMine ? '#34d399' : s.isCorner ? '#fb923c' : '#FDF082';
+            const vertical = s.rowSpan >= s.colSpan;
+            const longSide = vertical ? h : w;
+
+            // Separation lines for each 100 sq ft module inside the stall.
+            const dividers: React.ReactElement[] = [];
+            for (let k = 1; k < s.rowSpan; k++) {
+              dividers.push(
+                <line key={`h${k}`} x1={x} y1={y + k * U} x2={x + w} y2={y + k * U} stroke="#a16207" strokeWidth={0.4} opacity={0.45} />
+              );
+            }
+            for (let k = 1; k < s.colSpan; k++) {
+              dividers.push(
+                <line key={`v${k}`} x1={x + k * U} y1={y} x2={x + k * U} y2={y + h} stroke="#a16207" strokeWidth={0.4} opacity={0.45} />
+              );
+            }
+
+            const cx = x + w / 2;
+            const cy = y + h / 2;
 
             return (
               <g key={s.stallNumber} onClick={() => setSelected(s)} className="cursor-pointer">
                 <title>{`${s.stallNumber} — ${s.description} (${s.dimensions})`}</title>
                 <rect
-                  x={px(s.col)}
-                  y={py(s.row)}
+                  x={x}
+                  y={y}
                   width={w}
                   height={h}
                   fill={fill}
-                  stroke={isMine ? '#047857' : isSelected ? '#1d4ed8' : '#a16207'}
-                  strokeWidth={isMine || isSelected ? 2 : 0.6}
-                  rx={1.5}
+                  stroke={isMine ? '#047857' : isSelected ? '#1d4ed8' : '#92400e'}
+                  strokeWidth={isMine || isSelected ? 2.5 : 1.1}
                 >
-                  {isMine && (
-                    <animate attributeName="opacity" values="1;0.55;1" dur="1.6s" repeatCount="indefinite" />
-                  )}
+                  {isMine && <animate attributeName="opacity" values="1;0.55;1" dur="1.6s" repeatCount="indefinite" />}
                 </rect>
-                {(s.colSpan > 1 || s.rowSpan > 1) && (
+                {dividers}
+                {longSide >= 3 * U && (
                   <text
-                    x={px(s.col) + w / 2}
-                    y={py(s.row) + h / 2 + 3}
+                    x={cx}
+                    y={cy}
                     textAnchor="middle"
-                    fontSize={Math.min(9, w / 3.4)}
+                    dominantBaseline="central"
+                    fontSize={10}
                     fontWeight={700}
                     fill={isMine ? '#064e3b' : '#451a03'}
                     pointerEvents="none"
+                    transform={vertical ? `rotate(-90 ${cx} ${cy})` : undefined}
                   >
-                    {s.sqftNumber >= 400 ? s.stallNumber : s.stallNumber.split('-')[1]}
+                    {s.stallNumber} · {s.sqftNumber}
                   </text>
                 )}
               </g>
@@ -268,27 +282,26 @@ export default function SitemapVisualizer({
 
           {/* Marker for the allotted stall */}
           {myStall && (
-            <g pointerEvents="none">
-              <circle
-                cx={px(myStall.col) + (myStall.colSpan * U) / 2}
-                cy={py(myStall.row) + (myStall.rowSpan * U) / 2}
-                r={Math.max(myStall.colSpan, myStall.rowSpan) * U * 0.75}
-                fill="none"
-                stroke="#10b981"
-                strokeWidth={2}
-                opacity={0.8}
-              >
-                <animate attributeName="r" values="10;28;10" dur="2s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.9;0;0.9" dur="2s" repeatCount="indefinite" />
-              </circle>
-            </g>
+            <circle
+              cx={px(myStall.col) + (myStall.colSpan * U) / 2}
+              cy={py(myStall.row) + (myStall.rowSpan * U) / 2}
+              r={12}
+              fill="none"
+              stroke="#10b981"
+              strokeWidth={2.5}
+              pointerEvents="none"
+            >
+              <animate attributeName="r" values="12;36;12" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.9;0;0.9" dur="2s" repeatCount="indefinite" />
+            </circle>
           )}
         </svg>
       </div>
 
       <p className="text-[10px] text-slate-500 mt-3">
-        Tentative map. Each grid square is one 10ft × 10ft (100 sq ft) module; stall footprints are drawn to scale.
-        Aisle positions, gates and washrooms follow the official SIECC layout.
+        Tentative map. Each square is one 10ft × 10ft (100 sq ft) module. Every stall runs back along a single
+        line — 100 sq ft is the only square, all larger stalls are rectangles. Aisles, gates and washrooms follow
+        the official SIECC layout.
       </p>
     </div>
   );
@@ -319,10 +332,10 @@ function LobbyDoor({
   return (
     <g>
       <rect x={px(spec.col)} y={py(spec.row)} width={w} height={h} fill="#ffffff" stroke={color} strokeWidth={1.5} rx={2} />
-      <text x={px(spec.col) + w / 2} y={py(spec.row) + h / 2} textAnchor="middle" fontSize={9} fontWeight={800} fill={color}>
+      <text x={px(spec.col) + w / 2} y={py(spec.row) + h / 2 - 4} textAnchor="middle" fontSize={11} fontWeight={800} fill={color}>
         {label}
       </text>
-      <text x={px(spec.col) + w / 2} y={py(spec.row) + h / 2 + 13} textAnchor="middle" fontSize={13} fontWeight={800} fill={color}>
+      <text x={px(spec.col) + w / 2} y={py(spec.row) + h / 2 + 14} textAnchor="middle" fontSize={15} fontWeight={800} fill={color}>
         {arrow}
       </text>
     </g>

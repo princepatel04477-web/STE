@@ -14,6 +14,10 @@ export interface SyncPayload {
     support?: string[];
   };
   rental_days?: number;
+  logo_file_url?: string;
+  cdr_file_url?: string;
+  drive_file_url?: string;
+  drive_folder_url?: string;
   updated_at?: string;
 }
 
@@ -94,7 +98,12 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
       support_badge_names: supportNamesStr,
       // Summary & Notes
       items_summary: formattedItemsSummary,
-      special_notes: payload.special_notes || ''
+      special_notes: payload.special_notes || '',
+      // Official Brand Assets & Google Drive Links
+      logo_file_url: payload.logo_file_url || '',
+      cdr_file_url: payload.cdr_file_url || '',
+      drive_file_url: payload.drive_file_url || '',
+      drive_folder_url: payload.drive_folder_url || ''
     };
 
     // 1. Try POST request

@@ -12,8 +12,8 @@ export async function GET() {
     }
 
     const exhibitor = db
-      .prepare('SELECT mobile, brand_name, stall_sqft, fascia_names_json, updated_at FROM exhibitors WHERE mobile = ?')
-      .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; fascia_names_json?: string; updated_at: string } | undefined;
+      .prepare('SELECT mobile, brand_name, stall_sqft, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url, updated_at FROM exhibitors WHERE mobile = ?')
+      .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; fascia_names_json?: string; logo_file_url?: string; cdr_file_url?: string; drive_file_url?: string; drive_folder_id?: string; drive_folder_url?: string; updated_at: string } | undefined;
 
     const reg = findExhibitorByMobile(session.mobile);
     const brand_name = (exhibitor?.brand_name && exhibitor.brand_name.trim() !== '')
@@ -46,6 +46,10 @@ export async function GET() {
       brand_name,
       stall_sqft,
       fascia_names,
+      logo_file_url: exhibitor?.logo_file_url || null,
+      cdr_file_url: exhibitor?.cdr_file_url || null,
+      drive_file_url: exhibitor?.drive_file_url || null,
+      drive_folder_url: exhibitor?.drive_folder_url || null,
       category: reg?.category || '',
       market: reg?.market || ''
     });

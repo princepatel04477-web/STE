@@ -1,24 +1,30 @@
 /**
  * STE 2026 master stall inventory — derived directly from STE_Sitemap.jpeg.
  *
- * The site map is a uniform grid of identical square modules. One module is a
- * 10ft x 10ft (100 sq ft) shell — the smallest sellable stall. Every larger
- * booking is a contiguous run of those modules, so a 600 sq ft stall is a
- * 2-module-wide x 3-module-deep block.
+ * The map is a grid of 604 identical squares. One square is a 10ft x 10ft
+ * (100 sq ft) module, and the separation lines on the map are the stall
+ * divisions.
  *
- * Grid coordinates were measured off the map artwork itself (module pitch ~29px,
- * 43 column slots x 28 row slots) so on-screen positions and stall numbers always
- * agree with the printed map.
+ * SHAPE RULE
+ * Every stall occupies ONE line only — a single column of a block, never two.
+ * So 100 sq ft is the only square (10ft x 10ft); every larger stall is a
+ * rectangle running back along its line:
  *
- * ARRANGEMENT RULE (organiser's, enforced by arrangeOutward below):
- * every block reads large -> small -> large from end to end. The biggest stalls
- * take the block ends, where they get frontage on both the aisle and the cross
- * aisle (an L-shape corner); each successive size steps down toward the middle:
+ *     200 = 10 x 20    300 = 10 x 30    400 = 10 x 40
+ *     600 = 10 x 60    800 = 10 x 80   1000 = 10 x 100
+ *
+ * (The single exception is block B5, kept whole as the one 2000 sq ft anchor —
+ * 20 modules will not fit in a 14-module line.)
+ *
+ * ARRANGEMENT RULE
+ * Each line reads large -> small -> large from end to end. The biggest stalls
+ * take the line ends, where they front both the aisle and the cross aisle (an
+ * L-shape corner); each successive size steps down toward the middle:
  *
  *     corner 600+ | 400 | 300 | 200 | 100 | 100 | 200 | 300 | 400 | corner 600+
  *
- * That guarantees every >= 600 sq ft booking lands on a corner, and that a 400
- * sits next to a corner, a 300 next to a 400, and so on.
+ * Both rules are enforced at load by assertStallRules(); a recipe that breaks
+ * either one throws rather than mis-allotting quietly.
  */
 
 export type StallCategory = '100' | '200' | '300' | '400' | '600' | '800' | '1000' | '1200' | '2000';
@@ -29,14 +35,11 @@ export const MODULE_FT = 10;
 export const GRID_COLS = 43;
 export const GRID_ROWS = 28;
 
-/** Sizes at or above this span the full width of a block (2 modules / 20ft). */
-const FULL_WIDTH_FROM = 400;
-
 export interface StallItem {
   stallNumber: string;
   categorySqft: StallCategory;
   sqftNumber: number;
-  dimensions: string; // e.g. "20ft × 30ft"
+  dimensions: string; // e.g. "10ft × 30ft"
   isCorner: boolean;
   shape: StallShape;
   openSides: 1 | 2 | 3 | 4;
@@ -54,55 +57,34 @@ export interface StallItem {
 type Wing = 'north-gallery' | 'north-hall' | 'south-hall';
 
 /**
- * A recipe is only a bill of sizes — never a placement. Where each stall lands
- * is decided by the arrangement rule, so the ordering cannot drift from it.
+ * Cut patterns — a bill of stall sizes that must exactly fill one line.
+ * Placement is never written here; the arrangement rule decides it.
+ * Suffix is the line length in modules.
  */
-interface DoubleRecipe {
-  kind: 'double';
-  full: number[];   // full-width stalls (>= 400 sq ft), placed at the block ends
-  left: number[];   // single-column stalls, left column of the middle band
-  right: number[];  // single-column stalls, right column of the middle band
-}
-
-interface SingleRecipe {
-  kind: 'single';
-  column: number[]; // one module wide, against a perimeter wall
-}
-
-interface RunRecipe {
-  kind: 'run';
-  run: number[];    // one module deep, running west to east along the north wall
-}
-
-type Recipe = DoubleRecipe | SingleRecipe | RunRecipe;
-
-const dbl = (full: number[], left: number[], right: number[]): DoubleRecipe =>
-  ({ kind: 'double', full, left, right });
-
-const RECIPES: Record<string, Recipe> = {
-  // ---- 2 columns x 14 rows (north hall) ----
-  GRAND:   dbl([1000, 1000, 400, 400], [], []),
-  ANCHOR:  dbl([1000, 600, 400], [200, 200], [300, 100]),
-  PREMIUM: dbl([800, 600, 400], [300, 200], [200, 200, 100]),
-  CORNER:  dbl([600, 600, 400, 400], [200, 100, 100], [300, 100]),
-  MEGA:    dbl([1200, 600, 400], [300], [200, 100]),
-  TWIN:    dbl([1000, 800], [300, 200], [200, 200, 100]),
-  // ---- 2 columns x 10 rows (south hall) ----
-  S_QUAD:  dbl([600, 600, 400, 400], [], []),
-  S_ARENA: dbl([2000], [], []),
-  S_SPLIT: dbl([600, 600], [200, 200], [200, 100, 100]),
-  // ---- 2 columns x 9 rows (south hall) ----
-  S_PAIR:  dbl([600, 600], [300], [200, 100]),
-  S_MEGA:  dbl([1200, 600], [], []),
-  S_MIX:   dbl([600, 600], [100, 200], [300]),
-  // ---- single-column perimeter blocks ----
-  W_LONG:  { kind: 'single', column: [300, 200, 200, 200, 300, 200] },
-  E_LONG:  { kind: 'single', column: [300, 200, 200, 200, 200, 100, 100] },
-  W_SHORT: { kind: 'single', column: [200, 200, 300, 200, 100] },
-  E_SHORT: { kind: 'single', column: [100, 200, 200, 100, 200, 200] },
-  // ---- north wall gallery runs ----
-  GAL_14:  { kind: 'run', run: [100, 200, 200, 300, 200, 200, 100, 100] },
-  GAL_13:  { kind: 'run', run: [100, 200, 200, 300, 200, 200, 100] },
+const PATTERNS: Record<string, number[]> = {
+  // ---- 14-module lines (north hall + the two long gallery runs) ----
+  MEGA_14:   [1200, 200],
+  ANCHOR_14: [800, 600],
+  GRAND_14:  [1000, 400],
+  TWIN_14:   [600, 200, 600],
+  CORNER_14: [600, 400, 400],
+  QUAD_14:   [400, 200, 100, 100, 200, 400],
+  STEP_14:   [300, 300, 200, 200, 100, 100, 100, 100],
+  INLINE_14: [200, 200, 200, 200, 100, 100, 100, 100, 100, 100],
+  // ---- 13-module lines ----
+  TWIN_13:   [600, 100, 600],
+  STEP_13:   [400, 300, 200, 200, 200],
+  // ---- 10-module lines (south hall) ----
+  GRAND_10:  [1000],
+  CORNER_10: [600, 400],
+  QUAD_10:   [400, 200, 400],
+  STEP_10:   [300, 200, 200, 300],
+  INLINE_10: [200, 200, 200, 100, 100, 100, 100],
+  // ---- 9-module lines (south hall) ----
+  CORNER_9:  [600, 300],
+  QUAD_9:    [400, 200, 300],
+  STEP_9:    [300, 300, 300],
+  INLINE_9:  [200, 200, 200, 200, 100],
 };
 
 export interface BlockDef {
@@ -112,7 +94,11 @@ export interface BlockDef {
   rowEnd: number;      // inclusive
   wing: Wing;
   label: string;
-  recipe: string;
+  /** One cut pattern per line, west to east. Gallery blocks hold a single
+   *  horizontal line, so they name one pattern. */
+  columns: string[];
+  /** Set when the whole block is one oversized stall (the 2000 sq ft anchor). */
+  whole?: number;
 }
 
 /**
@@ -121,39 +107,39 @@ export interface BlockDef {
  * South hall: 5 blocks west of the entry lobby, 5 east of it.
  */
 export const SITEMAP_BLOCKS: BlockDef[] = [
-  // North hall — rows 2..15 (block A15 is one row shorter on the map)
-  { id: 'A1',  cols: [0],      rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'West Wall Row',      recipe: 'W_LONG' },
-  { id: 'A2',  cols: [2, 3],   rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 1 West',       recipe: 'GRAND' },
-  { id: 'A3',  cols: [5, 6],   rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 1 East',       recipe: 'GRAND' },
-  { id: 'A4',  cols: [8, 9],   rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 2 West',       recipe: 'GRAND' },
-  { id: 'A5',  cols: [11, 12], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 2 East',       recipe: 'ANCHOR' },
-  { id: 'A6',  cols: [14, 15], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 3 West',       recipe: 'ANCHOR' },
-  { id: 'A7',  cols: [17, 18], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 3 East',       recipe: 'PREMIUM' },
-  { id: 'A8',  cols: [20, 21], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Central Aisle West', recipe: 'PREMIUM' },
-  { id: 'A9',  cols: [24, 25], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Central Aisle East', recipe: 'TWIN' },
-  { id: 'A10', cols: [27, 28], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 4 West',       recipe: 'CORNER' },
-  { id: 'A11', cols: [30, 31], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 4 East',       recipe: 'CORNER' },
-  { id: 'A12', cols: [33, 34], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 5 West',       recipe: 'CORNER' },
-  { id: 'A13', cols: [36, 37], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 5 East',       recipe: 'CORNER' },
-  { id: 'A14', cols: [39, 40], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 6 West',       recipe: 'MEGA' },
-  { id: 'A15', cols: [42],     rowStart: 2, rowEnd: 14, wing: 'north-hall', label: 'East Wall Row',      recipe: 'E_LONG' },
+  // North hall — 14-module lines (block A15 is one module shorter on the map)
+  { id: 'A1',  cols: [0],      rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'West Wall Row',      columns: ['STEP_14'] },
+  { id: 'A2',  cols: [2, 3],   rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 1 West',       columns: ['GRAND_14', 'GRAND_14'] },
+  { id: 'A3',  cols: [5, 6],   rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 1 East',       columns: ['GRAND_14', 'GRAND_14'] },
+  { id: 'A4',  cols: [8, 9],   rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 2 West',       columns: ['GRAND_14', 'GRAND_14'] },
+  { id: 'A5',  cols: [11, 12], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 2 East',       columns: ['ANCHOR_14', 'ANCHOR_14'] },
+  { id: 'A6',  cols: [14, 15], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 3 West',       columns: ['ANCHOR_14', 'MEGA_14'] },
+  { id: 'A7',  cols: [17, 18], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 3 East',       columns: ['MEGA_14', 'TWIN_14'] },
+  { id: 'A8',  cols: [20, 21], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Central Aisle West', columns: ['TWIN_14', 'TWIN_14'] },
+  { id: 'A9',  cols: [24, 25], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Central Aisle East', columns: ['TWIN_14', 'TWIN_14'] },
+  { id: 'A10', cols: [27, 28], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 4 West',       columns: ['TWIN_14', 'TWIN_14'] },
+  { id: 'A11', cols: [30, 31], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 4 East',       columns: ['TWIN_14', 'CORNER_14'] },
+  { id: 'A12', cols: [33, 34], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 5 West',       columns: ['CORNER_14', 'QUAD_14'] },
+  { id: 'A13', cols: [36, 37], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 5 East',       columns: ['QUAD_14', 'QUAD_14'] },
+  { id: 'A14', cols: [39, 40], rowStart: 2, rowEnd: 15, wing: 'north-hall', label: 'Aisle 6 West',       columns: ['QUAD_14', 'STEP_14'] },
+  { id: 'A15', cols: [42],     rowStart: 2, rowEnd: 14, wing: 'north-hall', label: 'East Wall Row',      columns: ['TWIN_13'] },
 
-  // South hall — rows 18..27 (alternating blocks are one row shorter on the map)
-  { id: 'B1',  cols: [0],      rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'West Wall Row',    recipe: 'W_SHORT' },
-  { id: 'B2',  cols: [2, 3],   rowStart: 18, rowEnd: 26, wing: 'south-hall', label: 'Exit Aisle West',  recipe: 'S_MEGA' },
-  { id: 'B3',  cols: [5, 6],   rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'Exit Aisle East',  recipe: 'S_QUAD' },
-  { id: 'B4',  cols: [8, 9],   rowStart: 18, rowEnd: 26, wing: 'south-hall', label: 'South Aisle 1',    recipe: 'S_PAIR' },
-  { id: 'B5',  cols: [11, 12], rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'South Aisle 2',    recipe: 'S_ARENA' },
-  { id: 'B6',  cols: [30, 31], rowStart: 18, rowEnd: 26, wing: 'south-hall', label: 'South Aisle 3',    recipe: 'S_MIX' },
-  { id: 'B7',  cols: [33, 34], rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'South Aisle 4',    recipe: 'S_SPLIT' },
-  { id: 'B8',  cols: [36, 37], rowStart: 18, rowEnd: 26, wing: 'south-hall', label: 'Entry Aisle West', recipe: 'S_PAIR' },
-  { id: 'B9',  cols: [39, 40], rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'Entry Aisle East', recipe: 'S_QUAD' },
-  { id: 'B10', cols: [42],     rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'East Wall Row',    recipe: 'E_SHORT' },
+  // South hall — 10- and 9-module lines, alternating as drawn
+  { id: 'B1',  cols: [0],      rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'West Wall Row',    columns: ['INLINE_10'] },
+  { id: 'B2',  cols: [2, 3],   rowStart: 18, rowEnd: 26, wing: 'south-hall', label: 'Exit Aisle West',  columns: ['CORNER_9', 'CORNER_9'] },
+  { id: 'B3',  cols: [5, 6],   rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'Exit Aisle East',  columns: ['GRAND_10', 'GRAND_10'] },
+  { id: 'B4',  cols: [8, 9],   rowStart: 18, rowEnd: 26, wing: 'south-hall', label: 'South Aisle 1',    columns: ['QUAD_9', 'QUAD_9'] },
+  { id: 'B5',  cols: [11, 12], rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'South Aisle 2',    columns: [], whole: 2000 },
+  { id: 'B6',  cols: [30, 31], rowStart: 18, rowEnd: 26, wing: 'south-hall', label: 'South Aisle 3',    columns: ['QUAD_9', 'STEP_9'] },
+  { id: 'B7',  cols: [33, 34], rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'South Aisle 4',    columns: ['GRAND_10', 'CORNER_10'] },
+  { id: 'B8',  cols: [36, 37], rowStart: 18, rowEnd: 26, wing: 'south-hall', label: 'Entry Aisle West', columns: ['INLINE_9', 'INLINE_9'] },
+  { id: 'B9',  cols: [39, 40], rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'Entry Aisle East', columns: ['CORNER_10', 'QUAD_10'] },
+  { id: 'B10', cols: [42],     rowStart: 18, rowEnd: 27, wing: 'south-hall', label: 'East Wall Row',    columns: ['STEP_10'] },
 
   // North wall gallery — one module deep, split by the two washrooms
-  { id: 'NG1', cols: [0, 13],  rowStart: 0, rowEnd: 0, wing: 'north-gallery', label: 'North Gallery West',   recipe: 'GAL_14' },
-  { id: 'NG2', cols: [15, 27], rowStart: 0, rowEnd: 0, wing: 'north-gallery', label: 'North Gallery Centre', recipe: 'GAL_13' },
-  { id: 'NG3', cols: [29, 42], rowStart: 0, rowEnd: 0, wing: 'north-gallery', label: 'North Gallery East',   recipe: 'GAL_14' },
+  { id: 'NG1', cols: [0, 13],  rowStart: 0, rowEnd: 0, wing: 'north-gallery', label: 'North Gallery West',   columns: ['STEP_14'] },
+  { id: 'NG2', cols: [15, 27], rowStart: 0, rowEnd: 0, wing: 'north-gallery', label: 'North Gallery Centre', columns: ['STEP_13'] },
+  { id: 'NG3', cols: [29, 42], rowStart: 0, rowEnd: 0, wing: 'north-gallery', label: 'North Gallery East',   columns: ['INLINE_14'] },
 ];
 
 const HALL_NAMES: Record<Wing, string> = {
@@ -163,23 +149,15 @@ const HALL_NAMES: Record<Wing, string> = {
 };
 
 /**
- * The arrangement rule. Deals the largest stall to one end, the next largest to
- * the other end, and works inward, so the run reads large -> small -> large.
- * `head` is in order from the leading end; `tail` is in the same direction of
- * travel, ending with the largest stall at the far end.
+ * The arrangement rule: deal the largest stall to one end, the next largest to
+ * the other end, and work inward, so the line reads large -> small -> large.
  */
-function arrangeOutward(sizes: number[]): { head: number[]; tail: number[] } {
+function arrangeLine(sizes: number[]): number[] {
   const descending = [...sizes].sort((a, b) => b - a);
   const head: number[] = [];
   const tail: number[] = [];
   descending.forEach((size, i) => (i % 2 === 0 ? head : tail).push(size));
-  return { head, tail: tail.reverse() };
-}
-
-/** Same rule, flattened into a single ordered run. */
-function arrangeRun(sizes: number[]): number[] {
-  const { head, tail } = arrangeOutward(sizes);
-  return [...head, ...tail];
+  return [...head, ...tail.reverse()];
 }
 
 interface Placed {
@@ -188,121 +166,104 @@ interface Placed {
   row: number;
   colSpan: number;
   rowSpan: number;
-  fullWidth: boolean;
+  wholeBlock: boolean;
 }
 
 function buildBlock(block: BlockDef): Placed[] {
-  const recipe = RECIPES[block.recipe];
-  if (!recipe) throw new Error(`Unknown recipe "${block.recipe}" on block ${block.id}`);
-  const placed: Placed[] = [];
   const rows = block.rowEnd - block.rowStart + 1;
 
-  if (recipe.kind === 'run') {
+  // The one oversized anchor: a whole block kept as a single stall.
+  if (block.whole) {
+    const colSpan = block.cols.length;
+    if (block.whole !== colSpan * rows * MODULE_SQFT) {
+      throw new Error(`Block ${block.id} holds ${colSpan * rows} modules, not ${block.whole / MODULE_SQFT}`);
+    }
+    return [{ size: block.whole, col: block.cols[0], row: block.rowStart, colSpan, rowSpan: rows, wholeBlock: true }];
+  }
+
+  const placed: Placed[] = [];
+
+  // Gallery: one horizontal line running west to east along the wall.
+  if (block.wing === 'north-gallery') {
     const width = block.cols[1] - block.cols[0] + 1;
-    const used = recipe.run.reduce((sum, size) => sum + size / MODULE_SQFT, 0);
-    if (used !== width) throw new Error(`Recipe ${block.recipe} covers ${used} of ${width} modules on ${block.id}`);
+    const sizes = PATTERNS[block.columns[0]];
+    if (!sizes) throw new Error(`Unknown pattern "${block.columns[0]}" on block ${block.id}`);
+    const used = sizes.reduce((sum, size) => sum + size / MODULE_SQFT, 0);
+    if (used !== width) throw new Error(`Pattern ${block.columns[0]} fills ${used} of ${width} modules on ${block.id}`);
+
     let col = block.cols[0];
-    arrangeRun(recipe.run).forEach((size) => {
+    arrangeLine(sizes).forEach((size) => {
       const colSpan = size / MODULE_SQFT;
-      placed.push({ size, col, row: block.rowStart, colSpan, rowSpan: 1, fullWidth: false });
+      placed.push({ size, col, row: block.rowStart, colSpan, rowSpan: 1, wholeBlock: false });
       col += colSpan;
     });
     return placed;
   }
 
-  if (recipe.kind === 'single') {
-    const used = recipe.column.reduce((sum, size) => sum + size / MODULE_SQFT, 0);
-    if (used !== rows) throw new Error(`Recipe ${block.recipe} covers ${used} of ${rows} rows on ${block.id}`);
+  // Hall block: each column is an independent line, cut on its own pattern.
+  if (block.columns.length !== block.cols.length) {
+    throw new Error(`Block ${block.id} has ${block.cols.length} lines but ${block.columns.length} patterns`);
+  }
+
+  block.cols.forEach((col, i) => {
+    const name = block.columns[i];
+    const sizes = PATTERNS[name];
+    if (!sizes) throw new Error(`Unknown pattern "${name}" on block ${block.id}`);
+    const used = sizes.reduce((sum, size) => sum + size / MODULE_SQFT, 0);
+    if (used !== rows) throw new Error(`Pattern ${name} fills ${used} of ${rows} modules on ${block.id}`);
+
     let row = block.rowStart;
-    arrangeRun(recipe.column).forEach((size) => {
+    arrangeLine(sizes).forEach((size) => {
       const rowSpan = size / MODULE_SQFT;
-      placed.push({ size, col: block.cols[0], row, colSpan: 1, rowSpan, fullWidth: false });
+      placed.push({ size, col, row, colSpan: 1, rowSpan, wholeBlock: false });
       row += rowSpan;
-    });
-    return placed;
-  }
-
-  // Double-loaded block: full-width stalls take both ends, single-column stalls
-  // fill the band between them — every run ordered by the arrangement rule.
-  const [leftCol, rightCol] = block.cols;
-  const width = rightCol - leftCol + 1;
-  const fullRows = (sizes: number[]) => sizes.reduce((sum, size) => sum + size / (MODULE_SQFT * width), 0);
-  const colRows = (sizes: number[]) => sizes.reduce((sum, size) => sum + size / MODULE_SQFT, 0);
-
-  if (recipe.full.some((size) => size < FULL_WIDTH_FROM)) {
-    throw new Error(`Recipe ${block.recipe} puts a sub-${FULL_WIDTH_FROM} sq ft stall in the full-width run`);
-  }
-  const bandRows = fullRows(recipe.full);
-  if (bandRows + colRows(recipe.left) !== rows || bandRows + colRows(recipe.right) !== rows) {
-    throw new Error(
-      `Recipe ${block.recipe} does not fill ${block.id}: ` +
-      `full ${bandRows} + left ${colRows(recipe.left)} / right ${colRows(recipe.right)} != ${rows} rows`
-    );
-  }
-
-  const ends = arrangeOutward(recipe.full);
-  const pushFull = (size: number, row: number) => {
-    placed.push({ size, col: leftCol, row, colSpan: width, rowSpan: size / (MODULE_SQFT * width), fullWidth: true });
-  };
-
-  let cursor = block.rowStart;
-  ends.head.forEach((size) => { pushFull(size, cursor); cursor += size / (MODULE_SQFT * width); });
-
-  const midStart = cursor;
-  const midEnd = block.rowEnd - fullRows(ends.tail); // exclusive
-  ([[recipe.left, leftCol], [recipe.right, rightCol]] as Array<[number[], number]>).forEach(([sizes, col]) => {
-    let row = midStart;
-    arrangeRun(sizes).forEach((size) => {
-      placed.push({ size, col, row, colSpan: 1, rowSpan: size / MODULE_SQFT, fullWidth: false });
-      row += size / MODULE_SQFT;
     });
   });
 
-  let tailCursor = midEnd + 1;
-  ends.tail.forEach((size) => { pushFull(size, tailCursor); tailCursor += size / (MODULE_SQFT * width); });
-
-  const covered = placed.reduce((sum, p) => sum + p.colSpan * p.rowSpan, 0);
-  if (covered !== block.cols.length * rows) {
-    throw new Error(`Block ${block.id} covers ${covered} of ${block.cols.length * rows} modules`);
-  }
   return placed;
 }
 
 /** Frontage is read back off the finished geometry, never asserted by hand. */
 function describe(p: Placed, block: BlockDef) {
-  const endFrontage =
+  const atEnd =
     block.wing === 'north-gallery'
       ? p.col === block.cols[0] || p.col + p.colSpan - 1 === block.cols[1]
       : p.row === block.rowStart || p.row + p.rowSpan - 1 === block.rowEnd;
 
-  const openSides = (p.fullWidth ? (endFrontage ? 3 : 2) : (endFrontage ? 2 : 1)) as 1 | 2 | 3 | 4;
-  const kind = endFrontage
-    ? `${openSides}-Side Open L-Shape Corner`
-    : p.fullWidth
-      ? 'Twin-Aisle Island'
-      : 'In-Line';
+  // A single-line stall fronts its own aisle; an end position adds the cross
+  // aisle. The whole-block anchor fronts both flanking aisles plus both ends.
+  const openSides = (p.wholeBlock ? 4 : atEnd ? 2 : 1) as 1 | 2 | 3 | 4;
+  const kind = atEnd ? `${openSides}-Side Open L-Shape Corner` : 'In-Line';
 
-  return { openSides, isCorner: endFrontage, shape: (endFrontage ? 'L-Shape' : 'Linear') as StallShape, kind };
+  return { openSides, isCorner: atEnd, shape: (atEnd ? 'L-Shape' : 'Linear') as StallShape, kind };
 }
 
 /**
- * Guards the organiser's rule at module load, so a future recipe edit that
- * breaks the gradient fails immediately instead of silently mis-allotting.
- * Each run must step down from a corner to the middle and back up to the far
- * corner, and no stall of 600 sq ft or more may sit anywhere but a corner.
+ * Guards both rules at module load, so a future pattern edit that breaks the
+ * shape or the gradient fails immediately instead of mis-allotting silently.
  */
-function assertArrangementRule(stalls: StallItem[]): void {
+function assertStallRules(stalls: StallItem[]): void {
+  // Shape: one line only. 100 sq ft is the sole square.
+  stalls.forEach((s) => {
+    const block = SITEMAP_BLOCKS.find((b) => b.id === s.block)!;
+    if (block.whole) return;
+    const across = block.wing === 'north-gallery' ? s.rowSpan : s.colSpan;
+    if (across !== 1) {
+      throw new Error(`Stall ${s.stallNumber} spans ${across} lines — every stall must occupy one line`);
+    }
+  });
+
+  // Gradient: each line steps down to the middle and back up to the far corner.
   SITEMAP_BLOCKS.forEach((block) => {
+    if (block.whole) return;
     const inBlock = stalls.filter((s) => s.block === block.id);
-    const runs =
+    const lines =
       block.wing === 'north-gallery'
         ? [[...inBlock].sort((a, b) => a.col - b.col)]
-        : block.cols.map((c) =>
-            inBlock.filter((s) => c >= s.col && c < s.col + s.colSpan).sort((a, b) => a.row - b.row)
-          );
+        : block.cols.map((c) => inBlock.filter((s) => s.col === c).sort((a, b) => a.row - b.row));
 
-    runs.forEach((run) => {
-      const sizes = run.map((s) => s.sqftNumber);
+    lines.forEach((line) => {
+      const sizes = line.map((s) => s.sqftNumber);
       let i = 1;
       while (i < sizes.length && sizes[i] <= sizes[i - 1]) i++; // stepping down toward the middle
       while (i < sizes.length && sizes[i] >= sizes[i - 1]) i++; // stepping back up to the far corner
@@ -324,7 +285,8 @@ function generateStallInventory(): StallItem[] {
   const stalls: StallItem[] = [];
 
   SITEMAP_BLOCKS.forEach((block) => {
-    const placed = buildBlock(block).sort((a, b) => (a.row - b.row) || (a.col - b.col));
+    // Numbered line by line, north to south, so consecutive numbers are neighbours.
+    const placed = buildBlock(block).sort((a, b) => (a.col - b.col) || (a.row - b.row));
 
     placed.forEach((p, i) => {
       const { openSides, isCorner, shape, kind } = describe(p, block);
@@ -349,7 +311,7 @@ function generateStallInventory(): StallItem[] {
     });
   });
 
-  assertArrangementRule(stalls);
+  assertStallRules(stalls);
   return stalls;
 }
 

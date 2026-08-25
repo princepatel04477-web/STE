@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getStallPackageBySqft, STALL_PACKAGES, StallPackage } from '@/data/stallPackages';
@@ -42,7 +42,12 @@ import {
   FileText,
   Store,
   Calendar,
-  ArrowRight
+  ArrowRight,
+  Upload,
+  FolderOpen,
+  ExternalLink,
+  FileCode,
+  Image as ImageIcon
 } from 'lucide-react';
 
 interface Product {
@@ -102,6 +107,17 @@ export default function ExhibitorDashboardPage() {
   const [supportBadgeNames, setSupportBadgeNames] = useState<string[]>([]);
   const [badgeErrors, setBadgeErrors] = useState<string[]>([]);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+
+  // Brand Logo & Vector Artwork (CDR) Upload State
+  const [logoFileUrl, setLogoFileUrl] = useState<string | null>(null);
+  const [cdrFileUrl, setCdrFileUrl] = useState<string | null>(null);
+  const [driveFileUrl, setDriveFileUrl] = useState<string | null>(null);
+  const [driveFolderUrl, setDriveFolderUrl] = useState<string | null>(null);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadSuccessMsg, setUploadSuccessMsg] = useState('');
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // General Loading & Auth check
   const [initialLoading, setInitialLoading] = useState(true);
@@ -204,6 +220,11 @@ export default function ExhibitorDashboardPage() {
         setFasciaNames([profData.brand_name, '', '', '']);
       }
 
+      setLogoFileUrl(profData.logo_file_url || null);
+      setCdrFileUrl(profData.cdr_file_url || null);
+      setDriveFileUrl(profData.drive_file_url || null);
+      setDriveFolderUrl(profData.drive_folder_url || null);
+
       // 2. Fetch Extras Catalog & existing order
       const catRes = await fetch('/api/exhibitor/extras');
       const catData = await catRes.json();
@@ -264,6 +285,63 @@ export default function ExhibitorDashboardPage() {
       console.error('Failed to load exhibitor dashboard data:', err);
     } finally {
       setInitialLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>,
+    directFile?: File
+  ) => {
+    let file: File | null = null;
+    if (directFile) {
+      file = directFile;
+    } else if ('dataTransfer' in e && e.dataTransfer.files?.[0]) {
+      file = e.dataTransfer.files[0];
+    } else if ('target' in e && (e.target as HTMLInputElement).files?.[0]) {
+      file = (e.target as HTMLInputElement).files![0];
+    }
+
+    if (!file) return;
+
+    setUploadError('');
+    setUploadSuccessMsg('');
+    setUploadingFile(true);
+    setUploadProgress(25);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      const isCdr = ['cdr', 'ai', 'eps', 'pdf'].includes(ext || '');
+      formData.append('category', isCdr ? 'cdr' : 'logo');
+
+      setUploadProgress(55);
+
+      const res = await fetch('/api/exhibitor/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      setUploadProgress(85);
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to upload file');
+      }
+
+      if (data.logoUrl) setLogoFileUrl(data.logoUrl);
+      if (data.cdrUrl) setCdrFileUrl(data.cdrUrl);
+      if (data.driveFileUrl) setDriveFileUrl(data.driveFileUrl);
+      if (data.driveFolderUrl) setDriveFolderUrl(data.driveFolderUrl);
+
+      setUploadSuccessMsg(data.message || 'File uploaded successfully and synced to Google Drive!');
+      setUploadProgress(100);
+    } catch (err: any) {
+      setUploadError(err.message || 'Failed to upload file. Please try again.');
+    } finally {
+      setUploadingFile(false);
+      setTimeout(() => setUploadProgress(0), 1500);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -911,7 +989,204 @@ export default function ExhibitorDashboardPage() {
           })()}
         </section>
 
-        {/* Section 2: Exhibitor Entry Badges */}
+        {/* Section 2: Official Brand Logo & CDR / Vector Artwork Upload */}
+        <section className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 relative overflow-hidden shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
+                <FileCode className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <span>2. Official Brand Logo & Vector Artwork (CDR)</span>
+                  <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    Google Drive Auto-Sync
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Upload your master CorelDRAW (.cdr), Illustrator (.ai), vector PDF, or high-res logo for stall fascia printing & event branding
+                </p>
+              </div>
+            </div>
+
+            {driveFolderUrl && (
+              <a
+                href={driveFolderUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 text-slate-800 hover:text-amber-950 text-xs font-bold border border-slate-200 hover:border-amber-300 transition-all self-start sm:self-auto shadow-xs"
+              >
+                <FolderOpen className="w-4 h-4 text-amber-600" />
+                <span>Open Drive: {brandName || 'STE Logos'}</span>
+                <ExternalLink className="w-3 h-3 text-slate-400" />
+              </a>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Upload Drag & Drop Area */}
+            <div className="lg:col-span-7">
+              <div
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  handleFileUpload(e);
+                }}
+                className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center transition-all flex flex-col items-center justify-center gap-3 relative ${
+                  uploadingFile
+                    ? 'border-amber-400 bg-amber-50/50'
+                    : 'border-slate-300 hover:border-amber-500 hover:bg-slate-50/80 bg-slate-50/40'
+                }`}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".cdr,.ai,.eps,.pdf,.svg,.png,.jpg,.jpeg,.webp"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="cdr-logo-file-input"
+                  disabled={uploadingFile}
+                />
+
+                <div className="w-14 h-14 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800 shadow-xs">
+                  {uploadingFile ? (
+                    <div className="w-6 h-6 border-3 border-amber-700/30 border-t-amber-700 rounded-full animate-spin" />
+                  ) : (
+                    <Upload className="w-7 h-7" />
+                  )}
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">
+                    {uploadingFile ? 'Uploading & Syncing to Drive...' : 'Drag & drop your CDR / Vector / Logo file here'}
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                    Supported formats: <strong className="text-slate-800">.CDR, .AI, .EPS, .PDF, .SVG, .PNG, .JPG</strong> (Up to 50MB)
+                  </p>
+                </div>
+
+                {uploadingFile ? (
+                  <div className="w-full max-w-xs space-y-1.5 mt-2">
+                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-500 to-yellow-500 transition-all duration-300 rounded-full"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                    <span className="text-[11px] font-mono text-amber-800 font-bold block">
+                      Syncing to Supabase & Drive: {uploadProgress}%
+                    </span>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="cdr-logo-file-input"
+                    className="mt-2 px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                  >
+                    <Upload className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Choose CDR or Logo File</span>
+                  </label>
+                )}
+
+                {uploadSuccessMsg && (
+                  <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-bold flex items-center gap-2 mt-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{uploadSuccessMsg}</span>
+                  </div>
+                )}
+
+                {uploadError && (
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-300 text-red-700 text-xs font-bold flex items-center gap-2 mt-2">
+                    <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                    <span>{uploadError}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Uploaded File Status & Information Card */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-xs">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-2">
+                  Uploaded Assets & Cloud Repository
+                </span>
+
+                {cdrFileUrl || logoFileUrl || driveFileUrl ? (
+                  <div className="space-y-3">
+                    <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 text-slate-950 font-black text-xs flex items-center justify-center uppercase shadow-xs">
+                          {cdrFileUrl ? 'CDR' : 'IMG'}
+                        </div>
+                        <div>
+                          <h5 className="text-xs font-bold text-slate-900 leading-snug">
+                            {brandName || 'Brand'} Artwork File
+                          </h5>
+                          <span className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1 mt-0.5">
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            Verified & Stored
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <a
+                          href={cdrFileUrl || logoFileUrl || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold border border-slate-300 transition-all flex items-center gap-1"
+                        >
+                          <span>View</span>
+                          <ExternalLink className="w-3 h-3 text-slate-500" />
+                        </a>
+                      </div>
+                    </div>
+
+                    {driveFileUrl && (
+                      <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <FolderOpen className="w-4 h-4 text-emerald-700 shrink-0" />
+                          <span className="text-[11px] font-bold text-emerald-900">
+                            Synced to Google Drive / STE Logos / {brandName || 'Folder'}
+                          </span>
+                        </div>
+                        <a
+                          href={driveFileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-extrabold text-emerald-800 hover:underline flex items-center gap-0.5 shrink-0"
+                        >
+                          <span>Open</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="py-6 text-center text-slate-400">
+                    <ImageIcon className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+                    <p className="text-xs font-semibold text-slate-600">No artwork file uploaded yet</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Upload your CorelDRAW (.cdr) or brand logo to auto-create your exhibitor folder in Google Drive.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Automated Google Drive Folder Info Note */}
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-950 text-xs space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                  <Info className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Automated Organizing Workflow</span>
+                </div>
+                <p className="text-slate-600 text-[11px] leading-relaxed">
+                  When you upload, the system creates a dedicated folder under <strong className="text-slate-900 font-mono">STE Logos / {brandName || 'Exhibitor'}</strong> and delivers your file directly to our production printing team.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 3: Exhibitor Entry Badges */}
         <section id="section-badges" className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
@@ -920,7 +1195,7 @@ export default function ExhibitorDashboardPage() {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <span>2. Exhibitor Entry Badges Request</span>
+                  <span>3. Exhibitor Entry Badges Request</span>
                   <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-amber-200 text-amber-900 border border-amber-300">
                     Names Compulsory *
                   </span>
@@ -1214,7 +1489,7 @@ export default function ExhibitorDashboardPage() {
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">3. Additional Requirements & Extras</h2>
+                <h2 className="text-xl font-bold text-slate-900">4. Additional Requirements & Extras</h2>
                 <p className="text-xs text-slate-500">Select extra furniture, display fixtures, audio-visual gear, and electrical connections needed for your booth</p>
               </div>
             </div>
@@ -1468,7 +1743,7 @@ export default function ExhibitorDashboardPage() {
         <section className="bg-slate-50 border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">4. Overall Requisition Summary</h2>
+              <h2 className="text-xl font-bold text-slate-900">5. Overall Requisition Summary</h2>
               <p className="text-xs text-slate-500">Review your booth configuration, fascia details, entry badges, and extra amenities</p>
             </div>
             {lastSubmittedAt && (

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store, LogOut, Printer } from 'lucide-react';
+import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store, LogOut, Printer, FolderOpen, ExternalLink, FileCode } from 'lucide-react';
 import BillModal from '@/components/extras/BillModal';
 import { EXTRAS_RATES } from '@/data/extras-rates';
 
@@ -40,6 +40,10 @@ interface ExhibitorRecord {
     sales?: string[];
     support?: string[];
   };
+  logo_file_url?: string;
+  cdr_file_url?: string;
+  drive_file_url?: string;
+  drive_folder_url?: string;
   rental_days?: number;
   last_updated: string;
 }
@@ -123,6 +127,8 @@ export default function AdminExhibitorsPage() {
       'Support Badge Names',
       'Rental Duration (Days)',
       'Extras Requested',
+      'Artwork / CDR URL',
+      'Google Drive Folder URL',
       'Special Notes',
       'Last Updated'
     ];
@@ -135,6 +141,8 @@ export default function AdminExhibitorsPage() {
       const f2 = ex.fascia_names?.[1] || '';
       const f3 = ex.fascia_names?.[2] || '';
       const f4 = ex.fascia_names?.[3] || '';
+      const artworkUrl = ex.cdr_file_url || ex.logo_file_url || '';
+      const driveFolderUrl = ex.drive_folder_url || ex.drive_file_url || '';
 
       return [
         `"${ex.mobile}"`,
@@ -152,6 +160,8 @@ export default function AdminExhibitorsPage() {
         `"${supportNamesStr.replace(/"/g, '""')}"`,
         `"${ex.rental_days || 2}"`,
         `"${extrasStr.replace(/"/g, '""')}"`,
+        `"${artworkUrl.replace(/"/g, '""')}"`,
+        `"${driveFolderUrl.replace(/"/g, '""')}"`,
         `"${(ex.special_notes || '').replace(/"/g, '""')}"`,
         `"${ex.last_updated || ''}"`
       ];
@@ -392,6 +402,7 @@ export default function AdminExhibitorsPage() {
                       <th className="py-3.5 px-4">Stall Size</th>
                       <th className="py-3.5 px-4">Entry Badges</th>
                       <th className="py-3.5 px-4">Requested Extras</th>
+                      <th className="py-3.5 px-4">Artwork (CDR / Drive)</th>
                       <th className="py-3.5 px-4">Special Notes</th>
                       <th className="py-3.5 px-4">Last Updated</th>
                       <th className="py-3.5 px-4 text-center">Action</th>
@@ -463,6 +474,38 @@ export default function AdminExhibitorsPage() {
                             </div>
                           ) : (
                             <span className="text-slate-400 italic">None selected</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-4 whitespace-nowrap">
+                          {ex.cdr_file_url || ex.logo_file_url || ex.drive_file_url ? (
+                            <div className="flex flex-col gap-1">
+                              {(ex.cdr_file_url || ex.logo_file_url) && (
+                                <a
+                                  href={ex.cdr_file_url || ex.logo_file_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold transition-all"
+                                >
+                                  <FileCode className="w-3 h-3 text-amber-700" />
+                                  <span>{ex.cdr_file_url ? 'View CDR' : 'View Logo'}</span>
+                                  <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
+                                </a>
+                              )}
+                              {(ex.drive_folder_url || ex.drive_file_url) && (
+                                <a
+                                  href={ex.drive_folder_url || ex.drive_file_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-bold transition-all"
+                                >
+                                  <FolderOpen className="w-3 h-3 text-emerald-700" />
+                                  <span>Drive Folder</span>
+                                  <ExternalLink className="w-2.5 h-2.5 text-emerald-600" />
+                                </a>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-slate-400 italic text-[11px]">None</span>
                           )}
                         </td>
                         <td className="py-4 px-4 max-w-xs text-slate-600 truncate">

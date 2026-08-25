@@ -82,9 +82,24 @@ export interface LotteryAllocationRecord {
   allocated_at: string;
 }
 
+export interface ExhibitorRecord {
+  id: number;
+  mobile: string;
+  brand_name: string;
+  stall_sqft: string;
+  custom_password?: string;
+  fascia_names_json?: string;
+  logo_file_url?: string;
+  cdr_file_url?: string;
+  drive_file_url?: string;
+  drive_folder_id?: string;
+  drive_folder_url?: string;
+  updated_at: string;
+}
+
 interface Schema {
   allowed_exhibitors: Array<{ id: number; mobile: string; notes: string; created_at: string }>;
-  exhibitors: Array<{ id: number; mobile: string; brand_name: string; stall_sqft: string; custom_password?: string; fascia_names_json?: string; updated_at: string }>;
+  exhibitors: Array<ExhibitorRecord>;
   extra_products: Array<{ id: string; name: string; category: string; description: string; unit: string; rate_inr?: number; icon_name: string; is_active: number }>;
   exhibitor_orders: Array<{ id: number; mobile: string; items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string; rental_days?: number; updated_at: string }>;
   lottery_allocations: Array<LotteryAllocationRecord>;
@@ -242,6 +257,11 @@ export const db = {
               brand_name: ex.brand_name,
               stall_sqft: ex.stall_sqft,
               fascia_names_json: ex.fascia_names_json ?? null,
+              logo_file_url: ex.logo_file_url ?? null,
+              cdr_file_url: ex.cdr_file_url ?? null,
+              drive_file_url: ex.drive_file_url ?? null,
+              drive_folder_id: ex.drive_folder_id ?? null,
+              drive_folder_url: ex.drive_folder_url ?? null,
               profile_updated: ex.updated_at,
               items_json: order ? order.items_json : null,
               special_notes: order ? order.special_notes : null,
@@ -525,5 +545,44 @@ export const db = {
     };
   }
 };
+
+export function updateExhibitorFiles(
+  mobile: string,
+  files: {
+    logo_file_url?: string;
+    cdr_file_url?: string;
+    drive_file_url?: string;
+    drive_folder_id?: string;
+    drive_folder_url?: string;
+  }
+): boolean {
+  try {
+    const data = readData();
+    let ex = data.exhibitors.find(e => e.mobile === mobile);
+    if (!ex) {
+      ex = {
+        id: data.exhibitors.length + 1,
+        mobile,
+        brand_name: '',
+        stall_sqft: '',
+        updated_at: new Date().toISOString()
+      };
+      data.exhibitors.push(ex);
+    }
+
+    if (files.logo_file_url !== undefined) ex.logo_file_url = files.logo_file_url;
+    if (files.cdr_file_url !== undefined) ex.cdr_file_url = files.cdr_file_url;
+    if (files.drive_file_url !== undefined) ex.drive_file_url = files.drive_file_url;
+    if (files.drive_folder_id !== undefined) ex.drive_folder_id = files.drive_folder_id;
+    if (files.drive_folder_url !== undefined) ex.drive_folder_url = files.drive_folder_url;
+    ex.updated_at = new Date().toISOString();
+
+    saveData(data);
+    return true;
+  } catch (err) {
+    console.error('Failed to update exhibitor files in db:', err);
+    return false;
+  }
+}
 
 export default db;

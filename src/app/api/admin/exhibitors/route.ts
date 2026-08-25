@@ -139,6 +139,10 @@ export async function GET() {
         sales_badges: sBadges,
         support_badges: supBadges,
         badge_names: badgeNames,
+        logo_file_url: dbEx?.logo_file_url || null,
+        cdr_file_url: dbEx?.cdr_file_url || null,
+        drive_file_url: dbEx?.drive_file_url || null,
+        drive_folder_url: dbEx?.drive_folder_url || null,
         rental_days: order?.rental_days ?? 2,
         last_updated: order?.order_updated || dbEx?.updated_at || new Date().toISOString()
       });
