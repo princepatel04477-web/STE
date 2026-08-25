@@ -2,114 +2,96 @@ import { NextResponse } from 'next/server';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import db, { updateExhibitorFiles } from '@/lib/db';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
-import { syncExhibitorFileToDrive } from '@/lib/googleDrive';
 import { syncToGoogleSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
-import path from 'path';
-import fs from 'fs';
-
-const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.cdr'];
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+import {
+  storeExhibitorAsset,
+  resolveCategory,
+  ALLOWED_EXTENSIONS,
+  MAX_FILE_SIZE
+} from '@/lib/exhibitorAssets';
+import { fileExtension } from '@/lib/googleDrive';
 
 export async function POST(request: Request) {
   try {
     const session = await getAuthenticatedExhibitor();
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized. Please login to your exhibitor portal.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Unauthorized. Please login to your exhibitor portal.' },
+        { status: 401 }
+      );
     }
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const uploadCategory = (formData.get('category') as string) || 'cdr'; // 'cdr' | 'logo'
+    const requestedCategory = (formData.get('category') as string) || undefined;
 
     if (!file) {
       return NextResponse.json({ error: 'No file was provided for upload.' }, { status: 400 });
+    }
+
+    if (file.size === 0) {
+      return NextResponse.json({ error: 'The selected file is empty.' }, { status: 400 });
     }
 
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json({ error: 'File exceeds 50MB maximum size limit.' }, { status: 400 });
     }
 
-    const ext = path.extname(file.name).toLowerCase();
+    const ext = fileExtension(file.name);
     if (!ALLOWED_EXTENSIONS.includes(ext)) {
-      return NextResponse.json({
-        error: `File format "${ext}" is not allowed. Only .PNG, .JPG, .JPEG, and .CDR files are accepted.`
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            'File format "' + (ext || 'unknown') +
+            '" is not allowed. Only .PNG, .JPG, .JPEG, and .CDR files are accepted.'
+        },
+        { status: 400 }
+      );
     }
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const cleanFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storagePath = `${session.mobile}/${Date.now()}_${cleanFileName}`;
 
-    let primaryStorageUrl = '';
-
-    // 1. Upload to Supabase Storage if configured
-    if (isSupabaseConfigured && supabaseAdmin) {
-      try {
-        const { error: uploadError } = await supabaseAdmin.storage
-          .from('exhibitor-assets')
-          .upload(storagePath, fileBuffer, {
-            contentType: file.type || 'application/octet-stream',
-            upsert: true
-          });
-
-        if (uploadError) {
-          console.error('[SupabaseStorage] Upload error:', uploadError.message);
-        } else {
-          const { data: publicUrlData } = supabaseAdmin.storage
-            .from('exhibitor-assets')
-            .getPublicUrl(storagePath);
-          primaryStorageUrl = publicUrlData.publicUrl;
-        }
-      } catch (storageErr) {
-        console.error('[SupabaseStorage] Exception:', storageErr);
-      }
-    }
-
-    // Fallback local persistence if Supabase Storage is not set up
-    if (!primaryStorageUrl) {
-      const localUploadDir = path.join(process.cwd(), 'public', 'uploads', session.mobile);
-      try {
-        if (!fs.existsSync(localUploadDir)) {
-          fs.mkdirSync(localUploadDir, { recursive: true });
-        }
-        const localFilePath = path.join(localUploadDir, `${Date.now()}_${cleanFileName}`);
-        fs.writeFileSync(localFilePath, fileBuffer);
-        primaryStorageUrl = `/uploads/${session.mobile}/${path.basename(localFilePath)}`;
-      } catch (localErr) {
-        console.error('[LocalUpload] Fallback local save error:', localErr);
-        primaryStorageUrl = `https://www.stesurat.com/assets/logo_STE.webp`;
-      }
-    }
-
-    // 2. Fetch Brand Name
+    // Resolve the brand name that names the exhibitor's folder.
     const existingExhibitor = db
-      .prepare('SELECT brand_name, stall_sqft, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url FROM exhibitors WHERE mobile = ?')
+      .prepare(
+        'SELECT brand_name, stall_sqft, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url FROM exhibitors WHERE mobile = ?'
+      )
       .get(session.mobile) as any;
 
     const reg = findExhibitorByMobile(session.mobile);
     const brandName = existingExhibitor?.brand_name?.trim() || reg?.brandName || 'Exhibitor';
 
-    // 3. Automatically sync to Google Drive in exhibitor folder under "STE Logos"
-    let driveResult = await syncExhibitorFileToDrive({
+    // Store in Supabase Storage and mirror into STE Logos/<Brand Name>/.
+    const result = await storeExhibitorAsset({
       mobile: session.mobile,
       brandName,
-      fileName: file.name,
+      originalFileName: file.name,
       fileBuffer,
-      mimeType: file.type || 'application/octet-stream'
+      browserMimeType: file.type,
+      category: resolveCategory(file.name, requestedCategory)
     });
 
-    const driveFileUrl = driveResult.webViewLink || existingExhibitor?.drive_file_url || null;
-    const driveFolderId = driveResult.folderId || existingExhibitor?.drive_folder_id || null;
-    const driveFolderUrl = driveResult.folderViewLink || existingExhibitor?.drive_folder_url || null;
+    if (!result.storageUrl) {
+      return NextResponse.json(
+        {
+          error:
+            'Could not save your file to secure storage. Please try again. (' +
+            (result.storageError || 'unknown error') +
+            ')'
+        },
+        { status: 502 }
+      );
+    }
 
-    const isCdr = ext === '.cdr' || uploadCategory === 'cdr';
-    const isLogoImage = ['.png', '.jpg', '.jpeg'].includes(ext) || uploadCategory === 'logo';
+    const isCdr = result.category === 'cdr';
+    const cdrUrl = isCdr ? result.storageUrl : existingExhibitor?.cdr_file_url || null;
+    const logoUrl = isCdr ? existingExhibitor?.logo_file_url || null : result.storageUrl;
 
-    const cdrUrl = isCdr ? primaryStorageUrl : (existingExhibitor?.cdr_file_url || null);
-    const logoUrl = isLogoImage ? primaryStorageUrl : (existingExhibitor?.logo_file_url || null);
+    const driveFileUrl = result.drive.webViewLink || existingExhibitor?.drive_file_url || null;
+    const driveFolderId = result.drive.folderId || existingExhibitor?.drive_folder_id || null;
+    const driveFolderUrl = result.drive.folderViewLink || existingExhibitor?.drive_folder_url || null;
 
-    // 4. Update Database
     updateExhibitorFiles(session.mobile, {
       logo_file_url: logoUrl || undefined,
       cdr_file_url: cdrUrl || undefined,
@@ -118,7 +100,6 @@ export async function POST(request: Request) {
       drive_folder_url: driveFolderUrl || undefined
     });
 
-    // Also update Supabase database directly if configured
     if (isSupabaseConfigured && supabaseAdmin) {
       try {
         await supabaseAdmin
@@ -137,7 +118,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Sync row to Google Sheets
     try {
       let fasciaNames = [brandName, '', '', ''];
       if (existingExhibitor?.fascia_names_json) {
@@ -162,16 +142,21 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      fileName: file.name,
+      fileName: result.assetFileName,
+      originalFileName: file.name,
       fileSize: file.size,
       fileType: ext.replace('.', '').toUpperCase(),
-      fileUrl: primaryStorageUrl,
+      category: result.category,
+      folderName: result.folderName,
+      fileUrl: result.storageUrl,
       logoUrl,
       cdrUrl,
       driveFileUrl,
       driveFolderUrl,
-      isDriveSynced: Boolean(driveResult.success),
-      message: `File "${file.name}" uploaded successfully and linked to ${brandName} folder.`
+      isDriveSynced: result.drive.success,
+      message:
+        'File "' + file.name + '" uploaded successfully and saved to the ' +
+        result.folderName + ' folder.'
     });
   } catch (error: any) {
     console.error('Error handling exhibitor file upload:', error);

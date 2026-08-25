@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "db:migrate": "tsx scripts/migrate-to-supabase.ts",
-    "sync:sheets": "tsx scripts/sync-sheets-to-db.ts"
+    "sync:sheets": "tsx scripts/sync-sheets-to-db.ts",
+    "drive:check": "tsx scripts/drive-sync.ts check",
+    "drive:retry": "tsx scripts/drive-sync.ts retry"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

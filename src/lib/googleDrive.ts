@@ -1,231 +1,445 @@
 import { google, drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
 
+/**
+ * Google Drive sync for exhibitor brand assets.
+ *
+ * Target layout (kept deliberately symmetrical for every exhibitor):
+ *
+ *   STE Logos/                        <- GOOGLE_DRIVE_PARENT_FOLDER_ID
+ *     Apple Lifestyle/                <- one folder per exhibitor brand
+ *       Apple Lifestyle - Logo.png
+ *       Apple Lifestyle - Artwork.cdr
+ *     Zenith Textiles/
+ *       Zenith Textiles - Logo.jpg
+ *
+ * Auth is resolved in priority order, because each option has different
+ * storage-quota semantics:
+ *
+ *   1. OAuth2 refresh token  - files are owned by the human who consented and
+ *      consume that person's Drive quota. This is the only API-based option
+ *      that works for a folder living in a personal (gmail.com) My Drive.
+ *   2. Service account       - has NO storage quota of its own, so file
+ *      creation only succeeds inside a Google Workspace Shared Drive, or with
+ *      domain-wide delegation impersonating a real user.
+ *   3. Apps Script web app   - runs as the deploying user, so it uses their
+ *      quota. Zero Google Cloud setup; the usual choice for personal accounts.
+ */
+
+export type AssetCategory = 'logo' | 'cdr';
+
 export interface DriveUploadParams {
   mobile: string;
   brandName: string;
   fileName: string;
   fileBuffer: Buffer;
   mimeType: string;
+  category?: AssetCategory;
 }
 
 export interface DriveUploadResult {
   success: boolean;
+  strategy?: 'oauth' | 'service_account' | 'apps_script';
   fileId?: string;
+  fileName?: string;
   webViewLink?: string;
   folderId?: string;
+  folderName?: string;
   folderViewLink?: string;
   error?: string;
 }
 
+const DEFAULT_ROOT_FOLDER_NAME = 'STE Logos';
+const DRIVE_SCOPES = ['https://www.googleapis.com/auth/drive'];
+
+/* ------------------------------------------------------------------ *
+ * Naming
+ * ------------------------------------------------------------------ */
+
 /**
- * Initializes authenticated Google Drive client using Service Account credentials.
+ * Strips characters Drive and Supabase Storage handle badly, then collapses
+ * whitespace, so '  Apple   Lifestyle/Pvt Ltd ' becomes 'Apple Lifestyle-Pvt Ltd'.
  */
-function getDriveClient() {
-  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || process.env.GOOGLE_CLIENT_EMAIL;
-  let privateKey = process.env.GOOGLE_PRIVATE_KEY;
+const FORBIDDEN_NAME_CHARS = new Set(['\\', '/', ':', '*', '?', '"', '<', '>', '|']);
 
-  if (!clientEmail || !privateKey) {
-    return null;
-  }
+export function sanitizeFolderName(raw: string): string {
+  const cleaned = Array.from(raw || '')
+    .map((char) => {
+      const code = char.charCodeAt(0);
+      // Fold ASCII control characters (tabs, newlines) into a space so the
+      // collapse below turns "Krishna\tSarees" into "Krishna Sarees".
+      if (code < 32 || code === 127) return ' ';
+      // Replace path-hostile characters rather than deleting them, so
+      // "Apple/Lifestyle" stays readable as "Apple-Lifestyle".
+      return FORBIDDEN_NAME_CHARS.has(char) ? '-' : char;
+    })
+    .join('')
+    .replace(/-+/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^[.\-]+/, '')
+    .replace(/[.\-]+$/, '')
+    .trim();
 
-  // Handle newlines in environment variable private key
-  if (privateKey.includes('\\n')) {
-    privateKey = privateKey.replace(/\\n/g, '\n');
-  }
+  return cleaned || 'Exhibitor';
+}
 
-  const auth = new google.auth.JWT({
-    email: clientEmail,
-    key: privateKey,
-    scopes: [
-      'https://www.googleapis.com/auth/drive',
-      'https://www.googleapis.com/auth/drive.file'
-    ]
-  });
-
-  return google.drive({ version: 'v3', auth });
+export function fileExtension(fileName: string): string {
+  const match = /(\.[a-zA-Z0-9]+)$/.exec(fileName || '');
+  return match ? match[1].toLowerCase() : '';
 }
 
 /**
- * Finds or creates a folder inside a specified parent folder in Google Drive.
+ * Deterministic, human-readable asset name so every exhibitor folder looks the
+ * same: 'Apple Lifestyle - Logo.png' / 'Apple Lifestyle - Artwork.cdr'.
+ *
+ * Because the name is deterministic, re-uploading the same category replaces
+ * the previous file in place instead of stacking 'logo (1).png' duplicates.
  */
-async function getOrCreateFolder(
-  drive: any,
-  folderName: string,
-  parentFolderId?: string
-): Promise<{ id: string; webViewLink?: string }> {
-  let query = `mimeType = 'application/vnd.google-apps.folder' and name = '${folderName.replace(/'/g, "\\'")}' and trashed = false`;
-  if (parentFolderId) {
-    query += ` and '${parentFolderId}' in parents`;
-  }
-
-  const searchRes = await drive.files.list({
-    q: query,
-    fields: 'files(id, name, webViewLink)',
-    spaces: 'drive'
-  });
-
-  if (searchRes.data.files && searchRes.data.files.length > 0) {
-    const found = searchRes.data.files[0];
-    return { id: found.id, webViewLink: found.webViewLink };
-  }
-
-  // Folder does not exist, create it
-  const createMetadata: any = {
-    name: folderName,
-    mimeType: 'application/vnd.google-apps.folder'
-  };
-
-  if (parentFolderId) {
-    createMetadata.parents = [parentFolderId];
-  }
-
-  const createRes = await drive.files.create({
-    requestBody: createMetadata,
-    fields: 'id, name, webViewLink'
-  });
-
-  // Make folder accessible via link if possible
-  try {
-    if (createRes.data.id) {
-      await drive.permissions.create({
-        fileId: createRes.data.id,
-        requestBody: {
-          role: 'reader',
-          type: 'anyone'
-        }
-      });
-    }
-  } catch {}
-
-  return { id: createRes.data.id || undefined, webViewLink: createRes.data.webViewLink || undefined };
+export function buildAssetFileName(
+  brandName: string,
+  originalFileName: string,
+  category?: AssetCategory
+): string {
+  const brand = sanitizeFolderName(brandName);
+  const ext = fileExtension(originalFileName) || '.bin';
+  const resolved: AssetCategory = category || (ext === '.cdr' ? 'cdr' : 'logo');
+  const label = resolved === 'cdr' ? 'Artwork' : 'Logo';
+  return brand + ' - ' + label + ext;
 }
 
-/**
- * Converts a Buffer into a readable stream for Google Drive API.
- */
-function bufferToStream(buffer: Buffer) {
+/** Escapes a value for use inside a Drive `q=` search string. */
+function escapeQueryValue(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function bufferToStream(buffer: Buffer): Readable {
   const stream = new Readable();
   stream.push(buffer);
   stream.push(null);
   return stream;
 }
 
+/* ------------------------------------------------------------------ *
+ * Auth
+ * ------------------------------------------------------------------ */
+
+function getOAuthClient() {
+  const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+  const refreshToken = process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
+
+  if (!clientId || !clientSecret || !refreshToken) return null;
+
+  const client = new google.auth.OAuth2(
+    clientId,
+    clientSecret,
+    process.env.GOOGLE_OAUTH_REDIRECT_URI || 'http://localhost:5813/oauth2callback'
+  );
+  client.setCredentials({ refresh_token: refreshToken });
+  return client;
+}
+
+function getServiceAccountClient() {
+  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || process.env.GOOGLE_CLIENT_EMAIL;
+  let privateKey = process.env.GOOGLE_PRIVATE_KEY;
+
+  if (!clientEmail || !privateKey) return null;
+
+  // Vercel and dotenv store the PEM with literal backslash-n sequences.
+  if (privateKey.includes('\\n')) {
+    privateKey = privateKey.replace(/\\n/g, '\n');
+  }
+
+  return new google.auth.JWT({
+    email: clientEmail,
+    key: privateKey,
+    scopes: DRIVE_SCOPES,
+    // Domain-wide delegation: impersonate a real user so uploads use their quota.
+    subject: process.env.GOOGLE_IMPERSONATED_USER_EMAIL || undefined
+  });
+}
+
 /**
- * Automatically creates/finds the exhibitor folder inside "STE Logos" and uploads the file.
+ * Returns the highest-priority Drive client available, or null when no Google
+ * API credentials are configured at all.
+ */
+function getDriveClient(): { drive: drive_v3.Drive; strategy: 'oauth' | 'service_account' } | null {
+  const oauth = getOAuthClient();
+  if (oauth) {
+    return { drive: google.drive({ version: 'v3', auth: oauth }), strategy: 'oauth' };
+  }
+
+  const serviceAccount = getServiceAccountClient();
+  if (serviceAccount) {
+    return { drive: google.drive({ version: 'v3', auth: serviceAccount }), strategy: 'service_account' };
+  }
+
+  return null;
+}
+
+/* ------------------------------------------------------------------ *
+ * Drive primitives
+ * ------------------------------------------------------------------ */
+
+const ALL_DRIVES = { supportsAllDrives: true, includeItemsFromAllDrives: true };
+
+async function findOrCreateFolder(
+  drive: drive_v3.Drive,
+  folderName: string,
+  parentFolderId?: string
+): Promise<{ id: string; webViewLink?: string }> {
+  const clauses = [
+    "mimeType = 'application/vnd.google-apps.folder'",
+    "name = '" + escapeQueryValue(folderName) + "'",
+    'trashed = false'
+  ];
+  if (parentFolderId) {
+    clauses.push("'" + escapeQueryValue(parentFolderId) + "' in parents");
+  }
+
+  const existing = await drive.files.list({
+    q: clauses.join(' and '),
+    fields: 'files(id, name, webViewLink)',
+    pageSize: 1,
+    spaces: 'drive',
+    ...ALL_DRIVES
+  });
+
+  const found = existing.data.files?.[0];
+  if (found?.id) {
+    return { id: found.id, webViewLink: found.webViewLink || undefined };
+  }
+
+  const created = await drive.files.create({
+    requestBody: {
+      name: folderName,
+      mimeType: 'application/vnd.google-apps.folder',
+      parents: parentFolderId ? [parentFolderId] : undefined
+    },
+    fields: 'id, name, webViewLink',
+    supportsAllDrives: true
+  });
+
+  if (!created.data.id) {
+    throw new Error('Drive did not return an id for new folder "' + folderName + '"');
+  }
+
+  return { id: created.data.id, webViewLink: created.data.webViewLink || undefined };
+}
+
+/**
+ * Finds a same-named file in the folder so a re-upload updates it in place,
+ * preserving the file id and therefore any link already shared with vendors.
+ */
+async function findExistingFile(
+  drive: drive_v3.Drive,
+  fileName: string,
+  folderId: string
+): Promise<string | null> {
+  const res = await drive.files.list({
+    q: [
+      "name = '" + escapeQueryValue(fileName) + "'",
+      "'" + escapeQueryValue(folderId) + "' in parents",
+      'trashed = false'
+    ].join(' and '),
+    fields: 'files(id)',
+    pageSize: 1,
+    spaces: 'drive',
+    ...ALL_DRIVES
+  });
+
+  return res.data.files?.[0]?.id || null;
+}
+
+/** Best-effort link sharing; a failure here must not fail the upload. */
+async function makeReadableByLink(drive: drive_v3.Drive, fileId: string): Promise<void> {
+  try {
+    await drive.permissions.create({
+      fileId,
+      requestBody: { role: 'reader', type: 'anyone' },
+      supportsAllDrives: true
+    });
+  } catch {
+    // Shared drives and some org policies forbid public links - not fatal.
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Upload strategies
+ * ------------------------------------------------------------------ */
+
+async function uploadViaDriveApi(
+  drive: drive_v3.Drive,
+  strategy: 'oauth' | 'service_account',
+  params: DriveUploadParams
+): Promise<DriveUploadResult> {
+  const folderName = sanitizeFolderName(params.brandName);
+  const assetName = buildAssetFileName(params.brandName, params.fileName, params.category);
+
+  // 1. Root folder ("STE Logos"), by configured id where available.
+  const configuredRootId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID?.trim();
+  const rootFolderId =
+    configuredRootId || (await findOrCreateFolder(drive, DEFAULT_ROOT_FOLDER_NAME)).id;
+
+  // 2. Per-exhibitor folder, e.g. "Apple Lifestyle".
+  const exhibitorFolder = await findOrCreateFolder(drive, folderName, rootFolderId);
+
+  // 3. Create or update the asset itself.
+  const media = {
+    mimeType: params.mimeType || 'application/octet-stream',
+    body: bufferToStream(params.fileBuffer)
+  };
+
+  const existingFileId = await findExistingFile(drive, assetName, exhibitorFolder.id);
+
+  const saved = existingFileId
+    ? await drive.files.update({
+        fileId: existingFileId,
+        requestBody: { name: assetName },
+        media,
+        fields: 'id, name, webViewLink, webContentLink',
+        supportsAllDrives: true
+      })
+    : await drive.files.create({
+        requestBody: { name: assetName, parents: [exhibitorFolder.id] },
+        media,
+        fields: 'id, name, webViewLink, webContentLink',
+        supportsAllDrives: true
+      });
+
+  if (saved.data.id) {
+    await makeReadableByLink(drive, saved.data.id);
+  }
+
+  return {
+    success: true,
+    strategy,
+    fileId: saved.data.id || undefined,
+    fileName: assetName,
+    webViewLink: saved.data.webViewLink || saved.data.webContentLink || undefined,
+    folderId: exhibitorFolder.id,
+    folderName,
+    folderViewLink:
+      exhibitorFolder.webViewLink || 'https://drive.google.com/drive/folders/' + exhibitorFolder.id
+  };
+}
+
+async function uploadViaAppsScript(params: DriveUploadParams): Promise<DriveUploadResult | null> {
+  const webhookUrl = process.env.GOOGLE_DRIVE_WEBAPP_URL || process.env.GOOGLE_DRIVE_SCRIPT_URL;
+  if (!webhookUrl || !webhookUrl.startsWith('http')) return null;
+
+  const folderName = sanitizeFolderName(params.brandName);
+  const assetName = buildAssetFileName(params.brandName, params.fileName, params.category);
+
+  const res = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      action: 'upload_file',
+      token: process.env.GOOGLE_DRIVE_WEBAPP_TOKEN || '',
+      parentFolderId: process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID || '',
+      parentFolderName: DEFAULT_ROOT_FOLDER_NAME,
+      exhibitorFolderName: folderName,
+      mobile: params.mobile,
+      brandName: folderName,
+      fileName: assetName,
+      mimeType: params.mimeType || 'application/octet-stream',
+      base64Data: params.fileBuffer.toString('base64')
+    })
+  });
+
+  const json = (await res.json().catch(() => null)) as any;
+
+  // Require a concrete file id or link. A bare {"result":"success"} means the
+  // URL points at a script that logged the payload without storing the file.
+  if (!json || (!json.fileId && !json.fileUrl && !json.webViewLink)) {
+    return {
+      success: false,
+      strategy: 'apps_script',
+      error: json?.error || 'Apps Script web app did not return an uploaded file id.'
+    };
+  }
+
+  return {
+    success: true,
+    strategy: 'apps_script',
+    fileId: json.fileId,
+    fileName: json.fileName || assetName,
+    webViewLink: json.fileUrl || json.webViewLink,
+    folderId: json.folderId,
+    folderName,
+    folderViewLink:
+      json.folderUrl ||
+      json.folderViewLink ||
+      (json.folderId ? 'https://drive.google.com/drive/folders/' + json.folderId : undefined)
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Public entry point
+ * ------------------------------------------------------------------ */
+
+export function isDriveConfigured(): boolean {
+  return Boolean(
+    getDriveClient() || process.env.GOOGLE_DRIVE_WEBAPP_URL || process.env.GOOGLE_DRIVE_SCRIPT_URL
+  );
+}
+
+/**
+ * Ensures 'STE Logos/<Brand Name>/' exists and stores the asset inside it.
+ * Never throws - callers treat Drive as a mirror of Supabase Storage, so a
+ * Drive outage must not fail the exhibitor's upload.
  */
 export async function syncExhibitorFileToDrive(
   params: DriveUploadParams
 ): Promise<DriveUploadResult> {
-  const { mobile, brandName, fileName, fileBuffer, mimeType } = params;
-  const cleanBrand = (brandName || 'Exhibitor').trim();
-  const folderName = `${cleanBrand}`;
+  const brand = sanitizeFolderName(params.brandName);
+  const errors: string[] = [];
 
-  // 1. Try Google Drive API via Service Account
-  const drive = getDriveClient();
-  if (drive) {
+  const client = getDriveClient();
+  if (client) {
     try {
-      console.log(`[GoogleDrive] Starting drive sync for ${cleanBrand} (${fileName})...`);
-
-      // 1. Root Parent Folder: STE Logos
-      const configuredParentId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID;
-      let rootFolderId: string | undefined = configuredParentId;
-
-      if (!rootFolderId) {
-        const rootFolder = await getOrCreateFolder(drive, 'STE Logos');
-        rootFolderId = rootFolder.id;
-      }
-
-      // 2. Exhibitor Subfolder: e.g. "Apple Lifestyle"
-      const exhibitorFolder = await getOrCreateFolder(drive, folderName, rootFolderId);
-
-      // 3. Upload the file into the exhibitor subfolder
-      const fileMetadata: drive_v3.Schema$File = {
-        name: fileName,
-        parents: exhibitorFolder.id ? [exhibitorFolder.id] : undefined
-      };
-
-      const media = {
-        mimeType: mimeType || 'application/octet-stream',
-        body: bufferToStream(fileBuffer)
-      };
-
-      const fileRes = await drive.files.create({
-        requestBody: fileMetadata,
-        media: media,
-        fields: 'id, name, webViewLink, webContentLink'
-      });
-
-      // Make file accessible
-      try {
-        if (fileRes.data.id) {
-          await drive.permissions.create({
-            fileId: fileRes.data.id,
-            requestBody: {
-              role: 'reader',
-              type: 'anyone'
-            }
-          });
-        }
-      } catch {}
-
-      console.log(`[GoogleDrive] Successfully uploaded ${fileName} to Google Drive folder "${folderName}".`);
-
-      return {
-        success: true,
-        fileId: fileRes.data.id || undefined,
-        webViewLink: fileRes.data.webViewLink || fileRes.data.webContentLink || undefined,
-        folderId: exhibitorFolder.id,
-        folderViewLink: exhibitorFolder.webViewLink
-      };
+      const result = await uploadViaDriveApi(client.drive, client.strategy, params);
+      console.log(
+        '[GoogleDrive] Stored "' + result.fileName + '" in "' +
+          DEFAULT_ROOT_FOLDER_NAME + '/' + brand + '" via ' + client.strategy + '.'
+      );
+      return result;
     } catch (error: any) {
-      console.error('[GoogleDrive] Service account drive sync failed:', error.message);
-    }
-  }
+      const message = error?.errors?.[0]?.message || error?.message || String(error);
+      errors.push(client.strategy + ': ' + message);
+      console.error('[GoogleDrive] ' + client.strategy + ' upload failed:', message);
 
-  // 2. Fallback via Google Apps Script Web App if configured
-  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
-  if (webhookUrl && webhookUrl.startsWith('http')) {
-    try {
-      console.log(`[GoogleDrive] Attempting upload via Google Apps Script Web App...`);
-      const base64Data = fileBuffer.toString('base64');
-      const parentFolderId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID || '1_6t-lfH0ha4BF1MxP2nsry6zmjmUFFcm';
-      const payload = {
-        action: 'upload_file',
-        parentFolderId,
-        parentFolderName: 'STE Logos',
-        exhibitorFolderName: folderName,
-        mobile,
-        brandName: cleanBrand,
-        fileName,
-        mimeType,
-        base64Data
-      };
-
-      const res = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-
-      const json = await res.json().catch(() => null);
-      if (json && (json.fileUrl || json.webViewLink || json.status === 'success')) {
-        return {
-          success: true,
-          fileId: json.fileId,
-          webViewLink: json.fileUrl || json.webViewLink,
-          folderId: json.folderId,
-          folderViewLink: json.folderUrl || json.folderViewLink
-        };
+      if (/storage quota/i.test(message)) {
+        console.error(
+          '[GoogleDrive] Service accounts own no storage. Use a Shared Drive, set ' +
+            'GOOGLE_IMPERSONATED_USER_EMAIL for domain-wide delegation, or switch to ' +
+            'OAuth / the Apps Script web app.'
+        );
       }
-    } catch (err: any) {
-      console.warn('[GoogleDrive] Apps Script webhook upload attempt failed:', err.message);
     }
   }
 
-  console.log('[GoogleDrive] No Google Drive credentials configured. File safely stored in Supabase.');
-  return {
-    success: false,
-    error: 'Google Drive credentials not configured. File stored in primary cloud storage.'
-  };
+  try {
+    const scriptResult = await uploadViaAppsScript(params);
+    if (scriptResult?.success) {
+      console.log(
+        '[GoogleDrive] Stored "' + scriptResult.fileName + '" in "' + brand +
+          '" via Apps Script web app.'
+      );
+      return scriptResult;
+    }
+    if (scriptResult?.error) errors.push('apps_script: ' + scriptResult.error);
+  } catch (error: any) {
+    errors.push('apps_script: ' + (error?.message || String(error)));
+    console.warn('[GoogleDrive] Apps Script upload failed:', error?.message);
+  }
+
+  const error = errors.length
+    ? errors.join(' | ')
+    : 'No Google Drive credentials configured (set GOOGLE_DRIVE_WEBAPP_URL or OAuth credentials).';
+
+  console.warn('[GoogleDrive] Drive sync skipped for "' + brand + '": ' + error);
+  return { success: false, error };
 }
