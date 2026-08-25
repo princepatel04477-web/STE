@@ -8,7 +8,7 @@ import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import path from 'path';
 import fs from 'fs';
 
-const ALLOWED_EXTENSIONS = ['.cdr', '.ai', '.eps', '.pdf', '.svg', '.png', '.jpg', '.jpeg', '.webp'];
+const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.cdr'];
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: Request) {
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     const ext = path.extname(file.name).toLowerCase();
     if (!ALLOWED_EXTENSIONS.includes(ext)) {
       return NextResponse.json({
-        error: `File format ${ext} is not supported. Please upload a CDR, AI, EPS, PDF, SVG, PNG, or JPG file.`
+        error: `File format "${ext}" is not allowed. Only .PNG, .JPG, .JPEG, and .CDR files are accepted.`
       }, { status: 400 });
     }
 
@@ -103,10 +103,10 @@ export async function POST(request: Request) {
     const driveFolderId = driveResult.folderId || existingExhibitor?.drive_folder_id || null;
     const driveFolderUrl = driveResult.folderViewLink || existingExhibitor?.drive_folder_url || null;
 
-    const isCdrOrVector = ['.cdr', '.ai', '.eps', '.pdf'].includes(ext) || uploadCategory === 'cdr';
-    const isLogoImage = ['.png', '.jpg', '.jpeg', '.svg', '.webp'].includes(ext) || uploadCategory === 'logo';
+    const isCdr = ext === '.cdr' || uploadCategory === 'cdr';
+    const isLogoImage = ['.png', '.jpg', '.jpeg'].includes(ext) || uploadCategory === 'logo';
 
-    const cdrUrl = isCdrOrVector ? primaryStorageUrl : (existingExhibitor?.cdr_file_url || null);
+    const cdrUrl = isCdr ? primaryStorageUrl : (existingExhibitor?.cdr_file_url || null);
     const logoUrl = isLogoImage ? primaryStorageUrl : (existingExhibitor?.logo_file_url || null);
 
     // 4. Update Database

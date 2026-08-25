@@ -312,7 +312,7 @@ export default function ExhibitorDashboardPage() {
       const formData = new FormData();
       formData.append('file', file);
       const ext = file.name.split('.').pop()?.toLowerCase();
-      const isCdr = ['cdr', 'ai', 'eps', 'pdf'].includes(ext || '');
+      const isCdr = ext === 'cdr';
       formData.append('category', isCdr ? 'cdr' : 'logo');
 
       setUploadProgress(55);
@@ -1041,7 +1041,7 @@ export default function ExhibitorDashboardPage() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".cdr,.ai,.eps,.pdf,.svg,.png,.jpg,.jpeg,.webp"
+                  accept=".png,.jpg,.jpeg,.cdr"
                   onChange={handleFileUpload}
                   className="hidden"
                   id="cdr-logo-file-input"
@@ -1058,10 +1058,10 @@ export default function ExhibitorDashboardPage() {
 
                 <div>
                   <h4 className="text-sm font-bold text-slate-900">
-                    {uploadingFile ? 'Uploading & Syncing to Drive...' : 'Drag & drop your CDR / Vector / Logo file here'}
+                    {uploadingFile ? 'Uploading & Syncing to Drive...' : 'Drag & drop your CDR / Logo file here'}
                   </h4>
                   <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                    Supported formats: <strong className="text-slate-800">.CDR, .AI, .EPS, .PDF, .SVG, .PNG, .JPG</strong> (Up to 50MB)
+                    Supported formats: <strong className="text-slate-800">.PNG, .JPG, .JPEG, .CDR</strong> (Up to 50MB)
                   </p>
                 </div>
 
