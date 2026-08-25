@@ -75,10 +75,36 @@ export default function ExhibitorDashboardPage() {
   const [market, setMarket] = useState('');
   const [selectedSqftOption, setSelectedSqftOption] = useState<string>('200');
   const [customSqft, setCustomSqft] = useState<string>('');
-  const [fasciaNames, setFasciaNames] = useState<string[]>(['', '', '', '']);
+  const [fasciaNames, setFasciaNames] = useState<string[]>(['', '']);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccessMsg, setProfileSuccessMsg] = useState('');
   const [profileError, setProfileError] = useState('');
+
+  const handleAddFasciaName = () => {
+    if (fasciaNames.length < 4) {
+      setFasciaNames((prev) => [...prev, '']);
+    }
+  };
+
+  const handleRemoveFasciaName = (indexToRemove: number) => {
+    if (fasciaNames.length > 2) {
+      setFasciaNames((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    } else {
+      setFasciaNames((prev) => {
+        const copy = [...prev];
+        copy[indexToRemove] = '';
+        return copy;
+      });
+    }
+  };
+
+  const handleFasciaNameChange = (index: number, val: string) => {
+    setFasciaNames((prev) => {
+      const copy = [...prev];
+      copy[index] = val;
+      return copy;
+    });
+  };
 
   // Extras Catalog State
   const [products, setProducts] = useState<Product[]>([]);
@@ -181,14 +207,18 @@ export default function ExhibitorDashboardPage() {
       }
 
       if (Array.isArray(profData.fascia_names)) {
-        setFasciaNames([
-          profData.fascia_names[0] || '',
-          profData.fascia_names[1] || '',
-          profData.fascia_names[2] || '',
-          profData.fascia_names[3] || ''
-        ]);
+        const loaded = profData.fascia_names.map((n: any) => String(n || ''));
+        if (loaded[3]?.trim()) {
+          setFasciaNames([loaded[0] || '', loaded[1] || '', loaded[2] || '', loaded[3] || '']);
+        } else if (loaded[2]?.trim()) {
+          setFasciaNames([loaded[0] || '', loaded[1] || '', loaded[2] || '']);
+        } else {
+          setFasciaNames([loaded[0] || '', loaded[1] || '']);
+        }
       } else if (profData.brand_name) {
-        setFasciaNames([profData.brand_name, '', '', '']);
+        setFasciaNames([profData.brand_name, '']);
+      } else {
+        setFasciaNames(['', '']);
       }
 
       setLogoFileUrl(profData.logo_file_url || null);
@@ -634,7 +664,7 @@ export default function ExhibitorDashboardPage() {
             </div>
           </div>
 
-          {/* Facia / Banner Name of Companies (4 Options) */}
+          {/* Facia / Banner Name of Companies (Dynamic: 2 visible by default, addable up to 4) */}
           <div className="mt-8 pt-6 border-t border-slate-200">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2.5">
@@ -645,110 +675,88 @@ export default function ExhibitorDashboardPage() {
                   <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                     <span>Stall Facia & Banner Names</span>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-500 text-slate-950">
-                      4 Firm Name Options
+                      {fasciaNames.length} Firm Name Option{fasciaNames.length > 1 ? 's' : ''}
                     </span>
                   </h3>
                   <p className="text-xs text-slate-500 font-medium">
-                    Enter up to 4 company / firm name options to be printed on your booth fascia board header and promotional banners
+                    Enter company / firm name options to be printed on your booth fascia board header and promotional banners
                   </p>
                 </div>
               </div>
+
+              {fasciaNames.length < 4 && (
+                <button
+                  type="button"
+                  onClick={handleAddFasciaName}
+                  className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider transition-all shadow-xs hover:scale-105 active:scale-95"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Option {fasciaNames.length + 1}</span>
+                </button>
+              )}
             </div>
 
-            {/* 4 Firm Name Inputs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-              {/* Option 1 */}
-              <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">1</span>
-                    <span>Option 1 (Main Header Firm Name)</span>
-                  </label>
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">Main Header</span>
+            {/* Dynamic Firm Name Inputs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              {fasciaNames.map((name, index) => (
+                <div
+                  key={index}
+                  className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs relative"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">
+                        {index + 1}
+                      </span>
+                      <span>Option {index + 1} (Main Header Firm Name)</span>
+                    </label>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                        Main Header
+                      </span>
+                      {index >= 2 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFasciaName(index)}
+                          className="p-1 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                          title={`Remove Option ${index + 1}`}
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder={`e.g. Ambika Silk Mills (Main Header Option ${index + 1})`}
+                    value={name || ''}
+                    onChange={(e) => handleFasciaNameChange(index, e.target.value)}
+                    className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                  />
+                  <span className="text-[10px] text-slate-500 mt-1 block">
+                    Main header firm name option {index + 1} for booth fascia board
+                  </span>
                 </div>
-                <input
-                  type="text"
-                  placeholder="e.g. Ambika Silk Mills (Main Header Option 1)"
-                  value={fasciaNames[0] || ''}
-                  onChange={(e) => {
-                    const copy = [...fasciaNames];
-                    copy[0] = e.target.value;
-                    setFasciaNames(copy);
-                  }}
-                  className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                />
-                <span className="text-[10px] text-slate-500 mt-1 block">Main header firm name option 1 for booth fascia board</span>
-              </div>
-
-              {/* Option 2 */}
-              <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">2</span>
-                    <span>Option 2 (Main Header Firm Name)</span>
-                  </label>
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">Main Header</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="e.g. Ambika Tex Fab (Main Header Option 2)"
-                  value={fasciaNames[1] || ''}
-                  onChange={(e) => {
-                    const copy = [...fasciaNames];
-                    copy[1] = e.target.value;
-                    setFasciaNames(copy);
-                  }}
-                  className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                />
-                <span className="text-[10px] text-slate-500 mt-1 block">Main header firm name option 2 for booth fascia board</span>
-              </div>
-
-              {/* Option 3 */}
-              <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">3</span>
-                    <span>Option 3 (Main Header Firm Name)</span>
-                  </label>
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">Main Header</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="e.g. Ambika Digital Prints (Main Header Option 3)"
-                  value={fasciaNames[2] || ''}
-                  onChange={(e) => {
-                    const copy = [...fasciaNames];
-                    copy[2] = e.target.value;
-                    setFasciaNames(copy);
-                  }}
-                  className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                />
-                <span className="text-[10px] text-slate-500 mt-1 block">Main header firm name option 3 for booth fascia board</span>
-              </div>
-
-              {/* Option 4 */}
-              <div className="p-4 bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-xl transition-all shadow-xs">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-[11px] font-black flex items-center justify-center">4</span>
-                    <span>Option 4 (Main Header Firm Name)</span>
-                  </label>
-                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">Main Header</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="e.g. Ambika Fabrics (Main Header Option 4)"
-                  value={fasciaNames[3] || ''}
-                  onChange={(e) => {
-                    const copy = [...fasciaNames];
-                    copy[3] = e.target.value;
-                    setFasciaNames(copy);
-                  }}
-                  className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                />
-                <span className="text-[10px] text-slate-500 mt-1 block">Main header firm name option 4 for booth fascia board</span>
-              </div>
+              ))}
             </div>
+
+            {/* Add Another Option Bar if < 4 */}
+            {fasciaNames.length < 4 && (
+              <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 rounded-xl bg-amber-50/60 border border-dashed border-amber-300 gap-2">
+                <div className="flex items-center gap-2 text-xs text-amber-900 font-medium">
+                  <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Have more sister brands or partners sharing your booth?</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddFasciaName}
+                  className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs hover:scale-105 active:scale-95"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>+ Add Option {fasciaNames.length + 1} (Up to 4)</span>
+                </button>
+              </div>
+            )}
 
             {/* Live Facia Board Mockup Preview */}
             <div className="p-4 bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-950 rounded-xl border border-amber-500/30 text-white shadow-md mb-4">
@@ -1390,27 +1398,21 @@ export default function ExhibitorDashboardPage() {
 
             <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
               <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">
-                Fascia / Main Header (4 Options)
+                Fascia / Main Header ({fasciaNames.length} Option{fasciaNames.length > 1 ? 's' : ''})
               </span>
               <div className="space-y-1 text-xs">
-                <p className="text-slate-800">
-                  <span className="font-bold text-amber-800">1.</span> {fasciaNames[0]?.trim() || <span className="text-slate-400 italic">Same as Firm Name</span>}
-                </p>
-                {fasciaNames[1]?.trim() && (
-                  <p className="text-slate-800">
-                    <span className="font-bold text-amber-800">2.</span> {fasciaNames[1].trim()}
+                {fasciaNames.map((name, i) => (
+                  <p key={i} className="text-slate-800">
+                    <span className="font-bold text-amber-800">{i + 1}.</span>{' '}
+                    {name?.trim() ? (
+                      name.trim()
+                    ) : i === 0 ? (
+                      <span className="text-slate-400 italic">Same as Firm Name</span>
+                    ) : (
+                      <span className="text-slate-400 italic">Not set</span>
+                    )}
                   </p>
-                )}
-                {fasciaNames[2]?.trim() && (
-                  <p className="text-slate-800">
-                    <span className="font-bold text-amber-800">3.</span> {fasciaNames[2].trim()}
-                  </p>
-                )}
-                {fasciaNames[3]?.trim() && (
-                  <p className="text-slate-800">
-                    <span className="font-bold text-amber-800">4.</span> {fasciaNames[3].trim()}
-                  </p>
-                )}
+                ))}
               </div>
             </div>
           </div>

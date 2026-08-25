@@ -24,21 +24,23 @@ export async function GET() {
       ? exhibitor.stall_sqft
       : (reg?.stallSqft || '200 sq ft');
 
-    let fascia_names = ['', '', '', ''];
+    let fascia_names = ['', ''];
     if (exhibitor?.fascia_names_json) {
       try {
         const parsed = JSON.parse(exhibitor.fascia_names_json);
         if (Array.isArray(parsed)) {
-          fascia_names = [
-            parsed[0] || '',
-            parsed[1] || '',
-            parsed[2] || '',
-            parsed[3] || ''
-          ];
+          const names = parsed.map(n => String(n || ''));
+          if (names[3]?.trim()) {
+            fascia_names = [names[0] || '', names[1] || '', names[2] || '', names[3] || ''];
+          } else if (names[2]?.trim()) {
+            fascia_names = [names[0] || '', names[1] || '', names[2] || ''];
+          } else {
+            fascia_names = [names[0] || '', names[1] || ''];
+          }
         }
       } catch {}
     } else {
-      fascia_names = [brand_name, '', '', ''];
+      fascia_names = [brand_name, ''];
     }
 
     return NextResponse.json({
@@ -80,17 +82,15 @@ export async function POST(request: Request) {
     const cleanBrand = brand_name.trim();
     const cleanSqft = stall_sqft.trim();
     
-    // Sanitize 4 fascia names options
-    let cleanFasciaNames: string[] = ['', '', '', ''];
+    // Sanitize dynamic fascia names options (up to 4, minimum 2)
+    let cleanFasciaNames: string[] = ['', ''];
     if (Array.isArray(fascia_names)) {
-      cleanFasciaNames = [
-        String(fascia_names[0] || '').trim(),
-        String(fascia_names[1] || '').trim(),
-        String(fascia_names[2] || '').trim(),
-        String(fascia_names[3] || '').trim()
-      ];
+      cleanFasciaNames = fascia_names.map(n => String(n || '').trim()).slice(0, 4);
+      while (cleanFasciaNames.length < 2) {
+        cleanFasciaNames.push('');
+      }
     } else {
-      cleanFasciaNames = [cleanBrand, '', '', ''];
+      cleanFasciaNames = [cleanBrand, ''];
     }
     const fasciaNamesJson = JSON.stringify(cleanFasciaNames);
 
