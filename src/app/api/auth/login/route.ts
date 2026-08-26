@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db, { fetchRemotePasswords } from '@/lib/db';
 import { createSessionToken, validatePassword, isAdminMobile } from '@/lib/auth';
+import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function POST(request: Request) {
   try {
@@ -38,13 +39,27 @@ export async function POST(request: Request) {
       db.prepare('INSERT INTO exhibitors (mobile) VALUES (?)').run(cleanMobile);
     }
 
-    // Retrieve custom password from local memory, backup cookie, or remote persistent store
+    // Retrieve custom password from Supabase, local memory, backup cookie, or remote persistent store
     const cookieStore = await cookies();
     const cookiePass = cookieStore.get(`ste_custom_pass_${cleanMobile}`)?.value;
     const remoteMap = await fetchRemotePasswords();
     const remotePass = remoteMap[cleanMobile];
 
-    const customPass = existing?.custom_password || cookiePass || remotePass;
+    let supabaseCustomPass: string | null = null;
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbEx } = await supabaseAdmin
+          .from('exhibitors')
+          .select('custom_password')
+          .eq('mobile', cleanMobile)
+          .maybeSingle();
+        if (sbEx?.custom_password) {
+          supabaseCustomPass = sbEx.custom_password;
+        }
+      } catch {}
+    }
+
+    const customPass = supabaseCustomPass || existing?.custom_password || cookiePass || remotePass;
     const inputPass = String(password).trim();
     const isValidPassword = validatePassword(inputPass, customPass, cleanMobile);
 

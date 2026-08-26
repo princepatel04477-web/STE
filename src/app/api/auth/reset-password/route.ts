@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import db, { REGISTERED_EXHIBITOR_MOBILES, saveRemotePassword } from '@/lib/db';
 import { createSessionToken, isAdminMobile } from '@/lib/auth';
+import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function POST(request: Request) {
   try {
@@ -50,6 +51,20 @@ export async function POST(request: Request) {
     // Update custom_password in local DB memory & remote persistent store
     db.prepare('UPDATE exhibitors SET custom_password = ? WHERE mobile = ?').run(cleanPass, cleanMobile);
     await saveRemotePassword(cleanMobile, cleanPass);
+
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        await supabaseAdmin
+          .from('exhibitors')
+          .upsert({
+            mobile: cleanMobile,
+            custom_password: cleanPass,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'mobile' });
+      } catch (sbErr) {
+        console.error('[SupabaseDB] Password reset sync error:', sbErr);
+      }
+    }
 
     // Create session JWT token for instant login
     const token = await createSessionToken(cleanMobile);

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAuthenticatedExhibitor, isAdminMobile } from '@/lib/auth';
+import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function POST(request: Request) {
   try {
@@ -21,6 +22,13 @@ export async function POST(request: Request) {
 
     if (resetAll) {
       db.prepare('DELETE FROM lottery_allocations').run();
+      if (isSupabaseConfigured && supabaseAdmin) {
+        try {
+          await supabaseAdmin.from('lottery_allocations').delete().neq('mobile', '');
+        } catch (sbErr) {
+          console.error('[SupabaseDB] Reset all allocations error:', sbErr);
+        }
+      }
       return NextResponse.json({
         success: true,
         message: 'All lottery allocations have been successfully reset.'
@@ -30,6 +38,13 @@ export async function POST(request: Request) {
     if (mobile) {
       const cleanMobile = String(mobile).replace(/\D/g, '').slice(-10);
       db.prepare('DELETE FROM lottery_allocations WHERE mobile = ?').run(cleanMobile);
+      if (isSupabaseConfigured && supabaseAdmin) {
+        try {
+          await supabaseAdmin.from('lottery_allocations').delete().eq('mobile', cleanMobile);
+        } catch (sbErr) {
+          console.error('[SupabaseDB] Reset allocation error:', sbErr);
+        }
+      }
       return NextResponse.json({
         success: true,
         message: `Lottery allocation for exhibitor ${cleanMobile} has been reset.`

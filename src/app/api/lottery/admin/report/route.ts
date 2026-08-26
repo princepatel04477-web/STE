@@ -1,13 +1,25 @@
 import { NextResponse } from 'next/server';
 import db, { LotteryAllocationRecord } from '@/lib/db';
 import { MASTER_STALL_INVENTORY, STALL_CATEGORY_LADDER, normalizeSqftCategory } from '@/data/stallInventory';
+import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'json';
 
-    const allocations = (db.prepare('SELECT * FROM lottery_allocations').all() as LotteryAllocationRecord[]) || [];
+    let allocations = (db.prepare('SELECT * FROM lottery_allocations').all() as LotteryAllocationRecord[]) || [];
+
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbAllocations } = await supabaseAdmin.from('lottery_allocations').select('*');
+        if (sbAllocations && Array.isArray(sbAllocations)) {
+          allocations = sbAllocations;
+        }
+      } catch (sbErr) {
+        console.warn('[Lottery Report] Supabase fetch fallback:', sbErr);
+      }
+    }
     
     // Category Breakdown Stats
     const categoryStats = STALL_CATEGORY_LADDER.map((cat) => {

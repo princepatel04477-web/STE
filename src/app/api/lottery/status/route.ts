@@ -4,6 +4,7 @@ import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import db, { LotteryAllocationRecord } from '@/lib/db';
 import { getAllocatedStallForMobile } from '@/lib/lotteryEngine';
 import { normalizeSqftCategory } from '@/data/stallInventory';
+import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function GET(request: Request) {
   try {
@@ -34,8 +35,23 @@ export async function GET(request: Request) {
     const categorySqft = normalizeSqftCategory(rawSqft);
     const market = registeredMaster?.market || '';
 
-    // 2. Check allocation status
-    const allocation = getAllocatedStallForMobile(mobile);
+    // 2. Check allocation status from Supabase (source of truth) or local fallback
+    let allocation = getAllocatedStallForMobile(mobile);
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbAlloc } = await supabaseAdmin
+          .from('lottery_allocations')
+          .select('*')
+          .eq('mobile', mobile)
+          .maybeSingle();
+
+        if (sbAlloc) {
+          allocation = sbAlloc;
+        }
+      } catch (sbErr) {
+        console.warn('[Lottery Status] Supabase fetch fallback:', sbErr);
+      }
+    }
 
     return NextResponse.json({
       success: true,
