@@ -31,6 +31,13 @@ const nextConfig = {
       ],
     },
   ],
+  redirects: async () => [
+    // STE-08 — common short paths that exhibitors type from brochures / WhatsApp
+    { source: "/exhibitor",  destination: "/exhibitor/login", permanent: false },
+    { source: "/login",      destination: "/exhibitor/login", permanent: false },
+    { source: "/portal",     destination: "/exhibitor/login", permanent: false },
+    { source: "/register",   destination: "/#buyer-registration", permanent: false },
+  ],
 };
 
 export default nextConfig;

@@ -67,7 +67,7 @@ export default function PremiumTransitions({ mode }: TransitionProps) {
       {/* 3. Text systems */}
       <div className="relative z-20 text-center select-none pointer-events-none">
         <span className="transition-title font-sans text-xs sm:text-sm font-bold tracking-[8px] text-expo-gold uppercase block opacity-0">
-          {isTunnel ? "• COUTURE ENCLAVE •" : "• INDUSTRIAL POWER •"}
+          {isTunnel ? "COUTURE ENCLAVE" : "INDUSTRIAL POWER"}
         </span>
       </div>
     </div>

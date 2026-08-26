@@ -9,7 +9,9 @@ import { Translate } from "@/components/LanguageContext";
 
 const STATS_DATA = [
   { value: 650, suffix: "+", labelEn: "EXHIBITOR STALLS", labelHi: "प्रदर्शक स्टॉल", subEn: "Surat's leading manufacturers showcasing premium catalogs", subHi: "सूरत के अग्रणी निर्माता अपने प्रीमियम संग्रह का प्रदर्शन करते हैं" },
-  { value: 8000, suffix: "+", labelEn: "VERIFIED B2B BUYERS", labelHi: "सत्यापित B2B खरीदार", subEn: "Retailers, wholesalers, boutique owners & chain stores", subHi: "रिटेलर्स, थोक विक्रेता, बुटीक मालिक और स्टोर चेन" },
+  // STE-14: Replaced duplicate "8,000+ Verified B2B Buyers" (already in hero strip)
+  //         with a distinct metric that adds new information.
+  { value: 500, suffix: "+", labelEn: "PRODUCT CATEGORIES", labelHi: "उत्पाद श्रेणियां", subEn: "Sarees, lehenga, dress material, suiting, embroidery & more", subHi: "साड़ी, लहंगा, ड्रेस मटेरियल, सूटिंग, एम्ब्रॉयडरी और अधिक" },
   { value: 0, suffix: "", labelEn: "PAN INDIA REACH", labelHi: "अखिल भारतीय पहुंच", subEn: "Connecting sourcing hubs from across the nation", subHi: "देश भर के प्रमुख कपड़ा व्यापार केंद्रों को जोड़ना" },
   { value: 100, suffix: "%", labelEn: "WHOLESALE BUSINESS FOCUS", labelHi: "थोक व्यापार पर ध्यान", subEn: "Direct manufacturer pricing & high margin inventory sourcing", subHi: "सीधे निर्माताओं से मूल्य निर्धारण और उच्च मार्जिन इन्वेंट्री सोर्सिंग" },
 ];
@@ -110,7 +112,7 @@ export default function PowerOfSurat() {
           </span>
           <h2
             ref={headingRef}
-            className={`font-serif text-3xl sm:text-5xl md:text-6xl tracking-widest text-white leading-tight heading-underline ${headingInView ? "in-view" : ""}`}
+            className={`font-serif text-3xl sm:text-4xl md:text-5xl tracking-widest text-white leading-tight heading-underline ${headingInView ? "in-view" : ""}`}
           >
             <span className="gold-shimmer-text">
               <Translate en="The Monumental Scale of" hi="विश्व कपड़ा व्यापार का" />

@@ -152,7 +152,7 @@ export default function CinematicPreloader() {
                 <Translate en="Surat Textile Exhibition" hi="सूरत टेक्सटाइल प्रदर्शनी" />
               </span>
               <span className="font-serif text-3xl font-light italic text-white tracking-[2px] z-10">
-                <Translate en="Orchestrating Couture..." hi="कॉउचर का आयोजन..." />
+                <Translate en="Orchestrating Couture, Commerce &amp; Connections" hi="कॉउचर, वाणिज्य और कनेक्शन का संयोजन" />
               </span>
             </motion.div>
 

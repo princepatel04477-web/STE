@@ -79,7 +79,7 @@ export default function StallPackages() {
           <FadeUp delay={0.06}>
             <h2
               ref={headingRef}
-              className={`font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight heading-underline ${
+              className={`font-serif text-3xl sm:text-4xl md:text-5xl tracking-wide text-white leading-tight heading-underline ${
                 headingInView ? "in-view" : ""
               }`}
             >

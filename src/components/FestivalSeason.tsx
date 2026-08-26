@@ -121,7 +121,7 @@ export default function FestivalSeason() {
           </span>
           <h2
             ref={headingRef}
-            className={`font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight heading-underline ${headingInView ? "in-view" : ""}`}
+            className={`font-serif text-3xl sm:text-4xl md:text-5xl tracking-wide text-white leading-tight heading-underline ${headingInView ? "in-view" : ""}`}
           >
             <span className="gold-shimmer-text"><Translate en="Cinematic Festival Demand &" hi="भव्य त्योहारी मांग और" /></span> <br />
             <span className="text-metallic font-light italic"><Translate en="Seasonal Business Opportunity" hi="मौसमी व्यावसायिक अवसर" /></span>

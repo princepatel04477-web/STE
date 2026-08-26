@@ -292,7 +292,7 @@ export default function FinalCTA() {
           </span>
           <h2
             ref={headlineRef}
-            className={`font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-[1.08] mb-8 uppercase heading-underline ${
+            className={`font-serif text-3xl sm:text-4xl md:text-5xl tracking-wide text-white leading-[1.08] mb-8 uppercase heading-underline ${
               inView ? "in-view" : ""
             }`}
           >

@@ -18,10 +18,18 @@ const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "600", "
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // Do NOT set maximumScale/userScalable — blocking pinch-zoom is an a11y failure.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#D4AF37" },
+    { media: "(prefers-color-scheme: dark)",  color: "#050505" },
+  ],
 };
 
 export const metadata: Metadata = {
-  title: "Surat Textile Exhibition 2026 (STE) | India's Premier B2B Sourcing Machine",
+  title: {
+    default: "Surat Textile Exhibition 2026 (STE) | India's Premier B2B Sourcing Machine",
+    template: "%s | Surat Textile Exhibition 2026",
+  },
   description:
     `Official portal for ${EVENT.name} presented by ${EVENT.presenterName} and supported by ${EVENT.organizerName}. ` +
     `${EVENT.stalls}+ stalls, ${formatCount(EVENT.buyers)}+ verified B2B buyers and ${EVENT.agents}+ sourcing agents at ${EVENT.venueShortEn}.`,

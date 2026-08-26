@@ -6,7 +6,7 @@ import HeroCountdown from "@/components/HeroCountdown";
 import StatCounter from "@/components/StatCounter";
 import { EVENT, formatCount } from "@/lib/event-facts";
 import { useMobileAnimation } from "./useMobileAnimation";
-import { GoldParticles } from "@/components/GoldParticles";
+
 import BoomerangVideoBg from "@/BoomerangVideoBg";
 import { masterRAF } from "@/hooks/useMasterRAF";
 import TextReveal from "@/components/TextReveal";
@@ -248,8 +248,7 @@ export default function CinematicHero() {
           data-speed="0.25"
         />
 
-        {/* Floating particles */}
-        <GoldParticles />
+
 
         {/* Ambient Floating Dust Glow Spotlights */}
         <div className="spotlight-glowing left-[20%] top-[30%] w-[35vw] h-[35vw]" />
@@ -427,15 +426,7 @@ export default function CinematicHero() {
         </div>
       </div>
 
-      {/* 4. Luxury Scroll Down Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center pointer-events-none z-30 select-none">
-        <span className="font-sans text-xs tracking-[4px] text-expo-warm/60 uppercase mb-3">
-          <Translate en="Scroll to explore" hi="खोजने के लिए स्क्रॉल करें" />
-        </span>
-        <div className="w-[18px] h-[34px] rounded-full border border-expo-warm/20 flex justify-center p-1">
-          <div className="scroll-indicator-dot w-1.5 h-1.5 rounded-full bg-expo-gold" />
-        </div>
-      </div>
+
     </section>
   );
 }

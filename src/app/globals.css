@@ -63,7 +63,12 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    display: inline-block;
+    padding-top: 0.12em !important;
+    padding-bottom: 0.12em !important;
     padding-right: 0.15em !important;
+    margin-top: -0.12em !important;
+    margin-bottom: -0.12em !important;
   }
 
   .text-metallic * {
@@ -71,7 +76,12 @@ body {
     background-clip: text !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
+    display: inline-block;
+    padding-top: 0.12em !important;
+    padding-bottom: 0.12em !important;
     padding-right: 0.15em !important;
+    margin-top: -0.12em !important;
+    margin-bottom: -0.12em !important;
     margin-right: -0.05em !important;
   }
 
@@ -654,6 +664,12 @@ html.lenis, html.lenis body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  display: inline-block;
+  padding-top: 0.12em;
+  padding-bottom: 0.12em;
+  padding-right: 0.08em;
+  margin-top: -0.12em;
+  margin-bottom: -0.12em;
 }
 
 @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
@@ -739,6 +755,8 @@ html.lenis, html.lenis body {
 .heading-underline {
   position: relative;
   display: inline-block;
+  padding-top: 0.08em;
+  padding-bottom: 0.08em;
 }
 
 .heading-underline::after {

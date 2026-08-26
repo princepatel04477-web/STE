@@ -457,11 +457,16 @@ export default function Navbar({ theme = "dark" }: NavbarProps) {
             </div>
           </div>
 
-          {/* WhatsApp Button */}
+          {/* WhatsApp Button — locale-aware prefill (STE-16) */}
           <a
-            href="https://wa.me/919950787787?text=Namaste!%20I%20visited%20the%20STE%202026%20website%20and%20would%20like%20more%20information."
+            href={`https://wa.me/${PHONE_TEL.replace(/\D/g, '')}?text=${encodeURIComponent(
+              language === 'en'
+                ? 'Namaste! I visited the STE 2026 website and would like more information.'
+                : 'नमस्ते! मैंने STE 2026 की वेबसाइट देखी और मुझे अधिक जानकारी चाहिए।'
+            )}`}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={language === 'en' ? 'Chat with STE 2026 on WhatsApp' : 'STE 2026 को WhatsApp पर मैसेज करें'}
             className={`w-full h-[52px] bg-[#25D366] text-white flex items-center justify-center gap-2 rounded-xl font-bold text-[15px] wa-pulse btn-shimmer tap-feedback mobile-menu-cta ${
               isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
@@ -469,7 +474,10 @@ export default function Navbar({ theme = "dark" }: NavbarProps) {
               transitionDelay: "450ms"
             }}
           >
-            <span>📲 WhatsApp Us</span>
+            <span aria-hidden="true">📲</span>
+            <span>
+              <Translate en="WhatsApp Us" hi="व्हाट्सएप पर बात करें" />
+            </span>
           </a>
 
           {/* Exhibitor's Portal Button */}

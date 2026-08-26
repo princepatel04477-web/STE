@@ -16,8 +16,11 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/api/',
           '/admin/',
-          '/exhibitor/',
-          '/*?_rsc=', // Block crawlers from scanning Next.js dynamic routing JSON payloads
+          // /exhibitor/login is kept out of search results via `noindex` metadata
+          // on that page, NOT via robots disallow. A disallow here also blocks
+          // WhatsApp and LinkedIn from generating link previews when exhibitors
+          // receive their portal URL directly.
+          '/*?_rsc=', // Block Next.js RSC JSON payloads from being indexed
         ],
       },
     ],

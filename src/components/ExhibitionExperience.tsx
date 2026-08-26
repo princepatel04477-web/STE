@@ -120,7 +120,7 @@ export default function ExhibitionExperience() {
           </span>
           <h2
             ref={headingRef}
-            className={`font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight heading-underline ${headingInView ? "in-view" : ""}`}
+            className={`font-serif text-3xl sm:text-4xl md:text-5xl tracking-wide text-white leading-tight heading-underline ${headingInView ? "in-view" : ""}`}
           >
             <span className="gold-shimmer-text"><Translate en="SIECC, Sarsana Dome" hi="SIECC, सरसाना डोम" /></span> <br />
             <span className="text-metallic font-light italic"><Translate en="Surat’s Sourcing Epicenter" hi="सूरत का सोर्सिंग केंद्र" /></span>
@@ -131,7 +131,7 @@ export default function ExhibitionExperience() {
         </FadeUp>
 
         {/* Layout: Interactive Blueprint overlays & Pavilions list */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* Left Block: Luxury Exhibition Blueprint Cards */}
           <div className="lg:col-span-6 flex flex-col sm:flex-row gap-6">
@@ -198,23 +198,23 @@ export default function ExhibitionExperience() {
               {EXHIBITION_HIGHLIGHTS.map((pav, idx) => (
                 <div
                   key={idx}
-                  className="pavilion-item opacity-0 translate-y-[30px] py-5 flex items-center justify-between group hover:pl-2 transition-all duration-300 card-tap"
+                  className="pavilion-item opacity-0 translate-y-[30px] py-5 flex items-start justify-between gap-4 group hover:pl-2 transition-all duration-300 card-tap"
                 >
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-display text-lg text-white font-semibold tracking-wide group-hover:text-expo-gold transition-colors duration-300 gold-shimmer-text">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                      <span className="font-display text-base sm:text-lg text-white font-semibold tracking-wide group-hover:text-expo-gold transition-colors duration-300 gold-shimmer-text">
                         <Translate en={pav.nameEn} hi={pav.nameHi} />
                       </span>
-                      <span className="font-sans text-xs tracking-[1.5px] text-white/40 bg-white/5 border border-white/10 px-2 py-0.5 rounded-sm badge-tap">
+                      <span className="font-sans text-[11px] tracking-[1.5px] text-white/50 bg-white/5 border border-white/10 px-2 py-0.5 rounded-sm badge-tap shrink-0">
                         <Translate en={pav.coordsEn} hi={pav.coordsHi} />
                       </span>
                     </div>
-                    <p className="font-sans text-xs text-expo-warm/50 mt-1 leading-relaxed">
+                    <p className="font-sans text-xs text-expo-warm/50 mt-1.5 leading-relaxed">
                       <Translate en={pav.focusEn} hi={pav.focusHi} />
                     </p>
                   </div>
 
-                  <span className="font-display text-sm text-expo-gold font-bold tracking-wide">
+                  <span className="shrink-0 text-right font-display text-xs sm:text-sm text-expo-gold font-bold tracking-wide pt-0.5">
                     <Translate en={pav.metersEn} hi={pav.metersHi} />
                   </span>
                 </div>

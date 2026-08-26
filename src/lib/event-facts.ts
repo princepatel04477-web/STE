@@ -32,8 +32,19 @@ export const EVENT = {
   country: "IN",
 
   // Attribution
-  organizerName: "AKAS Group",
+  // STE-11: Use these fields everywhere — homepage credit line, meta description,
+  //         legal pages, and JSON-LD organizer. Do NOT hardcode alternate phrasings.
+  organizerName: "AKAS Group",        // Legal / formal name — for schema.org, invoices
+  organizerLegalName: "AKAS Group",   // Same right now; update if entity name changes
   presenterName: "STE",
+  // Homepage credit line: "Organized by STE • Supported by AKAS Group"
+  organizerCredit: "STE • Supported By AKAS Group",
+
+  // Contact
+  email: "surattextileexhibition@gmail.com",
+
+  // STE-12: Canonical venue URL — use this for "Get Directions" links
+  venueGoogleMapsUrl: "https://maps.google.com/?q=Surat+International+Exhibition+Convention+Centre+SIECC+Sarsana",
 } as const;
 
 /** "8,000" — Indian-agnostic grouping, stable between server and client. */

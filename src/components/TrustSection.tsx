@@ -208,7 +208,7 @@ export default function TrustSection() {
           <FadeUp delay={0.08}>
             <h2
               ref={headingRef}
-              className={`font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white leading-tight heading-underline ${
+              className={`font-serif text-3xl sm:text-4xl md:text-5xl tracking-wide text-white leading-tight heading-underline ${
                 headingInView ? "in-view" : ""
               }`}
             >
@@ -256,40 +256,40 @@ export default function TrustSection() {
           <div className="lg:col-span-6 flex flex-col gap-6 items-stretch">
             
             {/* Previous event stats */}
-            <div className="trust-animate opacity-0 translate-y-[25px] border-glow-card p-6 bg-black/40 md:backdrop-blur-sm rounded-xl grid grid-cols-2 gap-4 card-tap">
+            <div className="trust-animate opacity-0 translate-y-[25px] border-glow-card p-6 bg-black/40 md:backdrop-blur-sm rounded-xl grid grid-cols-1 sm:grid-cols-2 gap-4 card-tap">
               {PREVIOUS_EVENTS.map((item, idx) => (
-                <div key={idx} className="p-4 bg-white/[0.02] border border-white/5 rounded-sm badge-tap active:scale-95">
-                  <div className="flex justify-between items-center mb-2">
+                <div key={idx} className="p-4 bg-white/[0.02] border border-white/5 rounded-lg badge-tap active:scale-95">
+                  <div className="flex justify-between items-center mb-3">
                     <span className="font-serif text-base text-expo-gold font-bold">STE {item.year}</span>
-                    <span className="text-xs bg-expo-gold/10 border border-expo-gold/20 text-expo-gold px-2 py-0.5 rounded-full uppercase font-bold">
+                    <span className="text-[10px] bg-expo-gold/10 border border-expo-gold/20 text-expo-gold px-2 py-0.5 rounded-full uppercase font-bold tracking-wider">
                       <Translate en="Verified" hi="सत्यापित" />
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 mt-3">
-                    <div>
-                      <span className="text-xs text-expo-warm/60 uppercase block tracking-[1px]">
-                        <Translate en="Wholesalers:" hi="थोक खरीदार:" />
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-[11px] text-expo-warm/60 uppercase tracking-wider">
+                        <Translate en="Wholesalers" hi="थोक खरीदार" />
                       </span>
                       <span className="text-white text-sm font-bold">
                         <AnimatedCounter value={item.visitors} />
                       </span>
                     </div>
-                    <div>
-                      <span className="text-xs text-expo-warm/60 uppercase block tracking-[1px]">
-                        <Translate en="Stalls Booked:" hi="बुक किए गए स्टॉल:" />
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-[11px] text-expo-warm/60 uppercase tracking-wider">
+                        <Translate en="Stalls Booked" hi="बुक किए गए स्टॉल" />
                       </span>
                       <span className="text-white text-sm font-bold">
                         <AnimatedCounter value={item.stalls} />
                       </span>
                     </div>
-                  </div>
-                  <div className="mt-3 border-t border-white/5 pt-2">
-                    <span className="text-xs text-expo-warm/60 uppercase block tracking-[1px]">
-                      <Translate en="Trade Volume:" hi="कुल व्यापार मात्रा:" />
-                    </span>
-                    <span className="text-expo-gold text-sm font-extrabold">
-                      <AnimatedCounter value={item.transactions} />
-                    </span>
+                    <div className="flex items-baseline justify-between gap-2 border-t border-white/5 pt-2 mt-1">
+                      <span className="text-[11px] text-expo-warm/60 uppercase tracking-wider">
+                        <Translate en="Trade Volume" hi="कुल व्यापार" />
+                      </span>
+                      <span className="text-expo-gold text-sm font-extrabold">
+                        <AnimatedCounter value={item.transactions} />
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}

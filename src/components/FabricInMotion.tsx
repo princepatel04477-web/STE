@@ -204,7 +204,7 @@ export default function FabricInMotion() {
             </span>
             <h2
               ref={headingRef}
-              className={`font-serif text-3xl sm:text-5xl md:text-6xl tracking-widest text-white leading-tight heading-underline ${headingInView ? "in-view" : ""}`}
+              className={`font-serif text-3xl sm:text-4xl md:text-5xl tracking-widest text-white leading-tight heading-underline ${headingInView ? "in-view" : ""}`}
             >
               <span className="gold-shimmer-text"><Translate en="Fabric in " hi="परिधान की " /></span><span className="text-metallic font-light italic"><Translate en="Motion" hi="गतिशीलता" /></span>
             </h2>

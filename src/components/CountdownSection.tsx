@@ -124,7 +124,7 @@ export default function CountdownSection() {
         <FadeUp delay={0.08}>
           <h2
             ref={headingRef}
-            className={`font-serif text-3xl sm:text-5xl md:text-6xl tracking-wide text-white mb-6 leading-tight max-w-4xl heading-underline ${
+            className={`font-serif text-3xl sm:text-4xl md:text-5xl tracking-wide text-white mb-6 leading-tight max-w-4xl heading-underline ${
               headingInView ? "in-view" : ""
             }`}
           >

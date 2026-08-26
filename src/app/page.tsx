@@ -14,7 +14,6 @@ const ExhibitionExperience = nextDynamic(() => import("@/components/ExhibitionEx
 const FutureOfCommerce = nextDynamic(() => import("@/components/FutureOfCommerce"));
 const BilingualSection = nextDynamic(() => import("@/components/BilingualSection"));
 const TrustSection = nextDynamic(() => import("@/components/TrustSection"));
-const SponsorSection = nextDynamic(() => import("@/components/SponsorSection"));
 const PremiumTransitions = nextDynamic(() => import("@/components/PremiumTransitions"));
 const FestivalSeason = nextDynamic(() => import("@/components/FestivalSeason"));
 const CountdownSection = nextDynamic(() => import("@/components/CountdownSection"));
@@ -92,10 +91,6 @@ export default function Home() {
 
         <LazySection id="trust-social" minHeight="500px">
           <TrustSection />
-        </LazySection>
-
-        <LazySection id="media-wall" minHeight="200px">
-          <SponsorSection />
         </LazySection>
 
         <LazySection id="countdown-section" minHeight="400px">

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Instagram, Facebook, Twitter, Linkedin, Phone, Mail, MapPin } from "lucide-react";
 import { Translate } from "@/components/LanguageContext";
 import { StaggerWrapper, StaggerChild } from "@/components/animations/MobileAnimations";
+import { EVENT } from "@/lib/event-facts";
 
 const PHONE_TEL = "+919950787787";
 const PHONE_DISPLAY = "+91 99507 87787";
@@ -144,10 +145,20 @@ export default function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-expo-gold shrink-0 mt-0.5" />
                 <span>
+                  {/* STE-12: Use canonical full name from event-facts, not shorthand */}
                   <Translate 
-                    en="SIECC Sarsana Dome, Surat, Gujarat, India" 
-                    hi="SIECC सरसाना डोम, सूरत, गुजरात, भारत" 
+                    en={`${EVENT.venueName}, ${EVENT.streetAddress}, ${EVENT.city}, ${EVENT.region} — ${EVENT.postalCode}`} 
+                    hi={`${EVENT.venueName}, ${EVENT.streetAddress}, ${EVENT.city}, ${EVENT.region} — ${EVENT.postalCode}`} 
                   />
+                  {" "}
+                  <a
+                    href={EVENT.venueGoogleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-expo-gold hover:text-white transition-colors underline underline-offset-2 text-[10px]"
+                  >
+                    <Translate en="Get Directions →" hi="दिशा-निर्देश →" />
+                  </a>
                 </span>
               </div>
               <div className="flex items-center gap-3">
@@ -161,7 +172,12 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-expo-gold shrink-0" />
-                <span>info@suratexpo.com</span>
+                <a 
+                  href={`mailto:${EVENT.email}`}
+                  className="hover:text-expo-gold transition-colors lowercase"
+                >
+                  {EVENT.email}
+                </a>
               </div>
             </div>
           </StaggerChild>
