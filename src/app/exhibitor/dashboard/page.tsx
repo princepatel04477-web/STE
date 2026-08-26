@@ -88,13 +88,6 @@ export default function ExhibitorDashboardPage() {
   const [profileSuccessMsg, setProfileSuccessMsg] = useState('');
   const [profileError, setProfileError] = useState('');
 
-  // Compulsory Name Modal State
-  const [showCompulsoryNameModal, setShowCompulsoryNameModal] = useState(false);
-  const [modalExhibitorName, setModalExhibitorName] = useState('');
-  const [modalCompanyDesc, setModalCompanyDesc] = useState('');
-  const [modalSaving, setModalSaving] = useState(false);
-  const [modalError, setModalError] = useState('');
-
   // Profile Picture Upload State
   const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
   const [profilePicSuccess, setProfilePicSuccess] = useState('');
@@ -220,13 +213,6 @@ export default function ExhibitorDashboardPage() {
       setCompanyDescription(profData.company_description || '');
       setCategory(profData.category || '');
       setMarket(profData.market || '');
-
-      // Check if exhibitor name is missing (compulsory after login)
-      if (!profData.exhibitor_name || !profData.exhibitor_name.trim()) {
-        setModalExhibitorName('');
-        setModalCompanyDesc(profData.company_description || '');
-        setShowCompulsoryNameModal(true);
-      }
 
       const existingSqft = profData.stall_sqft || '200 sq ft';
       if (SQFT_PRESETS.includes(existingSqft)) {
@@ -356,58 +342,6 @@ export default function ExhibitorDashboardPage() {
     }
   };
 
-  const handleSaveCompulsoryNameModal = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!modalExhibitorName || !modalExhibitorName.trim()) {
-      setModalError('Exhibitor Name is compulsory. Please enter your name.');
-      return;
-    }
-    if (modalCompanyDesc && modalCompanyDesc.length > 400) {
-      setModalError('Company description cannot exceed 400 characters.');
-      return;
-    }
-
-    setModalSaving(true);
-    setModalError('');
-
-    const finalSqft =
-      selectedSqftOption === 'Other'
-        ? customSqft.trim()
-          ? `Other: ${customSqft.trim()}`
-          : 'Other'
-        : selectedSqftOption;
-
-    try {
-      const res = await fetch('/api/exhibitor/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          exhibitor_name: modalExhibitorName.trim(),
-          company_description: modalCompanyDesc.trim(),
-          brand_name: brandName,
-          stall_sqft: finalSqft,
-          fascia_names: fasciaNames
-        })
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setModalError(data.error || 'Failed to save exhibitor name.');
-      } else {
-        setExhibitorName(modalExhibitorName.trim());
-        setCompanyDescription(modalCompanyDesc.trim());
-        setShowCompulsoryNameModal(false);
-        setProfileSuccessMsg('Exhibitor Profile registered successfully!');
-        setTimeout(() => setProfileSuccessMsg(''), 4000);
-      }
-    } catch (err) {
-      console.error(err);
-      setModalError('Connection error. Please try again.');
-    } finally {
-      setModalSaving(false);
-    }
-  };
-
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>,
     directFile?: File
@@ -468,10 +402,6 @@ export default function ExhibitorDashboardPage() {
 
   const handleSaveProfile = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!exhibitorName || !exhibitorName.trim()) {
-      setProfileError('Exhibitor Name is compulsory. Please enter your name above.');
-      return;
-    }
     if (companyDescription && companyDescription.length > 400) {
       setProfileError('Company description cannot exceed 400 characters.');
       return;
@@ -561,8 +491,25 @@ export default function ExhibitorDashboardPage() {
       }));
 
     try {
-      // Also save stall profile
-      await handleSaveProfile();
+      // Save profile and fascia simultaneously
+      const finalSqft =
+        selectedSqftOption === 'Other'
+          ? customSqft.trim()
+            ? `Other: ${customSqft.trim()}`
+            : 'Other'
+          : selectedSqftOption;
+
+      await fetch('/api/exhibitor/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          exhibitor_name: exhibitorName.trim(),
+          company_description: companyDescription.trim(),
+          brand_name: brandName,
+          stall_sqft: finalSqft,
+          fascia_names: fasciaNames
+        })
+      });
 
       const res = await fetch('/api/exhibitor/extras', {
         method: 'POST',
@@ -586,9 +533,12 @@ export default function ExhibitorDashboardPage() {
         setExtrasSuccessMsg('Your requirements have been submitted successfully!');
         setLastSubmittedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
         setTimeout(() => setExtrasSuccessMsg(''), 5000);
+      } else {
+        alert(data.error || 'Failed to submit requirements.');
       }
     } catch (err) {
       console.error(err);
+      alert('Failed to submit requirements. Please check your network connection.');
     } finally {
       setExtrasSaving(false);
     }
@@ -1062,9 +1012,9 @@ export default function ExhibitorDashboardPage() {
                 type="button"
                 onClick={() => handleSaveProfile()}
                 disabled={profileSaving}
-                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-xs flex items-center gap-2"
+                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 shadow-xs flex items-center gap-2 cursor-pointer"
               >
-                {profileSaving ? 'Saving...' : 'Save Facia & Stall Details'}
+                {profileSaving ? 'Saving Profile...' : 'Save Exhibitor Profile & Stall Details'}
               </button>
             </div>
           </div>
@@ -1821,99 +1771,6 @@ export default function ExhibitorDashboardPage() {
             days: itemDays[p.id] || 2,
           }))}
       />
-
-      {/* Compulsory Exhibitor Profile Registration Modal (Blocks portal until name is entered) */}
-      {showCompulsoryNameModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white border border-amber-300 rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 relative overflow-hidden">
-            {/* Modal Header Decoration */}
-            <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400" />
-            
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-700 shrink-0 mt-0.5">
-                <User className="w-6 h-6" />
-              </div>
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 inline-block mb-1.5">
-                  Compulsory Registration Step
-                </span>
-                <h3 className="text-xl font-black text-slate-900 leading-tight">
-                  Welcome to STE 2026!
-                </h3>
-                <p className="text-xs text-slate-600 mt-1">
-                  Please enter your <strong>Full Exhibitor Name</strong> (compulsory) and an optional company bio to complete your login.
-                </p>
-              </div>
-            </div>
-
-            <form onSubmit={handleSaveCompulsoryNameModal} className="space-y-4">
-              <div>
-                <label className="block text-xs font-black text-slate-900 mb-1.5">
-                  Exhibitor / Representative Full Name <span className="text-red-600 font-black">* Compulsory</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Rajesh Kumar Mehta"
-                  value={modalExhibitorName}
-                  onChange={(e) => setModalExhibitorName(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
-                  autoFocus
-                />
-                <p className="text-[11px] text-slate-500 mt-1">
-                  This name will appear on official passes, directory badges, and organizer documents.
-                </p>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold text-slate-900">
-                    About Your Company & Products (Paragraph)
-                  </label>
-                  <span className={`text-[10px] font-mono font-bold ${modalCompanyDesc.length > 380 ? 'text-red-600' : 'text-slate-500'}`}>
-                    {modalCompanyDesc.length} / 400 chars
-                  </span>
-                </div>
-                <textarea
-                  rows={3}
-                  maxLength={400}
-                  placeholder="Briefly describe your company specialties, fabrics, sarees, kurtis, or offerings (max 400 characters)..."
-                  value={modalCompanyDesc}
-                  onChange={(e) => setModalCompanyDesc(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 resize-none"
-                />
-              </div>
-
-              {modalError && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-700 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-                  <span>{modalError}</span>
-                </div>
-              )}
-
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={modalSaving || !modalExhibitorName.trim()}
-                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm uppercase tracking-wider transition-all shadow-lg hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  {modalSaving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Saving Profile...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Save & Enter Portal</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

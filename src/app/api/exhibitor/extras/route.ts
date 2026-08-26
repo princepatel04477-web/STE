@@ -16,14 +16,40 @@ export async function GET() {
       .prepare('SELECT id, name, category, description, unit, rate_inr, icon_name FROM extra_products WHERE is_active = 1')
       .all();
 
-    const order = db
+    let order = db
       .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json, rental_days, updated_at FROM exhibitor_orders WHERE mobile = ?')
-      .get(session.mobile) as { items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string; rental_days?: number; updated_at: string } | undefined;
+      .get(session.mobile) as { items_json: string | any; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string | any; rental_days?: number; updated_at: string } | undefined;
+
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbOrder } = await supabaseAdmin
+          .from('exhibitor_orders')
+          .select('*')
+          .eq('mobile', session.mobile)
+          .maybeSingle();
+
+        if (sbOrder) {
+          order = {
+            ...order,
+            items_json: sbOrder.items_json,
+            special_notes: sbOrder.special_notes ?? order?.special_notes ?? '',
+            owner_badges: sbOrder.owner_badges ?? order?.owner_badges ?? 0,
+            sales_badges: sbOrder.sales_badges ?? order?.sales_badges ?? 0,
+            support_badges: sbOrder.support_badges ?? order?.support_badges ?? 0,
+            badge_names_json: sbOrder.badge_names_json ?? order?.badge_names_json,
+            rental_days: sbOrder.rental_days ?? order?.rental_days ?? 2,
+            updated_at: sbOrder.updated_at || order?.updated_at || null
+          };
+        }
+      } catch (err) {
+        console.warn('[Extras GET] Supabase fetch fallback to local:', err);
+      }
+    }
 
     let items = [];
     if (order && order.items_json) {
       try {
-        items = JSON.parse(order.items_json);
+        items = typeof order.items_json === 'string' ? JSON.parse(order.items_json) : order.items_json;
       } catch {
         items = [];
       }
@@ -32,7 +58,7 @@ export async function GET() {
     let badgeNames = { owner: [] as string[], sales: [] as string[], support: [] as string[] };
     if (order && order.badge_names_json) {
       try {
-        badgeNames = JSON.parse(order.badge_names_json);
+        badgeNames = typeof order.badge_names_json === 'string' ? JSON.parse(order.badge_names_json) : order.badge_names_json;
       } catch {}
     }
 

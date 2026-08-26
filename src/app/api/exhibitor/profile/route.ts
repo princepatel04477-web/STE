@@ -108,22 +108,17 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { brand_name, stall_sqft, fascia_names, exhibitor_name, company_description } = body;
 
-    if (!exhibitor_name || typeof exhibitor_name !== 'string' || !exhibitor_name.trim()) {
-      return NextResponse.json({ error: 'Exhibitor Name is compulsory.' }, { status: 400 });
-    }
+    const reg = findExhibitorByMobile(session.mobile);
+    const cleanBrand = (typeof brand_name === 'string' && brand_name.trim())
+      ? brand_name.trim()
+      : (reg?.brandName || 'Registered Exhibitor');
 
-    if (!brand_name || typeof brand_name !== 'string' || !brand_name.trim()) {
-      return NextResponse.json({ error: 'Brand Name is required.' }, { status: 400 });
-    }
+    const cleanSqft = (typeof stall_sqft === 'string' && stall_sqft.trim())
+      ? stall_sqft.trim()
+      : (reg?.stallSqft || '200 sq ft');
 
-    if (!stall_sqft || typeof stall_sqft !== 'string' || !stall_sqft.trim()) {
-      return NextResponse.json({ error: 'Stall size (square feet) is required.' }, { status: 400 });
-    }
-
-    const cleanExhibitorName = exhibitor_name.trim();
+    const cleanExhibitorName = typeof exhibitor_name === 'string' ? exhibitor_name.trim() : '';
     const cleanCompanyDesc = typeof company_description === 'string' ? company_description.trim().slice(0, 400) : '';
-    const cleanBrand = brand_name.trim();
-    const cleanSqft = stall_sqft.trim();
     
     // Sanitize dynamic fascia names options (up to 4, minimum 2)
     let cleanFasciaNames: string[] = ['', ''];
