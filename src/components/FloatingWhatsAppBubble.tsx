@@ -14,11 +14,11 @@ export default function FloatingWhatsAppBubble() {
   const [isVisible, setIsVisible] = useState(false);
 
   // Hide on exhibitor portal and admin console to prevent overlapping bottom action bars
-  // Hidden on the working tools - portal, admin console and the stall map -
+  // Hidden on the working tools - portal, admin console and the lucky draw -
   // where a floating bar would sit over the controls.
   const isPortalOrAdmin = pathname?.startsWith('/exhibitor')
     || pathname?.startsWith('/admin')
-    || pathname?.startsWith('/stall-map');
+    || pathname?.startsWith('/stall-allocation');
 
   useEffect(() => {
     // Only active on mobile devices

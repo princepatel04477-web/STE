@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import LuckyBox from '@/components/lottery/LuckyBox';
 import AllotmentSlipModal from '@/components/lottery/AllotmentSlipModal';
-import SitemapVisualizer from '@/components/lottery/SitemapVisualizer';
+import FloorPlan2026 from '@/components/stallmap/FloorPlan2026';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import { LotteryAllocationRecord } from '@/lib/db';
 
@@ -48,9 +48,6 @@ export default function StallAllocationPage() {
   // Authentication States
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobile, setMobile] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState('');
-  const [demoOtpHint, setDemoOtpHint] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
 
@@ -72,9 +69,6 @@ export default function StallAllocationPage() {
 
   const handleSelectPreset = (preset: typeof TEST_EXHIBITOR_PRESETS[0]) => {
     setMobile(preset.mobile);
-    setOtpSent(true);
-    setOtp('541389');
-    setDemoOtpHint('541389');
   };
 
   const handleResetCurrentTestDraw = async () => {
@@ -119,37 +113,18 @@ export default function StallAllocationPage() {
     }
   };
 
-  const handleSendOtp = () => {
-    const clean = mobile.replace(/\D/g, '').slice(-10);
-    if (clean.length < 10) {
-      setAuthError('Please enter a valid 10-digit registered mobile number.');
-      return;
-    }
-    setAuthError('');
-    setAuthLoading(true);
-
-    // Simulate OTP delivery (video demo code: 541389)
-    setTimeout(() => {
-      setOtpSent(true);
-      setDemoOtpHint('541389');
-      setAuthLoading(false);
-    }, 600);
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
-    setAuthLoading(true);
 
     const clean = mobile.replace(/\D/g, '').slice(-10);
-    if (otp.length < 4) {
-      setAuthError('Please enter the 6-digit OTP received on your WhatsApp.');
-      setAuthLoading(false);
+    if (clean.length < 10) {
+      setAuthError('Please enter your registered 10-digit mobile number.');
       return;
     }
 
+    setAuthLoading(true);
     try {
-      // Lookup registered exhibitor data
       const registered = findExhibitorByMobile(clean);
       const res = await fetch(`/api/lottery/status?mobile=${clean}`);
       const data = await res.json();
@@ -163,7 +138,7 @@ export default function StallAllocationPage() {
         setAllocation(data.allocation);
         setIsLoggedIn(true);
       } else {
-        setAuthError(data.error || 'Failed to authenticate. Please check your mobile number.');
+        setAuthError(data.error || 'That number is not on the exhibitor list. Please check it and try again.');
       }
     } catch (err) {
       setAuthError('Network error during login.');
@@ -201,8 +176,6 @@ export default function StallAllocationPage() {
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
     setIsLoggedIn(false);
-    setOtpSent(false);
-    setOtp('');
     setAllocation(null);
     setHasDrawn(false);
   };
@@ -314,7 +287,7 @@ export default function StallAllocationPage() {
                   Stall Allocation Login
                 </h1>
                 <p className="text-xs text-slate-400 mt-1">
-                  Enter your registered WhatsApp mobile number to access the Lucky Draw.
+                  Enter your registered mobile number to open the Lucky Draw.
                 </p>
               </div>
 
@@ -325,12 +298,12 @@ export default function StallAllocationPage() {
               )}
 
               {/* Login Form */}
-              <form onSubmit={otpSent ? handleVerifyOtp : (e) => { e.preventDefault(); handleSendOtp(); }} className="space-y-4">
-                
+              <form onSubmit={handleLogin} className="space-y-4">
+
                 {/* Mobile Input */}
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    WhatsApp Number
+                    Registered Mobile Number
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-xs">
@@ -338,89 +311,34 @@ export default function StallAllocationPage() {
                     </div>
                     <input
                       type="tel"
+                      inputMode="numeric"
+                      autoComplete="tel"
                       value={mobile}
                       onChange={(e) => setMobile(e.target.value)}
                       placeholder="10-digit number"
-                      disabled={otpSent}
-                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-950/80 border border-white/15 text-white placeholder-slate-500 text-sm font-semibold focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors disabled:opacity-60"
+                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-950/80 border border-white/15 text-white placeholder-slate-500 text-base sm:text-sm font-semibold focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors"
                       required
                     />
                   </div>
+                  <p className="text-[11px] text-slate-500 mt-1.5">
+                    The number on your STE booking. No code is sent.
+                  </p>
                 </div>
 
-                {!otpSent ? (
-                  <button
-                    type="submit"
-                    disabled={authLoading}
-                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
-                  >
-                    {authLoading ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <span>Send OTP on WhatsApp</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <div className="space-y-4 pt-1 animate-in fade-in">
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                          Enter OTP
-                        </label>
-                        {demoOtpHint && (
-                          <button
-                            type="button"
-                            onClick={() => setOtp(demoOtpHint)}
-                            className="text-[11px] text-amber-400 hover:underline font-mono"
-                          >
-                            Auto-fill OTP ({demoOtpHint})
-                          </button>
-                        )}
-                      </div>
-                      <input
-                        type="text"
-                        maxLength={6}
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        placeholder="6-digit OTP"
-                        className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-emerald-500/40 text-center tracking-[0.5em] text-lg font-mono font-black text-emerald-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
-                        autoFocus
-                        required
-                      />
-                      <p className="text-[11px] text-emerald-400/80 mt-1 text-center font-medium">
-                        ✓ OTP sent to your WhatsApp number +91 {mobile}
-                      </p>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={authLoading}
-                      className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-amber-500/25 active:scale-95 transition-all flex items-center justify-center gap-2"
-                    >
-                      {authLoading ? (
-                        <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <ShieldCheck className="w-4 h-4 text-slate-950" />
-                          <span>Verify & Login</span>
-                        </>
-                      )}
-                    </button>
-
-                    <div className="text-center">
-                      <button
-                        type="button"
-                        onClick={() => { setOtpSent(false); setOtp(''); }}
-                        className="text-[11px] text-slate-400 hover:text-white"
-                      >
-                        Change Mobile Number
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-amber-500/25 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                >
+                  {authLoading ? (
+                    <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <ShieldCheck className="w-4 h-4 text-slate-950" />
+                      <span>Enter Lucky Draw</span>
+                    </>
+                  )}
+                </button>
 
               </form>
 
@@ -599,10 +517,10 @@ export default function StallAllocationPage() {
                         />
                       </div>
 
-                      {/* WhatsApp Number */}
+                      {/* Registered mobile */}
                       <div>
                         <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                          WhatsApp Number
+                          Registered Mobile
                         </label>
                         <input
                           type="text"
@@ -712,9 +630,8 @@ export default function StallAllocationPage() {
               {/* Tab 3: Sitemap / Floor Plan View */}
               {activeTab === 'sitemap' && (
                 <div className="animate-in fade-in">
-                  <SitemapVisualizer
-                    allocatedStallNumber={allocation?.stall_number || null}
-                    allocationRecord={allocation}
+                  <FloorPlan2026
+                    selectedUnitId={allocation?.stall_number || null}
                   />
                 </div>
               )}

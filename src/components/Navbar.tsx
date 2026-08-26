@@ -323,14 +323,6 @@ export default function Navbar({ theme = "dark" }: NavbarProps) {
               </button>
             </div>
             
-            <a
-              href="/stall-map"
-              data-cursor="cta"
-              className="px-5 py-2.5 rounded-full border border-expo-gold/40 text-expo-champagne font-semibold text-xs uppercase tracking-[0.15em] transition-all duration-300 hover:border-expo-gold hover:scale-105 active:scale-95 flex items-center justify-center whitespace-nowrap"
-            >
-              <Translate en="Stall Map" hi="स्टॉल नक्शा" />
-            </a>
-
             <a 
               href="/exhibitor/login"
               data-cursor="cta"
@@ -418,18 +410,6 @@ export default function Navbar({ theme = "dark" }: NavbarProps) {
               </a>
             );
           })}
-          <a
-            href="/stall-map"
-            onClick={() => setIsMobileOpen(false)}
-            className={`h-[64px] flex items-center font-cormorant text-[28px] border-b mobile-nav-link badge-tap ${
-              theme === "light"
-                ? "text-slate-800 border-b-slate-200 pl-1 hover:border-l-[4px] hover:border-l-amber-500 hover:pl-3"
-                : "text-[#F7F4EF] border-b-[#D4AF37]/20 pl-1 hover:border-l-[4px] hover:border-l-[#D4AF37] hover:pl-3"
-            } ${isMobileOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-            style={{ transitionDelay: `${navItems.length * 50}ms` }}
-          >
-            <Translate en="Stall Map" hi="स्टॉल नक्शा" />
-          </a>
         </nav>
 
         <div className="flex flex-col gap-4 w-full mt-8 mb-6">
