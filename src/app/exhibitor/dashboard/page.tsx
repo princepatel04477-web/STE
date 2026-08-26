@@ -946,24 +946,6 @@ export default function ExhibitorDashboardPage() {
               ))}
             </div>
 
-            {/* Add Another Option Bar if < 4 */}
-            {fasciaNames.length < 4 && (
-              <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 rounded-xl bg-amber-50/60 border border-dashed border-amber-300 gap-2">
-                <div className="flex items-center gap-2 text-xs text-amber-900 font-medium">
-                  <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>Have more sister brands or partners sharing your booth?</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleAddFasciaName}
-                  className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs hover:scale-105 active:scale-95"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>+ Add Option {fasciaNames.length + 1} (Up to 4)</span>
-                </button>
-              </div>
-            )}
-
             {/* Live Facia Board Mockup Preview */}
             <div className="p-4 bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-950 rounded-xl border border-amber-500/30 text-white shadow-md mb-4">
               <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-neutral-800">
