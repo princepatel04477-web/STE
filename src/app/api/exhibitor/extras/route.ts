@@ -164,24 +164,57 @@ export async function POST(request: Request) {
 
         if (sbErr) {
           console.error('[SupabaseDB] Order upsert error:', sbErr.message);
+          return NextResponse.json({ error: `Failed to persist order to cloud database: ${sbErr.message}` }, { status: 500 });
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('[SupabaseDB] Order sync exception:', err);
+        return NextResponse.json({ error: `Database persistence error: ${err?.message || 'Unknown error'}` }, { status: 500 });
       }
     }
 
-    // Fetch exhibitor profile or fallback to master registered list
-    const profile = db
-      .prepare('SELECT brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description FROM exhibitors WHERE mobile = ?')
-      .get(session.mobile) as { brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string } | undefined;
-
+    // Fetch exhibitor profile from Supabase (source of truth) or local db fallback
     const reg = findExhibitorByMobile(session.mobile);
-    const finalBrand = (profile?.brand_name && profile.brand_name.trim())
-      ? profile.brand_name
-      : (reg?.brandName || 'Registered Exhibitor');
-    const finalSqft = (profile?.stall_sqft && profile.stall_sqft.trim())
-      ? profile.stall_sqft
-      : (reg?.stallSqft || '200 sq ft');
+    let finalBrand = reg?.brandName || 'Registered Exhibitor';
+    let finalSqft = reg?.stallSqft || '200 sq ft';
+    let finalExhibitorName = '';
+    let finalProfilePicUrl = '';
+    let finalCompanyDesc = '';
+    let finalFasciaNames = [finalBrand, ''];
+
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbProfile } = await supabaseAdmin
+          .from('exhibitors')
+          .select('*')
+          .eq('mobile', session.mobile)
+          .maybeSingle();
+
+        if (sbProfile) {
+          if (sbProfile.brand_name) finalBrand = sbProfile.brand_name;
+          if (sbProfile.stall_sqft) finalSqft = sbProfile.stall_sqft;
+          if (sbProfile.fascia_names_json) {
+            const parsed = typeof sbProfile.fascia_names_json === 'string' ? JSON.parse(sbProfile.fascia_names_json) : sbProfile.fascia_names_json;
+            if (Array.isArray(parsed)) {
+              finalFasciaNames = parsed.map(n => String(n || ''));
+            } else if (parsed && typeof parsed === 'object') {
+              if (Array.isArray(parsed.fascia_names)) finalFasciaNames = parsed.fascia_names.map((n: any) => String(n || ''));
+              if (parsed.exhibitor_name) finalExhibitorName = parsed.exhibitor_name;
+              if (parsed.profile_pic_url) finalProfilePicUrl = parsed.profile_pic_url;
+              if (parsed.company_description) finalCompanyDesc = parsed.company_description;
+            }
+          }
+        }
+      } catch {}
+    } else {
+      const profile = db
+        .prepare('SELECT brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description FROM exhibitors WHERE mobile = ?')
+        .get(session.mobile) as { brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string } | undefined;
+      if (profile?.brand_name) finalBrand = profile.brand_name;
+      if (profile?.stall_sqft) finalSqft = profile.stall_sqft;
+      if (profile?.exhibitor_name) finalExhibitorName = profile.exhibitor_name;
+      if (profile?.profile_pic_url) finalProfilePicUrl = profile.profile_pic_url;
+      if (profile?.company_description) finalCompanyDesc = profile.company_description;
+    }
 
     // Sync to Google Sheets and await completion for Vercel Serverless execution
     try {

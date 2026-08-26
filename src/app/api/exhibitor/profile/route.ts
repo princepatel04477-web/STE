@@ -16,31 +16,51 @@ export async function GET() {
       .prepare('SELECT mobile, brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url, updated_at FROM exhibitors WHERE mobile = ?')
       .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string; fascia_names_json?: string; logo_file_url?: string; cdr_file_url?: string; drive_file_url?: string; drive_folder_id?: string; drive_folder_url?: string; updated_at: string } | undefined;
 
-    // If Supabase is active, ensure we load latest remote data
+    let extractedExhibitorName = exhibitor?.exhibitor_name || '';
+    let extractedProfilePicUrl = exhibitor?.profile_pic_url || null;
+    let extractedCompanyDesc = exhibitor?.company_description || '';
+    let extractedFasciaNames = ['', ''];
+
+    // If Supabase is active, ensure we load latest remote data (source of truth)
     if (isSupabaseConfigured && supabaseAdmin) {
       try {
-        const { data: sbExhibitor } = await supabaseAdmin
+        const { data: sbExhibitor, error: sbFetchErr } = await supabaseAdmin
           .from('exhibitors')
           .select('*')
           .eq('mobile', session.mobile)
           .maybeSingle();
 
-        if (sbExhibitor) {
+        if (sbFetchErr) {
+          console.warn('[Profile GET] Supabase fetch error:', sbFetchErr.message);
+        } else if (sbExhibitor) {
           exhibitor = {
             ...exhibitor,
             mobile: sbExhibitor.mobile,
             brand_name: sbExhibitor.brand_name || exhibitor?.brand_name || '',
             stall_sqft: sbExhibitor.stall_sqft || exhibitor?.stall_sqft || '',
-            exhibitor_name: sbExhibitor.exhibitor_name ?? exhibitor?.exhibitor_name,
-            profile_pic_url: sbExhibitor.profile_pic_url ?? exhibitor?.profile_pic_url,
-            company_description: sbExhibitor.company_description ?? exhibitor?.company_description,
-            fascia_names_json: sbExhibitor.fascia_names_json ? JSON.stringify(sbExhibitor.fascia_names_json) : exhibitor?.fascia_names_json,
             logo_file_url: sbExhibitor.logo_file_url ?? exhibitor?.logo_file_url,
             cdr_file_url: sbExhibitor.cdr_file_url ?? exhibitor?.cdr_file_url,
             drive_file_url: sbExhibitor.drive_file_url ?? exhibitor?.drive_file_url,
             drive_folder_url: sbExhibitor.drive_folder_url ?? exhibitor?.drive_folder_url,
             updated_at: sbExhibitor.updated_at || exhibitor?.updated_at || new Date().toISOString()
           };
+
+          if (sbExhibitor.fascia_names_json) {
+            const parsed = typeof sbExhibitor.fascia_names_json === 'string'
+              ? JSON.parse(sbExhibitor.fascia_names_json)
+              : sbExhibitor.fascia_names_json;
+
+            if (Array.isArray(parsed)) {
+              extractedFasciaNames = parsed.map(n => String(n || ''));
+            } else if (parsed && typeof parsed === 'object') {
+              if (Array.isArray(parsed.fascia_names)) {
+                extractedFasciaNames = parsed.fascia_names.map((n: any) => String(n || ''));
+              }
+              if (parsed.exhibitor_name) extractedExhibitorName = parsed.exhibitor_name;
+              if (parsed.profile_pic_url) extractedProfilePicUrl = parsed.profile_pic_url;
+              if (parsed.company_description) extractedCompanyDesc = parsed.company_description;
+            }
+          }
         }
       } catch (err) {
         console.warn('[Profile GET] Supabase fetch fallback to local:', err);
@@ -57,7 +77,15 @@ export async function GET() {
       : (reg?.stallSqft || '200 sq ft');
 
     let fascia_names = ['', ''];
-    if (exhibitor?.fascia_names_json) {
+    if (extractedFasciaNames.length > 0 && extractedFasciaNames.some(n => n.trim() !== '')) {
+      if (extractedFasciaNames[3]?.trim()) {
+        fascia_names = [extractedFasciaNames[0] || '', extractedFasciaNames[1] || '', extractedFasciaNames[2] || '', extractedFasciaNames[3] || ''];
+      } else if (extractedFasciaNames[2]?.trim()) {
+        fascia_names = [extractedFasciaNames[0] || '', extractedFasciaNames[1] || '', extractedFasciaNames[2] || ''];
+      } else {
+        fascia_names = [extractedFasciaNames[0] || '', extractedFasciaNames[1] || ''];
+      }
+    } else if (exhibitor?.fascia_names_json) {
       try {
         const parsed = typeof exhibitor.fascia_names_json === 'string'
           ? JSON.parse(exhibitor.fascia_names_json)
@@ -81,9 +109,9 @@ export async function GET() {
       mobile: session.mobile,
       brand_name,
       stall_sqft,
-      exhibitor_name: exhibitor?.exhibitor_name || '',
-      profile_pic_url: exhibitor?.profile_pic_url || null,
-      company_description: exhibitor?.company_description || '',
+      exhibitor_name: extractedExhibitorName,
+      profile_pic_url: extractedProfilePicUrl,
+      company_description: extractedCompanyDesc,
       fascia_names,
       logo_file_url: exhibitor?.logo_file_url || null,
       cdr_file_url: exhibitor?.cdr_file_url || null,
@@ -130,11 +158,39 @@ export async function POST(request: Request) {
     } else {
       cleanFasciaNames = [cleanBrand, ''];
     }
-    const fasciaNamesJson = JSON.stringify(cleanFasciaNames);
 
     const existing = db
       .prepare('SELECT id, profile_pic_url, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url FROM exhibitors WHERE mobile = ?')
       .get(session.mobile) as any;
+
+    let profilePicUrl = existing?.profile_pic_url || null;
+
+    // Fetch existing profile pic from Supabase if not in local db
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbEx } = await supabaseAdmin
+          .from('exhibitors')
+          .select('fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url')
+          .eq('mobile', session.mobile)
+          .maybeSingle();
+
+        if (sbEx?.fascia_names_json) {
+          const parsed = typeof sbEx.fascia_names_json === 'string' ? JSON.parse(sbEx.fascia_names_json) : sbEx.fascia_names_json;
+          if (parsed && typeof parsed === 'object' && parsed.profile_pic_url) {
+            profilePicUrl = parsed.profile_pic_url;
+          }
+        }
+      } catch {}
+    }
+
+    const structuredProfilePayload = {
+      fascia_names: cleanFasciaNames,
+      exhibitor_name: cleanExhibitorName,
+      company_description: cleanCompanyDesc,
+      profile_pic_url: profilePicUrl
+    };
+
+    const fasciaNamesJson = JSON.stringify(cleanFasciaNames);
 
     if (existing) {
       db.prepare(
@@ -155,10 +211,7 @@ export async function POST(request: Request) {
             mobile: session.mobile,
             brand_name: cleanBrand,
             stall_sqft: cleanSqft,
-            exhibitor_name: cleanExhibitorName,
-            company_description: cleanCompanyDesc,
-            fascia_names_json: cleanFasciaNames,
-            profile_pic_url: existing?.profile_pic_url || null,
+            fascia_names_json: structuredProfilePayload,
             logo_file_url: existing?.logo_file_url || null,
             cdr_file_url: existing?.cdr_file_url || null,
             drive_file_url: existing?.drive_file_url || null,
@@ -169,9 +222,11 @@ export async function POST(request: Request) {
 
         if (sbErr) {
           console.error('[SupabaseDB] Profile upsert error:', sbErr.message);
+          return NextResponse.json({ error: `Failed to persist to cloud database: ${sbErr.message}` }, { status: 500 });
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('[SupabaseDB] Profile sync exception:', err);
+        return NextResponse.json({ error: `Database persistence error: ${err?.message || 'Unknown error'}` }, { status: 500 });
       }
     }
 

@@ -119,9 +119,28 @@ export async function GET() {
 
       const brandName = reg?.brandName || dbEx?.brand_name || 'Registered Exhibitor';
       const stallSqft = reg?.stallSqft || dbEx?.stall_sqft || '200 sq ft';
-      const exhibitorName = dbEx?.exhibitor_name || '';
-      const profilePicUrl = dbEx?.profile_pic_url || null;
-      const companyDescription = dbEx?.company_description || '';
+      let exhibitorName = dbEx?.exhibitor_name || '';
+      let profilePicUrl = dbEx?.profile_pic_url || null;
+      let companyDescription = dbEx?.company_description || '';
+      let fasciaNames = ['', '', '', ''];
+
+      if (dbEx?.fascia_names_json) {
+        try {
+          const parsed = typeof dbEx.fascia_names_json === 'string' ? JSON.parse(dbEx.fascia_names_json) : dbEx.fascia_names_json;
+          if (Array.isArray(parsed)) {
+            fasciaNames = [parsed[0] || '', parsed[1] || '', parsed[2] || '', parsed[3] || ''];
+          } else if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed.fascia_names)) {
+              fasciaNames = [parsed.fascia_names[0] || '', parsed.fascia_names[1] || '', parsed.fascia_names[2] || '', parsed.fascia_names[3] || ''];
+            }
+            if (parsed.exhibitor_name && !exhibitorName) exhibitorName = parsed.exhibitor_name;
+            if (parsed.profile_pic_url && !profilePicUrl) profilePicUrl = parsed.profile_pic_url;
+            if (parsed.company_description && !companyDescription) companyDescription = parsed.company_description;
+          }
+        } catch {}
+      } else {
+        fasciaNames = [brandName, '', '', ''];
+      }
 
       let items: Array<{ id: string; name: string; quantity: number; unit: string }> = [];
       if (order && order.items_json) {
@@ -152,18 +171,6 @@ export async function GET() {
         try {
           badgeNames = typeof order.badge_names_json === 'string' ? JSON.parse(order.badge_names_json) : order.badge_names_json;
         } catch {}
-      }
-
-      let fasciaNames = ['', '', '', ''];
-      if (dbEx?.fascia_names_json) {
-        try {
-          const parsed = typeof dbEx.fascia_names_json === 'string' ? JSON.parse(dbEx.fascia_names_json) : dbEx.fascia_names_json;
-          if (Array.isArray(parsed)) {
-            fasciaNames = [parsed[0] || '', parsed[1] || '', parsed[2] || '', parsed[3] || ''];
-          }
-        } catch {}
-      } else {
-        fasciaNames = [brandName, '', '', ''];
       }
 
       totalOwnerBadges += oBadges;

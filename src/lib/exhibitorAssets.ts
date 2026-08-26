@@ -126,6 +126,10 @@ export async function claimDriveFolderName(mobile: string, brandName: string): P
 /** Upserts the ledger row for this exhibitor + category. */
 async function recordAsset(row: Record<string, unknown>): Promise<void> {
   if (!isSupabaseConfigured || !supabaseAdmin) return;
+  // exhibitor_assets table has check constraint for ('logo', 'cdr')
+  if (row.category !== 'logo' && row.category !== 'cdr') {
+    return;
+  }
   try {
     const { error } = await supabaseAdmin
       .from('exhibitor_assets')

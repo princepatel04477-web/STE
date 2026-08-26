@@ -169,6 +169,9 @@ export default function ExhibitorDashboardPage() {
 
   // General Loading & Auth check
   const [initialLoading, setInitialLoading] = useState(true);
+  const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
     fetchInitialData();
@@ -318,8 +321,110 @@ export default function ExhibitorDashboardPage() {
       console.error('Failed to load exhibitor dashboard data:', err);
     } finally {
       setInitialLoading(false);
+      setTimeout(() => {
+        isInitializedRef.current = true;
+      }, 600);
     }
   };
+
+  // Debounced cloud autosave on change across all profile and order requirements
+  useEffect(() => {
+    if (!isInitializedRef.current || initialLoading) return;
+
+    if (autosaveTimeoutRef.current) {
+      clearTimeout(autosaveTimeoutRef.current);
+    }
+
+    autosaveTimeoutRef.current = setTimeout(async () => {
+      setAutosaveStatus('saving');
+      try {
+        const finalSqft =
+          selectedSqftOption === 'Other'
+            ? customSqft.trim()
+              ? `Other: ${customSqft.trim()}`
+              : 'Other'
+            : selectedSqftOption;
+
+        const profPromise = fetch('/api/exhibitor/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            exhibitor_name: exhibitorName.trim(),
+            company_description: companyDescription.trim(),
+            brand_name: brandName,
+            stall_sqft: finalSqft,
+            fascia_names: fasciaNames
+          })
+        });
+
+        const selectedItems: OrderItem[] = products
+          .filter((p) => (quantities[p.id] || 0) > 0)
+          .map((p) => ({
+            id: p.id,
+            name: p.name,
+            category: p.category,
+            unit: p.unit,
+            rate_inr: p.rate_inr || 0,
+            quantity: quantities[p.id],
+            days: itemDays[p.id] || 2
+          }));
+
+        const extrasPromise = fetch('/api/exhibitor/extras', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: selectedItems,
+            special_notes: specialNotes,
+            owner_badges: ownerBadges,
+            sales_badges: salesBadges,
+            support_badges: supportBadges,
+            badge_names: {
+              owner: ownerBadgeNames,
+              sales: salesBadgeNames,
+              support: supportBadgeNames
+            },
+            rental_days: 2
+          })
+        });
+
+        const [profRes, extrasRes] = await Promise.all([profPromise, extrasPromise]);
+        if (profRes.ok && extrasRes.ok) {
+          setAutosaveStatus('saved');
+          setTimeout(() => {
+            setAutosaveStatus((prev) => (prev === 'saved' ? 'idle' : prev));
+          }, 3500);
+        } else {
+          setAutosaveStatus('error');
+        }
+      } catch (err) {
+        console.error('Autosave sync exception:', err);
+        setAutosaveStatus('error');
+      }
+    }, 1200);
+
+    return () => {
+      if (autosaveTimeoutRef.current) {
+        clearTimeout(autosaveTimeoutRef.current);
+      }
+    };
+  }, [
+    exhibitorName,
+    companyDescription,
+    brandName,
+    selectedSqftOption,
+    customSqft,
+    fasciaNames,
+    quantities,
+    itemDays,
+    specialNotes,
+    ownerBadges,
+    salesBadges,
+    supportBadges,
+    ownerBadgeNames,
+    salesBadgeNames,
+    supportBadgeNames,
+    initialLoading
+  ]);
 
   const handleProfilePicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -620,15 +725,38 @@ export default function ExhibitorDashboardPage() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden sm:flex items-center gap-2.5">
-            <Link
-              href="/stall-allocation"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black uppercase tracking-wider transition-all shadow-xs"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Stall Lottery</span>
-            </Link>
+          {/* Cloud Sync Status Indicator & Desktop Navigation */}
+          <div className="flex items-center gap-2">
+            {autosaveStatus === 'saving' && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold animate-pulse shadow-2xs">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600" />
+                <span className="hidden sm:inline">Saving to Cloud...</span>
+                <span className="sm:hidden">Saving...</span>
+              </div>
+            )}
+            {autosaveStatus === 'saved' && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-2xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="hidden sm:inline">Saved to Cloud</span>
+                <span className="sm:hidden">Saved</span>
+              </div>
+            )}
+            {autosaveStatus === 'error' && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold shadow-2xs">
+                <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
+                <span className="hidden sm:inline">Sync error</span>
+                <span className="sm:hidden">Error</span>
+              </div>
+            )}
+
+            <div className="hidden sm:flex items-center gap-2.5">
+              <Link
+                href="/stall-allocation"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black uppercase tracking-wider transition-all shadow-xs"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Stall Lottery</span>
+              </Link>
             {(mobile === '9106139666' || mobile === '9950787787') && (
               <a
                 href="/admin/exhibitors"
@@ -649,6 +777,7 @@ export default function ExhibitorDashboardPage() {
               <span>Logout</span>
             </button>
           </div>
+        </div>
 
           {/* Mobile Kebab / Quick Actions */}
           <div className="flex sm:hidden items-center gap-2 relative">

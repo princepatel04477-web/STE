@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       .get(session.mobile) as any;
 
     const reg = findExhibitorByMobile(session.mobile);
-    const brandName = existingExhibitor?.brand_name?.trim() || reg?.brandName || 'Exhibitor';
+    let brandName = existingExhibitor?.brand_name?.trim() || reg?.brandName || 'Exhibitor';
 
     const category = resolveCategory(file.name, requestedCategory);
 
@@ -105,41 +105,104 @@ export async function POST(request: Request) {
       drive_folder_url: driveFolderUrl || undefined
     });
 
+    let currentExhibitorName = existingExhibitor?.exhibitor_name || '';
+    let currentCompanyDesc = existingExhibitor?.company_description || '';
+    let currentFasciaNames = [brandName, '', '', ''];
+    let currentSqft = existingExhibitor?.stall_sqft || reg?.stallSqft || '200 sq ft';
+
+    if (existingExhibitor?.fascia_names_json) {
+      try {
+        const parsed = typeof existingExhibitor.fascia_names_json === 'string'
+          ? JSON.parse(existingExhibitor.fascia_names_json)
+          : existingExhibitor.fascia_names_json;
+        if (Array.isArray(parsed)) {
+          currentFasciaNames = [parsed[0] || '', parsed[1] || '', parsed[2] || '', parsed[3] || ''];
+        } else if (parsed && typeof parsed === 'object') {
+          if (Array.isArray(parsed.fascia_names)) {
+            currentFasciaNames = [parsed.fascia_names[0] || '', parsed.fascia_names[1] || '', parsed.fascia_names[2] || '', parsed.fascia_names[3] || ''];
+          }
+          if (parsed.exhibitor_name && !currentExhibitorName) currentExhibitorName = parsed.exhibitor_name;
+          if (parsed.company_description && !currentCompanyDesc) currentCompanyDesc = parsed.company_description;
+        }
+      } catch {}
+    }
+
+    // Direct cloud sync to Supabase Database
     if (isSupabaseConfigured && supabaseAdmin) {
       try {
-        await supabaseAdmin
+        // Fetch latest remote record to prevent overwriting concurrent edits
+        const { data: sbCurrent } = await supabaseAdmin
           .from('exhibitors')
-          .update({
-            logo_file_url: logoUrl,
-            cdr_file_url: cdrUrl,
-            profile_pic_url: profilePicUrl,
-            drive_file_url: driveFileUrl,
-            drive_folder_id: driveFolderId,
-            drive_folder_url: driveFolderUrl,
+          .select('*')
+          .eq('mobile', session.mobile)
+          .maybeSingle();
+
+        if (sbCurrent) {
+          if (sbCurrent.fascia_names_json) {
+            const parsed = typeof sbCurrent.fascia_names_json === 'string'
+              ? JSON.parse(sbCurrent.fascia_names_json)
+              : sbCurrent.fascia_names_json;
+            if (Array.isArray(parsed)) {
+              currentFasciaNames = [parsed[0] || '', parsed[1] || '', parsed[2] || '', parsed[3] || ''];
+            } else if (parsed && typeof parsed === 'object') {
+              if (Array.isArray(parsed.fascia_names)) {
+                currentFasciaNames = [parsed.fascia_names[0] || '', parsed.fascia_names[1] || '', parsed.fascia_names[2] || '', parsed.fascia_names[3] || ''];
+              }
+              if (parsed.exhibitor_name) currentExhibitorName = parsed.exhibitor_name;
+              if (parsed.company_description) currentCompanyDesc = parsed.company_description;
+            }
+          }
+          if (sbCurrent.brand_name) brandName = sbCurrent.brand_name;
+          if (sbCurrent.stall_sqft) currentSqft = sbCurrent.stall_sqft;
+        }
+
+        const structuredProfilePayload = {
+          fascia_names: currentFasciaNames,
+          exhibitor_name: currentExhibitorName,
+          company_description: currentCompanyDesc,
+          profile_pic_url: profilePicUrl || null
+        };
+
+        const { error: sbUpdateErr } = await supabaseAdmin
+          .from('exhibitors')
+          .upsert({
+            mobile: session.mobile,
+            brand_name: brandName,
+            stall_sqft: currentSqft,
+            fascia_names_json: structuredProfilePayload,
+            logo_file_url: logoUrl || sbCurrent?.logo_file_url || null,
+            cdr_file_url: cdrUrl || sbCurrent?.cdr_file_url || null,
+            drive_file_url: driveFileUrl || sbCurrent?.drive_file_url || null,
+            drive_folder_id: driveFolderId || sbCurrent?.drive_folder_id || null,
+            drive_folder_url: driveFolderUrl || sbCurrent?.drive_folder_url || null,
             updated_at: new Date().toISOString()
-          })
-          .eq('mobile', session.mobile);
-      } catch (dbErr) {
-        console.error('[SupabaseDB] update error:', dbErr);
+          }, { onConflict: 'mobile' });
+
+        if (sbUpdateErr) {
+          console.error('[SupabaseDB] Upload update error:', sbUpdateErr);
+          return NextResponse.json(
+            { error: `Upload succeeded in storage, but database link failed: ${sbUpdateErr.message}` },
+            { status: 500 }
+          );
+        }
+      } catch (dbErr: any) {
+        console.error('[SupabaseDB] Fatal database update error on upload:', dbErr);
+        return NextResponse.json(
+          { error: `Database persistence error: ${dbErr?.message || 'Unknown error'}` },
+          { status: 500 }
+        );
       }
     }
 
     try {
-      let fasciaNames = [brandName, '', '', ''];
-      if (existingExhibitor?.fascia_names_json) {
-        try {
-          fasciaNames = JSON.parse(existingExhibitor.fascia_names_json);
-        } catch {}
-      }
-
       await syncToGoogleSheets({
         mobile: session.mobile,
-        exhibitor_name: existingExhibitor?.exhibitor_name || '',
+        exhibitor_name: currentExhibitorName,
         profile_pic_url: profilePicUrl || '',
-        company_description: existingExhibitor?.company_description || '',
+        company_description: currentCompanyDesc,
         brand_name: brandName,
-        stall_sqft: existingExhibitor?.stall_sqft || reg?.stallSqft || '200 sq ft',
-        fascia_names: fasciaNames,
+        stall_sqft: currentSqft,
+        fascia_names: currentFasciaNames,
         logo_file_url: logoUrl || '',
         cdr_file_url: cdrUrl || '',
         drive_file_url: driveFileUrl || '',
