@@ -6,9 +6,7 @@ import { masterRAF } from "@/hooks/useMasterRAF";
 export default function GlobalVisuals() {
   const [mounted, setMounted] = useState(false);
   const [introDone, setIntroDone] = useState(false);
-  const particleRefs = useRef<(HTMLDivElement | null)[]>([]);
   const orbitRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Setup mounted state asynchronously to avoid lint warnings
   useEffect(() => {
@@ -32,40 +30,6 @@ export default function GlobalVisuals() {
       window.addEventListener("ste-intro-done", checkIntro);
       return () => window.removeEventListener("ste-intro-done", checkIntro);
     }
-  }, []);
-
-  // Generate deterministic particles on the client side
-  const particles = useMemo(() => {
-    const colors = [
-      "rgba(214, 160, 102, 0.45)", // Gold
-      "rgba(184, 115, 51, 0.4)",   // Copper
-      "rgba(247, 244, 239, 0.35)",  // Warm white
-      "rgba(240, 196, 138, 0.5)"   // Light gold
-    ];
-    let seed = 789;
-    const seededRandom = (s: number) => {
-      const x = Math.sin(s) * 10000;
-      return x - Math.floor(x);
-    };
-
-    return Array.from({ length: 35 }, (_, i) => {
-      const size = seededRandom(seed++) * 2.5 + 1.5; // 1.5px to 4px
-      return {
-        id: i,
-        x: seededRandom(seed++) * 90 + 5, // 5% to 95% viewport width
-        y: seededRandom(seed++) * 90 + 5, // 5% to 95% viewport height
-        size,
-        parallax: seededRandom(seed++) * 0.08 - 0.04, // -0.04 to 0.04 parallax scroll factor
-        color: colors[Math.floor(seededRandom(seed++) * colors.length)],
-        baseOpacity: seededRandom(seed++) * 0.2 + 0.15, // 0.15 to 0.35 opacity
-        angle: seededRandom(seed++) * Math.PI * 2,
-        speed: seededRandom(seed++) * 0.15 + 0.05, // slow drift speed
-        vx: 0,
-        vy: 0,
-        dx: 0,
-        dy: 0,
-      };
-    });
   }, []);
 
   useEffect(() => {
@@ -266,68 +230,15 @@ export default function GlobalVisuals() {
         orbitRefs.current[1].style.transform = `translate3d(0, ${offset2}px, 0)`;
       }
 
-      // Update Light Nodes Parallax Transforms
-      if (nodeRefs.current[0]) {
-        const nOffset1 = Math.max(-45, Math.min(45, scrollY * 0.02));
-        nodeRefs.current[0].style.transform = `translate3d(0, ${nOffset1}px, 0)`;
+      // Update Orbital Lines Parallax Parent Transforms
+      if (orbitRefs.current[0]) {
+        const offset1 = Math.max(-80, Math.min(80, scrollY * 0.035));
+        orbitRefs.current[0].style.transform = `translate3d(0, ${offset1}px, 0)`;
       }
-      if (nodeRefs.current[1]) {
-        const nOffset2 = Math.max(-45, Math.min(45, scrollY * -0.015));
-        nodeRefs.current[1].style.transform = `translate3d(0, ${nOffset2}px, 0)`;
+      if (orbitRefs.current[1]) {
+        const offset2 = Math.max(-80, Math.min(80, scrollY * -0.025));
+        orbitRefs.current[1].style.transform = `translate3d(0, ${offset2}px, 0)`;
       }
-      if (nodeRefs.current[2]) {
-        const nOffset3 = Math.max(-45, Math.min(45, scrollY * 0.025));
-        nodeRefs.current[2].style.transform = `translate3d(0, ${nOffset3}px, 0)`;
-      }
-
-      // Update Particles Positions
-      particles.forEach((p, idx) => {
-        const el = particleRefs.current[idx];
-        if (!el) return;
-
-        // Slow drift offset (random sin/cos waves)
-        p.angle += p.speed * 0.005;
-        const driftX = Math.sin(p.angle) * 10;
-        const driftY = Math.cos(p.angle) * 10;
-
-        // Base relative position in pixels
-        const baseX = (p.x / 100) * width;
-        const baseY = (p.y / 100) * height;
-
-        // Parallax translation
-        const scrollOffset = Math.max(-60, Math.min(60, scrollY * p.parallax * 0.75));
-
-        // Spring displacement from mouse
-        let dispX = 0;
-        let dispY = 0;
-
-        if (mouseX !== -1000 && !isMobileDevice) {
-          const currX = baseX + driftX;
-          const currY = baseY + driftY + scrollOffset;
-
-          const dx = currX - mouseX;
-          const dy = currY - mouseY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 130) {
-            const force = (1 - dist / 130) * 14;
-            dispX = (dx / dist) * force;
-            dispY = (dy / dist) * force;
-          }
-        }
-
-        // Apply spring physics interpolation
-        p.vx += (dispX - p.dx) * 0.04 - p.vx * 0.08;
-        p.vy += (dispY - p.dy) * 0.04 - p.vy * 0.08;
-        p.dx += p.vx;
-        p.dy += p.vy;
-
-        const finalX = driftX + p.dx;
-        const finalY = driftY + p.dy + scrollOffset;
-
-        el.style.transform = `translate3d(${finalX}px, ${finalY}px, 0)`;
-      });
-
     };
 
     const unsubscribeTick = masterRAF.subscribe(tick);
@@ -343,7 +254,7 @@ export default function GlobalVisuals() {
       window.removeEventListener('scroll', handleScroll);
       unsubscribeTick();
     };
-  }, [particles, introDone]);
+  }, [introDone]);
 
   if (!mounted) return null;
 
@@ -352,7 +263,7 @@ export default function GlobalVisuals() {
       aria-hidden="true">
       {introDone && (
         <>
-          {/* 1. Animated Orbital Lines (Parallax Parents + slow CSS Rotations) */}
+          {/* Animated Orbital Lines (Parallax Parents + slow CSS Rotations) */}
           <div
             ref={(el) => { orbitRefs.current[0] = el; }}
             className="absolute top-[-300px] left-[-300px] w-[600px] h-[600px] pointer-events-none"
@@ -377,45 +288,6 @@ export default function GlobalVisuals() {
             style={{ transform: 'rotate(-15deg)' }}
           >
             <div className="w-full h-full rounded-full border border-[#D6A066]/[0.02] animate-orbit-slow" />
-          </div>
-
-          {/* 2. Floating Light Nodes (copper-gold pulsing nodes) */}
-          <div
-            ref={(el) => { nodeRefs.current[0] = el; }}
-            className="absolute top-[25%] left-[15%] w-1.5 h-1.5 pointer-events-none"
-          >
-            <div className="w-full h-full rounded-full bg-[#D6A066] shadow-[0_0_10px_#D6A066] animate-pulse-stagger-1" />
-          </div>
-          <div
-            ref={(el) => { nodeRefs.current[1] = el; }}
-            className="absolute top-[65%] right-[12%] w-1.5 h-1.5 pointer-events-none"
-          >
-            <div className="w-full h-full rounded-full bg-[#D6A066] shadow-[0_0_10px_#D6A066] animate-pulse-stagger-2" />
-          </div>
-          <div
-            ref={(el) => { nodeRefs.current[2] = el; }}
-            className="absolute bottom-[20%] left-[25%] w-1.5 h-1.5 pointer-events-none"
-          >
-            <div className="w-full h-full rounded-full bg-[#D6A066] shadow-[0_0_10px_#D6A066] animate-pulse-stagger-3" />
-          </div>
-
-          {/* 3. Floating Micro Particles */}
-          <div className="absolute inset-0 w-full h-full">
-            {particles.map((p, idx) => (
-              <div
-                key={p.id}
-                ref={(el) => { particleRefs.current[idx] = el; }}
-                className="absolute rounded-full"
-                style={{
-                  left: `${p.x}%`,
-                  top: `${p.y}%`,
-                  width: `${p.size}px`,
-                  height: `${p.size}px`,
-                  backgroundColor: p.color,
-                  opacity: p.baseOpacity,
-                }}
-              />
-            ))}
           </div>
         </>
       )}

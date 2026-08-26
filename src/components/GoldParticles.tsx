@@ -13,29 +13,4 @@ const particles = [
   { size: 3, top: "10%", left: "70%", duration: "7s",  delay: "0.8s" },
 ];
 
-export const GoldParticles = () => (
-  <div 
-    aria-hidden="true"
-    style={{ 
-      position: "absolute", 
-      inset: 0, 
-      pointerEvents: "none",
-      overflow: "hidden"
-    }}
-  >
-    {particles.map((p, i) => (
-      <span
-        key={i}
-        className="particle"
-        style={{
-          width: `${p.size}px`,
-          height: `${p.size}px`,
-          top: p.top,
-          left: p.left,
-          "--duration": p.duration,
-          "--delay": p.delay,
-        } as React.CSSProperties}
-      />
-    ))}
-  </div>
-);
+export const GoldParticles = () => null;
