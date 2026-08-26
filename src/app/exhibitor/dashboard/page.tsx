@@ -45,8 +45,12 @@ import {
   Camera,
   Trash2,
   Edit3,
-  Loader2
+  Loader2,
+  MoreVertical,
+  Search
 } from 'lucide-react';
+
+const STRICT_CUTOFF_DATE = '5th September 2026, 12:00 PM';
 
 interface Product {
   id: string;
@@ -130,6 +134,16 @@ export default function ExhibitorDashboardPage() {
   const [extrasSuccessMsg, setExtrasSuccessMsg] = useState('');
   const [lastSubmittedAt, setLastSubmittedAt] = useState<string | null>(null);
   const [showBillModal, setShowBillModal] = useState(false);
+
+  // Mobile navigation, search & UI State
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchFilter, setSearchFilter] = useState('');
+  const [isDisclaimerDismissed, setIsDisclaimerDismissed] = useState(false);
+  const [expandedMobileCards, setExpandedMobileCards] = useState<Record<string, boolean>>({});
+
+  const toggleMobileCard = (id: string) => {
+    setExpandedMobileCards((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   // Exhibitor Entry Badges State (Owner, Sales Staff, Support Staff & Names)
   const [ownerBadges, setOwnerBadges] = useState<number>(1);
@@ -551,10 +565,15 @@ export default function ExhibitorDashboardPage() {
 
   const categories = ['All', ...Array.from(new Set(products.map((p) => p.category)))];
 
-  const filteredProducts =
-    selectedCategory === 'All'
-      ? products
-      : products.filter((p) => p.category === selectedCategory);
+  const filteredProducts = products.filter((p) => {
+    const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
+    const matchesSearch =
+      !searchFilter.trim() ||
+      p.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      p.description.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      p.category.toLowerCase().includes(searchFilter.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const totalSelectedItemsCount = Object.values(quantities).reduce((a, b) => a + b, 0);
 
@@ -572,27 +591,32 @@ export default function ExhibitorDashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-28">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-30 bg-white/95 md:backdrop-blur-sm border-b border-slate-200 shadow-sm px-4 lg:px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/20 text-slate-950 font-bold">
+      <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-xs px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-xs text-slate-950 font-black text-xs shrink-0">
               STE
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                Exhibitor Portal
-                <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h1 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight whitespace-nowrap">
+                  Exhibitor Portal
+                </h1>
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
                   2026
                 </span>
-              </h1>
-              <p className="text-xs text-slate-500 font-medium">Surat Textile Expo — Exhibitor Extras & Requirements</p>
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
+                Surat Textile Expo — Exhibitor Extras & Requirements
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Desktop Navigation */}
+          <div className="hidden sm:flex items-center gap-2.5">
             <Link
               href="/stall-allocation"
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black uppercase tracking-wider transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-black uppercase tracking-wider transition-all shadow-xs"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Stall Lottery</span>
@@ -600,65 +624,127 @@ export default function ExhibitorDashboardPage() {
             {(mobile === '9106139666' || mobile === '9950787787') && (
               <a
                 href="/admin/exhibitors"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-extrabold transition-all shadow-md animate-pulse"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-extrabold transition-all shadow-xs"
               >
                 👑 Organizer Admin Console
               </a>
             )}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-700 font-medium">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-700 font-medium">
               <Phone className="w-3.5 h-3.5 text-amber-600" />
               <span>User ID: <strong className="text-slate-900 font-bold">{mobile}</strong></span>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all border border-slate-200"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Logout</span>
             </button>
           </div>
+
+          {/* Mobile Kebab / Quick Actions */}
+          <div className="flex sm:hidden items-center gap-2 relative">
+            <Link
+              href="/stall-allocation"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-2xs"
+            >
+              <Sparkles className="w-3 h-3" />
+              <span>Lottery</span>
+            </Link>
+            
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all cursor-pointer"
+              aria-label="Toggle user menu"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+
+            {/* Mobile Dropdown Menu */}
+            {mobileMenuOpen && (
+              <div className="absolute right-0 top-11 w-56 bg-white border border-slate-200 rounded-xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="px-3 py-2 border-b border-slate-100 text-xs">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Logged In As</span>
+                  <span className="font-bold text-slate-900 flex items-center gap-1 mt-0.5">
+                    <Phone className="w-3 h-3 text-amber-600" />
+                    {mobile}
+                  </span>
+                </div>
+                {(mobile === '9106139666' || mobile === '9950787787') && (
+                  <a
+                    href="/admin/exhibitors"
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 transition-colors"
+                  >
+                    👑 Organizer Admin Console
+                  </a>
+                )}
+                <Link
+                  href="/stall-allocation"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50 transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Stall Lottery & Draw</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-6 sm:pt-8 pb-32 sm:pb-28 space-y-6 sm:space-y-8">
+      <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-4 sm:pt-8 pb-36 sm:pb-32 space-y-6 sm:space-y-8">
 
         {/* Deadline Caution Banner */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 text-amber-900 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-amber-500 text-slate-950 shadow-md flex-shrink-0">
-              <AlertTriangle className="w-6 h-6" />
+        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-400/80 text-amber-950 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3 w-full sm:w-auto">
+            <div className="p-2.5 rounded-xl bg-amber-500 text-slate-950 shadow-xs shrink-0 mt-0.5 sm:mt-0">
+              <AlertTriangle className="w-5 h-5" />
             </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
-                <span>CRITICAL DEADLINE NOTICE</span>
-                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold bg-amber-500 text-slate-950">
+            <div className="space-y-1 w-full">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
+                  CRITICAL DEADLINE NOTICE
+                </h3>
+                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold bg-amber-500 text-slate-950 shrink-0">
                   Strict Cutoff
                 </span>
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-700 font-semibold mt-0.5">
-                Exhibitor stall details, entry badges, and extra requirements <strong className="text-red-700 underline font-black">CANNOT be edited or modified after 5th September 2026 at 12:00 PM</strong>.
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 font-medium">
+                Exhibitor stall details, entry badges, and extra requirements <strong className="text-red-700 font-black">CANNOT be edited or modified after {STRICT_CUTOFF_DATE}</strong>.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-amber-300 shadow-xs text-xs font-mono font-bold text-amber-900 self-stretch sm:self-auto justify-center whitespace-nowrap">
-            <Clock className="w-4 h-4 text-amber-600" />
-            <span>Cutoff: 05 Sept 2026, 12:00 PM</span>
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-amber-300 shadow-2xs text-xs font-mono font-bold text-amber-950 self-stretch sm:self-auto justify-center whitespace-nowrap shrink-0">
+            <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>Cutoff: {STRICT_CUTOFF_DATE}</span>
           </div>
         </div>
 
         {/* Lucky Draw / Stall Allocation Banner */}
-        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-2 border-amber-500/40 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl relative overflow-hidden">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
-              <Sparkles className="w-6 h-6 animate-pulse" />
+        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-amber-500/40 rounded-2xl p-5 sm:p-6 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg relative overflow-hidden">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
             </div>
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-1">
                 <span>Official Lucky Draw System Live</span>
               </div>
-              <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">
+              <h2 className="text-base sm:text-lg font-bold text-white leading-snug">
                 Participate in Stall Allocation & Lucky Draw
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -669,15 +755,15 @@ export default function ExhibitorDashboardPage() {
 
           <Link
             href="/stall-allocation"
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <span>Open Lucky Box</span>
-            <ArrowRight className="w-4 h-4 text-slate-950" />
+            <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
           </Link>
         </div>
 
         {/* Section 1: Official Exhibitor Profile & Stall Allocation */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 relative overflow-hidden shadow-sm">
+        <section id="section-profile" className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 relative overflow-hidden shadow-xs scroll-mt-20 sm:scroll-mt-24">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
               <Building2 className="w-5 h-5" />
@@ -1091,7 +1177,7 @@ export default function ExhibitorDashboardPage() {
         </section>
 
         {/* Section 2: Official Brand Logo & CDR / Vector Artwork Upload */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 relative overflow-hidden shadow-sm">
+        <section id="section-artwork" className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 relative overflow-hidden shadow-xs scroll-mt-20 sm:scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
@@ -1252,7 +1338,7 @@ export default function ExhibitorDashboardPage() {
         </section>
 
         {/* Section 3: Exhibitor Entry Badges Registration */}
-        <section id="section-badges" className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm scroll-mt-24">
+        <section id="section-badges" className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xs scroll-mt-20 sm:scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
@@ -1295,112 +1381,288 @@ export default function ExhibitorDashboardPage() {
           </div>
         </section>
 
-        {/* Section 3: Extras Catalog Store */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        {/* Section 4: Extras Catalog Store */}
+        <section id="section-extras" className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xs scroll-mt-20 sm:scroll-mt-24">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">4. Additional Requirements & Extras</h2>
-                <p className="text-xs text-slate-500">Select extra furniture, display fixtures, audio-visual gear, and electrical connections needed for your booth</p>
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900">4. Additional Requirements & Extras</h2>
+                <p className="text-xs text-slate-500">Select extra furniture, display fixtures, audio-visual gear, and electrical connections</p>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <a
                 href="/exhibitor-extras"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
+                className="px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
               >
-                <Layers className="w-4 h-4 text-amber-700" />
+                <Layers className="w-3.5 h-3.5 text-amber-700" />
                 <span>View Full Rate Card</span>
               </a>
 
               {totalSelectedItemsCount > 0 && (
-                <span className="px-3 py-2 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center gap-1.5">
+                <span className="px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-amber-700" />
-                  {totalSelectedItemsCount} Extra Item(s)
+                  <span>{totalSelectedItemsCount} Extra Item{totalSelectedItemsCount === 1 ? '' : 's'}</span>
                 </span>
               )}
             </div>
           </div>
 
-          {/* Category Filter Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none border-b border-slate-200">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-slate-900 text-white font-bold shadow-md'
-                    : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+          {/* Search Bar & Sticky Category Filter */}
+          <div className="space-y-3 mb-6">
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search extra furniture, lighting, TV screens, counters..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-amber-500 focus:bg-white transition-all shadow-2xs"
+              />
+              {searchFilter && (
+                <button
+                  type="button"
+                  onClick={() => setSearchFilter('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
 
-          {/* Product Image Reference & Rate Disclaimer Banner */}
-          <div className="mb-6 p-4 bg-amber-50/80 border border-amber-300 rounded-xl flex items-start gap-3 text-amber-900 shadow-xs">
-            <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-            <div className="text-xs space-y-1">
-              <span className="font-extrabold block text-amber-950 uppercase tracking-wide">
-                Product Image & GST Notice:
-              </span>
-              <p className="text-amber-900 font-bold">
-                • Note: The images are for booking purpose only. The original product may change.
-              </p>
-              <p className="text-amber-950 font-extrabold">
-                • All rates shown are EXCLUDING GST. Applicable 18% GST will be added at final billing.
-              </p>
+            {/* Category Chips with High WCAG AA Contrast */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
+              {categories.map((cat) => {
+                const isSelected = selectedCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all border shrink-0 cursor-pointer ${
+                      isSelected
+                        ? 'bg-slate-900 text-amber-400 border-slate-900 shadow-xs'
+                        : cat === 'Furniture & Seating'
+                        ? 'bg-blue-50/80 text-blue-900 border-blue-200 hover:bg-blue-100'
+                        : cat === 'Electrical & Lighting'
+                        ? 'bg-amber-50/80 text-amber-950 border-amber-300 hover:bg-amber-100'
+                        : cat === 'Display & AV'
+                        ? 'bg-purple-50/80 text-purple-900 border-purple-200 hover:bg-purple-100'
+                        : cat === 'Manpower & Staff'
+                        ? 'bg-emerald-50/80 text-emerald-950 border-emerald-300 hover:bg-emerald-100'
+                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Product Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* Single Dismissible Product Image Reference & Rate Disclaimer Banner */}
+          {!isDisclaimerDismissed && (
+            <div className="mb-6 p-3.5 sm:p-4 bg-amber-50 border border-amber-300/80 rounded-xl flex items-start justify-between gap-3 text-amber-950 shadow-2xs animate-in fade-in duration-200">
+              <div className="flex items-start gap-2.5 sm:gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                <div className="text-xs space-y-1">
+                  <span className="font-extrabold block text-amber-950 uppercase tracking-wide">
+                    Product Image & GST Notice
+                  </span>
+                  <p className="text-amber-900 font-medium">
+                    • Note: The images are for booking purpose only. The original product may change.
+                  </p>
+                  <p className="text-amber-950 font-bold">
+                    • All rates shown are EXCLUDING GST. Applicable 18% GST will be added at final billing.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDisclaimerDismissed(true)}
+                className="p-1 rounded-md text-amber-700 hover:text-amber-950 hover:bg-amber-100 transition-colors shrink-0 cursor-pointer"
+                aria-label="Dismiss disclaimer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Product Grid / List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-5">
             {filteredProducts.map((p) => {
               const qty = quantities[p.id] || 0;
               const d = itemDays[p.id] || 2;
               const imgUrl = getProductImage(p.id);
-              const lineTotal = (p.rate_inr || 0) * qty * d;
+              const baseLineTotal = (p.rate_inr || 0) * qty * d;
+              const gstAmount = Math.round(baseLineTotal * 0.18);
+              const totalWithGst = baseLineTotal + gstAmount;
+              const isExpanded = expandedMobileCards[p.id] || qty > 0;
+
               return (
                 <div
                   key={p.id}
-                  className={`p-4 rounded-xl border transition-all flex flex-col justify-between ${
+                  className={`p-3 sm:p-4 rounded-xl border transition-all flex flex-col justify-between ${
                     qty > 0
-                      ? 'bg-amber-50/70 border-amber-400 shadow-md ring-1 ring-amber-400/40'
-                      : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                      ? 'bg-amber-50/60 border-amber-400 shadow-xs ring-1 ring-amber-400/40'
+                      : 'bg-white border-slate-200 hover:border-slate-300 shadow-2xs'
                   }`}
                 >
-                  <div>
-                    {/* Reference Product Image */}
-                    <div className="relative w-full h-44 mb-3 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group shadow-xs">
-                      <img
-                        src={imgUrl}
-                        alt={p.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                      />
-                      <div className="absolute bottom-0 inset-x-0 bg-slate-900/90 backdrop-blur-xs text-[10px] text-amber-300 px-2 py-1 font-bold text-center leading-tight">
-                        ⚠️ Note: The images are for booking purpose only. The original product may change.
+                  {/* --- MOBILE COMPACT VIEW (< 640px) --- */}
+                  <div className="sm:hidden">
+                    <div className="flex items-center gap-3">
+                      {/* Square Thumbnail */}
+                      <div 
+                        onClick={() => toggleMobileCard(p.id)}
+                        className="w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 shrink-0 overflow-hidden flex items-center justify-center p-1 cursor-pointer"
+                      >
+                        <img
+                          src={imgUrl}
+                          alt={p.name}
+                          className="w-full h-full object-contain"
+                          loading="lazy"
+                        />
+                      </div>
+
+                      {/* Item Info Center */}
+                      <div className="flex-1 min-w-0" onClick={() => toggleMobileCard(p.id)}>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${
+                            p.category === 'Furniture & Seating'
+                              ? 'bg-blue-100 text-blue-900 border-blue-200'
+                              : p.category === 'Electrical & Lighting'
+                              ? 'bg-amber-100 text-amber-950 border-amber-300'
+                              : p.category === 'Display & AV'
+                              ? 'bg-purple-100 text-purple-900 border-purple-200'
+                              : p.category === 'Manpower & Staff'
+                              ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                              : 'bg-slate-100 text-slate-700 border-slate-200'
+                          }`}>
+                            {p.category}
+                          </span>
+                        </div>
+                        <h3 className="text-xs font-bold text-slate-900 truncate">{p.name}</h3>
+                        {p.rate_inr ? (
+                          <div className="flex items-baseline gap-1 mt-0.5">
+                            <span className="text-xs font-mono font-black text-amber-800">
+                              ₹{p.rate_inr.toLocaleString('en-IN')}/d
+                            </span>
+                            <span className="text-[9px] font-bold text-slate-500 uppercase">
+                              +18% GST
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-slate-500 font-mono">Per {p.unit}</span>
+                        )}
+                      </div>
+
+                      {/* Stepper on Mobile */}
+                      <div className="flex items-center gap-1 bg-slate-50 border border-slate-300 rounded-lg p-0.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(p.id, -1)}
+                          disabled={qty <= 0}
+                          className="w-7 h-7 rounded bg-white hover:bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-xs disabled:opacity-30 border border-slate-200 active:scale-95 cursor-pointer"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-6 text-center text-xs font-mono font-black text-slate-900">
+                          {qty}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(p.id, 1)}
+                          className="w-7 h-7 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold text-xs shadow-2xs active:scale-95 cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
                       </div>
                     </div>
 
+                    {/* Expandable details & Rental Days on Mobile */}
+                    {isExpanded && (
+                      <div className="mt-2.5 pt-2.5 border-t border-slate-200/80 space-y-2 animate-in fade-in duration-150">
+                        <p className="text-[11px] text-slate-600">{p.description}</p>
+                        
+                        {/* Rental Days Segmented Control */}
+                        {qty > 0 && (
+                          <div className="flex items-center justify-between bg-amber-100/60 p-2 rounded-lg border border-amber-300/60">
+                            <span className="text-[10px] font-bold text-amber-950 flex items-center gap-1">
+                              <Calendar className="w-3 h-3 text-amber-700" />
+                              <span>Rental Duration:</span>
+                            </span>
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3].map((num) => (
+                                <button
+                                  key={num}
+                                  type="button"
+                                  onClick={() => updateItemDays(p.id, num)}
+                                  className={`px-2.5 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                                    (itemDays[p.id] || 2) === num
+                                      ? 'bg-slate-900 text-amber-400 font-black shadow-2xs'
+                                      : 'bg-white text-slate-700 hover:bg-amber-50 border border-slate-300'
+                                  }`}
+                                >
+                                  {num} {num === 1 ? 'Day' : 'Days'}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Live Total Calculation */}
+                        {qty > 0 && p.rate_inr ? (
+                          <div className="p-2 bg-amber-200/60 border border-amber-300 rounded-lg flex items-center justify-between text-xs">
+                            <span className="text-amber-950 font-bold text-[11px]">Item Total:</span>
+                            <span className="font-mono font-black text-amber-950 text-xs">
+                              ₹{baseLineTotal.toLocaleString('en-IN')}{' '}
+                              <span className="text-[10px] text-slate-700 font-normal">
+                                (+ GST ₹{gstAmount.toLocaleString('en-IN')} = ₹{totalWithGst.toLocaleString('en-IN')})
+                              </span>
+                            </span>
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* --- DESKTOP GRID VIEW (sm: and above) --- */}
+                  <div className="hidden sm:block">
+                    {/* Product Image */}
+                    <div className="relative w-full h-36 mb-3 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group flex items-center justify-center p-2">
+                      <img
+                        src={imgUrl}
+                        alt={p.name}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    </div>
+
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 bg-slate-200 text-slate-700 rounded-md">
+                      <span className={`text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                        p.category === 'Furniture & Seating'
+                          ? 'bg-blue-100 text-blue-900 border-blue-200'
+                          : p.category === 'Electrical & Lighting'
+                          ? 'bg-amber-100 text-amber-950 border-amber-300'
+                          : p.category === 'Display & AV'
+                          ? 'bg-purple-100 text-purple-900 border-purple-200'
+                          : p.category === 'Manpower & Staff'
+                          ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                          : 'bg-slate-100 text-slate-700 border-slate-200'
+                      }`}>
                         {p.category}
                       </span>
                       {p.rate_inr ? (
                         <div className="text-right">
-                          <span className="text-xs font-mono font-extrabold text-amber-700 block">
+                          <span className="text-xs font-mono font-extrabold text-amber-800 block">
                             ₹{p.rate_inr.toLocaleString('en-IN')} / day
                           </span>
-                          <span className="text-[9px] font-extrabold text-amber-800 uppercase tracking-tight block">
+                          <span className="text-[9px] font-bold text-amber-900 uppercase tracking-tight block">
                             + 18% GST Extra
                           </span>
                         </div>
@@ -1411,65 +1673,40 @@ export default function ExhibitorDashboardPage() {
                       )}
                     </div>
                     <h3 className="text-sm font-bold text-slate-900 mb-1">{p.name}</h3>
-                    <p className="text-xs text-slate-600 mb-3">{p.description}</p>
+                    <p className="text-xs text-slate-600 mb-3 line-clamp-2">{p.description}</p>
                   </div>
 
-                  <div className="space-y-2 pt-2 border-t border-slate-200 mt-2">
-                    {/* Rental Days Selector per Item */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-amber-600" />
-                        <span>Rental Days:</span>
-                      </span>
+                  {/* Desktop Actions Footer */}
+                  <div className="hidden sm:block space-y-2 pt-2 border-t border-slate-200 mt-2">
+                    {/* Rental Days Selector per Item (Only if qty > 0) */}
+                    {qty > 0 ? (
+                      <div className="flex items-center justify-between bg-amber-50/80 p-2 rounded-lg border border-amber-200">
+                        <span className="text-[11px] font-bold text-amber-950 flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-amber-700" />
+                          <span>Rental Days:</span>
+                        </span>
 
-                      <div className="flex items-center gap-1.5">
-                        {/* Quick Days Pills */}
                         <div className="flex items-center gap-1">
                           {[1, 2, 3].map((num) => (
                             <button
                               key={num}
                               type="button"
                               onClick={() => updateItemDays(p.id, num)}
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                              className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${
                                 (itemDays[p.id] || 2) === num
                                   ? 'bg-slate-900 text-amber-400 font-black shadow-2xs'
-                                  : 'bg-white text-slate-600 hover:bg-amber-50 border border-slate-200'
+                                  : 'bg-white text-slate-700 hover:bg-amber-50 border border-slate-300'
                               }`}
                             >
-                              {num}D
+                              {num} {num === 1 ? 'Day' : 'Days'}
                             </button>
                           ))}
                         </div>
-
-                        {/* Stepper */}
-                        <div className="flex items-center gap-1 bg-white border border-slate-300 rounded-lg p-0.5 shadow-2xs">
-                          <button
-                            type="button"
-                            onClick={() => updateItemDays(p.id, (itemDays[p.id] || 2) - 1)}
-                            disabled={(itemDays[p.id] || 2) <= 1}
-                            className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center font-bold text-xs disabled:opacity-30 active:scale-95"
-                            title="Decrease days"
-                          >
-                            -
-                          </button>
-                          <span className="w-8 text-center text-[11px] font-mono font-black text-amber-900">
-                            {itemDays[p.id] || 2}d
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => updateItemDays(p.id, (itemDays[p.id] || 2) + 1)}
-                            disabled={(itemDays[p.id] || 2) >= 30}
-                            className="w-5 h-5 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-xs disabled:opacity-30 active:scale-95 shadow-2xs"
-                            title="Increase days"
-                          >
-                            +
-                          </button>
-                        </div>
                       </div>
-                    </div>
+                    ) : null}
 
                     {/* Quantity Selector */}
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+                    <div className="flex items-center justify-between pt-1">
                       <span className="text-xs font-semibold text-slate-600">
                         Quantity:
                       </span>
@@ -1477,7 +1714,8 @@ export default function ExhibitorDashboardPage() {
                         <button
                           type="button"
                           onClick={() => updateQuantity(p.id, -1)}
-                          className="w-7 h-7 rounded-md bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-800 border border-slate-200 transition-colors active:scale-95 font-bold"
+                          disabled={qty <= 0}
+                          className="w-7 h-7 rounded-md bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-800 border border-slate-200 transition-colors active:scale-95 font-bold disabled:opacity-30 cursor-pointer"
                         >
                           <Minus className="w-3.5 h-3.5" />
                         </button>
@@ -1487,7 +1725,7 @@ export default function ExhibitorDashboardPage() {
                         <button
                           type="button"
                           onClick={() => updateQuantity(p.id, 1)}
-                          className="w-7 h-7 rounded-md bg-amber-500 hover:bg-amber-400 flex items-center justify-center text-slate-950 font-extrabold transition-colors active:scale-95 shadow-sm"
+                          className="w-7 h-7 rounded-md bg-amber-500 hover:bg-amber-400 flex items-center justify-center text-slate-950 font-extrabold transition-colors active:scale-95 shadow-sm cursor-pointer"
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
@@ -1496,11 +1734,11 @@ export default function ExhibitorDashboardPage() {
 
                     {/* Live Line Total when Quantity > 0 */}
                     {qty > 0 && p.rate_inr ? (
-                      <div className="mt-2 p-2 bg-amber-100/80 border border-amber-300 rounded-lg flex items-center justify-between text-xs">
+                      <div className="mt-2 p-2 bg-amber-100/90 border border-amber-300 rounded-lg flex items-center justify-between text-xs">
                         <span className="text-amber-950 font-bold">Item Total:</span>
-                        <span className="font-mono font-black text-amber-900">
-                          ₹{lineTotal.toLocaleString('en-IN')}{' '}
-                          <span className="text-[10px] text-slate-600 font-medium font-sans">
+                        <span className="font-mono font-black text-amber-950">
+                          ₹{baseLineTotal.toLocaleString('en-IN')}{' '}
+                          <span className="text-[10px] text-slate-700 font-medium font-sans">
                             ({qty} {p.unit} × {d}d)
                           </span>
                         </span>
@@ -1553,11 +1791,11 @@ export default function ExhibitorDashboardPage() {
           </div>
         </section>
 
-        {/* Section 4: Live Order & Badges Summary */}
-        <section className="bg-slate-50 border border-slate-200 rounded-2xl p-6 lg:p-8 space-y-6">
+        {/* Section 5: Live Order & Badges Summary */}
+        <section id="section-summary" className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 space-y-6 scroll-mt-20 sm:scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">5. Overall Requisition Summary</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">5. Overall Requisition Summary</h2>
               <p className="text-xs text-slate-500">Review your booth configuration, fascia details, entry badges, and extra amenities</p>
             </div>
             {lastSubmittedAt && (
@@ -1696,27 +1934,49 @@ export default function ExhibitorDashboardPage() {
 
       </main>
 
-      {/* Sticky Floating Bottom Submit Bar for Easy Mobile & Desktop Access */}
-      <div className="fixed bottom-0 inset-x-0 z-40 bg-white/95 md:backdrop-blur-sm border-t border-amber-300 p-4 shadow-2xl">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-            <div className="text-xs">
-              <span className="text-slate-900 font-extrabold block sm:inline">
-                {brandName ? brandName : 'Stall Profile'}: {selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : 'Custom') : `${selectedSqftOption} sq ft`}
-              </span>
-              <span className="text-slate-600 sm:ml-2">
-                ({totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'}, {ownerBadges + salesBadges + supportBadges} badge{ownerBadges + salesBadges + supportBadges === 1 ? '' : 's'})
-              </span>
+      {/* Sticky Floating Bottom Submit Bar with Opaque Background & Compact Mobile Layout */}
+      <div 
+        className="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 shadow-[0_-6px_25px_rgba(0,0,0,0.09)] px-3 sm:px-6 py-2.5 sm:py-3.5"
+        style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom, 10px))' }}
+      >
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
+          {/* Line 1 on Mobile / Left on Desktop: Summary & Profile */}
+          <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
+              <div className="text-xs truncate">
+                <span className="text-slate-900 font-extrabold truncate">
+                  {brandName || 'Stall Profile'}:
+                </span>{' '}
+                <span className="font-mono font-bold text-amber-800">
+                  {selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : 'Custom') : `${selectedSqftOption} sq ft`}
+                </span>
+                <span className="text-slate-500 ml-1.5 hidden xs:inline">
+                  • {totalSelectedItemsCount} extra{totalSelectedItemsCount === 1 ? '' : 's'}
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+            {/* Quick Tax Bill trigger on mobile line 1 if items present */}
             {totalSelectedItemsCount > 0 && (
               <button
                 type="button"
                 onClick={() => setShowBillModal(true)}
-                className="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-900 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-xs"
+                className="sm:hidden text-[11px] font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2 py-1 rounded-lg flex items-center gap-1 shrink-0 cursor-pointer"
+              >
+                <FileText className="w-3 h-3 text-amber-700" />
+                <span>Tax Bill</span>
+              </button>
+            )}
+          </div>
+
+          {/* Line 2 on Mobile / Right on Desktop: Action Buttons */}
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            {totalSelectedItemsCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowBillModal(true)}
+                className="hidden sm:flex px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-900 font-bold text-xs uppercase tracking-wider transition-all items-center gap-1.5 shadow-2xs cursor-pointer"
               >
                 <FileText className="w-4 h-4 text-amber-700" />
                 <span>View Tax Bill</span>
@@ -1726,9 +1986,9 @@ export default function ExhibitorDashboardPage() {
             <button
               onClick={handleSaveExtras}
               disabled={extrasSaving}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all transform active:scale-95 disabled:opacity-50"
+              className="w-full sm:w-auto flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider shadow-md shadow-amber-500/20 transition-all transform active:scale-95 disabled:opacity-50 cursor-pointer"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3.5 h-3.5" />
               <span>{extrasSaving ? 'Submitting...' : 'Submit All Requirements'}</span>
             </button>
           </div>

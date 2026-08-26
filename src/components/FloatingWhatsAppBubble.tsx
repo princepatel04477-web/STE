@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
@@ -8,8 +9,12 @@ import { useLanguage } from "@/components/LanguageContext";
 const PHONE_NUMBER = "919950787787";
 
 export default function FloatingWhatsAppBubble() {
+  const pathname = usePathname();
   const { language } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
+
+  // Hide on exhibitor portal and admin console to prevent overlapping bottom action bars
+  const isPortalOrAdmin = pathname?.startsWith('/exhibitor') || pathname?.startsWith('/admin');
 
   useEffect(() => {
     // Only active on mobile devices
@@ -30,6 +35,8 @@ export default function FloatingWhatsAppBubble() {
       : "नमस्ते, मैंने STE 2026 की वेबसाइट देखी और मुझे अधिक जानकारी चाहिए।";
     window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
   };
+
+  if (isPortalOrAdmin) return null;
 
   return (
     <AnimatePresence>

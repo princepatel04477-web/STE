@@ -78,6 +78,10 @@ export default function AdminExhibitorsPage() {
     setLoading(true);
     try {
       const res = await fetch('/api/admin/exhibitors');
+      if (res.status === 401 || res.status === 403) {
+        router.push('/exhibitor/dashboard');
+        return;
+      }
       const data = await res.json();
       if (data.exhibitors) {
         setExhibitors(data.exhibitors);

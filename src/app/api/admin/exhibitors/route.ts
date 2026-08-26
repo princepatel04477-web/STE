@@ -2,9 +2,18 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { REGISTERED_EXHIBITORS_LIST } from '@/data/registeredExhibitors';
+import { getAuthenticatedExhibitor, isAdminMobile } from '@/lib/auth';
 
 export async function GET() {
   try {
+    // Strict server-side role gate: only authenticated admin mobile numbers can access
+    const session = await getAuthenticatedExhibitor();
+    if (!session || !isAdminMobile(session.mobile)) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Admin authorization required.' },
+        { status: 403 }
+      );
+    }
     // 1. Fetch saved orders from db
     const dbOrders = db.prepare(`
       SELECT 

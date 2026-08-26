@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, ArrowRight } from "lucide-react";
 import { useLanguage, Translate } from "@/components/LanguageContext";
@@ -8,8 +9,12 @@ import { useLanguage, Translate } from "@/components/LanguageContext";
 const PHONE_NUMBER = "919950787787";
 
 export default function MobileBottomCTA() {
+  const pathname = usePathname();
   const { language } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
+
+  // Hide on exhibitor portal and admin console
+  const isPortalOrAdmin = pathname?.startsWith('/exhibitor') || pathname?.startsWith('/admin');
 
   useEffect(() => {
     // Detect mobile device
@@ -42,6 +47,8 @@ export default function MobileBottomCTA() {
       el.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  if (isPortalOrAdmin) return null;
 
   return (
     <AnimatePresence>
