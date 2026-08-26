@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Search, Store, MapPin, Ruler, Phone, Lock, X } from 'lucide-react';
+import { ArrowLeft, Search, Store, MapPin, Ruler, Phone, Lock, X, Tag } from 'lucide-react';
 import FloorPlan2026 from '@/components/stallmap/FloorPlan2026';
 import { STALL_MAP_2026, getStall } from '@/data/stallMap2026';
 import {
@@ -31,6 +31,7 @@ export default function StallMapDemoPage() {
   const [query, setQuery] = useState('');
   const [pool, setPool] = useState<PoolFilter>('all');
   const [size, setSize] = useState('');
+  const [trade, setTrade] = useState('');
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
 
   const byUnit = useMemo(() => {
@@ -45,15 +46,17 @@ export default function StallMapDemoPage() {
       if (pool === 'held' && !a.held) return false;
       if (pool !== 'all' && pool !== 'held' && a.pool !== pool) return false;
       if (size && a.sheetSize !== size) return false;
+      if (trade && a.group !== trade) return false;
       if (!term) return true;
       return (
         a.brand.toLowerCase().includes(term) ||
         a.category.toLowerCase().includes(term) ||
         a.unitId.toLowerCase() === term ||
+        a.group.toLowerCase().includes(term) ||
         a.mobile.includes(term)
       );
     }).sort((a, b) => a.brand.localeCompare(b.brand));
-  }, [query, pool, size]);
+  }, [query, pool, size, trade]);
 
   const visibleUnitIds = useMemo(
     () =>
@@ -64,6 +67,12 @@ export default function StallMapDemoPage() {
   );
 
   const selected = selectedUnit ? byUnit.get(selectedUnit.toUpperCase()) ?? null : null;
+
+  const tradeCounts = useMemo(() => {
+    const c = new Map<string, number>();
+    for (const a of ALLOTMENTS_2026) c.set(a.group, (c.get(a.group) ?? 0) + 1);
+    return [...c.entries()].sort((x, y) => y[1] - x[1]);
+  }, []);
 
   const sizeCounts = useMemo(() => {
     const c = new Map<string, number>();
@@ -99,10 +108,12 @@ export default function StallMapDemoPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-5 space-y-5">
         <p className="text-sm text-expo-warm/60 max-w-2xl">
-          A seeded sample allotment so every kind of exhibitor profile can be checked
-          end to end. Saree, lehenga and uniform-saree brands draw from stalls 1&ndash;107
-          (less 27, 28, 29); everyone else takes the south hall and those three blocks.
-          Nothing here is a live draw result.
+          The floor is laid out trade by trade: inside any one stall size, every
+          brand of a trade sits in one unbroken run, so kurti never backs onto
+          menswear. Saree, lehenga and uniform-saree brands draw from stalls
+          1&ndash;107 (less 27, 28, 29); everyone else takes the south hall and those
+          three blocks. A live draw shuffles brands inside their own trade block and
+          never across blocks &mdash; this page shows a seeded sample, not a live result.
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
@@ -135,6 +146,19 @@ export default function StallMapDemoPage() {
                 className="w-full rounded-xl border border-white/15 bg-black/40 py-3 pl-9 pr-3 text-base sm:text-sm placeholder:text-expo-warm/35 focus:border-expo-gold/60 focus:outline-none"
               />
             </label>
+            <select
+              value={trade}
+              onChange={(e) => setTrade(e.target.value)}
+              aria-label="Filter by trade"
+              className="rounded-xl border border-white/15 bg-black/40 py-3 px-3 text-base sm:text-sm focus:border-expo-gold/60 focus:outline-none"
+            >
+              <option value="">All trades</option>
+              {tradeCounts.map(([g, n]) => (
+                <option key={g} value={g}>
+                  {g} &middot; {n}
+                </option>
+              ))}
+            </select>
             <select
               value={size}
               onChange={(e) => setSize(e.target.value)}
@@ -204,7 +228,7 @@ export default function StallMapDemoPage() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium">{a.brand}</span>
                       <span className="block truncate text-xs text-expo-warm/50">
-                        {a.category} &middot; {a.sheetSize}
+                        {a.group} &middot; {a.sheetSize}
                         {a.held && ' · held'}
                       </span>
                     </span>
@@ -264,9 +288,10 @@ function ProfileCard({
         </button>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
         <Field icon={Store} label="Stall" value={allotment.unitId} big />
         <Field icon={Ruler} label="Size" value={`${allotment.sheetSize}`} sub={`${allotment.areaSqft} sq ft`} />
+        <Field icon={Tag} label="Trade" value={allotment.group} sub={allotment.category} />
         <Field icon={MapPin} label="Zone" value={allotment.zone} sub={`${allotment.pool} pool`} />
         <Field
           icon={allotment.mobile ? Phone : Lock}

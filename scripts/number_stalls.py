@@ -84,6 +84,33 @@ SAREE_POOL_EXCLUDES = {27, 28, 29}
 # exactly.
 SAREE_CATEGORY = re.compile(r"sare+|leh[ae]ng", re.I)
 
+# Trade groups. The sheet writes a category 35 different ways - "Kurties",
+# "Kurtis", "Kurti / Suits" - so each row is folded into one of these, first
+# match winning. A brand selling sarees and lehengas is a saree brand, which is
+# why saree is tested before lehenga.
+#
+# The floor is then laid out group by group in this order, so neighbours are
+# always in the same trade: no kurti stall backing onto menswear.
+TRADE_GROUPS = [
+    ("Saree", re.compile(r"sare+", re.I)),
+    ("Lehenga", re.compile(r"leh[ae]ng", re.I)),
+    ("Blouses", re.compile(r"blouse", re.I)),
+    ("Kurti", re.compile(r"kurt", re.I)),
+    ("Suits", re.compile(r"suit", re.I)),
+    ("Dress Material & Fabrics", re.compile(r"fabric|dress mat+erial|lace", re.I)),
+    ("Kids Wear", re.compile(r"kids", re.I)),
+    ("Men's Wear", re.compile(r"men", re.I)),
+    ("Ethnic & Poshak", re.compile(r"poshak|ethnic", re.I)),
+    ("Home & Other", re.compile(r".", re.I)),
+]
+
+
+def trade_group(category):
+    for name, rule in TRADE_GROUPS:
+        if rule.search(str(category or "")):
+            return name
+    return "Home & Other"
+
 # The sheet still writes the two 6M-wide blocks the old way in places.
 SHEET_SIZE_ALIASES = {"3m x 60m": "30m x 6m", "3m x 78m": "42m x 6m"}
 
@@ -366,6 +393,7 @@ def read_exhibitors():
             "areaSqft": int(sqft),
             "mobile": normalise_mobile(mobile),
             "isSaree": bool(SAREE_CATEGORY.search(str(category or ""))),
+            "group": trade_group(category),
         })
     return out
 
@@ -412,65 +440,98 @@ def size_pool_and_splits(stalls, saree):
     raise SystemExit("the saree list does not fit anywhere on this floor")
 
 
-def allot(stalls, exhibitors, pool_end, split_bays):
-    """Give every exhibitor a stall of the size they booked.
-
-    Saree brands draw from the opening block, everyone else from what is left.
-    The order is seeded so the demo shows the same floor every time."""
-    import random
-
+def build_units(stalls, split_bays):
+    """Every lettable unit: a split bay contributes its two 100 sqft halves."""
     units = []
     for s in stalls:
         if s["stallNumber"] in split_bays:
             for h in s["halves"]:
-                units.append({"unitId": h["id"], "stall": s, "sheetSize": "3m x 3m",
-                              "areaSqft": 100})
+                units.append({"unitId": h["id"], "stall": s,
+                              "sheetSize": "3m x 3m", "areaSqft": 100})
         else:
             units.append({"unitId": str(s["stallNumber"]), "stall": s,
                           "sheetSize": s["sheetSize"], "areaSqft": s["areaSqft"]})
+    units.sort(key=lambda u: (u["stall"]["stallNumber"], u["unitId"]))
+    return units
 
-    def in_saree_pool(u):
-        n = u["stall"]["stallNumber"]
-        return n <= pool_end and n not in SAREE_POOL_EXCLUDES
 
-    free = {True: defaultdict(list), False: defaultdict(list)}
-    for u in units:
-        free[in_saree_pool(u)][u["sheetSize"]].append(u)
-    for side in free.values():
-        for lst in side.values():
-            lst.sort(key=lambda u: (u["stall"]["stallNumber"], u["unitId"]))
+def allot(stalls, exhibitors, pool_end, split_bays):
+    """Give every exhibitor a stall of the size they booked, next to its trade.
 
-    allotments, unplaced = [], []
-    # Hand-allotted stalls come out of the pool before anyone draws.
+    Stalls of one size sit together on this floor - the 100 sqft stalls run
+    down the east wall, the 600 sqft ones fill the middle columns - so the
+    clustering is done inside each size band. Within a band the stalls are
+    handed out in floor order to brands sorted by trade, and the trade order is
+    the same in every band. That puts all the kurti 600s side by side, all the
+    menswear 600s side by side, and keeps the two apart, in every size.
+
+    Counts match exactly per size, so nobody is left over and nobody is moved
+    to a size they did not book."""
+    order = [name for name, _ in TRADE_GROUPS]
+    units = build_units(stalls, split_bays)
+
+    def in_saree_pool(number):
+        return number <= pool_end and number not in SAREE_POOL_EXCLUDES
+
+    allotments = []
+    taken_numbers, taken_brands = set(), set()
     by_brand = {e["brand"]: e for e in exhibitors}
     for number, brand in sorted(RESERVED.items()):
         ex = by_brand.get(brand)
         if not ex:
             continue
-        for side in free.values():
-            side[ex["sheetSize"]] = [u for u in side[ex["sheetSize"]]
-                                     if u["stall"]["stallNumber"] != number]
         stall = next(s for s in stalls if s["stallNumber"] == number)
         allotments.append({"unitId": str(number), "stall": stall, "ex": ex,
                            "held": True})
-        exhibitors = [e for e in exhibitors if e is not ex]
+        taken_numbers.add(number)
+        taken_brands.add(brand)
 
-    rng = random.Random(2026)
+    unplaced = []
     for saree_side in (True, False):
-        group = [e for e in exhibitors if e["isSaree"] is saree_side]
-        rng.shuffle(group)
-        for ex in group:
-            bucket = free[saree_side][ex["sheetSize"]]
-            if not bucket:                     # spill over to the other pool
-                bucket = free[not saree_side][ex["sheetSize"]]
+        free = defaultdict(list)
+        for u in units:
+            n = u["stall"]["stallNumber"]
+            if n in taken_numbers or in_saree_pool(n) is not saree_side:
+                continue
+            free[u["sheetSize"]].append(u)
+        for lst in free.values():
+            lst.sort(key=lambda u: (u["stall"]["stallNumber"], u["unitId"]))
+
+        people = [e for e in exhibitors
+                  if e["isSaree"] is saree_side and e["brand"] not in taken_brands]
+        people.sort(key=lambda e: (e["sheetSize"], order.index(e["group"]),
+                                   e["brand"]))
+        for ex in people:
+            bucket = free.get(ex["sheetSize"]) or []
             if not bucket:
                 unplaced.append(ex)
                 continue
             u = bucket.pop(0)
             allotments.append({"unitId": u["unitId"], "stall": u["stall"],
                                "ex": ex, "held": False})
+
     allotments.sort(key=lambda a: (a["stall"]["stallNumber"], a["unitId"]))
     return allotments, unplaced
+
+
+def trade_runs(allotments):
+    """Check the promise: inside any one size, a trade must be a single
+    unbroken run of stalls. Returns a row per size with the run count against
+    the number of trades in it - equal means no trade is split."""
+    by_size = defaultdict(list)
+    for a in sorted(allotments, key=lambda a: (a["stall"]["stallNumber"],
+                                               a["unitId"])):
+        by_size[a["ex"]["sheetSize"]].append(a)
+    rows = []
+    for size, items in by_size.items():
+        runs, prev = 0, None
+        for a in items:
+            if a["ex"]["group"] != prev:
+                runs += 1
+            prev = a["ex"]["group"]
+        trades = len({a["ex"]["group"] for a in items})
+        rows.append((size, len(items), trades, runs))
+    return sorted(rows, key=lambda r: -r[1])
 
 
 # --------------------------------------------------------------------------
@@ -660,11 +721,11 @@ def write_allotment(allotments, pool_end, split_bays, exhibitors):
         ex, s = a["ex"], a["stall"]
         rows.append(
             "  { unitId: %-8s stallNumber: %-5s brand: %s, category: %s,\n"
-            "    mobile: %-14s sheetSize: %-12s areaSqft: %-6s pool: %-11s"
-            " zone: %-21s held: %s },"
+            "    group: %-28s mobile: %-14s sheetSize: %-12s areaSqft: %-6s"
+            " pool: %-11s zone: %-21s held: %s },"
             % ('"%s",' % a["unitId"], "%d," % s["stallNumber"],
                json_str(ex["brand"]), json_str(ex["category"]),
-               '"%s",' % ex["mobile"], '"%s",' % ex["sheetSize"],
+               '"%s",' % ex["group"], '"%s",' % ex["mobile"], '"%s",' % ex["sheetSize"],
                "%d," % ex["areaSqft"],
                '"%s",' % ("Saree" if ex["isSaree"] else "General"),
                '"%s",' % s["zone"],
@@ -691,6 +752,8 @@ def write_allotment(allotments, pool_end, split_bays, exhibitors):
         "  stallNumber: number;\n"
         "  brand: string;\n"
         "  category: string;\n"
+        "  /** Trade group the floor is laid out by. */\n"
+        "  group: string;\n"
         "  mobile: string;\n"
         "  sheetSize: string;\n"
         "  areaSqft: number;\n"
@@ -752,6 +815,11 @@ def main():
              pool_end - len(SAREE_POOL_EXCLUDES)))
     print("bays split  %s" % (sorted(split_bays) or "none"))
     print("allotted    %d" % len(allotments))
+    print("")
+    print("size        brands  trades  runs")
+    for size, n, trades, runs in trade_runs(allotments):
+        flag = "clean" if runs == trades else "SPLIT"
+        print("  %-10s %3d %6d %5d   %s" % (size, n, trades, runs, flag))
     if unplaced:
         print("UNPLACED    %d" % len(unplaced))
         for e in unplaced:

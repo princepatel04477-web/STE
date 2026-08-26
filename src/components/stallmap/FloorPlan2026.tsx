@@ -3,7 +3,27 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Minus, Plus, Maximize2 } from 'lucide-react';
 import { STALL_MAP_2026, Stall2026 } from '@/data/stallMap2026';
-import { SAREE_POOL_STALLS, SPLIT_BAYS_2026 } from '@/data/stallAllotment2026';
+import {
+  ALLOTMENTS_2026,
+  SAREE_POOL_STALLS,
+  SPLIT_BAYS_2026,
+} from '@/data/stallAllotment2026';
+
+/** One colour per trade, so a block of one trade reads as a band on the plan. */
+const TRADE_COLOURS: Record<string, string> = {
+  Saree: '#D6A066',
+  Lehenga: '#C2557A',
+  Blouses: '#8E6BB5',
+  Kurti: '#4E93C4',
+  Suits: '#3F9E8C',
+  'Dress Material & Fabrics': '#8AA84A',
+  'Kids Wear': '#D08A3E',
+  "Men's Wear": '#B5563C',
+  'Ethnic & Poshak': '#9C7BC7',
+  'Home & Other': '#7C8794',
+};
+
+const TRADE_BY_UNIT = new Map(ALLOTMENTS_2026.map((a) => [a.unitId, a.group]));
 
 /** The floor plan's own coordinate space, from the approved drawing. */
 const VIEW_W = 841.92007;
@@ -56,9 +76,13 @@ function buildUnits(): Unit[] {
   return out;
 }
 
-function fillFor(unit: Unit, selected: boolean, dimmed: boolean) {
+function fillFor(unit: Unit, selected: boolean, dimmed: boolean, byTrade: boolean) {
   if (selected) return '#E5A96A';
   if (dimmed) return 'rgba(255,255,255,0.04)';
+  if (byTrade) {
+    const trade = TRADE_BY_UNIT.get(unit.id);
+    return trade ? `${TRADE_COLOURS[trade] ?? '#7C8794'}55` : 'rgba(255,255,255,0.06)';
+  }
   if (unit.stall.reservedFor) return 'rgba(184,115,51,0.42)';
   if (SAREE.has(unit.stall.stallNumber)) return 'rgba(214,160,102,0.20)';
   return 'rgba(255,255,255,0.10)';
@@ -82,6 +106,7 @@ export default function FloorPlan2026({
 }: FloorPlan2026Props) {
   const units = useMemo(buildUnits, []);
   const [zoom, setZoom] = useState(1);
+  const [byTrade, setByTrade] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const selected = selectedUnitId
@@ -134,6 +159,18 @@ export default function FloorPlan2026({
             <Plus className="w-3.5 h-3.5" />
           </button>
         </div>
+        <button
+          type="button"
+          onClick={() => setByTrade((v) => !v)}
+          aria-pressed={byTrade}
+          className={`shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition ${
+            byTrade
+              ? 'border-expo-gold/60 text-expo-champagne'
+              : 'border-white/15 text-expo-warm/60'
+          }`}
+        >
+          Trade colours
+        </button>
         <p className="text-[11px] sm:text-xs text-expo-warm/50 tabular-nums truncate">
           {selected
             ? `Stall ${selected.id} · ${selected.size} · ${selected.stall.zone}`
@@ -178,7 +215,7 @@ export default function FloorPlan2026({
                   y={u.y}
                   width={u.w}
                   height={u.h}
-                  fill={fillFor(u, isSel, dimmed)}
+                  fill={fillFor(u, isSel, dimmed, byTrade)}
                   stroke={isSel ? '#F7F4EF' : 'rgba(255,255,255,0.16)'}
                   strokeWidth={isSel ? 1.6 : 0.4}
                 />
@@ -201,9 +238,17 @@ export default function FloorPlan2026({
       </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 border-t border-white/10 text-[10px] sm:text-[11px] text-expo-warm/55">
-        <Key colour="rgba(214,160,102,0.20)" label="Saree pool" />
-        <Key colour="rgba(255,255,255,0.10)" label="General pool" />
-        <Key colour="rgba(184,115,51,0.42)" label="Held" />
+        {byTrade ? (
+          Object.entries(TRADE_COLOURS).map(([trade, colour]) => (
+            <Key key={trade} colour={`${colour}88`} label={trade} />
+          ))
+        ) : (
+          <>
+            <Key colour="rgba(214,160,102,0.20)" label="Saree pool" />
+            <Key colour="rgba(255,255,255,0.10)" label="General pool" />
+            <Key colour="rgba(184,115,51,0.42)" label="Held" />
+          </>
+        )}
         <Key colour="#E5A96A" label="Selected" />
       </div>
     </div>

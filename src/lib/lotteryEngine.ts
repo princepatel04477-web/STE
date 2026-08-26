@@ -1,10 +1,10 @@
-import {
-  MASTER_STALL_INVENTORY,
-  StallItem,
-  normalizeSqftCategory,
-  STALL_CATEGORY_LADDER
-} from '@/data/stallInventory';
 import db, { LotteryAllocationRecord } from '@/lib/db';
+import {
+  DrawUnit,
+  blockFor,
+  drawStall,
+  heldUnitFor
+} from '@/lib/drawEngine2026';
 
 export interface LotteryResult {
   success: boolean;
@@ -54,73 +54,44 @@ export function performLuckyDraw(
     };
   }
 
-  // 2. Determine category & fetch master inventory
-  const category = normalizeSqftCategory(rawSqft);
-  const isLargeStall = parseInt(category, 10) >= 600;
+  // 2. Find the exhibitor's block on the 2026 floor plan and draw inside it.
+  //    The block is their pool, their booked size and their trade group, so a
+  //    draw can only ever return a stall of the right size standing among the
+  //    same trade.
+  const held = heldUnitFor(cleanMobile, brandName);
+  const occupied = ((db.prepare('SELECT stall_number FROM lottery_allocations')
+    .all() as Array<{ stall_number: string }>) || []).map((a) => a.stall_number);
 
-  // 3. Fetch all currently occupied stall numbers
-  const allAllocations = (db.prepare(
-    'SELECT stall_number FROM lottery_allocations'
-  ).all() as Array<{ stall_number: string }>) || [];
-  
-  const occupiedSet = new Set<string>(
-    allAllocations.map((a) => a.stall_number.toUpperCase())
-  );
-
-  // 4. Filter available stalls in this category
-  const categoryStalls = MASTER_STALL_INVENTORY.filter(
-    (s) => s.categorySqft === category
-  );
-  
-  const availableStalls = categoryStalls.filter(
-    (s) => !occupiedSet.has(s.stallNumber.toUpperCase())
-  );
-
-  let candidatePool: StallItem[] = [];
-
-  if (isLargeStall) {
-    // Bookings of 600 sq ft and above always take a corner. The floor plan only
-    // ever cuts a >= 600 sq ft stall at a block end, so this filter is a guard
-    // against a future layout change rather than a preference.
-    candidatePool = availableStalls.filter((s) => s.isCorner);
-  } else {
-    // Smaller bookings sit in the middle of a block, stepping down from the
-    // corners (400 next to a corner, then 300, 200, 100). A small stall only
-    // takes an end position in blocks that hold no large stall at all — the
-    // single-column perimeter rows and the north gallery — and even then only
-    // once the middle of those runs is full.
-    const middleCandidates = availableStalls.filter((s) => !s.isCorner);
-    candidatePool = middleCandidates.length > 0 ? middleCandidates : availableStalls;
-  }
-
-  // Graceful fallback if the paid-for category is sold out: step UP the ladder to
-  // the next larger size. Never downgrade — an exhibitor must not receive less
-  // floor area than they booked.
-  if (candidatePool.length === 0) {
-    const startIdx = STALL_CATEGORY_LADDER.indexOf(category);
-    for (let i = startIdx + 1; i < STALL_CATEGORY_LADDER.length; i++) {
-      const upgrade = STALL_CATEGORY_LADDER[i];
-      const pool = MASTER_STALL_INVENTORY.filter(
-        (s) => s.categorySqft === upgrade && !occupiedSet.has(s.stallNumber.toUpperCase())
-      );
-      if (pool.length > 0) {
-        candidatePool = pool;
-        break;
-      }
+  let chosen: DrawUnit;
+  if (held) {
+    // Hand-allotted before the draw - there is nothing to draw for.
+    const heldBlock = blockFor(cleanMobile, brandName);
+    const unit = heldBlock?.units.find((u) => u.unitId === held.unitId);
+    if (!unit) {
+      return {
+        success: false,
+        isExisting: false,
+        error: `Stall ${held.unitId} is held for ${held.brand} but is missing from the floor plan.`
+      };
     }
+    chosen = unit;
+  } else {
+    const outcome = drawStall(cleanMobile, brandName, { taken: occupied });
+    if (!outcome.unit) {
+      return { success: false, isExisting: false, error: outcome.error };
+    }
+    chosen = outcome.unit;
   }
 
-  if (candidatePool.length === 0) {
-    return {
-      success: false,
-      isExisting: false,
-      error: `No ${category} sq ft stall (or larger) remains on the STE 2026 floor plan. Please contact the organiser.`
-    };
-  }
-
-  // 5. Select uniformly at random from eligible candidates
-  const randomIndex = Math.floor(Math.random() * candidatePool.length);
-  const chosenStall = candidatePool[randomIndex];
+  const chosenStall = {
+    stallNumber: chosen.unitId,
+    sqftNumber: chosen.areaSqft,
+    isCorner: chosen.stall.zone === 'North Wall Strip',
+    shape: 'Linear' as const,
+    hall: chosen.zone,
+    zone: `${chosen.group} · ${chosen.pool} pool`,
+    dimensions: chosen.sheetSize
+  };
 
   const slipId = generateSlipId(cleanMobile, chosenStall.stallNumber);
   const allocatedAt = new Date().toISOString();
