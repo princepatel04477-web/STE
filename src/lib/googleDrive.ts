@@ -26,7 +26,7 @@ import { Readable } from 'stream';
  *      quota. Zero Google Cloud setup; the usual choice for personal accounts.
  */
 
-export type AssetCategory = 'logo' | 'cdr';
+export type AssetCategory = 'logo' | 'cdr' | 'profile_pic';
 
 export interface DriveUploadParams {
   mobile: string;
@@ -91,7 +91,7 @@ export function fileExtension(fileName: string): string {
 
 /**
  * Deterministic, human-readable asset name so every exhibitor folder looks the
- * same: 'Apple Lifestyle - Logo.png' / 'Apple Lifestyle - Artwork.cdr'.
+ * same: 'Apple Lifestyle - Logo.png' / 'Apple Lifestyle - Artwork.cdr' / 'Apple Lifestyle - ProfilePhoto.jpg'.
  *
  * Because the name is deterministic, re-uploading the same category replaces
  * the previous file in place instead of stacking 'logo (1).png' duplicates.
@@ -104,7 +104,7 @@ export function buildAssetFileName(
   const brand = sanitizeFolderName(brandName);
   const ext = fileExtension(originalFileName) || '.bin';
   const resolved: AssetCategory = category || (ext === '.cdr' ? 'cdr' : 'logo');
-  const label = resolved === 'cdr' ? 'Artwork' : 'Logo';
+  const label = resolved === 'cdr' ? 'Artwork' : (resolved === 'profile_pic' ? 'ProfilePhoto' : 'Logo');
   return brand + ' - ' + label + ext;
 }
 

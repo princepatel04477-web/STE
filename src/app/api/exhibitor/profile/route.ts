@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
+import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { syncToGoogleSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 
@@ -11,9 +12,40 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const exhibitor = db
-      .prepare('SELECT mobile, brand_name, stall_sqft, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url, updated_at FROM exhibitors WHERE mobile = ?')
-      .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; fascia_names_json?: string; logo_file_url?: string; cdr_file_url?: string; drive_file_url?: string; drive_folder_id?: string; drive_folder_url?: string; updated_at: string } | undefined;
+    let exhibitor = db
+      .prepare('SELECT mobile, brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url, updated_at FROM exhibitors WHERE mobile = ?')
+      .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string; fascia_names_json?: string; logo_file_url?: string; cdr_file_url?: string; drive_file_url?: string; drive_folder_id?: string; drive_folder_url?: string; updated_at: string } | undefined;
+
+    // If Supabase is active, ensure we load latest remote data
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbExhibitor } = await supabaseAdmin
+          .from('exhibitors')
+          .select('*')
+          .eq('mobile', session.mobile)
+          .maybeSingle();
+
+        if (sbExhibitor) {
+          exhibitor = {
+            ...exhibitor,
+            mobile: sbExhibitor.mobile,
+            brand_name: sbExhibitor.brand_name || exhibitor?.brand_name || '',
+            stall_sqft: sbExhibitor.stall_sqft || exhibitor?.stall_sqft || '',
+            exhibitor_name: sbExhibitor.exhibitor_name ?? exhibitor?.exhibitor_name,
+            profile_pic_url: sbExhibitor.profile_pic_url ?? exhibitor?.profile_pic_url,
+            company_description: sbExhibitor.company_description ?? exhibitor?.company_description,
+            fascia_names_json: sbExhibitor.fascia_names_json ? JSON.stringify(sbExhibitor.fascia_names_json) : exhibitor?.fascia_names_json,
+            logo_file_url: sbExhibitor.logo_file_url ?? exhibitor?.logo_file_url,
+            cdr_file_url: sbExhibitor.cdr_file_url ?? exhibitor?.cdr_file_url,
+            drive_file_url: sbExhibitor.drive_file_url ?? exhibitor?.drive_file_url,
+            drive_folder_url: sbExhibitor.drive_folder_url ?? exhibitor?.drive_folder_url,
+            updated_at: sbExhibitor.updated_at || exhibitor?.updated_at || new Date().toISOString()
+          };
+        }
+      } catch (err) {
+        console.warn('[Profile GET] Supabase fetch fallback to local:', err);
+      }
+    }
 
     const reg = findExhibitorByMobile(session.mobile);
     const brand_name = (exhibitor?.brand_name && exhibitor.brand_name.trim() !== '')
@@ -27,7 +59,9 @@ export async function GET() {
     let fascia_names = ['', ''];
     if (exhibitor?.fascia_names_json) {
       try {
-        const parsed = JSON.parse(exhibitor.fascia_names_json);
+        const parsed = typeof exhibitor.fascia_names_json === 'string'
+          ? JSON.parse(exhibitor.fascia_names_json)
+          : exhibitor.fascia_names_json;
         if (Array.isArray(parsed)) {
           const names = parsed.map(n => String(n || ''));
           if (names[3]?.trim()) {
@@ -47,6 +81,9 @@ export async function GET() {
       mobile: session.mobile,
       brand_name,
       stall_sqft,
+      exhibitor_name: exhibitor?.exhibitor_name || '',
+      profile_pic_url: exhibitor?.profile_pic_url || null,
+      company_description: exhibitor?.company_description || '',
       fascia_names,
       logo_file_url: exhibitor?.logo_file_url || null,
       cdr_file_url: exhibitor?.cdr_file_url || null,
@@ -69,7 +106,11 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { brand_name, stall_sqft, fascia_names } = body;
+    const { brand_name, stall_sqft, fascia_names, exhibitor_name, company_description } = body;
+
+    if (!exhibitor_name || typeof exhibitor_name !== 'string' || !exhibitor_name.trim()) {
+      return NextResponse.json({ error: 'Exhibitor Name is compulsory.' }, { status: 400 });
+    }
 
     if (!brand_name || typeof brand_name !== 'string' || !brand_name.trim()) {
       return NextResponse.json({ error: 'Brand Name is required.' }, { status: 400 });
@@ -79,6 +120,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Stall size (square feet) is required.' }, { status: 400 });
     }
 
+    const cleanExhibitorName = exhibitor_name.trim();
+    const cleanCompanyDesc = typeof company_description === 'string' ? company_description.trim().slice(0, 400) : '';
     const cleanBrand = brand_name.trim();
     const cleanSqft = stall_sqft.trim();
     
@@ -95,17 +138,46 @@ export async function POST(request: Request) {
     const fasciaNamesJson = JSON.stringify(cleanFasciaNames);
 
     const existing = db
-      .prepare('SELECT id FROM exhibitors WHERE mobile = ?')
-      .get(session.mobile);
+      .prepare('SELECT id, profile_pic_url, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url FROM exhibitors WHERE mobile = ?')
+      .get(session.mobile) as any;
 
     if (existing) {
       db.prepare(
-        'UPDATE exhibitors SET brand_name = ?, stall_sqft = ?, fascia_names_json = ?, updated_at = CURRENT_TIMESTAMP WHERE mobile = ?'
-      ).run(cleanBrand, cleanSqft, fasciaNamesJson, session.mobile);
+        'UPDATE exhibitors SET brand_name = ?, stall_sqft = ?, fascia_names_json = ?, exhibitor_name = ?, company_description = ?, updated_at = CURRENT_TIMESTAMP WHERE mobile = ?'
+      ).run(cleanBrand, cleanSqft, fasciaNamesJson, cleanExhibitorName, cleanCompanyDesc, session.mobile);
     } else {
       db.prepare(
-        'INSERT INTO exhibitors (mobile, brand_name, stall_sqft, fascia_names_json) VALUES (?, ?, ?, ?)'
-      ).run(session.mobile, cleanBrand, cleanSqft, fasciaNamesJson);
+        'INSERT INTO exhibitors (mobile, brand_name, stall_sqft, fascia_names_json, exhibitor_name, company_description) VALUES (?, ?, ?, ?, ?, ?)'
+      ).run(session.mobile, cleanBrand, cleanSqft, fasciaNamesJson, cleanExhibitorName, cleanCompanyDesc);
+    }
+
+    // Direct cloud sync to Supabase Database
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { error: sbErr } = await supabaseAdmin
+          .from('exhibitors')
+          .upsert({
+            mobile: session.mobile,
+            brand_name: cleanBrand,
+            stall_sqft: cleanSqft,
+            exhibitor_name: cleanExhibitorName,
+            company_description: cleanCompanyDesc,
+            fascia_names_json: cleanFasciaNames,
+            profile_pic_url: existing?.profile_pic_url || null,
+            logo_file_url: existing?.logo_file_url || null,
+            cdr_file_url: existing?.cdr_file_url || null,
+            drive_file_url: existing?.drive_file_url || null,
+            drive_folder_id: existing?.drive_folder_id || null,
+            drive_folder_url: existing?.drive_folder_url || null,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'mobile' });
+
+        if (sbErr) {
+          console.error('[SupabaseDB] Profile upsert error:', sbErr.message);
+        }
+      } catch (err) {
+        console.error('[SupabaseDB] Profile sync exception:', err);
+      }
     }
 
     // Fetch existing order items for complete Google Sheet row sync
@@ -127,6 +199,9 @@ export async function POST(request: Request) {
     try {
       await syncToGoogleSheets({
         mobile: session.mobile,
+        exhibitor_name: cleanExhibitorName,
+        profile_pic_url: existing?.profile_pic_url || '',
+        company_description: cleanCompanyDesc,
         brand_name: cleanBrand,
         stall_sqft: cleanSqft,
         fascia_names: cleanFasciaNames,
@@ -146,6 +221,8 @@ export async function POST(request: Request) {
       success: true,
       mobile: session.mobile,
       brand_name: cleanBrand,
+      exhibitor_name: cleanExhibitorName,
+      company_description: cleanCompanyDesc,
       stall_sqft: cleanSqft,
       message: 'Exhibitor profile updated successfully.'
     });

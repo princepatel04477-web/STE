@@ -40,7 +40,12 @@ import {
   Upload,
   ExternalLink,
   FileCode,
-  Image as ImageIcon
+  Image as ImageIcon,
+  User,
+  Camera,
+  Trash2,
+  Edit3,
+  Loader2
 } from 'lucide-react';
 
 interface Product {
@@ -70,6 +75,9 @@ export default function ExhibitorDashboardPage() {
 
   // Profile State
   const [mobile, setMobile] = useState('');
+  const [exhibitorName, setExhibitorName] = useState('');
+  const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
+  const [companyDescription, setCompanyDescription] = useState('');
   const [brandName, setBrandName] = useState('');
   const [category, setCategory] = useState('');
   const [market, setMarket] = useState('');
@@ -79,6 +87,19 @@ export default function ExhibitorDashboardPage() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileSuccessMsg, setProfileSuccessMsg] = useState('');
   const [profileError, setProfileError] = useState('');
+
+  // Compulsory Name Modal State
+  const [showCompulsoryNameModal, setShowCompulsoryNameModal] = useState(false);
+  const [modalExhibitorName, setModalExhibitorName] = useState('');
+  const [modalCompanyDesc, setModalCompanyDesc] = useState('');
+  const [modalSaving, setModalSaving] = useState(false);
+  const [modalError, setModalError] = useState('');
+
+  // Profile Picture Upload State
+  const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
+  const [profilePicSuccess, setProfilePicSuccess] = useState('');
+  const [profilePicError, setProfilePicError] = useState('');
+  const profilePicInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleAddFasciaName = () => {
     if (fasciaNames.length < 4) {
@@ -194,8 +215,18 @@ export default function ExhibitorDashboardPage() {
 
       setMobile(profData.mobile || '');
       setBrandName(profData.brand_name || '');
+      setExhibitorName(profData.exhibitor_name || '');
+      setProfilePicUrl(profData.profile_pic_url || null);
+      setCompanyDescription(profData.company_description || '');
       setCategory(profData.category || '');
       setMarket(profData.market || '');
+
+      // Check if exhibitor name is missing (compulsory after login)
+      if (!profData.exhibitor_name || !profData.exhibitor_name.trim()) {
+        setModalExhibitorName('');
+        setModalCompanyDesc(profData.company_description || '');
+        setShowCompulsoryNameModal(true);
+      }
 
       const existingSqft = profData.stall_sqft || '200 sq ft';
       if (SQFT_PRESETS.includes(existingSqft)) {
@@ -289,6 +320,94 @@ export default function ExhibitorDashboardPage() {
     }
   };
 
+  const handleProfilePicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setProfilePicError('');
+    setProfilePicSuccess('');
+    setUploadingProfilePic(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('category', 'profile_pic');
+
+      const res = await fetch('/api/exhibitor/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to upload profile picture.');
+      }
+
+      if (data.profilePicUrl || data.fileUrl) {
+        setProfilePicUrl(data.profilePicUrl || data.fileUrl);
+      }
+      setProfilePicSuccess('Profile picture updated successfully!');
+      setTimeout(() => setProfilePicSuccess(''), 4000);
+    } catch (err: any) {
+      setProfilePicError(err.message || 'Failed to upload profile picture.');
+    } finally {
+      setUploadingProfilePic(false);
+      if (profilePicInputRef.current) profilePicInputRef.current.value = '';
+    }
+  };
+
+  const handleSaveCompulsoryNameModal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modalExhibitorName || !modalExhibitorName.trim()) {
+      setModalError('Exhibitor Name is compulsory. Please enter your name.');
+      return;
+    }
+    if (modalCompanyDesc && modalCompanyDesc.length > 400) {
+      setModalError('Company description cannot exceed 400 characters.');
+      return;
+    }
+
+    setModalSaving(true);
+    setModalError('');
+
+    const finalSqft =
+      selectedSqftOption === 'Other'
+        ? customSqft.trim()
+          ? `Other: ${customSqft.trim()}`
+          : 'Other'
+        : selectedSqftOption;
+
+    try {
+      const res = await fetch('/api/exhibitor/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          exhibitor_name: modalExhibitorName.trim(),
+          company_description: modalCompanyDesc.trim(),
+          brand_name: brandName,
+          stall_sqft: finalSqft,
+          fascia_names: fasciaNames
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setModalError(data.error || 'Failed to save exhibitor name.');
+      } else {
+        setExhibitorName(modalExhibitorName.trim());
+        setCompanyDescription(modalCompanyDesc.trim());
+        setShowCompulsoryNameModal(false);
+        setProfileSuccessMsg('Exhibitor Profile registered successfully!');
+        setTimeout(() => setProfileSuccessMsg(''), 4000);
+      }
+    } catch (err) {
+      console.error(err);
+      setModalError('Connection error. Please try again.');
+    } finally {
+      setModalSaving(false);
+    }
+  };
+
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>,
     directFile?: File
@@ -332,6 +451,7 @@ export default function ExhibitorDashboardPage() {
 
       if (data.logoUrl) setLogoFileUrl(data.logoUrl);
       if (data.cdrUrl) setCdrFileUrl(data.cdrUrl);
+      if (data.profilePicUrl) setProfilePicUrl(data.profilePicUrl);
       if (data.driveFileUrl) setDriveFileUrl(data.driveFileUrl);
       if (data.driveFolderUrl) setDriveFolderUrl(data.driveFolderUrl);
 
@@ -348,6 +468,15 @@ export default function ExhibitorDashboardPage() {
 
   const handleSaveProfile = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (!exhibitorName || !exhibitorName.trim()) {
+      setProfileError('Exhibitor Name is compulsory. Please enter your name above.');
+      return;
+    }
+    if (companyDescription && companyDescription.length > 400) {
+      setProfileError('Company description cannot exceed 400 characters.');
+      return;
+    }
+
     setProfileSaving(true);
     setProfileSuccessMsg('');
     setProfileError('');
@@ -364,6 +493,8 @@ export default function ExhibitorDashboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          exhibitor_name: exhibitorName.trim(),
+          company_description: companyDescription.trim(),
           brand_name: brandName,
           stall_sqft: finalSqft,
           fascia_names: fasciaNames
@@ -374,7 +505,7 @@ export default function ExhibitorDashboardPage() {
       if (!res.ok) {
         setProfileError(data.error || 'Failed to save profile.');
       } else {
-        setProfileSuccessMsg('Stall and Fascia details saved successfully!');
+        setProfileSuccessMsg('Exhibitor profile, stall, and fascia details saved successfully!');
         setTimeout(() => setProfileSuccessMsg(''), 4000);
       }
     } catch (err) {
@@ -603,7 +734,132 @@ export default function ExhibitorDashboardPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-900">1. Verified Exhibitor Profile & Stall Allocation</h2>
-              <p className="text-xs text-slate-500">Official stall size and brand allocation registered with STE 2026 Organizers</p>
+              <p className="text-xs text-slate-500">Official stall size, exhibitor identity, and company profile for STE 2026</p>
+            </div>
+          </div>
+
+          {/* Top Profile Card: Avatar, Compulsory Exhibitor Name & Company Summary */}
+          <div className="bg-gradient-to-br from-amber-50/70 via-slate-50 to-white border border-amber-200/80 rounded-2xl p-5 sm:p-6 mb-6 shadow-xs">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+              {/* Profile Photo Avatar */}
+              <div className="relative group shrink-0 self-center sm:self-auto">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-amber-400 bg-slate-100 shadow-md flex items-center justify-center relative">
+                  {profilePicUrl ? (
+                    <img
+                      src={profilePicUrl}
+                      alt={exhibitorName || 'Exhibitor Profile'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-tr from-amber-100 to-amber-50 text-amber-700">
+                      <User className="w-10 h-10 mb-1 opacity-70" />
+                      <span className="text-[10px] font-black uppercase tracking-tight">Add Photo</span>
+                    </div>
+                  )}
+                  {uploadingProfilePic && (
+                    <div className="absolute inset-0 bg-slate-950/70 flex flex-col items-center justify-center text-white">
+                      <Loader2 className="w-6 h-6 animate-spin text-amber-400" />
+                      <span className="text-[10px] font-bold mt-1">Uploading...</span>
+                    </div>
+                  )}
+                </div>
+
+                <input
+                  type="file"
+                  ref={profilePicInputRef}
+                  onChange={handleProfilePicUpload}
+                  accept="image/png, image/jpeg, image/jpg, image/webp"
+                  className="hidden"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => profilePicInputRef.current?.click()}
+                  disabled={uploadingProfilePic}
+                  className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md border-2 border-white transition-all hover:scale-110 active:scale-95 cursor-pointer"
+                  title="Upload / Change Profile Picture"
+                >
+                  <Camera className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Exhibitor Name & Info */}
+              <div className="flex-1 w-full space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 bg-amber-200/80 px-2.5 py-0.5 rounded-full border border-amber-300 inline-block">
+                      Exhibitor Representative
+                    </span>
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900 mt-1">
+                      {exhibitorName || (
+                        <span className="text-red-600 font-bold text-sm">Please enter your name below (Compulsory)</span>
+                      )}
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => profilePicInputRef.current?.click()}
+                      className="px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                    >
+                      <Camera className="w-3.5 h-3.5 text-amber-600" />
+                      <span>{profilePicUrl ? 'Change Profile Picture' : 'Upload Profile Picture'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {profilePicSuccess && (
+                  <p className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>{profilePicSuccess}</span>
+                  </p>
+                )}
+                {profilePicError && (
+                  <p className="text-xs font-bold text-red-600 flex items-center gap-1.5">
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    <span>{profilePicError}</span>
+                  </p>
+                )}
+
+                {/* Live Name Input */}
+                <div>
+                  <label className="block text-xs font-extrabold text-slate-900 mb-1">
+                    Exhibitor / Representative Name <span className="text-red-600 font-black">* (Compulsory)</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter your full name (e.g. Rajesh Kumar Mehta)..."
+                    value={exhibitorName}
+                    onChange={(e) => setExhibitorName(e.target.value)}
+                    className="w-full max-w-lg px-3.5 py-2 bg-white border border-slate-300 focus:border-amber-500 rounded-xl text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 shadow-2xs"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Company Description Paragraph Input (Max 400 Chars) */}
+            <div className="mt-5 pt-4 border-t border-amber-200/60">
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-amber-700" />
+                  <span>About Your Company / Products (Paragraph)</span>
+                </label>
+                <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded ${companyDescription.length > 380 ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-slate-100 text-slate-700'}`}>
+                  {companyDescription.length} / 400 characters
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                maxLength={400}
+                placeholder="Briefly describe your company, products, and specialties (fabrics, sarees, kurtis, zari, lehengas, etc.). Maximum 400 characters."
+                value={companyDescription}
+                onChange={(e) => setCompanyDescription(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-300 focus:border-amber-500 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 shadow-2xs resize-none"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">
+                This description will appear in the STE 2026 Exhibitor Directory and Admin exports.
+              </p>
             </div>
           </div>
 
@@ -1565,6 +1821,99 @@ export default function ExhibitorDashboardPage() {
             days: itemDays[p.id] || 2,
           }))}
       />
+
+      {/* Compulsory Exhibitor Profile Registration Modal (Blocks portal until name is entered) */}
+      {showCompulsoryNameModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-white border border-amber-300 rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 relative overflow-hidden">
+            {/* Modal Header Decoration */}
+            <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-400" />
+            
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-700 shrink-0 mt-0.5">
+                <User className="w-6 h-6" />
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 inline-block mb-1.5">
+                  Compulsory Registration Step
+                </span>
+                <h3 className="text-xl font-black text-slate-900 leading-tight">
+                  Welcome to STE 2026!
+                </h3>
+                <p className="text-xs text-slate-600 mt-1">
+                  Please enter your <strong>Full Exhibitor Name</strong> (compulsory) and an optional company bio to complete your login.
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveCompulsoryNameModal} className="space-y-4">
+              <div>
+                <label className="block text-xs font-black text-slate-900 mb-1.5">
+                  Exhibitor / Representative Full Name <span className="text-red-600 font-black">* Compulsory</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Rajesh Kumar Mehta"
+                  value={modalExhibitorName}
+                  onChange={(e) => setModalExhibitorName(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                  autoFocus
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  This name will appear on official passes, directory badges, and organizer documents.
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold text-slate-900">
+                    About Your Company & Products (Paragraph)
+                  </label>
+                  <span className={`text-[10px] font-mono font-bold ${modalCompanyDesc.length > 380 ? 'text-red-600' : 'text-slate-500'}`}>
+                    {modalCompanyDesc.length} / 400 chars
+                  </span>
+                </div>
+                <textarea
+                  rows={3}
+                  maxLength={400}
+                  placeholder="Briefly describe your company specialties, fabrics, sarees, kurtis, or offerings (max 400 characters)..."
+                  value={modalCompanyDesc}
+                  onChange={(e) => setModalCompanyDesc(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 resize-none"
+                />
+              </div>
+
+              {modalError && (
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-700 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                  <span>{modalError}</span>
+                </div>
+              )}
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={modalSaving || !modalExhibitorName.trim()}
+                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm uppercase tracking-wider transition-all shadow-lg hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {modalSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving Profile...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Save & Enter Portal</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

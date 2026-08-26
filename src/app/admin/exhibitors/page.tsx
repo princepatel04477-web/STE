@@ -28,7 +28,12 @@ interface ItemTotal {
 interface ExhibitorRecord {
   mobile: string;
   brand_name: string;
+  exhibitor_name?: string;
+  profile_pic_url?: string | null;
+  company_description?: string;
   stall_sqft: string;
+  category?: string;
+  market?: string;
   fascia_names?: string[];
   items: ExhibitorItem[];
   special_notes: string;
@@ -95,12 +100,16 @@ export default function AdminExhibitorsPage() {
 
   const filteredExhibitors = exhibitors.filter((ex) => {
     const q = searchQuery.toLowerCase();
+    const exName = (ex.exhibitor_name || '').toLowerCase();
+    const desc = (ex.company_description || '').toLowerCase();
     const ownerNames = (ex.badge_names?.owner || []).join(' ').toLowerCase();
     const salesNames = (ex.badge_names?.sales || []).join(' ').toLowerCase();
     const supportNames = (ex.badge_names?.support || []).join(' ').toLowerCase();
     const fasciaStr = (ex.fascia_names || []).join(' ').toLowerCase();
     return (
       ex.brand_name.toLowerCase().includes(q) ||
+      exName.includes(q) ||
+      desc.includes(q) ||
       ex.mobile.includes(q) ||
       ex.stall_sqft.toLowerCase().includes(q) ||
       fasciaStr.includes(q) ||
@@ -113,8 +122,11 @@ export default function AdminExhibitorsPage() {
   const exportCSV = () => {
     const headers = [
       'Mobile Number',
+      'Exhibitor Representative Name',
       'Brand Name',
-      'Stall Size (Sq Ft)',
+      'Allocated Stall Size (Sq Ft)',
+      'Exhibitor Profile Picture URL',
+      'Company Description / Bio (Max 400 Chars)',
       'Fascia Main Header (Option 1)',
       'Fascia Main Header (Option 2)',
       'Fascia Main Header (Option 3)',
@@ -127,6 +139,7 @@ export default function AdminExhibitorsPage() {
       'Support Badge Names',
       'Rental Duration (Days)',
       'Extras Requested',
+      'Logo File URL',
       'Artwork / CDR URL',
       'Google Drive Folder URL',
       'Special Notes',
@@ -141,13 +154,20 @@ export default function AdminExhibitorsPage() {
       const f2 = ex.fascia_names?.[1] || '';
       const f3 = ex.fascia_names?.[2] || '';
       const f4 = ex.fascia_names?.[3] || '';
-      const artworkUrl = ex.cdr_file_url || ex.logo_file_url || '';
+      const profilePic = ex.profile_pic_url || '';
+      const exhibitorName = ex.exhibitor_name || '';
+      const companyBio = ex.company_description || '';
+      const logoUrl = ex.logo_file_url || '';
+      const cdrUrl = ex.cdr_file_url || '';
       const driveFolderUrl = ex.drive_folder_url || ex.drive_file_url || '';
 
       return [
         `"${ex.mobile}"`,
+        `"${exhibitorName.replace(/"/g, '""')}"`,
         `"${ex.brand_name.replace(/"/g, '""')}"`,
         `"${ex.stall_sqft.replace(/"/g, '""')}"`,
+        `"${profilePic.replace(/"/g, '""')}"`,
+        `"${companyBio.replace(/"/g, '""')}"`,
         `"${f1.replace(/"/g, '""')}"`,
         `"${f2.replace(/"/g, '""')}"`,
         `"${f3.replace(/"/g, '""')}"`,
@@ -160,21 +180,25 @@ export default function AdminExhibitorsPage() {
         `"${supportNamesStr.replace(/"/g, '""')}"`,
         `"${ex.rental_days || 2}"`,
         `"${extrasStr.replace(/"/g, '""')}"`,
-        `"${artworkUrl.replace(/"/g, '""')}"`,
+        `"${logoUrl.replace(/"/g, '""')}"`,
+        `"${cdrUrl.replace(/"/g, '""')}"`,
         `"${driveFolderUrl.replace(/"/g, '""')}"`,
         `"${(ex.special_notes || '').replace(/"/g, '""')}"`,
         `"${ex.last_updated || ''}"`
       ];
     });
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    // Add UTF-8 Byte Order Mark (\uFEFF) for Excel native decoding
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blobUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `STE_Admin_Master_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('href', blobUrl);
+    link.setAttribute('download', `STE_2026_Admin_Master_Report_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
   };
 
   return (
@@ -397,8 +421,9 @@ export default function AdminExhibitorsPage() {
                 <table className="w-full text-left text-xs text-slate-800">
                   <thead className="bg-slate-100 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-700">
                     <tr>
+                      <th className="py-3.5 px-4">Exhibitor & Photo</th>
                       <th className="py-3.5 px-4">Mobile (ID)</th>
-                      <th className="py-3.5 px-4">Brand Name</th>
+                      <th className="py-3.5 px-4">Brand / Company</th>
                       <th className="py-3.5 px-4">Stall Size</th>
                       <th className="py-3.5 px-4">Entry Badges</th>
                       <th className="py-3.5 px-4">Requested Extras</th>
@@ -411,13 +436,61 @@ export default function AdminExhibitorsPage() {
                   <tbody className="divide-y divide-slate-100">
                     {filteredExhibitors.map((ex, idx) => (
                       <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                        <td className="py-4 px-4 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <div className="relative shrink-0">
+                              {ex.profile_pic_url ? (
+                                <a
+                                  href={ex.profile_pic_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="block w-10 h-10 rounded-xl overflow-hidden border border-amber-300 shadow-2xs hover:scale-105 transition-transform"
+                                  title="View full profile photo"
+                                >
+                                  <img
+                                    src={ex.profile_pic_url}
+                                    alt={ex.exhibitor_name || ex.brand_name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </a>
+                              ) : (
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-100 to-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 font-bold">
+                                  {ex.exhibitor_name ? ex.exhibitor_name.slice(0, 2).toUpperCase() : 'EX'}
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <span className="font-extrabold text-slate-900 block text-xs">
+                                {ex.exhibitor_name || (
+                                  <span className="text-amber-800 italic font-semibold">Not registered yet</span>
+                                )}
+                              </span>
+                              {ex.profile_pic_url && (
+                                <a
+                                  href={ex.profile_pic_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[10px] text-amber-700 hover:underline font-semibold flex items-center gap-0.5"
+                                >
+                                  <span>Photo Link</span>
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </td>
                         <td className="py-4 px-4 font-mono font-bold text-amber-700 whitespace-nowrap">
                           {ex.mobile}
                         </td>
-                        <td className="py-4 px-4 whitespace-nowrap">
+                        <td className="py-4 px-4 max-w-[280px]">
                           <div className="font-bold text-slate-900">{ex.brand_name}</div>
+                          {ex.company_description && (
+                            <p className="text-[11px] text-slate-600 line-clamp-2 mt-0.5" title={ex.company_description}>
+                              {ex.company_description}
+                            </p>
+                          )}
                           {ex.fascia_names && ex.fascia_names.some((n) => n && n.trim()) && (
-                            <div className="mt-1 flex flex-col gap-0.5 max-w-[220px]">
+                            <div className="mt-1.5 flex flex-col gap-0.5 max-w-[240px]">
                               {ex.fascia_names.map((n, i) => n && n.trim() ? (
                                 <span key={i} className="text-[10px] text-amber-900 bg-amber-50/80 px-1.5 py-0.5 rounded border border-amber-200/60 truncate" title={`Main Header Option ${i + 1}: ${n}`}>
                                   🏷️ Main Header {i + 1}: <strong className="font-semibold">{n}</strong>

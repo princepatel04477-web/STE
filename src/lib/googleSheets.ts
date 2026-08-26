@@ -1,5 +1,8 @@
 export interface SyncPayload {
   mobile: string;
+  exhibitor_name?: string;
+  profile_pic_url?: string;
+  company_description?: string;
   brand_name?: string;
   stall_sqft?: string;
   fascia_names?: string[];
@@ -67,6 +70,9 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
     const bodyData = {
       timestamp,
       mobile: payload.mobile,
+      exhibitor_name: payload.exhibitor_name || '',
+      profile_pic_url: payload.profile_pic_url || '',
+      company_description: payload.company_description || '',
       brand_name: payload.brand_name || '',
       stall_sqft: payload.stall_sqft || '',
       // Facia / Banner Firm Name Options

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
+import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { syncToGoogleSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 
@@ -118,10 +119,35 @@ export async function POST(request: Request) {
       ).run(session.mobile, itemsJson, cleanNotes, oBadges, sBadges, supBadges, badgeNamesJson, rDays);
     }
 
+    // Direct cloud sync to Supabase Database
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { error: sbErr } = await supabaseAdmin
+          .from('exhibitor_orders')
+          .upsert({
+            mobile: session.mobile,
+            items_json: items,
+            special_notes: cleanNotes,
+            owner_badges: oBadges,
+            sales_badges: sBadges,
+            support_badges: supBadges,
+            badge_names_json: badge_names || {},
+            rental_days: rDays,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'mobile' });
+
+        if (sbErr) {
+          console.error('[SupabaseDB] Order upsert error:', sbErr.message);
+        }
+      } catch (err) {
+        console.error('[SupabaseDB] Order sync exception:', err);
+      }
+    }
+
     // Fetch exhibitor profile or fallback to master registered list
     const profile = db
-      .prepare('SELECT brand_name, stall_sqft FROM exhibitors WHERE mobile = ?')
-      .get(session.mobile) as { brand_name: string; stall_sqft: string } | undefined;
+      .prepare('SELECT brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description FROM exhibitors WHERE mobile = ?')
+      .get(session.mobile) as { brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string } | undefined;
 
     const reg = findExhibitorByMobile(session.mobile);
     const finalBrand = (profile?.brand_name && profile.brand_name.trim())

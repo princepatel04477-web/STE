@@ -21,7 +21,7 @@ import {
 
 export const STORAGE_BUCKET = 'exhibitor-assets';
 
-export const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.cdr'];
+export const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.cdr'];
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB, matches the bucket limit
 
 export interface StoreAssetParams {
@@ -55,6 +55,8 @@ export function canonicalMimeType(fileName: string, browserMimeType?: string): s
     case '.jpg':
     case '.jpeg':
       return 'image/jpeg';
+    case '.webp':
+      return 'image/webp';
     case '.cdr':
       return 'application/octet-stream';
     default:
@@ -63,7 +65,8 @@ export function canonicalMimeType(fileName: string, browserMimeType?: string): s
 }
 
 export function resolveCategory(fileName: string, requested?: string): AssetCategory {
-  if (requested === 'logo' || requested === 'cdr') return requested;
+  if (requested === 'logo' || requested === 'cdr' || requested === 'profile_pic') return requested;
+  if (requested === 'avatar') return 'profile_pic';
   return fileExtension(fileName) === '.cdr' ? 'cdr' : 'logo';
 }
 

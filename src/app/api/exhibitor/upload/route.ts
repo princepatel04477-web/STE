@@ -55,12 +55,14 @@ export async function POST(request: Request) {
     // Resolve the brand name that names the exhibitor's folder.
     const existingExhibitor = db
       .prepare(
-        'SELECT brand_name, stall_sqft, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url FROM exhibitors WHERE mobile = ?'
+        'SELECT brand_name, exhibitor_name, company_description, stall_sqft, fascia_names_json, logo_file_url, cdr_file_url, profile_pic_url, drive_file_url, drive_folder_id, drive_folder_url FROM exhibitors WHERE mobile = ?'
       )
       .get(session.mobile) as any;
 
     const reg = findExhibitorByMobile(session.mobile);
     const brandName = existingExhibitor?.brand_name?.trim() || reg?.brandName || 'Exhibitor';
+
+    const category = resolveCategory(file.name, requestedCategory);
 
     // Store in Supabase Storage and mirror into STE Logos/<Brand Name>/.
     const result = await storeExhibitorAsset({
@@ -69,7 +71,7 @@ export async function POST(request: Request) {
       originalFileName: file.name,
       fileBuffer,
       browserMimeType: file.type,
-      category: resolveCategory(file.name, requestedCategory)
+      category
     });
 
     if (!result.storageUrl) {
@@ -84,9 +86,11 @@ export async function POST(request: Request) {
       );
     }
 
+    const isProfilePic = result.category === 'profile_pic';
     const isCdr = result.category === 'cdr';
     const cdrUrl = isCdr ? result.storageUrl : existingExhibitor?.cdr_file_url || null;
-    const logoUrl = isCdr ? existingExhibitor?.logo_file_url || null : result.storageUrl;
+    const logoUrl = (!isCdr && !isProfilePic) ? result.storageUrl : existingExhibitor?.logo_file_url || null;
+    const profilePicUrl = isProfilePic ? result.storageUrl : existingExhibitor?.profile_pic_url || null;
 
     const driveFileUrl = result.drive.webViewLink || existingExhibitor?.drive_file_url || null;
     const driveFolderId = result.drive.folderId || existingExhibitor?.drive_folder_id || null;
@@ -95,6 +99,7 @@ export async function POST(request: Request) {
     updateExhibitorFiles(session.mobile, {
       logo_file_url: logoUrl || undefined,
       cdr_file_url: cdrUrl || undefined,
+      profile_pic_url: profilePicUrl || undefined,
       drive_file_url: driveFileUrl || undefined,
       drive_folder_id: driveFolderId || undefined,
       drive_folder_url: driveFolderUrl || undefined
@@ -107,6 +112,7 @@ export async function POST(request: Request) {
           .update({
             logo_file_url: logoUrl,
             cdr_file_url: cdrUrl,
+            profile_pic_url: profilePicUrl,
             drive_file_url: driveFileUrl,
             drive_folder_id: driveFolderId,
             drive_folder_url: driveFolderUrl,
@@ -128,6 +134,9 @@ export async function POST(request: Request) {
 
       await syncToGoogleSheets({
         mobile: session.mobile,
+        exhibitor_name: existingExhibitor?.exhibitor_name || '',
+        profile_pic_url: profilePicUrl || '',
+        company_description: existingExhibitor?.company_description || '',
         brand_name: brandName,
         stall_sqft: existingExhibitor?.stall_sqft || reg?.stallSqft || '200 sq ft',
         fascia_names: fasciaNames,
@@ -151,6 +160,7 @@ export async function POST(request: Request) {
       fileUrl: result.storageUrl,
       logoUrl,
       cdrUrl,
+      profilePicUrl,
       driveFileUrl,
       driveFolderUrl,
       isDriveSynced: result.drive.success,

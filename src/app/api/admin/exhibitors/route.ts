@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { REGISTERED_EXHIBITORS_LIST } from '@/data/registeredExhibitors';
 
 export async function GET() {
@@ -41,7 +42,38 @@ export async function GET() {
       dbExhibitorsMap[e.mobile] = e;
     });
 
-    // 2. Combine registered exhibitors list with db exhibitors & orders
+    // 2. If Supabase is active, query remote source of truth and merge
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbExhibitors } = await supabaseAdmin.from('exhibitors').select('*');
+        if (sbExhibitors && Array.isArray(sbExhibitors)) {
+          sbExhibitors.forEach((sbe) => {
+            dbExhibitorsMap[sbe.mobile] = {
+              ...dbExhibitorsMap[sbe.mobile],
+              ...sbe,
+              fascia_names_json: sbe.fascia_names_json ? JSON.stringify(sbe.fascia_names_json) : dbExhibitorsMap[sbe.mobile]?.fascia_names_json
+            };
+          });
+        }
+
+        const { data: sbOrders } = await supabaseAdmin.from('exhibitor_orders').select('*');
+        if (sbOrders && Array.isArray(sbOrders)) {
+          sbOrders.forEach((sbo) => {
+            ordersMap[sbo.mobile] = {
+              ...ordersMap[sbo.mobile],
+              ...sbo,
+              items_json: sbo.items_json ? JSON.stringify(sbo.items_json) : ordersMap[sbo.mobile]?.items_json,
+              badge_names_json: sbo.badge_names_json ? JSON.stringify(sbo.badge_names_json) : ordersMap[sbo.mobile]?.badge_names_json,
+              order_updated: sbo.updated_at || ordersMap[sbo.mobile]?.order_updated
+            };
+          });
+        }
+      } catch (sbErr) {
+        console.warn('[Admin API] Note on Supabase merge:', sbErr);
+      }
+    }
+
+    // 3. Combine registered exhibitors list with db exhibitors & orders
     const allMobiles = Array.from(new Set([
       ...REGISTERED_EXHIBITORS_LIST.map(r => r.mobile),
       ...Object.keys(dbExhibitorsMap),
@@ -78,11 +110,14 @@ export async function GET() {
 
       const brandName = reg?.brandName || dbEx?.brand_name || 'Registered Exhibitor';
       const stallSqft = reg?.stallSqft || dbEx?.stall_sqft || '200 sq ft';
+      const exhibitorName = dbEx?.exhibitor_name || '';
+      const profilePicUrl = dbEx?.profile_pic_url || null;
+      const companyDescription = dbEx?.company_description || '';
 
       let items: Array<{ id: string; name: string; quantity: number; unit: string }> = [];
       if (order && order.items_json) {
         try {
-          items = JSON.parse(order.items_json);
+          items = typeof order.items_json === 'string' ? JSON.parse(order.items_json) : order.items_json;
           items.forEach(item => {
             if (itemTotals[item.id]) {
               itemTotals[item.id].quantity += (Number(item.quantity) || 0);
@@ -106,14 +141,14 @@ export async function GET() {
       let badgeNames = { owner: [] as string[], sales: [] as string[], support: [] as string[] };
       if (order && order.badge_names_json) {
         try {
-          badgeNames = JSON.parse(order.badge_names_json);
+          badgeNames = typeof order.badge_names_json === 'string' ? JSON.parse(order.badge_names_json) : order.badge_names_json;
         } catch {}
       }
 
       let fasciaNames = ['', '', '', ''];
       if (dbEx?.fascia_names_json) {
         try {
-          const parsed = JSON.parse(dbEx.fascia_names_json);
+          const parsed = typeof dbEx.fascia_names_json === 'string' ? JSON.parse(dbEx.fascia_names_json) : dbEx.fascia_names_json;
           if (Array.isArray(parsed)) {
             fasciaNames = [parsed[0] || '', parsed[1] || '', parsed[2] || '', parsed[3] || ''];
           }
@@ -129,6 +164,9 @@ export async function GET() {
       formattedList.push({
         mobile: mob,
         brand_name: brandName,
+        exhibitor_name: exhibitorName,
+        profile_pic_url: profilePicUrl,
+        company_description: companyDescription,
         stall_sqft: stallSqft,
         category: reg?.category || '',
         market: reg?.market || '',

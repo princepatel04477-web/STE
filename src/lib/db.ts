@@ -87,6 +87,9 @@ export interface ExhibitorRecord {
   mobile: string;
   brand_name: string;
   stall_sqft: string;
+  exhibitor_name?: string;
+  profile_pic_url?: string;
+  company_description?: string;
   custom_password?: string;
   fascia_names_json?: string;
   logo_file_url?: string;
@@ -256,6 +259,9 @@ export const db = {
               mobile: ex.mobile,
               brand_name: ex.brand_name,
               stall_sqft: ex.stall_sqft,
+              exhibitor_name: ex.exhibitor_name ?? '',
+              profile_pic_url: ex.profile_pic_url ?? null,
+              company_description: ex.company_description ?? '',
               fascia_names_json: ex.fascia_names_json ?? null,
               logo_file_url: ex.logo_file_url ?? null,
               cdr_file_url: ex.cdr_file_url ?? null,
@@ -289,6 +295,8 @@ export const db = {
               mobile,
               brand_name: '',
               stall_sqft: '',
+              exhibitor_name: '',
+              company_description: '',
               updated_at: new Date().toISOString()
             });
           }
@@ -296,22 +304,71 @@ export const db = {
           return { changes: 1 };
         }
 
-        if (q.includes('update exhibitors set brand_name = ?, stall_sqft = ?')) {
-          const brand_name = String(args[0]);
-          const stall_sqft = String(args[1]);
-          let fascia_names_json: string | undefined = undefined;
-          let mobile = '';
-          if (args.length >= 4) {
-            fascia_names_json = String(args[2]);
-            mobile = String(args[3]);
-          } else {
-            mobile = String(args[2]);
+        if (q.includes('update exhibitors set')) {
+          if (q.includes('custom_password = ?')) {
+            const custom_password = String(args[0]);
+            const mobile = String(args[1]);
+            const ex = data.exhibitors.find(e => e.mobile === mobile);
+            if (ex) {
+              ex.custom_password = custom_password;
+              ex.updated_at = new Date().toISOString();
+            } else {
+              data.exhibitors.push({
+                id: data.exhibitors.length + 1,
+                mobile,
+                brand_name: '',
+                stall_sqft: '',
+                custom_password,
+                updated_at: new Date().toISOString()
+              });
+            }
+            saveData(data);
+            return { changes: 1 };
           }
+
+          if (q.includes('profile_pic_url')) {
+            const profile_pic_url = String(args[0] || '');
+            const mobile = String(args[1]);
+            const ex = data.exhibitors.find(e => e.mobile === mobile);
+            if (ex) {
+              ex.profile_pic_url = profile_pic_url;
+              ex.updated_at = new Date().toISOString();
+            }
+            saveData(data);
+            return { changes: 1 };
+          }
+
+          // Full Profile Update
+          // Handles: UPDATE exhibitors SET brand_name = ?, stall_sqft = ?, fascia_names_json = ?, exhibitor_name = ?, company_description = ?, updated_at = ... WHERE mobile = ?
+          const mobile = String(args[args.length - 1]);
+          let brand_name = '';
+          let stall_sqft = '';
+          let fascia_names_json: string | undefined = undefined;
+          let exhibitor_name: string | undefined = undefined;
+          let company_description: string | undefined = undefined;
+
+          if (args.length >= 6) {
+            brand_name = String(args[0] || '');
+            stall_sqft = String(args[1] || '');
+            fascia_names_json = String(args[2] || '');
+            exhibitor_name = String(args[3] || '');
+            company_description = String(args[4] || '');
+          } else if (args.length === 4) {
+            brand_name = String(args[0] || '');
+            stall_sqft = String(args[1] || '');
+            fascia_names_json = String(args[2] || '');
+          } else if (args.length === 3) {
+            brand_name = String(args[0] || '');
+            stall_sqft = String(args[1] || '');
+          }
+
           const ex = data.exhibitors.find(e => e.mobile === mobile);
           if (ex) {
-            ex.brand_name = brand_name;
-            ex.stall_sqft = stall_sqft;
+            if (brand_name) ex.brand_name = brand_name;
+            if (stall_sqft) ex.stall_sqft = stall_sqft;
             if (fascia_names_json !== undefined) ex.fascia_names_json = fascia_names_json;
+            if (exhibitor_name !== undefined) ex.exhibitor_name = exhibitor_name;
+            if (company_description !== undefined) ex.company_description = company_description;
             ex.updated_at = new Date().toISOString();
           } else {
             data.exhibitors.push({
@@ -320,6 +377,8 @@ export const db = {
               brand_name,
               stall_sqft,
               fascia_names_json,
+              exhibitor_name: exhibitor_name || '',
+              company_description: company_description || '',
               updated_at: new Date().toISOString()
             });
           }
@@ -327,38 +386,21 @@ export const db = {
           return { changes: 1 };
         }
 
-        if (q.includes('update exhibitors set custom_password = ?')) {
-          const custom_password = String(args[0]);
-          const mobile = String(args[1]);
-          const ex = data.exhibitors.find(e => e.mobile === mobile);
-          if (ex) {
-            ex.custom_password = custom_password;
-            ex.updated_at = new Date().toISOString();
-          } else {
-            data.exhibitors.push({
-              id: data.exhibitors.length + 1,
-              mobile,
-              brand_name: '',
-              stall_sqft: '',
-              custom_password,
-              updated_at: new Date().toISOString()
-            });
-          }
-          saveData(data);
-          return { changes: 1 };
-        }
-
-        if (q.includes('insert into exhibitors (mobile, brand_name, stall_sqft')) {
+        if (q.includes('insert into exhibitors')) {
           const mobile = String(args[0]);
-          const brand_name = String(args[1]);
-          const stall_sqft = String(args[2]);
+          const brand_name = String(args[1] || '');
+          const stall_sqft = String(args[2] || '');
           const fascia_names_json = args[3] ? String(args[3]) : undefined;
+          const exhibitor_name = args[4] ? String(args[4]) : undefined;
+          const company_description = args[5] ? String(args[5]) : undefined;
           data.exhibitors.push({
             id: data.exhibitors.length + 1,
             mobile,
             brand_name,
             stall_sqft,
             fascia_names_json,
+            exhibitor_name: exhibitor_name || '',
+            company_description: company_description || '',
             updated_at: new Date().toISOString()
           });
           saveData(data);
@@ -551,6 +593,7 @@ export function updateExhibitorFiles(
   files: {
     logo_file_url?: string;
     cdr_file_url?: string;
+    profile_pic_url?: string;
     drive_file_url?: string;
     drive_folder_id?: string;
     drive_folder_url?: string;
@@ -565,6 +608,8 @@ export function updateExhibitorFiles(
         mobile,
         brand_name: '',
         stall_sqft: '',
+        exhibitor_name: '',
+        company_description: '',
         updated_at: new Date().toISOString()
       };
       data.exhibitors.push(ex);
@@ -572,6 +617,7 @@ export function updateExhibitorFiles(
 
     if (files.logo_file_url !== undefined) ex.logo_file_url = files.logo_file_url;
     if (files.cdr_file_url !== undefined) ex.cdr_file_url = files.cdr_file_url;
+    if (files.profile_pic_url !== undefined) ex.profile_pic_url = files.profile_pic_url;
     if (files.drive_file_url !== undefined) ex.drive_file_url = files.drive_file_url;
     if (files.drive_folder_id !== undefined) ex.drive_folder_id = files.drive_folder_id;
     if (files.drive_folder_url !== undefined) ex.drive_folder_url = files.drive_folder_url;
