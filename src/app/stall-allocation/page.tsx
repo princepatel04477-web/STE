@@ -30,6 +30,7 @@ import LuckyBox from '@/components/lottery/LuckyBox';
 import AllotmentSlipModal from '@/components/lottery/AllotmentSlipModal';
 import FloorPlan2026 from '@/components/stallmap/FloorPlan2026';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
+import { isAdminMobile } from '@/lib/adminMobiles';
 import { LotteryAllocationRecord } from '@/lib/db';
 
 const TEST_EXHIBITOR_PRESETS = [
@@ -214,8 +215,7 @@ export default function StallAllocationPage() {
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 text-xs uppercase tracking-wider font-semibold">
             <Link href="/" className="text-slate-400 hover:text-white transition-colors">Home</Link>
-            <Link href="/exhibitor/dashboard" className="text-slate-400 hover:text-white transition-colors">Exhibitor</Link>
-            <Link href="/visit" className="text-slate-400 hover:text-white transition-colors">Visitors</Link>
+            <Link href="/exhibitor/dashboard" className="text-slate-400 hover:text-white transition-colors">Exhibitor&apos;s Panel</Link>
             <Link href="/stall-allocation" className="text-amber-400 font-bold border-b-2 border-amber-400 pb-0.5">
               Stall Allocation
             </Link>
@@ -231,14 +231,7 @@ export default function StallAllocationPage() {
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Logout</span>
               </button>
-            ) : (
-              <Link
-                href="/exhibitor/login"
-                className="px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-extrabold text-xs uppercase tracking-wider shadow-md hover:scale-105 transition-transform"
-              >
-                Portal Login
-              </Link>
-            )}
+            ) : null}
           </div>
 
         </div>
@@ -342,14 +335,6 @@ export default function StallAllocationPage() {
 
               </form>
 
-              <div className="mt-6 pt-4 border-t border-white/10 text-center">
-                <p className="text-[11px] text-slate-400">
-                  Are you an event administrator?{' '}
-                  <Link href="/admin/lottery" className="text-amber-400 hover:underline font-bold">
-                    Go to Admin Control Room
-                  </Link>
-                </p>
-              </div>
 
             </div>
           </div>
@@ -428,6 +413,17 @@ export default function StallAllocationPage() {
                   </div>
                   <span className="text-[10px] opacity-70">SIECC</span>
                 </button>
+
+                {/* Only the two event administrators ever see this. */}
+                {isAdminMobile(mobile) && (
+                  <Link
+                    href="/admin/lottery"
+                    className="w-full px-4 py-3 rounded-xl font-bold text-xs flex items-center gap-2.5 text-amber-400 hover:bg-amber-500/10 transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Admin Control Room</span>
+                  </Link>
+                )}
 
                 <button
                   onClick={handleLogout}

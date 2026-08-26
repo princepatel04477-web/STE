@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { isAdminMobile } from '@/lib/adminMobiles';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'ste-exhibitor-portal-secret-key-2026'
@@ -35,12 +36,7 @@ export async function getAuthenticatedExhibitor(): Promise<ExhibitorSession | nu
   return verifySessionToken(token);
 }
 
-export const ADMIN_MOBILES = ['9106139666', '9950787787'];
-
-export function isAdminMobile(mobile: string): boolean {
-  const clean = mobile.replace(/\D/g, '').slice(-10);
-  return ADMIN_MOBILES.includes(clean);
-}
+export { ADMIN_MOBILES, isAdminMobile } from '@/lib/adminMobiles';
 
 export function validatePassword(password: string, customPassword?: string, mobile?: string): boolean {
   const p = password.trim();
