@@ -125,9 +125,11 @@ export default function AdminExhibitorsPage() {
 
   const exportCSV = () => {
     const headers = [
-      'Mobile Number',
+      'Mobile Number / User ID',
       'Exhibitor Representative Name',
       'Brand Name',
+      'Category',
+      'Market',
       'Allocated Stall Size (Sq Ft)',
       'Exhibitor Profile Picture URL',
       'Company Description / Bio (Max 400 Chars)',
@@ -146,6 +148,7 @@ export default function AdminExhibitorsPage() {
       'Logo File URL',
       'Artwork / CDR URL',
       'Google Drive Folder URL',
+      'Google Drive Direct File Link',
       'Special Notes',
       'Last Updated'
     ];
@@ -164,11 +167,14 @@ export default function AdminExhibitorsPage() {
       const logoUrl = ex.logo_file_url || '';
       const cdrUrl = ex.cdr_file_url || '';
       const driveFolderUrl = ex.drive_folder_url || ex.drive_file_url || '';
+      const driveFileUrl = ex.drive_file_url || '';
 
       return [
         `"${ex.mobile}"`,
         `"${exhibitorName.replace(/"/g, '""')}"`,
         `"${ex.brand_name.replace(/"/g, '""')}"`,
+        `"${(ex.category || '').replace(/"/g, '""')}"`,
+        `"${(ex.market || '').replace(/"/g, '""')}"`,
         `"${ex.stall_sqft.replace(/"/g, '""')}"`,
         `"${profilePic.replace(/"/g, '""')}"`,
         `"${companyBio.replace(/"/g, '""')}"`,
@@ -187,6 +193,7 @@ export default function AdminExhibitorsPage() {
         `"${logoUrl.replace(/"/g, '""')}"`,
         `"${cdrUrl.replace(/"/g, '""')}"`,
         `"${driveFolderUrl.replace(/"/g, '""')}"`,
+        `"${driveFileUrl.replace(/"/g, '""')}"`,
         `"${(ex.special_notes || '').replace(/"/g, '""')}"`,
         `"${ex.last_updated || ''}"`
       ];

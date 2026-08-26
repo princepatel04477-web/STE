@@ -193,14 +193,44 @@ async function runMigration() {
     }
   });
 
-  const { error: exErr } = await supabase
+  // Deduplicate entries by mobile to satisfy Postgres ON CONFLICT requirement
+  const uniqueExhibitorsMap = new Map<string, any>();
+  exhibitorsToInsert.forEach(ex => {
+    uniqueExhibitorsMap.set(ex.mobile, ex);
+  });
+  const finalExhibitorsToInsert = Array.from(uniqueExhibitorsMap.values());
+
+  let { error: exErr } = await supabase
     .from('exhibitors')
-    .upsert(exhibitorsToInsert, { onConflict: 'mobile' });
+    .upsert(finalExhibitorsToInsert, { onConflict: 'mobile' });
 
   if (exErr) {
-    console.error('❌ Failed to migrate exhibitors:', exErr.message);
+    console.warn('⚠️ Note on extended fields migration:', exErr.message);
+    console.log('Retrying with base schema fields...');
+    const baseExhibitors = finalExhibitorsToInsert.map(e => ({
+      mobile: e.mobile,
+      brand_name: e.brand_name,
+      stall_sqft: e.stall_sqft,
+      custom_password: e.custom_password,
+      fascia_names_json: e.fascia_names_json,
+      logo_file_url: e.logo_file_url,
+      cdr_file_url: e.cdr_file_url,
+      drive_file_url: e.drive_file_url,
+      drive_folder_id: e.drive_folder_id,
+      drive_folder_url: e.drive_folder_url,
+      updated_at: e.updated_at
+    }));
+    const { error: retryErr } = await supabase
+      .from('exhibitors')
+      .upsert(baseExhibitors, { onConflict: 'mobile' });
+
+    if (retryErr) {
+      console.error('❌ Failed to migrate base exhibitors:', retryErr.message);
+    } else {
+      console.log(`✓ Successfully migrated ${baseExhibitors.length} exhibitor profiles to Supabase.`);
+    }
   } else {
-    console.log(`✓ Successfully migrated ${exhibitorsToInsert.length} exhibitor profiles.`);
+    console.log(`✓ Successfully migrated ${finalExhibitorsToInsert.length} exhibitor profiles.`);
   }
 
   // 4. Migrate Orders

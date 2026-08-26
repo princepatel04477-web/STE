@@ -72,7 +72,7 @@ interface OrderItem {
   rate_inr?: number;
 }
 
-const SQFT_PRESETS = ['100', '200', '300', '400', '600', '800', '1000'];
+const SQFT_PRESETS = ['100', '200', '300', '400', '600', '800', '1000', '1200', '2000', '2600'];
 
 export default function ExhibitorDashboardPage() {
   const router = useRouter();

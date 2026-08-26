@@ -144,7 +144,7 @@ export default function ExhibitorLoginPage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="mobile" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                Mobile Number (User ID)
+                Mobile Number / User ID
               </label>
               <div className="relative rounded-xl shadow-xs">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -153,9 +153,9 @@ export default function ExhibitorLoginPage() {
                 <input
                   id="mobile"
                   name="mobile"
-                  type="tel"
+                  type="text"
                   required
-                  placeholder="Enter 10-digit mobile number"
+                  placeholder="Enter 10-digit mobile number or User ID (e.g. SSS)"
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
                   className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:bg-white transition-all text-base md:text-sm font-medium"
@@ -262,16 +262,16 @@ export default function ExhibitorLoginPage() {
             <form onSubmit={handleResetSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
-                  Registered Mobile Number
+                  Registered Mobile Number / User ID
                 </label>
                 <div className="relative rounded-xl shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
                     <Phone className="h-4 w-4" />
                   </div>
                   <input
-                    type="tel"
+                    type="text"
                     required
-                    placeholder="Enter registered 10-digit mobile"
+                    placeholder="Enter registered mobile number or User ID (e.g. SSS)"
                     value={resetMobile}
                     onChange={(e) => setResetMobile(e.target.value)}
                     className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-xs font-mono"

@@ -8,19 +8,25 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { mobile, password } = body;
 
-    if (!mobile || !password) {
+    const rawInput = String(mobile).trim();
+    if (!rawInput || !password) {
       return NextResponse.json(
-        { error: 'Mobile number and password are required.' },
+        { error: 'User ID / Mobile number and password are required.' },
         { status: 400 }
       );
     }
 
-    const cleanMobile = String(mobile).replace(/\D/g, '').slice(-10);
-    if (cleanMobile.length < 10) {
-      return NextResponse.json(
-        { error: 'Please enter a valid 10-digit mobile number.' },
-        { status: 400 }
-      );
+    let cleanMobile = rawInput;
+    if (/^[0-9+\-\s()]+$/.test(rawInput)) {
+      cleanMobile = rawInput.replace(/\D/g, '').slice(-10);
+      if (cleanMobile.length < 10) {
+        return NextResponse.json(
+          { error: 'Please enter a valid 10-digit mobile number or User ID.' },
+          { status: 400 }
+        );
+      }
+    } else {
+      cleanMobile = rawInput.toUpperCase();
     }
 
     // Ensure exhibitor profile exists
