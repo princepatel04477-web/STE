@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getStallPackageBySqft, STALL_PACKAGES, StallPackage } from '@/data/stallPackages';
 import { getProductImage, DISCLAIMER_TEXT } from '@/data/productImages';
@@ -593,9 +594,16 @@ export default function ExhibitorDashboardPage() {
       {/* Top Navbar */}
       <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-xs px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-xs text-slate-950 font-black text-xs shrink-0">
-              STE
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 relative rounded-xl bg-slate-900 p-1 border border-slate-200 shadow-xs flex items-center justify-center shrink-0 group-hover:border-amber-400 transition-colors">
+              <Image
+                src="/assets/logo_STE.webp"
+                alt="Surat Textile Expo 2026 Logo"
+                fill
+                sizes="40px"
+                className="object-contain p-0.5"
+                priority
+              />
             </div>
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
@@ -610,7 +618,7 @@ export default function ExhibitorDashboardPage() {
                 Surat Textile Expo — Exhibitor Extras & Requirements
               </p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden sm:flex items-center gap-2.5">

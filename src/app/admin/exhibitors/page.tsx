@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store, LogOut, Printer, FolderOpen, ExternalLink, FileCode } from 'lucide-react';
 import BillModal from '@/components/extras/BillModal';
@@ -217,9 +218,16 @@ export default function AdminExhibitorsPage() {
       {/* Top Navbar */}
       <header className="sticky top-0 z-30 bg-white/95 md:backdrop-blur-sm border-b border-slate-200 shadow-sm px-4 lg:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/20 text-slate-950 font-bold">
-              STE
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 relative rounded-xl bg-slate-900 p-1 border border-slate-200 shadow-sm flex items-center justify-center shrink-0 group-hover:border-amber-400 transition-colors">
+              <Image
+                src="/assets/logo_STE.webp"
+                alt="Surat Textile Expo 2026 Logo"
+                fill
+                sizes="40px"
+                className="object-contain p-0.5"
+                priority
+              />
             </div>
             <div>
               <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
@@ -230,7 +238,7 @@ export default function AdminExhibitorsPage() {
               </h1>
               <p className="text-xs text-slate-500 font-medium">Exhibitor Management & Extra Amenities Reports</p>
             </div>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-3">
             <Link

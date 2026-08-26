@@ -4,6 +4,8 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { Lock, Phone, ArrowRight, ShieldCheck, Sparkles, Building2, Crown, Store, KeyRound, CheckCircle2, X } from 'lucide-react';
 
 export default function ExhibitorLoginPage() {
@@ -118,17 +120,29 @@ export default function ExhibitorLoginPage() {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-amber-400/20 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-[400px] h-[300px] bg-emerald-400/15 blur-[100px] rounded-full pointer-events-none" />
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center">
+        <Link href="/" className="inline-flex flex-col items-center group mb-3">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 relative transition-transform duration-300 group-hover:scale-105">
+            <Image
+              src="/assets/logo_STE.webp"
+              alt="Surat Textile Expo 2026 Logo"
+              fill
+              sizes="80px"
+              className="object-contain"
+              priority
+            />
+          </div>
+        </Link>
         <div className="flex justify-center items-center gap-2 mb-2">
           <span className="px-3 py-1 bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold uppercase tracking-wider rounded-full flex items-center gap-1.5 shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-amber-700" />
             STE 2026 Portal
           </span>
         </div>
-        <h2 className="mt-2 text-center text-3xl font-extrabold tracking-tight text-slate-900 font-serif">
+        <h2 className="mt-1 text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-serif">
           Exhibitor Portal Login
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-600 font-medium">
+        <p className="mt-1.5 text-center text-xs sm:text-sm text-slate-600 font-medium">
           Access your stall details & request additional exhibition extras
         </p>
       </div>
