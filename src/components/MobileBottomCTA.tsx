@@ -13,8 +13,11 @@ export default function MobileBottomCTA() {
   const { language } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
 
-  // Hide on exhibitor portal and admin console
-  const isPortalOrAdmin = pathname?.startsWith('/exhibitor') || pathname?.startsWith('/admin');
+  // Hidden on the working tools - portal, admin console and the stall map -
+  // where a floating bar would sit over the controls.
+  const isPortalOrAdmin = pathname?.startsWith('/exhibitor')
+    || pathname?.startsWith('/admin')
+    || pathname?.startsWith('/stall-map');
 
   useEffect(() => {
     // Detect mobile device
