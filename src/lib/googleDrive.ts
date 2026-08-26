@@ -349,15 +349,31 @@ async function uploadViaAppsScript(params: DriveUploadParams): Promise<DriveUplo
     })
   });
 
-  const json = (await res.json().catch(() => null)) as any;
+  let json: any = null;
+  try {
+    const rawText = await res.text();
+    try {
+      json = JSON.parse(rawText);
+    } catch {
+      const jsonMatch = rawText.match(/\{[\s\S]*"(?:fileId|fileUrl|status|folderId)"[\s\S]*\}/);
+      if (jsonMatch) {
+        json = JSON.parse(jsonMatch[0]);
+      }
+    }
+  } catch (err: any) {
+    return {
+      success: false,
+      strategy: 'apps_script',
+      error: `Could not read Apps Script response: ${err.message}`
+    };
+  }
 
-  // Require a concrete file id or link. A bare {"result":"success"} means the
-  // URL points at a script that logged the payload without storing the file.
+  // Require a concrete file id or link.
   if (!json || (!json.fileId && !json.fileUrl && !json.webViewLink)) {
     return {
       success: false,
       strategy: 'apps_script',
-      error: json?.error || 'Apps Script web app did not return an uploaded file id.'
+      error: json?.error || json?.message || 'Apps Script web app did not return an uploaded file id.'
     };
   }
 
