@@ -45,12 +45,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Disable custom cursor on ALL touch devices */
-@media (hover: none) and (pointer: coarse) {
-  * { cursor: auto !important; }
-  .custom-cursor { display: none !important; }
-}
-
 /* Disable heavy desktop-only components on mobile */
 @media (max-width: 767px) {
   .desktop-only { display: none !important; }
@@ -472,23 +466,6 @@ html.lenis, html.lenis body {
 }
 .trace-border-btn:hover rect {
   stroke-dashoffset: 0;
-}
-
-/* Hide the native cursor ONLY where a replacement is actually being drawn.
-   CinematicCursor adds .has-custom-cursor under exactly the same conditions
-   this rule requires, and removes it on any uncaught error — so there is
-   always a recovery path back to a visible pointer. */
-@media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .has-custom-cursor,
-  .has-custom-cursor body,
-  .has-custom-cursor a,
-  .has-custom-cursor button,
-  .has-custom-cursor [role="button"],
-  .has-custom-cursor input,
-  .has-custom-cursor select,
-  .has-custom-cursor textarea {
-    cursor: none !important;
-  }
 }
 
 /* Custom navigation link hover underline trace */

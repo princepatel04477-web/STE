@@ -7,7 +7,6 @@ import { EVENT, EVENT_SUMMARY_EN, formatCount } from "@/lib/event-facts";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { PageTransition } from "@/components/PageTransition";
-import CinematicCursor from "@/components/CinematicCursor";
 import GlobalVisuals from "@/components/GlobalVisuals";
 import AnimationInjection from "@/components/AnimationInjection";
 import MobileBottomCTA from "@/components/MobileBottomCTA";
@@ -117,7 +116,6 @@ export default function RootLayout({
         <LanguageProvider>
           <LazyMotion features={domAnimation}>
             <ScrollProgress />
-            <CinematicCursor />
             <GlobalVisuals />
             <AnimationInjection />
             <MobileBottomCTA />
