@@ -2,9 +2,20 @@ import { NextResponse } from 'next/server';
 import db, { LotteryAllocationRecord } from '@/lib/db';
 import { MASTER_STALL_INVENTORY, STALL_CATEGORY_LADDER, normalizeSqftCategory } from '@/data/stallInventory';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
+import { getAuthenticatedExhibitor, isAdminMobile } from '@/lib/auth';
 
 export async function GET(request: Request) {
   try {
+    // The report carries the whole allotment list, so it is admin-only — the
+    // same server-side gate the exhibitor master report runs behind.
+    const session = await getAuthenticatedExhibitor();
+    if (!session || !isAdminMobile(session.mobile)) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Admin authorization required.' },
+        { status: 403 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'json';
 

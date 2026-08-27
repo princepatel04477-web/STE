@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   Trophy,
@@ -37,6 +38,8 @@ interface CategoryStat {
 }
 
 export default function AdminLotteryPage() {
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
   const [allocations, setAllocations] = useState<LotteryAllocationRecord[]>([]);
   const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
   const [totalCapacity, setTotalCapacity] = useState(0);
@@ -62,8 +65,14 @@ export default function AdminLotteryPage() {
     setLoading(true);
     try {
       const res = await fetch('/api/lottery/admin/report');
+      if (res.status === 401 || res.status === 403) {
+        setAuthorized(false);
+        router.push('/exhibitor/dashboard');
+        return;
+      }
       const data = await res.json();
       if (data.success) {
+        setAuthorized(true);
         setAllocations(data.allocations || []);
         setCategoryStats(data.categoryStats || []);
         setTotalCapacity(data.totalCapacity || 0);
@@ -146,6 +155,17 @@ export default function AdminLotteryPage() {
     }
     return true;
   });
+
+  if (!authorized) {
+    return (
+      <div className="min-h-screen bg-[#07090E] text-slate-100 flex items-center justify-center p-8">
+        <div className="flex items-center gap-3 text-sm font-semibold text-slate-400">
+          <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+          <span>{loading ? 'Verifying organiser access…' : 'Organiser access required.'}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 p-4 sm:p-8 selection:bg-amber-500 selection:text-black">
