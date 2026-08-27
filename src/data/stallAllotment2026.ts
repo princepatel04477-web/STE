@@ -2,12 +2,18 @@
  * STE 2026 demo allotment - generated from STE_data_sheet.xlsx and the
  * stall map. Do not hand-edit; rerun scripts/number_stalls.py.
  *
- * 146 exhibitors on 145 stalls. Saree brands (sarees, lehengas and the
+ * 148 exhibitors on 147 stalls. Saree brands (sarees, lehengas and the
  * uniform-saree firms) draw from stalls 1-107 less 27, 28, 29; everyone else
  * takes the south hall and those three big blocks.
  *
  * The draw order is seeded, so the same floor comes back every run.
  * This is a demo allotment, not a live draw result.
+ *
+ * Rows with held: true are hand-allotted and sit outside the seeded draw, so
+ * a rerun of scripts/number_stalls.py must not reassign them:
+ *   111  Sweety Fashion (Fabrics), moved off 121
+ *   121  Radhey Silk Weaves, seated on the bay 111 vacated
+ *   151  Dream Delta, on a 3m x 3m bay the draw had left empty
  */
 
 export type AllotmentPool = "Saree" | "General";
@@ -112,8 +118,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Lehenga",                   mobile: "",            sheetSize: "30m x 6m",  areaSqft: 2000,  pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "41",    stallNumber: 41,   brand: "Sristi Sarees", category: "Sarees",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "42",    stallNumber: 42,   brand: "Subh Saachi/Shiv Ganges", category: "Sarees",
-    group: "Saree",                     mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: false },
+  { unitId: "42",    stallNumber: 42,   brand: "Shubh Saachi/Shiv Ganges", category: "Sarees",
+    group: "Saree",                     mobile: "7405442380",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "43",    stallNumber: 43,   brand: "Bahubali", category: "Sarees",
     group: "Saree",                     mobile: "9825231170",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "44",    stallNumber: 44,   brand: "Sukhdev Textile", category: "Sarees",
@@ -159,7 +165,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "64",    stallNumber: 64,   brand: "Nishcay Sarees / Naisha Synthetics", category: "Saree",
     group: "Saree",                     mobile: "9377191978",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "65",    stallNumber: 65,   brand: "Rachit Group", category: "Saree",
-    group: "Saree",                     mobile: "9852146981",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
+    group: "Saree",                     mobile: "9825146981",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "66",    stallNumber: 66,   brand: "Univastra Sarees", category: "Sarees (200)",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "67",    stallNumber: 67,   brand: "Roots Fabrics", category: "Sarees",
@@ -250,6 +256,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Kurti",                     mobile: "8141335579",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "110",   stallNumber: 110,  brand: "Dream Home Fab", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "7016067015",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
+  { unitId: "111",   stallNumber: 111,  brand: "Sweety Fashion", category: "Fabrics",
+    group: "Dress Material & Fabrics",  mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "112",   stallNumber: 112,  brand: "Sweety Fashion", category: "Suits",
     group: "Suits",                     mobile: "9376711888",  sheetSize: "3m x 24m",  areaSqft: 800,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "113",   stallNumber: 113,  brand: "Ethnico by Laxmi", category: "Men's Wear",
@@ -266,8 +274,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Dress Material & Fabrics",  mobile: "8980254587",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "120",   stallNumber: 120,  brand: "Shayam Fabrics", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "9099009117",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "121",   stallNumber: 121,  brand: "Sweety Fashion", category: "Fabrics",
-    group: "Dress Material & Fabrics",  mobile: "9374072626",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: false },
+  { unitId: "121",   stallNumber: 121,  brand: "Radhey Silk Weaves", category: "Fabrics",
+    group: "Dress Material & Fabrics",  mobile: "9374072626",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "122",   stallNumber: 122,  brand: "Vani NX", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "9726277110",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "123",   stallNumber: 123,  brand: "Shaurya Silk Mills", category: "Men's Wear",
@@ -322,6 +330,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Ethnic & Poshak",           mobile: "7878279828",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "150",   stallNumber: 150,  brand: "Abhilasha Enterprises", category: "Home Furnishing",
     group: "Home & Other",              mobile: "9824131004",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
+  { unitId: "151",   stallNumber: 151,  brand: "Dream Delta", category: "Books",
+    group: "Home & Other",              mobile: "8200203732",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: true },
 ];
 
 /** Stalls the saree brands drew from. */
