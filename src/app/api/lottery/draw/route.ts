@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { normalizeExhibitorId } from '@/lib/exhibitorId';
-import { findExhibitorByMobile } from '@/data/registeredExhibitors';
+import { findExhibitorByMobile, isRegisteredExhibitor } from '@/data/registeredExhibitors';
 import db from '@/lib/db';
 import { performLuckyDraw, DrawContext } from '@/lib/lotteryEngine';
 import type { LotteryAllocationRecord } from '@/lib/db';
@@ -21,6 +21,15 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: 'A registered mobile number or user ID is required to perform the lucky draw.' },
         { status: 400 }
+      );
+    }
+
+    // mobile can come straight off the request body, so the draw has to apply
+    // the same guest list as login rather than trusting the caller.
+    if (!isRegisteredExhibitor(mobile)) {
+      return NextResponse.json(
+        { error: 'This number is not on the STE 2026 exhibitor list, so it cannot draw a stall.' },
+        { status: 403 }
       );
     }
 

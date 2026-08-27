@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db, { fetchRemotePasswords } from '@/lib/db';
 import { createSessionToken, validatePassword, isAdminMobile } from '@/lib/auth';
+import { isRegisteredExhibitor } from '@/data/registeredExhibitors';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function POST(request: Request) {
@@ -28,6 +29,16 @@ export async function POST(request: Request) {
       }
     } else {
       cleanMobile = rawInput.toUpperCase();
+    }
+
+    // The portal is closed: only the numbers on the master sheet get in. This
+    // runs before any profile is touched, so an unknown number cannot register
+    // itself simply by trying to log in.
+    if (!isRegisteredExhibitor(cleanMobile)) {
+      return NextResponse.json(
+        { error: 'This number is not on the STE 2026 exhibitor list. Please contact the organisers.' },
+        { status: 403 }
+      );
     }
 
     // Ensure exhibitor profile exists

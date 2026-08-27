@@ -35,11 +35,13 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9879360089", brandName: "Dharam Art (S)", stallSqft: "400 sq ft", category: "Dress Matterial, Kurtie", market: "Globale" },
   { mobile: "9974125112", brandName: "Dinesh Textile (D.T)", stallSqft: "300 sq ft", category: "Sarees", market: "M2" },
   { mobile: "9909789088", brandName: "Divine Silk Mills", stallSqft: "200 sq ft", category: "Sarees", market: "Shree Kuberji Textile Park" },
+  { mobile: "8200203732", brandName: "Dream Delta", stallSqft: "100 sq ft", category: "Books", market: "" },
   { mobile: "7016067015", brandName: "Dream Home Fab", stallSqft: "200 sq ft", category: "Fabrics", market: "" },
   { mobile: "9978889174", brandName: "Durga Textiles / Durga Silk Mills", stallSqft: "200 sq ft", category: "Sarees", market: "RKTM, New Lucky" },
   { mobile: "9820935033", brandName: "Earth Fabrics", stallSqft: "600 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9979883010", brandName: "Etallica", stallSqft: "200 sq ft", category: "Fabrics", market: "M D Landmark" },
   { mobile: "9712366161", brandName: "Ethnico by Laxmi", stallSqft: "800 sq ft", category: "Men's Wear", market: "Ved Road" },
+  { mobile: "8980835552", brandName: "Ganesh Fashion", stallSqft: "200 sq ft", category: "Sarees", market: "" },
   { mobile: "9375022000", brandName: "Ganga Sarees", stallSqft: "100 sq ft", category: "Sarees", market: "Raghukul" },
   { mobile: "9601700354", brandName: "Gauri Ganesh", stallSqft: "200 sq ft", category: "Sarees", market: "429 A M2" },
   { mobile: "9586899777", brandName: "Gauri Putra", stallSqft: "400 sq ft", category: "Lehanga", market: "M1" },
@@ -98,8 +100,8 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9825267689", brandName: "Pikasho", stallSqft: "400 sq ft", category: "Saree", market: "M4" },
   { mobile: "9377062128", brandName: "Poonam Designer", stallSqft: "300 sq ft", category: "Kurties", market: "Rajhans Imperia" },
   { mobile: "9909095200", brandName: "Prabhuji", stallSqft: "400 sq ft", category: "Lehenga", market: "M2" },
-  { mobile: "9852146981", brandName: "Rachit Group", stallSqft: "600 sq ft", category: "Saree", market: "Annapurna" },
-  { mobile: "9374072626", brandName: "Sweety Fashion", stallSqft: "600 sq ft", category: "Fabrics", market: "" },
+  { mobile: "9825146981", brandName: "Rachit Group", stallSqft: "600 sq ft", category: "Saree", market: "Annapurna" },
+  { mobile: "9374072626", brandName: "Radhey Silk Weaves", stallSqft: "600 sq ft", category: "Fabrics", market: "" },
   { mobile: "9510064200", brandName: "Radhya Designer", stallSqft: "200 sq ft", category: "Sarees", market: "Raghukul" },
   { mobile: "7818968985", brandName: "Raghav Silk Mills", stallSqft: "100 sq ft", category: "Sarees", market: "M2" },
   { mobile: "9374049925", brandName: "Ramsha (Gouri Impex)", stallSqft: "600 sq ft", category: "Kurti / Suits", market: "NTM" },
@@ -135,7 +137,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9998626756", brandName: "Siddharth Blouse", stallSqft: "600 sq ft", category: "Blouses", market: "Globale" },
   { mobile: "9913314440", brandName: "Sitaram Creations", stallSqft: "200 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9913590154", brandName: "Sristi Sarees", stallSqft: "400 sq ft", category: "Sarees", market: "Raghukul" },
-  { mobile: "9687609749", brandName: "Subh Saachi/Shiv Ganges", stallSqft: "400 sq ft", category: "Sarees", market: "M2" },
+  { mobile: "7405442380", brandName: "Shubh Saachi/Shiv Ganges", stallSqft: "400 sq ft", category: "Sarees", market: "M2" },
   { mobile: "9033339606", brandName: "Sukhdev Textile", stallSqft: "400 sq ft", category: "Sarees", market: "M1" },
   { mobile: "6353582439", brandName: "Suparshva", stallSqft: "800 sq ft", category: "Saree", market: "M1" },
   { mobile: "9879892623", brandName: "Sur Shyam/Girraj", stallSqft: "1000 sq ft", category: "Lehenga", market: "Someshwar 2" },
@@ -177,4 +179,17 @@ export function findExhibitorByMobile(identifier: string): RegisteredExhibitor |
     );
   }
   return undefined;
+}
+
+/**
+ * The portal is closed to everyone who is not on the master sheet.
+ *
+ * REGISTERED_EXHIBITORS_LIST is the whole guest list - the exhibitors, plus the
+ * two organiser numbers - so membership of it is the single test every entry
+ * point applies. There is no sign-up path: a number that is not here cannot log
+ * in, cannot draw a stall, and cannot be added by the sheet webhook. To admit a
+ * new exhibitor, add their row above.
+ */
+export function isRegisteredExhibitor(identifier: string | null | undefined): boolean {
+  return findExhibitorByMobile(String(identifier ?? "")) !== undefined;
 }

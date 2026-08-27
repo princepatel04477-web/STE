@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
+import { isRegisteredExhibitor } from '@/data/registeredExhibitors';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 interface SheetExhibitorRow {
@@ -33,11 +34,20 @@ export async function POST(request: Request) {
 
     const updatedAllowed: any[] = [];
     const updatedExhibitors: any[] = [];
+    const rejected: string[] = [];
 
     for (const row of rows) {
       if (!row.mobile) continue;
       const cleanMobile = String(row.mobile).replace(/\D/g, '').slice(-10);
       if (cleanMobile.length !== 10) continue;
+
+      // This endpoint is unauthenticated, and it used to whitelist whatever
+      // number it was handed. It may now only refresh the details of exhibitors
+      // already on the master sheet - it can no longer enrol anyone.
+      if (!isRegisteredExhibitor(cleanMobile)) {
+        rejected.push(cleanMobile);
+        continue;
+      }
 
       const brandName = row.brand_name?.trim() || '';
       const stallSqft = row.stall_sqft?.trim() || '200 sq ft';
@@ -102,7 +112,11 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       count: updatedAllowed.length,
-      message: `Successfully synchronized ${updatedAllowed.length} exhibitor(s) from Google Sheets to Supabase.`
+      rejected,
+      message: `Synchronized ${updatedAllowed.length} registered exhibitor(s) from Google Sheets to Supabase.`
+        + (rejected.length
+            ? ` Ignored ${rejected.length} number(s) that are not on the master exhibitor list.`
+            : '')
     });
   } catch (error: any) {
     console.error('[GoogleSheetsWebhook] Sync error:', error);

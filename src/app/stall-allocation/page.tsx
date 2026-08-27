@@ -73,22 +73,6 @@ export default function StallAllocationPage() {
     setMobile(preset.mobile);
   };
 
-  const handleResetCurrentTestDraw = async () => {
-    if (!mobile) return;
-    try {
-      await fetch('/api/lottery/admin/reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobile, adminKey: 'ste@2026' })
-      });
-      setAllocation(null);
-      setHasDrawn(false);
-      setActiveTab('luckybox');
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   // Check initial session
   useEffect(() => {
     checkSession();
@@ -455,12 +439,6 @@ export default function StallAllocationPage() {
                   >
                     <Printer className="w-3.5 h-3.5" />
                     <span>View Allotment Slip</span>
-                  </button>
-                  <button
-                    onClick={handleResetCurrentTestDraw}
-                    className="w-full py-1.5 px-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold transition-colors text-center block mt-1"
-                  >
-                    ↺ Reset This Test Draw (Safe Test Mode)
                   </button>
                 </div>
               )}
