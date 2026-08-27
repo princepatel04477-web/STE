@@ -17,6 +17,7 @@
 
 import { STALL_MAP_2026, Stall2026, getStall } from '@/data/stallMap2026';
 import { ALLOTMENTS_2026, Allotment2026 } from '@/data/stallAllotment2026';
+import { normalizeExhibitorId } from '@/lib/exhibitorId';
 
 export interface DrawUnit {
   /** Stall number, or a split bay half such as "91A". */
@@ -67,7 +68,10 @@ const BY_BRAND: Map<string, Allotment2026> = new Map(
   ALLOTMENTS_2026.map((a) => [normaliseBrand(a.brand), a])
 );
 const BY_MOBILE: Map<string, Allotment2026> = new Map(
-  ALLOTMENTS_2026.filter((a) => a.mobile).map((a) => [a.mobile, a])
+  ALLOTMENTS_2026.filter((a) => normalizeExhibitorId(a.mobile)).map((a) => [
+    normalizeExhibitorId(a.mobile),
+    a,
+  ])
 );
 
 function normaliseBrand(name: string) {
@@ -76,7 +80,7 @@ function normaliseBrand(name: string) {
 
 /** The exhibitor's row on the plan, by mobile first and brand name second. */
 export function findOnPlan(mobile: string, brandName?: string) {
-  const key = String(mobile ?? '').replace(/\D/g, '').slice(-10);
+  const key = normalizeExhibitorId(mobile);
   return (
     (key && BY_MOBILE.get(key)) ||
     (brandName ? BY_BRAND.get(normaliseBrand(brandName)) : undefined)

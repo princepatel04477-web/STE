@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAuthenticatedExhibitor, isAdminMobile } from '@/lib/auth';
+import { normalizeExhibitorId } from '@/lib/exhibitorId';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function POST(request: Request) {
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     }
 
     if (mobile) {
-      const cleanMobile = String(mobile).replace(/\D/g, '').slice(-10);
+      const cleanMobile = normalizeExhibitorId(mobile);
       db.prepare('DELETE FROM lottery_allocations WHERE mobile = ?').run(cleanMobile);
       if (isSupabaseConfigured && supabaseAdmin) {
         try {

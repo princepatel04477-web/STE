@@ -31,6 +31,7 @@ import AllotmentSlipModal from '@/components/lottery/AllotmentSlipModal';
 import FloorPlan2026 from '@/components/stallmap/FloorPlan2026';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import { isAdminMobile } from '@/lib/adminMobiles';
+import { normalizeExhibitorId } from '@/lib/exhibitorId';
 import { LotteryAllocationRecord } from '@/lib/db';
 
 const TEST_EXHIBITOR_PRESETS = [
@@ -114,13 +115,17 @@ export default function StallAllocationPage() {
     }
   };
 
+  // A few firms are registered under a short user ID rather than a number;
+  // the +91 prefix only belongs on the numeric case.
+  const isNumericEntry = mobile.trim() === '' || /^[0-9+\-\s()]+$/.test(mobile.trim());
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
 
-    const clean = mobile.replace(/\D/g, '').slice(-10);
-    if (clean.length < 10) {
-      setAuthError('Please enter your registered 10-digit mobile number.');
+    const clean = normalizeExhibitorId(mobile);
+    if (!clean) {
+      setAuthError('Enter your registered 10-digit mobile number, or the user ID on your invoice.');
       return;
     }
 
@@ -296,25 +301,27 @@ export default function StallAllocationPage() {
                 {/* Mobile Input */}
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
-                    Registered Mobile Number
+                    Registered Mobile Number / User ID
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-xs">
-                      +91
-                    </div>
+                    {isNumericEntry && (
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-xs">
+                        +91
+                      </div>
+                    )}
                     <input
-                      type="tel"
+                      type="text"
                       inputMode="numeric"
                       autoComplete="tel"
                       value={mobile}
                       onChange={(e) => setMobile(e.target.value)}
-                      placeholder="10-digit number"
-                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-950/80 border border-white/15 text-white placeholder-slate-500 text-base sm:text-sm font-semibold focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors"
+                      placeholder="10-digit number or user ID"
+                      className={`w-full ${isNumericEntry ? 'pl-12' : 'pl-4'} pr-4 py-3 rounded-xl bg-slate-950/80 border border-white/15 text-white placeholder-slate-500 text-base sm:text-sm font-semibold focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors`}
                       required
                     />
                   </div>
                   <p className="text-[11px] text-slate-500 mt-1.5">
-                    The number on your STE booking. No code is sent.
+                    The number or user ID on your STE booking. No code is sent.
                   </p>
                 </div>
 

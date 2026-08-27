@@ -1,4 +1,5 @@
 import db, { LotteryAllocationRecord } from '@/lib/db';
+import { normalizeExhibitorId } from '@/lib/exhibitorId';
 import {
   DrawUnit,
   blockFor,
@@ -31,13 +32,13 @@ export function performLuckyDraw(
   brandName: string,
   rawSqft: string | number
 ): LotteryResult {
-  const cleanMobile = String(mobile).replace(/\D/g, '').slice(-10);
+  const cleanMobile = normalizeExhibitorId(mobile);
 
-  if (cleanMobile.length < 10) {
+  if (!cleanMobile) {
     return {
       success: false,
       isExisting: false,
-      error: 'Invalid 10-digit mobile number provided.'
+      error: 'A registered 10-digit mobile number or user ID is required.'
     };
   }
 
@@ -138,7 +139,7 @@ export function performLuckyDraw(
 }
 
 export function getAllocatedStallForMobile(mobile: string): LotteryAllocationRecord | null {
-  const clean = String(mobile).replace(/\D/g, '').slice(-10);
+  const clean = normalizeExhibitorId(mobile);
   const record = db.prepare('SELECT * FROM lottery_allocations WHERE mobile = ?').get(clean) as LotteryAllocationRecord | undefined;
   return record || null;
 }

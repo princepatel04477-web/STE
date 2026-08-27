@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
+import { normalizeExhibitorId } from '@/lib/exhibitorId';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import db from '@/lib/db';
 import { performLuckyDraw } from '@/lib/lotteryEngine';
@@ -8,16 +9,16 @@ import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
-    let mobile = body.mobile ? String(body.mobile).replace(/\D/g, '').slice(-10) : '';
+    let mobile = normalizeExhibitorId(body.mobile);
 
     const session = await getAuthenticatedExhibitor();
     if (!mobile && session?.mobile) {
-      mobile = session.mobile;
+      mobile = normalizeExhibitorId(session.mobile);
     }
 
-    if (!mobile || mobile.length < 10) {
+    if (!mobile) {
       return NextResponse.json(
-        { error: 'Valid 10-digit mobile number is required to perform lucky draw.' },
+        { error: 'A registered mobile number or user ID is required to perform the lucky draw.' },
         { status: 400 }
       );
     }

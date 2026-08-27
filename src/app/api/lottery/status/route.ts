@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
+import { normalizeExhibitorId } from '@/lib/exhibitorId';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import db, { LotteryAllocationRecord } from '@/lib/db';
 import { getAllocatedStallForMobile } from '@/lib/lotteryEngine';
@@ -14,14 +15,14 @@ export async function GET(request: Request) {
     let mobile = '';
     const session = await getAuthenticatedExhibitor();
     if (session?.mobile) {
-      mobile = session.mobile;
+      mobile = normalizeExhibitorId(session.mobile);
     } else if (queryMobile) {
-      mobile = queryMobile.replace(/\D/g, '').slice(-10);
+      mobile = normalizeExhibitorId(queryMobile);
     }
 
-    if (!mobile || mobile.length < 10) {
+    if (!mobile) {
       return NextResponse.json(
-        { error: 'Mobile number is required or user must be logged in.' },
+        { error: 'A mobile number or user ID is required, or the user must be logged in.' },
         { status: 400 }
       );
     }
