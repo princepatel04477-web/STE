@@ -165,7 +165,16 @@ export async function POST(request: Request) {
 
     let profilePicUrl = existing?.profile_pic_url || null;
 
-    // Fetch existing profile pic from Supabase if not in local db
+    // The artwork and Drive links are written by the upload route, and the local
+    // store is a /tmp cache that a cold serverless instance starts empty. Carry
+    // the cloud values forward, or saving a name would blank an exhibitor's
+    // uploaded logo, CDR and Drive folder.
+    let logoFileUrl = existing?.logo_file_url || null;
+    let cdrFileUrl = existing?.cdr_file_url || null;
+    let driveFileUrl = existing?.drive_file_url || null;
+    let driveFolderId = existing?.drive_folder_id || null;
+    let driveFolderUrl = existing?.drive_folder_url || null;
+
     if (isSupabaseConfigured && supabaseAdmin) {
       try {
         const { data: sbEx } = await supabaseAdmin
@@ -180,7 +189,15 @@ export async function POST(request: Request) {
             profilePicUrl = parsed.profile_pic_url;
           }
         }
-      } catch {}
+
+        logoFileUrl = sbEx?.logo_file_url ?? logoFileUrl;
+        cdrFileUrl = sbEx?.cdr_file_url ?? cdrFileUrl;
+        driveFileUrl = sbEx?.drive_file_url ?? driveFileUrl;
+        driveFolderId = sbEx?.drive_folder_id ?? driveFolderId;
+        driveFolderUrl = sbEx?.drive_folder_url ?? driveFolderUrl;
+      } catch (err) {
+        console.warn('[Profile POST] Could not read cloud artwork links:', err);
+      }
     }
 
     const structuredProfilePayload = {
@@ -212,11 +229,11 @@ export async function POST(request: Request) {
             brand_name: cleanBrand,
             stall_sqft: cleanSqft,
             fascia_names_json: structuredProfilePayload,
-            logo_file_url: existing?.logo_file_url || null,
-            cdr_file_url: existing?.cdr_file_url || null,
-            drive_file_url: existing?.drive_file_url || null,
-            drive_folder_id: existing?.drive_folder_id || null,
-            drive_folder_url: existing?.drive_folder_url || null,
+            logo_file_url: logoFileUrl,
+            cdr_file_url: cdrFileUrl,
+            drive_file_url: driveFileUrl,
+            drive_folder_id: driveFolderId,
+            drive_folder_url: driveFolderUrl,
             updated_at: new Date().toISOString()
           }, { onConflict: 'mobile' });
 
@@ -230,19 +247,52 @@ export async function POST(request: Request) {
       }
     }
 
-    // Fetch existing order items for complete Google Sheet row sync
-    const order = db
+    // Fetch existing order items for complete Google Sheet row sync. The sheet
+    // row is rewritten whole, so this has to come from the cloud database —
+    // reading the empty /tmp cache of a cold instance would blank the
+    // exhibitor's extras and badges in the sheet.
+    let order = db
       .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json, rental_days FROM exhibitor_orders WHERE mobile = ?')
-      .get(session.mobile) as { items_json: string; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string; rental_days?: number } | undefined;
+      .get(session.mobile) as { items_json: any; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: any; rental_days?: number } | undefined;
+
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbOrder } = await supabaseAdmin
+          .from('exhibitor_orders')
+          .select('*')
+          .eq('mobile', session.mobile)
+          .maybeSingle();
+
+        if (sbOrder) {
+          order = {
+            items_json: sbOrder.items_json ?? order?.items_json,
+            special_notes: sbOrder.special_notes ?? order?.special_notes ?? '',
+            owner_badges: sbOrder.owner_badges ?? order?.owner_badges ?? 0,
+            sales_badges: sbOrder.sales_badges ?? order?.sales_badges ?? 0,
+            support_badges: sbOrder.support_badges ?? order?.support_badges ?? 0,
+            badge_names_json: sbOrder.badge_names_json ?? order?.badge_names_json,
+            rental_days: sbOrder.rental_days ?? order?.rental_days ?? 2
+          };
+        }
+      } catch (err) {
+        console.warn('[Profile POST] Could not read cloud order for sheet sync:', err);
+      }
+    }
 
     let items = [];
     if (order && order.items_json) {
-      try { items = JSON.parse(order.items_json); } catch {}
+      try {
+        items = typeof order.items_json === 'string' ? JSON.parse(order.items_json) : order.items_json;
+      } catch {}
     }
 
     let badgeNames = undefined;
     if (order && order.badge_names_json) {
-      try { badgeNames = JSON.parse(order.badge_names_json); } catch {}
+      try {
+        badgeNames = typeof order.badge_names_json === 'string'
+          ? JSON.parse(order.badge_names_json)
+          : order.badge_names_json;
+      } catch {}
     }
 
     // Sync to Google Sheets and await completion for Vercel Serverless execution
@@ -250,7 +300,7 @@ export async function POST(request: Request) {
       await syncToGoogleSheets({
         mobile: session.mobile,
         exhibitor_name: cleanExhibitorName,
-        profile_pic_url: existing?.profile_pic_url || '',
+        profile_pic_url: profilePicUrl || '',
         company_description: cleanCompanyDesc,
         brand_name: cleanBrand,
         stall_sqft: cleanSqft,
