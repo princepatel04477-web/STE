@@ -1175,3 +1175,22 @@ body {
     overflow: hidden !important;
   }
 }
+
+/* ── Mobile form fields: stop iOS Safari zooming on focus ──
+   Safari zooms the viewport into any field whose text is smaller than 16px and
+   does not zoom back out. On the exhibitor portal that pushed half the form off
+   screen mid-entry, which is a large part of why filling it in on a phone was
+   so awkward. Bump the rendered size on small screens only; the desktop
+   typography is untouched. */
+@media (max-width: 640px) {
+  input[type='text'],
+  input[type='tel'],
+  input[type='email'],
+  input[type='number'],
+  input[type='password'],
+  input[type='search'],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

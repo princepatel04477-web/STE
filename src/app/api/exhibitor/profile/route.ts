@@ -2,8 +2,13 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
-import { syncToGoogleSheets } from '@/lib/googleSheets';
+import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
+
+// The write touches Supabase and then the Google Sheet; the platform default is
+// tight enough that a slow Apps Script can abort a request whose data was
+// already saved, which the portal then reports as a failed save.
+export const maxDuration = 30;
 
 export async function GET() {
   try {
@@ -118,7 +123,11 @@ export async function GET() {
       drive_file_url: exhibitor?.drive_file_url || null,
       drive_folder_url: exhibitor?.drive_folder_url || null,
       category: reg?.category || '',
-      market: reg?.market || ''
+      market: reg?.market || '',
+      // The portal replays any edit it could not send (a phone that lost signal
+      // or was killed mid-form) on the next visit. It compares against this to
+      // avoid replaying a stale draft over newer edits made elsewhere.
+      updated_at: exhibitor?.updated_at || null
     });
   } catch (error) {
     console.error('Error fetching exhibitor profile:', error);
@@ -247,74 +256,24 @@ export async function POST(request: Request) {
       }
     }
 
-    // Fetch existing order items for complete Google Sheet row sync. The sheet
-    // row is rewritten whole, so this has to come from the cloud database —
-    // reading the empty /tmp cache of a cold instance would blank the
-    // exhibitor's extras and badges in the sheet.
-    let order = db
-      .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json, rental_days FROM exhibitor_orders WHERE mobile = ?')
-      .get(session.mobile) as { items_json: any; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: any; rental_days?: number } | undefined;
-
-    if (isSupabaseConfigured && supabaseAdmin) {
-      try {
-        const { data: sbOrder } = await supabaseAdmin
-          .from('exhibitor_orders')
-          .select('*')
-          .eq('mobile', session.mobile)
-          .maybeSingle();
-
-        if (sbOrder) {
-          order = {
-            items_json: sbOrder.items_json ?? order?.items_json,
-            special_notes: sbOrder.special_notes ?? order?.special_notes ?? '',
-            owner_badges: sbOrder.owner_badges ?? order?.owner_badges ?? 0,
-            sales_badges: sbOrder.sales_badges ?? order?.sales_badges ?? 0,
-            support_badges: sbOrder.support_badges ?? order?.support_badges ?? 0,
-            badge_names_json: sbOrder.badge_names_json ?? order?.badge_names_json,
-            rental_days: sbOrder.rental_days ?? order?.rental_days ?? 2
-          };
-        }
-      } catch (err) {
-        console.warn('[Profile POST] Could not read cloud order for sheet sync:', err);
-      }
-    }
-
-    let items = [];
-    if (order && order.items_json) {
-      try {
-        items = typeof order.items_json === 'string' ? JSON.parse(order.items_json) : order.items_json;
-      } catch {}
-    }
-
-    let badgeNames = undefined;
-    if (order && order.badge_names_json) {
-      try {
-        badgeNames = typeof order.badge_names_json === 'string'
-          ? JSON.parse(order.badge_names_json)
-          : order.badge_names_json;
-      } catch {}
-    }
-
-    // Sync to Google Sheets and await completion for Vercel Serverless execution
+    // Push the exhibitor's COMPLETE row to the sheet — profile, artwork links,
+    // extras and badges together. Sending only the profile fields blanked the
+    // uploaded logo, the Drive links and every extra item in the sheet.
     try {
-      await syncToGoogleSheets({
-        mobile: session.mobile,
+      await syncExhibitorRowToSheets(session.mobile, {
         exhibitor_name: cleanExhibitorName,
         profile_pic_url: profilePicUrl || '',
         company_description: cleanCompanyDesc,
         brand_name: cleanBrand,
         stall_sqft: cleanSqft,
         fascia_names: cleanFasciaNames,
-        items,
-        special_notes: order?.special_notes || '',
-        owner_badges: order?.owner_badges ?? 0,
-        sales_badges: order?.sales_badges ?? 0,
-        support_badges: order?.support_badges ?? 0,
-        badge_names: badgeNames,
-        rental_days: order?.rental_days ?? 2
+        logo_file_url: logoFileUrl || '',
+        cdr_file_url: cdrFileUrl || '',
+        drive_file_url: driveFileUrl || '',
+        drive_folder_url: driveFolderUrl || ''
       });
     } catch (err) {
-      console.error('Google Sheets background sync error:', err);
+      console.error('Google Sheets sync error:', err);
     }
 
     return NextResponse.json({

@@ -1,9 +1,20 @@
+/**
+ * The guest list, taken from the master sheet (STE_data_sheet.xlsx).
+ *
+ * One row per exhibitor. A firm that gave the organisers more than one number,
+ * or that logged into the portal on a second number before the list was closed,
+ * keeps a single row: the extra numbers go in `aliases` so both log in as the
+ * same exhibitor and the admin panel counts the firm once.
+ */
 export interface RegisteredExhibitor {
+  /** The number the master sheet gives, or a portal ID where it gives none. */
   mobile: string;
   brandName: string;
   stallSqft: string;
   category?: string;
   market?: string;
+  /** Other numbers the same firm is known by. */
+  aliases?: string[];
 }
 
 export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
@@ -44,6 +55,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "8980835552", brandName: "Ganesh Fashion", stallSqft: "200 sq ft", category: "Sarees", market: "" },
   { mobile: "9375022000", brandName: "Ganga Sarees", stallSqft: "100 sq ft", category: "Sarees", market: "Raghukul" },
   { mobile: "9601700354", brandName: "Gauri Ganesh", stallSqft: "200 sq ft", category: "Sarees", market: "429 A M2" },
+  { mobile: "GOPALHARI", brandName: "Gopal Hari", stallSqft: "200 sq ft", category: "Sarees", market: "" },
   { mobile: "9586899777", brandName: "Gauri Putra", stallSqft: "400 sq ft", category: "Lehanga", market: "M1" },
   { mobile: "9879688431", brandName: "Geeta Tex (Ambika)", stallSqft: "1000 sq ft", category: "Suit", market: "Kuberji Houses" },
   { mobile: "9638338014", brandName: "Glorry Creation", stallSqft: "200 sq ft", category: "Kurtis", market: "Surana 101" },
@@ -72,7 +84,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9712972601", brandName: "Krishnam Art", stallSqft: "600 sq ft", category: "Saree", market: "M1" },
   { mobile: "9925557740", brandName: "Kuhu Creation (Kesari Creation)", stallSqft: "300 sq ft", category: "Kurti", market: "Udhna BRC" },
   { mobile: "9627868411", brandName: "Kunj Bihari Creations", stallSqft: "100 sq ft", category: "Dress Matterial", market: "" },
-  { mobile: "9825363009", brandName: "Laxmi Creation", stallSqft: "200 sq ft", category: "Saree", market: "Hojiwala Sachin" },
+  { mobile: "9825363009", brandName: "Laxmi Creation", stallSqft: "200 sq ft", category: "Saree", market: "Hojiwala Sachin", aliases: ["9825363099"] },
   { mobile: "9374739383", brandName: "Libaas Fashion (AK TRENDZ)", stallSqft: "400 sq ft", category: "Kurti", market: "Globale" },
   { mobile: "9825505610", brandName: "Mahadev Creations", stallSqft: "600 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9819582727", brandName: "Mahadev Fabrics", stallSqft: "100 sq ft", category: "Fabrics", market: "Raghuveer Scarlett" },
@@ -100,10 +112,10 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9825267689", brandName: "Pikasho", stallSqft: "400 sq ft", category: "Saree", market: "M4" },
   { mobile: "9377062128", brandName: "Poonam Designer", stallSqft: "300 sq ft", category: "Kurties", market: "Rajhans Imperia" },
   { mobile: "9909095200", brandName: "Prabhuji", stallSqft: "400 sq ft", category: "Lehenga", market: "M2" },
-  { mobile: "9825146981", brandName: "Rachit Group", stallSqft: "600 sq ft", category: "Saree", market: "Annapurna" },
+  { mobile: "9852146981", brandName: "Rachit Group", stallSqft: "600 sq ft", category: "Saree", market: "Annapurna", aliases: ["9825146981"] },
   { mobile: "9374072626", brandName: "Radhey Silk Weaves", stallSqft: "600 sq ft", category: "Fabrics", market: "" },
   { mobile: "9510064200", brandName: "Radhya Designer", stallSqft: "200 sq ft", category: "Sarees", market: "Raghukul" },
-  { mobile: "7818968985", brandName: "Raghav Silk Mills", stallSqft: "100 sq ft", category: "Sarees", market: "M2" },
+  { mobile: "9825572748", brandName: "Raghav Silk Mills", stallSqft: "100 sq ft", category: "Sarees", market: "M2", aliases: ["7818968985"] },
   { mobile: "9374049925", brandName: "Ramsha (Gouri Impex)", stallSqft: "600 sq ft", category: "Kurti / Suits", market: "NTM" },
   { mobile: "7383001130", brandName: "Reyansh Creation", stallSqft: "100 sq ft", category: "Saree", market: "Globale" },
   { mobile: "9825424890", brandName: "Roots Fabrics", stallSqft: "600 sq ft", category: "Sarees", market: "M1" },
@@ -117,13 +129,12 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "7719063355", brandName: "SANKALP", stallSqft: "200 sq ft", category: "Sarees", market: "STM" },
   { mobile: "SSS", brandName: "Saraogi Super Sales Private Limited", stallSqft: "2600 sq ft", category: "Sarees", market: "" },
   { mobile: "9978655007", brandName: "Sarv Kala (V.D)", stallSqft: "600 sq ft", category: "Sarees", market: "M1" },
-  { mobile: "9825122634", brandName: "Satish Dresses", stallSqft: "300 sq ft", category: "Uniform Saree", market: "Regent" },
-  { mobile: "9825900000", brandName: "Satish Dresses", stallSqft: "300 sq ft", category: "Uniform Saree", market: "Regent" },
+  { mobile: "9825122634", brandName: "Satish Dresses", stallSqft: "300 sq ft", category: "Uniform Saree", market: "Regent", aliases: ["9825900000"] },
   { mobile: "9099941185", brandName: "Satyavachan", stallSqft: "600 sq ft", category: "Sarees", market: "Raghukul" },
   { mobile: "9982170219", brandName: "Shakambari Lace House", stallSqft: "400 sq ft", category: "Lace Materials", market: "Behind M2" },
   { mobile: "9898297092", brandName: "Shalini Fashions", stallSqft: "200 sq ft", category: "Sarees", market: "M2" },
   { mobile: "8758832184", brandName: "Shangar Tex", stallSqft: "200 sq ft", category: "Sarees", market: "Old Bombay" },
-  { mobile: "7600710440", brandName: "Shankh Designer", stallSqft: "100 sq ft", category: "Sarees", market: "M1" },
+  { mobile: "7600710440", brandName: "Shankh Designer", stallSqft: "100 sq ft", category: "Sarees", market: "M1", aliases: ["8619183572"] },
   { mobile: "7359330135", brandName: "Shaurya Silk Mills", stallSqft: "200 sq ft", category: "Men's Wear", market: "RRTM 1" },
   { mobile: "9099009117", brandName: "Shayam Fabrics", stallSqft: "200 sq ft", category: "Fabrics", market: "Raghukul" },
   { mobile: "9924438132", brandName: "Shiv Fashion C K", stallSqft: "100 sq ft", category: "Fabrics", market: "" },
@@ -132,12 +143,11 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9825182005", brandName: "Shree Laxmi", stallSqft: "600 sq ft", category: "Lehenga/Saree", market: "M1" },
   { mobile: "9687014347", brandName: "Shreeji Designer / Khushi Fashion", stallSqft: "200 sq ft", category: "Saree", market: "Globale" },
   { mobile: "7487991498", brandName: "Shreya Silk Sarees", stallSqft: "100 sq ft", category: "Saree", market: "Raghukul" },
-  { mobile: "9081277726", brandName: "Shritik Designer", stallSqft: "200 sq ft", category: "Saree", market: "Someshwar 2" },
-  { mobile: "9978912068", brandName: "Shritik Designer", stallSqft: "200 sq ft", category: "Saree", market: "Someshwar 2" },
+  { mobile: "9081277726", brandName: "Shritik Designer", stallSqft: "200 sq ft", category: "Saree", market: "Someshwar 2", aliases: ["9978912068"] },
   { mobile: "9998626756", brandName: "Siddharth Blouse", stallSqft: "600 sq ft", category: "Blouses", market: "Globale" },
   { mobile: "9913314440", brandName: "Sitaram Creations", stallSqft: "200 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9913590154", brandName: "Sristi Sarees", stallSqft: "400 sq ft", category: "Sarees", market: "Raghukul" },
-  { mobile: "7405442380", brandName: "Shubh Saachi/Shiv Ganges", stallSqft: "400 sq ft", category: "Sarees", market: "M2" },
+  { mobile: "7405442380", brandName: "Shubh Saachi/Shiv Ganges", stallSqft: "400 sq ft", category: "Sarees", market: "M2", aliases: ["9687609749"] },
   { mobile: "9033339606", brandName: "Sukhdev Textile", stallSqft: "400 sq ft", category: "Sarees", market: "M1" },
   { mobile: "6353582439", brandName: "Suparshva", stallSqft: "800 sq ft", category: "Saree", market: "M1" },
   { mobile: "9879892623", brandName: "Sur Shyam/Girraj", stallSqft: "1000 sq ft", category: "Lehenga", market: "Someshwar 2" },
@@ -145,7 +155,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9374818499", brandName: "Swamee", stallSqft: "400 sq ft", category: "Saree", market: "M1" },
   { mobile: "9099448676", brandName: "Swarnpari Design", stallSqft: "300 sq ft", category: "Sarees", market: "M2" },
   { mobile: "9377404494", brandName: "Talreeja Sarees", stallSqft: "100 sq ft", category: "Sarees", market: "M1" },
-  { mobile: "9662399969", brandName: "Tithi Designer", stallSqft: "200 sq ft", category: "Saree", market: "M1" },
+  { mobile: "9662399969", brandName: "Tithi Designer", stallSqft: "200 sq ft", category: "Saree", market: "M1", aliases: ["8511573752"] },
   { mobile: "8141014006", brandName: "Todi Creation", stallSqft: "400 sq ft", category: "Lehanga", market: "M1" },
   { mobile: "7285010000", brandName: "Univastra Sarees", stallSqft: "200 sq ft", category: "Sarees (200)", market: "M1" },
   { mobile: "9328539215", brandName: "Vani Designer", stallSqft: "200 sq ft", category: "Sarees", market: "M2" },
@@ -162,25 +172,48 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9654554518", brandName: "Surekha", stallSqft: "400 sq ft", category: "Saree", market: "" }
 ];
 
+/** Every number one exhibitor answers to: the sheet's, plus any alias. */
+export function numbersFor(exhibitor: RegisteredExhibitor): string[] {
+  return [exhibitor.mobile, ...(exhibitor.aliases ?? [])];
+}
+
+const key = (identifier: string) => {
+  const trimmed = String(identifier ?? "").trim();
+  const digits = trimmed.replace(/\D/g, "").slice(-10);
+  return digits.length === 10 ? digits : trimmed.toUpperCase();
+};
+
+/** Lookup by any of an exhibitor's numbers, or by portal ID such as 'SSS'. */
+const BY_NUMBER: Map<string, RegisteredExhibitor> = new Map(
+  REGISTERED_EXHIBITORS_LIST.flatMap((e) =>
+    numbersFor(e).map((n) => [key(n), e] as [string, RegisteredExhibitor])
+  )
+);
+
 export function findExhibitorByMobile(identifier: string): RegisteredExhibitor | undefined {
   if (!identifier) return undefined;
-  const trimmed = identifier.trim();
-  
-  // Exact match (case-insensitive for custom IDs like 'SSS')
-  const exactMatch = REGISTERED_EXHIBITORS_LIST.find(
-    (e) => e.mobile.toLowerCase() === trimmed.toLowerCase()
-  );
-  if (exactMatch) return exactMatch;
-
-  // Standard 10-digit mobile number match
-  const clean = trimmed.replace(/\D/g, "").slice(-10);
-  if (clean.length >= 10) {
-    return REGISTERED_EXHIBITORS_LIST.find(
-      (e) => e.mobile.replace(/\D/g, "").slice(-10) === clean
-    );
-  }
-  return undefined;
+  return BY_NUMBER.get(key(identifier));
 }
+
+/**
+ * The number an exhibitor's records belong under.
+ *
+ * Anything saved against an alias - a profile, an order, a drawn stall -
+ * belongs to the one row on the master sheet, so the admin panel and the
+ * lottery report both fold it back onto this number rather than showing the
+ * same firm twice. An unknown number is returned as given.
+ */
+export function canonicalMobile(identifier: string | null | undefined): string {
+  return findExhibitorByMobile(String(identifier ?? ""))?.mobile ?? String(identifier ?? "");
+}
+
+/** The organiser logins, which are not exhibitors. */
+export const ORGANISER_MOBILES = ["9106139666", "9950787787"];
+
+/** The exhibitors alone - the master sheet's own list, without the organisers. */
+export const EXHIBITORS_ONLY: RegisteredExhibitor[] = REGISTERED_EXHIBITORS_LIST.filter(
+  (e) => !ORGANISER_MOBILES.includes(e.mobile)
+);
 
 /**
  * The portal is closed to everyone who is not on the master sheet.
@@ -189,7 +222,8 @@ export function findExhibitorByMobile(identifier: string): RegisteredExhibitor |
  * two organiser numbers - so membership of it is the single test every entry
  * point applies. There is no sign-up path: a number that is not here cannot log
  * in, cannot draw a stall, and cannot be added by the sheet webhook. To admit a
- * new exhibitor, add their row above.
+ * new exhibitor, add their row above; to admit a second number for an
+ * exhibitor already on it, add that number to their `aliases`.
  */
 export function isRegisteredExhibitor(identifier: string | null | undefined): boolean {
   return findExhibitorByMobile(String(identifier ?? "")) !== undefined;

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import db, { REGISTERED_EXHIBITOR_MOBILES, saveRemotePassword } from '@/lib/db';
+import db, { saveRemotePassword } from '@/lib/db';
+import { isRegisteredExhibitor } from '@/data/registeredExhibitors';
 import { createSessionToken, isAdminMobile } from '@/lib/auth';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
@@ -29,11 +30,9 @@ export async function POST(request: Request) {
       cleanMobile = rawInput.toUpperCase();
     }
 
-    // Verify mobile / user ID is in registered whitelist
-    const isWhitelisted = REGISTERED_EXHIBITOR_MOBILES.some(
-      (m) => m.toLowerCase() === cleanMobile.toLowerCase()
-    );
-    if (!isWhitelisted) {
+    // Verify mobile / user ID is on the master sheet - an alias counts as the
+    // exhibitor's own number, the same test login applies.
+    if (!isRegisteredExhibitor(cleanMobile)) {
       return NextResponse.json(
         { error: 'User ID / Mobile number not found in registered exhibitor list. Please check your credentials.' },
         { status: 403 }

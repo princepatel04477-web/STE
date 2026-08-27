@@ -2,12 +2,14 @@
 
 import React, { useMemo, useRef, useState } from 'react';
 import { Minus, Plus, Maximize2, Crosshair } from 'lucide-react';
-import { STALL_MAP_2026, Stall2026 } from '@/data/stallMap2026';
+import { STALL_MAP_2026 } from '@/data/stallMap2026';
+import { SAREE_POOL_STALLS } from '@/data/stallAllotment2026';
 import {
-  ALLOTMENTS_2026,
-  SAREE_POOL_STALLS,
-  SPLIT_BAYS_2026,
-} from '@/data/stallAllotment2026';
+  STALL_UNITS,
+  StallUnit,
+  ALLOTMENT_BY_UNIT,
+  OCCUPANCY_2026,
+} from '@/lib/stallOccupancy';
 
 /**
  * The approved 2026 floor plan, with every stall numbered.
@@ -36,51 +38,21 @@ const TRADE_COLOURS: Record<string, string> = {
   'Home & Other': '#7C8794',
 };
 
-const TRADE_BY_UNIT = new Map(ALLOTMENTS_2026.map((a) => [a.unitId, a.group]));
+/**
+ * Occupancy shading, painted over the printed plan: a free stall has to be
+ * the thing the eye lands on, so it takes the strong colour.
+ */
+const FREE_FILL = 'rgba(16,185,129,0.85)';
+const FREE_STROKE = '#064E3B';
+/** Seated on the layout, still to be confirmed by the draw. */
+const PLANNED_FILL = 'rgba(15,23,42,0.20)';
+/** Confirmed by a live draw. */
+const DRAWN_FILL = 'rgba(37,99,235,0.40)';
+
 const SAREE = new Set(SAREE_POOL_STALLS);
-const SPLIT = new Set(SPLIT_BAYS_2026);
 
-type Unit = {
-  id: string;
-  stall: Stall2026;
-  /** The unit's own size - the cut part, not the whole bay it sits in. */
-  size: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-};
-
-/** Every addressable unit: a split bay contributes its two halves. */
-function buildUnits(): Unit[] {
-  const out: Unit[] = [];
-  for (const stall of STALL_MAP_2026) {
-    if (SPLIT.has(stall.stallNumber) && stall.halves) {
-      for (const half of stall.halves) {
-        out.push({
-          id: half.id,
-          stall,
-          size: half.size ?? '3M x 3M',
-          x: half.x,
-          y: half.y,
-          w: half.w,
-          h: half.h,
-        });
-      }
-    } else {
-      out.push({
-        id: String(stall.stallNumber),
-        stall,
-        size: stall.size,
-        x: stall.x,
-        y: stall.y,
-        w: stall.w,
-        h: stall.h,
-      });
-    }
-  }
-  return out;
-}
+/** Which overlay the plan is painted with. */
+type View = 'plain' | 'trades' | 'occupancy';
 
 export interface FloorPlan2026Props {
   /** Unit id to mark on the plan, e.g. "76" or "91A". */
@@ -92,6 +64,12 @@ export interface FloorPlan2026Props {
   compact?: boolean;
   /** Start with the trade-block colours on. */
   showTrades?: boolean;
+  /** Start with allotted / free shading on - the organiser's view. */
+  showOccupancy?: boolean;
+  /** Units a live draw has already confirmed, marked apart from the layout. */
+  drawnUnitIds?: Set<string> | null;
+  /** What to call the marked stall on the jump button. */
+  focusLabel?: string;
 }
 
 export default function FloorPlan2026({
@@ -100,10 +78,15 @@ export default function FloorPlan2026({
   onSelect,
   compact = false,
   showTrades = false,
+  showOccupancy = false,
+  drawnUnitIds = null,
+  focusLabel,
 }: FloorPlan2026Props) {
-  const units = useMemo(buildUnits, []);
+  const units = useMemo<StallUnit[]>(() => STALL_UNITS, []);
   const [zoom, setZoom] = useState(1);
-  const [byTrade, setByTrade] = useState(showTrades);
+  const [view, setView] = useState<View>(
+    showOccupancy ? 'occupancy' : showTrades ? 'trades' : 'plain'
+  );
   /** What the viewer last tapped. Falls back to the stall they were allotted. */
   const [picked, setPicked] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -115,6 +98,9 @@ export default function FloorPlan2026({
   const isOwnStall = Boolean(
     selectedUnitId && selected && selected.id.toUpperCase() === selectedUnitId.toUpperCase()
   );
+  const selectedAllotment = selected
+    ? ALLOTMENT_BY_UNIT.get(selected.id.toUpperCase())
+    : undefined;
 
   const centreOnSelection = React.useCallback(() => {
     const box = scrollRef.current;
@@ -134,6 +120,10 @@ export default function FloorPlan2026({
   function reset() {
     setZoom(1);
     scrollRef.current?.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
+  }
+
+  function toggleView(wanted: Exclude<View, 'plain'>) {
+    setView((v) => (v === wanted ? 'plain' : wanted));
   }
 
   return (
@@ -177,16 +167,31 @@ export default function FloorPlan2026({
             className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-amber-400/60 px-2.5 py-1.5 text-[11px] font-semibold text-amber-300 hover:bg-amber-400/10"
           >
             <Crosshair className="w-3.5 h-3.5" />
-            My stall {selectedUnitId}
+            {focusLabel ?? 'My stall'} {selectedUnitId}
           </button>
+        )}
+
+        {showOccupancy && (
+        <button
+          type="button"
+          onClick={() => toggleView('occupancy')}
+          aria-pressed={view === 'occupancy'}
+          className={`shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition ${
+            view === 'occupancy'
+              ? 'border-emerald-400/60 text-emerald-300'
+              : 'border-white/15 text-slate-400'
+          }`}
+        >
+          Allotted / free
+        </button>
         )}
 
         <button
           type="button"
-          onClick={() => setByTrade((v) => !v)}
-          aria-pressed={byTrade}
+          onClick={() => toggleView('trades')}
+          aria-pressed={view === 'trades'}
           className={`shrink-0 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition ${
-            byTrade
+            view === 'trades'
               ? 'border-amber-400/60 text-amber-300'
               : 'border-white/15 text-slate-400'
           }`}
@@ -197,7 +202,13 @@ export default function FloorPlan2026({
         <p className="text-[11px] sm:text-xs text-slate-400 tabular-nums truncate">
           {selected
             ? `Stall ${selected.id} · ${selected.size} · ${selected.stall.zone}` +
-              (isOwnStall ? ' · yours' : '')
+              (showOccupancy
+                ? selectedAllotment
+                  ? ` · ${selectedAllotment.brand}`
+                  : ' · free'
+                : '') +
+              (drawnUnitIds?.has(selected.id.toUpperCase()) ? ' · drawn' : '') +
+              (isOwnStall ? (focusLabel ? ' · marked' : ' · yours') : '')
             : 'Tap a stall to identify it'}
         </p>
       </div>
@@ -225,19 +236,32 @@ export default function FloorPlan2026({
           <svg
             viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
             className="absolute inset-0 w-full h-full"
-            aria-hidden="true"
           >
             {units.map((u) => {
               const isSel = selected?.id === u.id;
               const veiled = Boolean(
                 visibleUnitIds && !visibleUnitIds.has(u.id) && !isSel
               );
-              const trade = TRADE_BY_UNIT.get(u.id);
+              const allotment = ALLOTMENT_BY_UNIT.get(u.id.toUpperCase());
+              const drawn = Boolean(drawnUnitIds?.has(u.id.toUpperCase()));
+              const free = !allotment && !drawn;
               let fill = 'transparent';
+              let stroke = 'none';
+              let strokeWidth = 0;
               if (veiled) fill = 'rgba(255,255,255,0.82)';
               else if (isSel) fill = 'rgba(214,160,102,0.42)';
-              else if (byTrade && trade)
-                fill = `${TRADE_COLOURS[trade] ?? '#7C8794'}4D`;
+              else if (view === 'occupancy') {
+                if (free) {
+                  fill = FREE_FILL;
+                  stroke = FREE_STROKE;
+                  strokeWidth = 2;
+                } else fill = drawn ? DRAWN_FILL : PLANNED_FILL;
+              } else if (view === 'trades' && allotment)
+                fill = `${TRADE_COLOURS[allotment.group] ?? '#7C8794'}4D`;
+              if (isSel) {
+                stroke = '#B87333';
+                strokeWidth = 2;
+              }
               return (
                 <rect
                   key={u.id}
@@ -246,14 +270,22 @@ export default function FloorPlan2026({
                   width={u.w}
                   height={u.h}
                   fill={fill}
-                  stroke={isSel ? '#B87333' : 'none'}
-                  strokeWidth={isSel ? 2 : 0}
+                  stroke={stroke}
+                  strokeWidth={strokeWidth}
                   style={{ cursor: onSelect ? 'pointer' : 'default' }}
                   onClick={() => {
                     setPicked(u.id);
                     onSelect?.(u.id);
                   }}
-                />
+                >
+                  <title>
+                    {`Stall ${u.id} · ${u.size} · ${u.areaSqft} sqft` +
+                      (showOccupancy
+                        ? ` · ${allotment ? allotment.brand : 'Free'}` +
+                          (drawn ? ' · drawn' : '')
+                        : '')}
+                  </title>
+                </rect>
               );
             })}
           </svg>
@@ -261,7 +293,19 @@ export default function FloorPlan2026({
       </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 border-t border-white/10 text-[10px] sm:text-[11px] text-slate-400">
-        {byTrade ? (
+        {view === 'occupancy' ? (
+          <>
+            <span className="tabular-nums">
+              {OCCUPANCY_2026.allotted} allotted &middot; {OCCUPANCY_2026.free} free
+              of {OCCUPANCY_2026.totalUnits} units
+            </span>
+            <Key colour={FREE_FILL} label="Free" />
+            <Key colour={PLANNED_FILL} label="Allotted on the layout" />
+            {drawnUnitIds && drawnUnitIds.size > 0 && (
+              <Key colour={DRAWN_FILL} label={`Drawn (${drawnUnitIds.size})`} />
+            )}
+          </>
+        ) : view === 'trades' ? (
           Object.entries(TRADE_COLOURS).map(([trade, colour]) => (
             <Key key={trade} colour={`${colour}88`} label={trade} />
           ))
@@ -271,7 +315,10 @@ export default function FloorPlan2026({
             the floor
           </span>
         )}
-        <Key colour="rgba(214,160,102,0.7)" label={isOwnStall ? 'Your stall' : 'Selected'} />
+        <Key
+          colour="rgba(214,160,102,0.7)"
+          label={focusLabel ? 'Marked' : isOwnStall ? 'Your stall' : 'Selected'}
+        />
       </div>
     </div>
   );

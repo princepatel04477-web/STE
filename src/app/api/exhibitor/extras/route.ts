@@ -2,8 +2,12 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
-import { syncToGoogleSheets } from '@/lib/googleSheets';
-import { findExhibitorByMobile } from '@/data/registeredExhibitors';
+import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
+
+// The write touches Supabase and then the Google Sheet; the platform default is
+// tight enough that a slow Apps Script can abort a request whose data was
+// already saved, which the portal then reports as a failed save.
+export const maxDuration = 30;
 
 export async function GET() {
   try {
@@ -218,60 +222,12 @@ export async function POST(request: Request) {
       }
     }
 
-    // Fetch exhibitor profile from Supabase (source of truth) or local db fallback
-    const reg = findExhibitorByMobile(session.mobile);
-    let finalBrand = reg?.brandName || 'Registered Exhibitor';
-    let finalSqft = reg?.stallSqft || '200 sq ft';
-    let finalExhibitorName = contactName;
-    let finalProfilePicUrl = '';
-    let finalCompanyDesc = '';
-    let finalFasciaNames = [finalBrand, ''];
-
-    if (isSupabaseConfigured && supabaseAdmin) {
-      try {
-        const { data: sbProfile } = await supabaseAdmin
-          .from('exhibitors')
-          .select('*')
-          .eq('mobile', session.mobile)
-          .maybeSingle();
-
-        if (sbProfile) {
-          if (sbProfile.brand_name) finalBrand = sbProfile.brand_name;
-          if (sbProfile.stall_sqft) finalSqft = sbProfile.stall_sqft;
-          if (sbProfile.fascia_names_json) {
-            const parsed = typeof sbProfile.fascia_names_json === 'string' ? JSON.parse(sbProfile.fascia_names_json) : sbProfile.fascia_names_json;
-            if (Array.isArray(parsed)) {
-              finalFasciaNames = parsed.map(n => String(n || ''));
-            } else if (parsed && typeof parsed === 'object') {
-              if (Array.isArray(parsed.fascia_names)) finalFasciaNames = parsed.fascia_names.map((n: any) => String(n || ''));
-              if (!finalExhibitorName && parsed.exhibitor_name) finalExhibitorName = parsed.exhibitor_name;
-              if (parsed.profile_pic_url) finalProfilePicUrl = parsed.profile_pic_url;
-              if (parsed.company_description) finalCompanyDesc = parsed.company_description;
-            }
-          }
-        }
-      } catch {}
-    } else {
-      const profile = db
-        .prepare('SELECT brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description FROM exhibitors WHERE mobile = ?')
-        .get(session.mobile) as { brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string } | undefined;
-      if (profile?.brand_name) finalBrand = profile.brand_name;
-      if (profile?.stall_sqft) finalSqft = profile.stall_sqft;
-      if (!finalExhibitorName && profile?.exhibitor_name) finalExhibitorName = profile.exhibitor_name;
-      if (profile?.profile_pic_url) finalProfilePicUrl = profile.profile_pic_url;
-      if (profile?.company_description) finalCompanyDesc = profile.company_description;
-    }
-
-    // Sync to Google Sheets and await completion for Vercel Serverless execution
+    // Push the exhibitor's COMPLETE row to the sheet — the order together with
+    // the profile, fascia names and artwork links. Sending only the order
+    // fields blanked the uploaded logo and Drive links in the sheet.
     try {
-      await syncToGoogleSheets({
-        mobile: session.mobile,
-        exhibitor_name: finalExhibitorName,
-        profile_pic_url: finalProfilePicUrl,
-        company_description: finalCompanyDesc,
-        brand_name: finalBrand,
-        stall_sqft: finalSqft,
-        fascia_names: finalFasciaNames,
+      await syncExhibitorRowToSheets(session.mobile, {
+        exhibitor_name: contactName,
         items,
         special_notes: cleanNotes,
         owner_badges: oBadges,
@@ -281,7 +237,7 @@ export async function POST(request: Request) {
         rental_days: rDays
       });
     } catch (err) {
-      console.error('Google Sheets background sync error:', err);
+      console.error('Google Sheets sync error:', err);
     }
 
     return NextResponse.json({

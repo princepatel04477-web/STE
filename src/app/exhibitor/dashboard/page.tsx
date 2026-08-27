@@ -73,7 +73,91 @@ interface OrderItem {
   rate_inr?: number;
 }
 
+interface ProfileSavePayload {
+  exhibitor_name: string;
+  company_description: string;
+  brand_name: string;
+  stall_sqft: string;
+  fascia_names: string[];
+}
+
+interface BadgeNames {
+  owner: string[];
+  sales: string[];
+  support: string[];
+}
+
+interface ExtrasSavePayload {
+  exhibitor_name: string;
+  items: OrderItem[];
+  special_notes: string;
+  owner_badges: number;
+  sales_badges: number;
+  support_badges: number;
+  badge_names: BadgeNames;
+  rental_days: number;
+}
+
+/** What is cached on the device between an edit and the server confirming it. */
+interface PortalDraft {
+  at: number;
+  profile: Partial<ProfileSavePayload>;
+  extras: Partial<ExtrasSavePayload> | null;
+}
+
 const SQFT_PRESETS = ['100', '200', '300', '400', '600', '800', '1000', '1200', '2000', '2600'];
+
+/**
+ * The presets are bare numbers while the master exhibitor list stores sizes as
+ * "400 sq ft". Without stripping the unit, every exhibitor whose size came from
+ * that list failed the preset match, was flipped to "Other", and had their
+ * stall size written back as "Other: 400 sq ft" — and rendered as
+ * "400 sq ft sq ft". Reduce any stored form to the bare number first.
+ */
+function normalizeSqft(stored: string): string {
+  return stored
+    .replace(/^Other:\s*/i, '')
+    .replace(/\s*sq\.?\s*ft\.?$/i, '')
+    .trim();
+}
+
+/**
+ * Where an exhibitor is sent once their requirements are in. They fill this
+ * form on a phone and expect to land back on the exhibition site afterwards.
+ */
+const POST_SUBMIT_DESTINATION = '/';
+const POST_SUBMIT_REDIRECT_SECONDS = 6;
+
+const draftStorageKey = (mobile: string) => `ste2026_portal_draft_${mobile}`;
+
+/**
+ * A save that fails on a phone is usually the network dropping for a moment in
+ * a crowded hall, not a rejection. Retry the transient cases; return the
+ * response as-is for anything the server has actually decided (4xx).
+ */
+async function postJsonWithRetry(url: string, body: unknown, attempts = 3): Promise<Response> {
+  let lastError: unknown = null;
+
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok || (res.status >= 400 && res.status < 500)) return res;
+      lastError = new Error(`Server responded ${res.status}`);
+    } catch (err) {
+      lastError = err;
+    }
+
+    if (attempt < attempts - 1) {
+      await new Promise((resolve) => setTimeout(resolve, 900 * (attempt + 1)));
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('Network request failed');
+}
 
 export default function ExhibitorDashboardPage() {
   const router = useRouter();
@@ -172,8 +256,23 @@ export default function ExhibitorDashboardPage() {
   // General Loading & Auth check
   const [initialLoading, setInitialLoading] = useState(true);
   const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  // Submission confirmation shown over the page, so the result is impossible to
+  // miss on a phone — the old inline message sat far above the sticky submit
+  // bar and never came into view.
+  const [submitConfirmed, setSubmitConfirmed] = useState(false);
+  const [redirectSeconds, setRedirectSeconds] = useState(POST_SUBMIT_REDIRECT_SECONDS);
+  const [restoredDraftNotice, setRestoredDraftNotice] = useState('');
   const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isInitializedRef = useRef(false);
+
+  // The most recent payload the form would send, and whether it has reached the
+  // server yet. A phone can be locked, backgrounded or killed while the 1.2s
+  // autosave timer is still pending, and a pending timer never fires again —
+  // these let the page push the edits out on the way down instead.
+  const latestPayloadRef = useRef<{ profile: ProfileSavePayload; extras: ExtrasSavePayload | null } | null>(null);
+  const hasUnsavedEditsRef = useRef(false);
+  const mobileRef = useRef('');
 
   useEffect(() => {
     fetchInitialData();
@@ -216,6 +315,126 @@ export default function ExhibitorDashboardPage() {
     return [];
   };
 
+  /**
+   * Puts a saved draft back into the form. Used only when the draft is newer
+   * than what the server holds, so it can never undo an edit made elsewhere.
+   */
+  const applyDraftToForm = (draft: PortalDraft) => {
+    const profile = draft.profile || {};
+    const extras = draft.extras;
+
+    if (typeof profile.exhibitor_name === 'string') setExhibitorName(profile.exhibitor_name);
+    if (typeof profile.company_description === 'string') setCompanyDescription(profile.company_description);
+    if (typeof profile.brand_name === 'string' && profile.brand_name) setBrandName(profile.brand_name);
+
+    if (typeof profile.stall_sqft === 'string' && profile.stall_sqft) {
+      const draftSqft = normalizeSqft(profile.stall_sqft);
+      if (SQFT_PRESETS.includes(draftSqft)) {
+        setSelectedSqftOption(draftSqft);
+        setCustomSqft('');
+      } else if (draftSqft) {
+        setSelectedSqftOption('Other');
+        setCustomSqft(draftSqft);
+      }
+    }
+
+    if (Array.isArray(profile.fascia_names) && profile.fascia_names.length >= 2) {
+      setFasciaNames(profile.fascia_names.map((n) => String(n || '')));
+    }
+
+    if (!extras) return;
+
+    if (Array.isArray(extras.items)) {
+      const qMap: Record<string, number> = {};
+      const dMap: Record<string, number> = {};
+      extras.items.forEach((item) => {
+        if (!item?.id) return;
+        if (item.quantity > 0) qMap[item.id] = item.quantity;
+        dMap[item.id] = Number(item.days) || 2;
+      });
+      setQuantities(qMap);
+      setItemDays(dMap);
+    }
+
+    if (typeof extras.special_notes === 'string') setSpecialNotes(extras.special_notes);
+
+    const oCount = Number(extras.owner_badges) || 0;
+    const sCount = Number(extras.sales_badges) || 0;
+    const supCount = Number(extras.support_badges) || 0;
+    setOwnerBadges(oCount);
+    setSalesBadges(sCount);
+    setSupportBadges(supCount);
+
+    const padded = (names: string[] | undefined, count: number) => {
+      const arr = Array.isArray(names) ? names.map((n) => String(n || '')) : [];
+      while (arr.length < count) arr.push('');
+      return arr.slice(0, count);
+    };
+    setOwnerBadgeNames(padded(extras.badge_names?.owner, oCount));
+    setSalesBadgeNames(padded(extras.badge_names?.sales, sCount));
+    setSupportBadgeNames(padded(extras.badge_names?.support, supCount));
+  };
+
+  /**
+   * Edits are cached locally before every save attempt and cleared once the
+   * server confirms. A cache left behind means the last save never got out —
+   * push it now rather than letting the exhibitor retype it.
+   */
+  const replayPendingDraft = async (mobileId: string, serverUpdatedAt: number) => {
+    if (!mobileId) return;
+
+    let draft: PortalDraft | null = null;
+    try {
+      const raw = window.localStorage.getItem(draftStorageKey(mobileId));
+      if (!raw) return;
+      draft = JSON.parse(raw) as PortalDraft;
+    } catch {
+      return;
+    }
+
+    const clear = () => {
+      try {
+        window.localStorage.removeItem(draftStorageKey(mobileId));
+      } catch {}
+    };
+
+    if (!draft?.profile || typeof draft.at !== 'number') {
+      clear();
+      return;
+    }
+
+    // The server is at least as fresh — the draft is a leftover, not lost work.
+    if (serverUpdatedAt && draft.at <= serverUpdatedAt) {
+      clear();
+      return;
+    }
+
+    try {
+      applyDraftToForm(draft);
+    } catch (err) {
+      console.warn('Discarding an unreadable saved draft:', err);
+      clear();
+      return;
+    }
+
+    try {
+      const profRes = await postJsonWithRetry('/api/exhibitor/profile', draft.profile, 2);
+      const extrasRes = draft.extras
+        ? await postJsonWithRetry('/api/exhibitor/extras', draft.extras, 2)
+        : null;
+
+      if (profRes.ok && (!extrasRes || extrasRes.ok)) {
+        clear();
+        setRestoredDraftNotice(
+          'We restored the details you had filled in before and saved them for you.'
+        );
+        setTimeout(() => setRestoredDraftNotice(''), 8000);
+      }
+    } catch (err) {
+      console.warn('Could not replay the saved draft yet:', err);
+    }
+  };
+
   const fetchInitialData = async () => {
     try {
       // 1. Fetch Profile
@@ -227,6 +446,7 @@ export default function ExhibitorDashboardPage() {
       const profData = await profRes.json();
 
       setMobile(profData.mobile || '');
+      mobileRef.current = profData.mobile || '';
       setBrandName(profData.brand_name || '');
       setExhibitorName(profData.exhibitor_name || '');
       setProfilePicUrl(profData.profile_pic_url || null);
@@ -234,13 +454,13 @@ export default function ExhibitorDashboardPage() {
       setCategory(profData.category || '');
       setMarket(profData.market || '');
 
-      const existingSqft = profData.stall_sqft || '200 sq ft';
+      const existingSqft = normalizeSqft(profData.stall_sqft || '200 sq ft');
       if (SQFT_PRESETS.includes(existingSqft)) {
         setSelectedSqftOption(existingSqft);
         setCustomSqft('');
       } else if (existingSqft) {
         setSelectedSqftOption('Other');
-        setCustomSqft(existingSqft.replace(/^Other:\s*/i, ''));
+        setCustomSqft(existingSqft);
       }
 
       if (Array.isArray(profData.fascia_names)) {
@@ -319,6 +539,15 @@ export default function ExhibitorDashboardPage() {
 
         setLastSubmittedAt(catData.existingOrder.updated_at || null);
       }
+
+      // 3. Recover anything typed on a previous visit that never reached the
+      //    server — a phone killed mid-form, or the hall's signal dropping.
+      //    The recovered values land in the form synchronously; only the resend
+      //    is left running, so a slow network cannot hold up the portal.
+      void replayPendingDraft(
+        profData.mobile || '',
+        profData.updated_at ? new Date(profData.updated_at).getTime() : 0
+      );
     } catch (err) {
       console.error('Failed to load exhibitor dashboard data:', err);
     } finally {
@@ -329,9 +558,81 @@ export default function ExhibitorDashboardPage() {
     }
   };
 
+  const buildFinalSqft = () =>
+    selectedSqftOption === 'Other'
+      ? customSqft.trim()
+        ? `Other: ${customSqft.trim()}`
+        : 'Other'
+      : selectedSqftOption;
+
+  const buildProfilePayload = (): ProfileSavePayload => ({
+    exhibitor_name: exhibitorName.trim(),
+    company_description: companyDescription.trim(),
+    brand_name: brandName,
+    stall_sqft: buildFinalSqft(),
+    fascia_names: fasciaNames
+  });
+
+  const buildSelectedItems = (): OrderItem[] =>
+    products
+      .filter((p) => (quantities[p.id] || 0) > 0)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        category: p.category,
+        unit: p.unit,
+        rate_inr: p.rate_inr || 0,
+        quantity: quantities[p.id],
+        days: itemDays[p.id] || 2
+      }));
+
+  const buildExtrasPayload = (): ExtrasSavePayload => ({
+    exhibitor_name: exhibitorName.trim(),
+    items: buildSelectedItems(),
+    special_notes: specialNotes,
+    owner_badges: ownerBadges,
+    sales_badges: salesBadges,
+    support_badges: supportBadges,
+    badge_names: {
+      owner: ownerBadgeNames.slice(0, ownerBadges),
+      sales: salesBadgeNames.slice(0, salesBadges),
+      support: supportBadgeNames.slice(0, supportBadges)
+    },
+    rental_days: 2
+  });
+
+  const rememberDraft = (profile: ProfileSavePayload, extras: ExtrasSavePayload | null) => {
+    if (!mobileRef.current) return;
+    try {
+      window.localStorage.setItem(
+        draftStorageKey(mobileRef.current),
+        JSON.stringify({ at: Date.now(), profile, extras })
+      );
+    } catch {
+      // Private browsing or a full quota — the network save is still the
+      // primary path, so carry on.
+    }
+  };
+
+  const forgetDraft = () => {
+    if (!mobileRef.current) return;
+    try {
+      window.localStorage.removeItem(draftStorageKey(mobileRef.current));
+    } catch {}
+  };
+
   // Debounced cloud autosave on change across all profile and order requirements
   useEffect(() => {
     if (!isInitializedRef.current || initialLoading) return;
+
+    const profilePayload = buildProfilePayload();
+    // The order write is rejected without a name, so hold it back rather than
+    // flashing a save error at someone still filling the form in.
+    const extrasPayload = exhibitorName.trim() ? buildExtrasPayload() : null;
+
+    latestPayloadRef.current = { profile: profilePayload, extras: extrasPayload };
+    hasUnsavedEditsRef.current = true;
+    rememberDraft(profilePayload, extrasPayload);
 
     if (autosaveTimeoutRef.current) {
       clearTimeout(autosaveTimeoutRef.current);
@@ -340,62 +641,17 @@ export default function ExhibitorDashboardPage() {
     autosaveTimeoutRef.current = setTimeout(async () => {
       setAutosaveStatus('saving');
       try {
-        const finalSqft =
-          selectedSqftOption === 'Other'
-            ? customSqft.trim()
-              ? `Other: ${customSqft.trim()}`
-              : 'Other'
-            : selectedSqftOption;
+        // Sequential, not parallel: both endpoints rewrite the exhibitor's
+        // master-sheet row, and running them together let the slower one
+        // publish a row it had read before the other's write landed.
+        const profRes = await postJsonWithRetry('/api/exhibitor/profile', profilePayload);
+        const extrasRes = extrasPayload
+          ? await postJsonWithRetry('/api/exhibitor/extras', extrasPayload)
+          : null;
 
-        const profPromise = fetch('/api/exhibitor/profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            exhibitor_name: exhibitorName.trim(),
-            company_description: companyDescription.trim(),
-            brand_name: brandName,
-            stall_sqft: finalSqft,
-            fascia_names: fasciaNames
-          })
-        });
-
-        const selectedItems: OrderItem[] = products
-          .filter((p) => (quantities[p.id] || 0) > 0)
-          .map((p) => ({
-            id: p.id,
-            name: p.name,
-            category: p.category,
-            unit: p.unit,
-            rate_inr: p.rate_inr || 0,
-            quantity: quantities[p.id],
-            days: itemDays[p.id] || 2
-          }));
-
-        // The order write is rejected without a name, so hold it back rather
-        // than flashing a save error at someone still filling the form in.
-        const extrasPromise = !exhibitorName.trim()
-          ? Promise.resolve(new Response(null, { status: 204 }))
-          : fetch('/api/exhibitor/extras', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            exhibitor_name: exhibitorName.trim(),
-            items: selectedItems,
-            special_notes: specialNotes,
-            owner_badges: ownerBadges,
-            sales_badges: salesBadges,
-            support_badges: supportBadges,
-            badge_names: {
-              owner: ownerBadgeNames,
-              sales: salesBadgeNames,
-              support: supportBadgeNames
-            },
-            rental_days: 2
-          })
-        });
-
-        const [profRes, extrasRes] = await Promise.all([profPromise, extrasPromise]);
-        if (profRes.ok && extrasRes.ok) {
+        if (profRes.ok && (!extrasRes || extrasRes.ok)) {
+          hasUnsavedEditsRef.current = false;
+          forgetDraft();
           setAutosaveStatus('saved');
           setTimeout(() => {
             setAutosaveStatus((prev) => (prev === 'saved' ? 'idle' : prev));
@@ -421,6 +677,7 @@ export default function ExhibitorDashboardPage() {
     selectedSqftOption,
     customSqft,
     fasciaNames,
+    products,
     quantities,
     itemDays,
     specialNotes,
@@ -432,6 +689,48 @@ export default function ExhibitorDashboardPage() {
     supportBadgeNames,
     initialLoading
   ]);
+
+  // Last-ditch flush. A phone that is locked, switched away from or killed
+  // freezes the pending autosave timer, and it never runs again — which is
+  // exactly how a filled-in form came back empty. `keepalive` lets these
+  // requests finish after the page itself is gone.
+  useEffect(() => {
+    const flush = () => {
+      if (!hasUnsavedEditsRef.current || !latestPayloadRef.current) return;
+
+      const { profile, extras } = latestPayloadRef.current;
+      const base: RequestInit = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true
+      };
+
+      try {
+        // Nothing can be awaited here, so both go at once. The database write
+        // in each route is authoritative; if their two sheet writes land out of
+        // order the row is corrected by the next save or page load.
+        void fetch('/api/exhibitor/profile', { ...base, body: JSON.stringify(profile) });
+        if (extras) {
+          void fetch('/api/exhibitor/extras', { ...base, body: JSON.stringify(extras) });
+        }
+      } catch {
+        // The draft in localStorage is replayed on the next visit.
+      }
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flush();
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pagehide', flush);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', flush);
+    };
+  }, []);
+
 
   const handleProfilePicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -538,36 +837,35 @@ export default function ExhibitorDashboardPage() {
     setProfileSuccessMsg('');
     setProfileError('');
 
-    const finalSqft =
-      selectedSqftOption === 'Other'
-        ? customSqft.trim()
-          ? `Other: ${customSqft.trim()}`
-          : 'Other'
-        : selectedSqftOption;
+    // A pending autosave carries the same edits; let this save be the one that
+    // lands rather than having both in flight against the same row.
+    if (autosaveTimeoutRef.current) {
+      clearTimeout(autosaveTimeoutRef.current);
+      autosaveTimeoutRef.current = null;
+    }
+
+    const profilePayload = buildProfilePayload();
 
     try {
-      const res = await fetch('/api/exhibitor/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          exhibitor_name: exhibitorName.trim(),
-          company_description: companyDescription.trim(),
-          brand_name: brandName,
-          stall_sqft: finalSqft,
-          fascia_names: fasciaNames
-        })
-      });
+      const res = await postJsonWithRetry('/api/exhibitor/profile', profilePayload);
+      const data = await res.json().catch(() => ({}));
 
-      const data = await res.json();
       if (!res.ok) {
-        setProfileError(data.error || 'Failed to save profile.');
+        setProfileError(data.error || 'Failed to save profile. Please try again.');
+        setAutosaveStatus('error');
       } else {
+        hasUnsavedEditsRef.current = false;
+        forgetDraft();
         setProfileSuccessMsg('Exhibitor profile, stall, and fascia details saved successfully!');
+        setAutosaveStatus('saved');
         setTimeout(() => setProfileSuccessMsg(''), 4000);
       }
     } catch (err) {
       console.error(err);
-      setProfileError('Failed to save exhibitor profile.');
+      setProfileError(
+        'Could not reach the server. Your details are held on this device and will be saved as soon as you are back online.'
+      );
+      setAutosaveStatus('error');
     } finally {
       setProfileSaving(false);
     }
@@ -615,74 +913,78 @@ export default function ExhibitorDashboardPage() {
     }
     setBadgeErrors([]);
 
+    // A pending autosave holds the same edits. Cancel it so it cannot fire
+    // behind this submission and race it against the same row.
+    if (autosaveTimeoutRef.current) {
+      clearTimeout(autosaveTimeoutRef.current);
+      autosaveTimeoutRef.current = null;
+    }
+
     setExtrasSaving(true);
 
-    const selectedItems: OrderItem[] = products
-      .filter((p) => (quantities[p.id] || 0) > 0)
-      .map((p) => ({
-        id: p.id,
-        name: p.name,
-        category: p.category,
-        unit: p.unit,
-        rate_inr: p.rate_inr || 0,
-        quantity: quantities[p.id],
-        days: itemDays[p.id] || 2
-      }));
+    const profilePayload = buildProfilePayload();
+    const extrasPayload = buildExtrasPayload();
+    rememberDraft(profilePayload, extrasPayload);
 
     try {
-      // Save profile and fascia simultaneously
-      const finalSqft =
-        selectedSqftOption === 'Other'
-          ? customSqft.trim()
-            ? `Other: ${customSqft.trim()}`
-            : 'Other'
-          : selectedSqftOption;
+      // Profile first, and its result is checked. It used to be fired and
+      // ignored, so a failed profile write still reported a successful
+      // submission and the name, stall size and fascia names were silently lost.
+      const profRes = await postJsonWithRetry('/api/exhibitor/profile', profilePayload);
+      if (!profRes.ok) {
+        const profData = await profRes.json().catch(() => ({}));
+        setAutosaveStatus('error');
+        setNameError(
+          profData.error || 'Your profile details could not be saved. Please try again.'
+        );
+        const profileSection = document.getElementById('section-profile');
+        if (profileSection) {
+          profileSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return;
+      }
 
-      await fetch('/api/exhibitor/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          exhibitor_name: exhibitorName.trim(),
-          company_description: companyDescription.trim(),
-          brand_name: brandName,
-          stall_sqft: finalSqft,
-          fascia_names: fasciaNames
-        })
-      });
+      const res = await postJsonWithRetry('/api/exhibitor/extras', extrasPayload);
+      const data = await res.json().catch(() => ({}));
 
-      const res = await fetch('/api/exhibitor/extras', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          exhibitor_name: exhibitorName.trim(),
-          items: selectedItems,
-          special_notes: specialNotes,
-          owner_badges: ownerBadges,
-          sales_badges: salesBadges,
-          support_badges: supportBadges,
-          badge_names: {
-            owner: ownerBadgeNames.slice(0, ownerBadges),
-            sales: salesBadgeNames.slice(0, salesBadges),
-            support: supportBadgeNames.slice(0, supportBadges)
-          }
-        })
-      });
-
-      const data = await res.json();
       if (res.ok) {
+        hasUnsavedEditsRef.current = false;
+        forgetDraft();
+        setAutosaveStatus('saved');
         setExtrasSuccessMsg('Your requirements have been submitted successfully!');
         setLastSubmittedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-        setTimeout(() => setExtrasSuccessMsg(''), 5000);
+        // Confirm over the whole page. The inline message sits far above the
+        // sticky submit bar, so on a phone it was submitted into thin air.
+        setRedirectSeconds(POST_SUBMIT_REDIRECT_SECONDS);
+        setSubmitConfirmed(true);
       } else {
+        setAutosaveStatus('error');
         alert(data.error || 'Failed to submit requirements.');
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to submit requirements. Please check your network connection.');
+      setAutosaveStatus('error');
+      alert(
+        'Could not reach the server. Your entries are saved on this device and will be submitted automatically once you are back online.'
+      );
     } finally {
       setExtrasSaving(false);
     }
   };
+
+  // Once submitted, take the exhibitor back to the exhibition site. The count
+  // is visible and can be cancelled, so nobody is thrown off the page mid-task.
+  useEffect(() => {
+    if (!submitConfirmed) return;
+
+    if (redirectSeconds <= 0) {
+      router.push(POST_SUBMIT_DESTINATION);
+      return;
+    }
+
+    const timer = setTimeout(() => setRedirectSeconds((prev) => prev - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [submitConfirmed, redirectSeconds, router]);
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -863,6 +1165,14 @@ export default function ExhibitorDashboardPage() {
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-4 sm:pt-8 pb-36 sm:pb-32 space-y-6 sm:space-y-8">
+
+        {/* Work recovered from a visit that could not reach the server */}
+        {restoredDraftNotice && (
+          <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-start gap-2.5 shadow-xs">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <span>{restoredDraftNotice}</span>
+          </div>
+        )}
 
         {/* Deadline Caution Banner */}
         <div className="p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-400/80 text-amber-950 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -2165,6 +2475,63 @@ export default function ExhibitorDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Submission confirmation — full screen so it cannot be missed on a phone */}
+      {submitConfirmed && (
+        <div className="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-white rounded-2xl border border-emerald-200 shadow-2xl p-6 text-center">
+            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center">
+              <CheckCircle2 className="w-9 h-9 text-emerald-600" />
+            </div>
+
+            <h2 className="mt-4 text-xl font-black text-slate-900">
+              Requirements submitted
+            </h2>
+            <p className="mt-2 text-sm text-slate-600 font-medium">
+              Everything you filled in — your details, stall and fascia names, badges and
+              extra items — has been saved to the STE 2026 organisers.
+            </p>
+
+            <div className="mt-4 rounded-xl bg-slate-50 border border-slate-200 p-3 text-left space-y-1.5">
+              <p className="text-xs text-slate-700 font-semibold flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Profile, stall size and fascia names saved</span>
+              </p>
+              <p className="text-xs text-slate-700 font-semibold flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>
+                  {ownerBadges + salesBadges + supportBadges} badge
+                  {ownerBadges + salesBadges + supportBadges === 1 ? '' : 's'} and{' '}
+                  {totalSelectedItemsCount} extra item
+                  {totalSelectedItemsCount === 1 ? '' : 's'} recorded
+                </span>
+              </p>
+            </div>
+
+            <p className="mt-4 text-xs text-slate-500 font-medium">
+              Taking you back to the STE 2026 website in {redirectSeconds}s…
+            </p>
+
+            <div className="mt-4 flex flex-col sm:flex-row gap-2.5">
+              <button
+                type="button"
+                onClick={() => router.push(POST_SUBMIT_DESTINATION)}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
+              >
+                <span>Back to website</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubmitConfirmed(false)}
+                className="flex-1 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
+              >
+                Stay and keep editing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Official Tax Invoice / Bill Modal */}
       <BillModal

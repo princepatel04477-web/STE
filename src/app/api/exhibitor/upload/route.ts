@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import db, { updateExhibitorFiles } from '@/lib/db';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
-import { syncToGoogleSheets } from '@/lib/googleSheets';
+import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import {
   storeExhibitorAsset,
@@ -11,6 +11,10 @@ import {
   MAX_FILE_SIZE
 } from '@/lib/exhibitorAssets';
 import { fileExtension } from '@/lib/googleDrive';
+
+// An upload carries a file body through storage, Drive and the sheet, and a
+// large logo over a phone connection needs more than the platform default.
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
@@ -194,9 +198,11 @@ export async function POST(request: Request) {
       }
     }
 
+    // Push the exhibitor's COMPLETE row to the sheet. Sending only the artwork
+    // fields blanked every extra item, badge count and badge name they had
+    // already submitted.
     try {
-      await syncToGoogleSheets({
-        mobile: session.mobile,
+      await syncExhibitorRowToSheets(session.mobile, {
         exhibitor_name: currentExhibitorName,
         profile_pic_url: profilePicUrl || '',
         company_description: currentCompanyDesc,

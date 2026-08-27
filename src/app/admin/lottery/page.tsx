@@ -26,6 +26,8 @@ import {
 } from 'lucide-react';
 import { LotteryAllocationRecord } from '@/lib/db';
 import AllotmentSlipModal from '@/components/lottery/AllotmentSlipModal';
+import FloorPlan2026 from '@/components/stallmap/FloorPlan2026';
+import { OCCUPANCY_2026, freeUnitsByZone } from '@/lib/stallOccupancy';
 import confetti from 'canvas-confetti';
 
 interface CategoryStat {
@@ -51,6 +53,14 @@ export default function AdminLotteryPage() {
   
   // Selected Slip Modal
   const [selectedSlip, setSelectedSlip] = useState<LotteryAllocationRecord | null>(null);
+
+  // Floor plan occupancy: the stall the organiser is looking at on the map.
+  const [focusUnitId, setFocusUnitId] = useState<string | null>(null);
+  const freeByZone = freeUnitsByZone();
+  /** Stalls a live draw has already confirmed, marked apart on the plan. */
+  const drawnUnitIds = new Set(
+    allocations.map((a) => String(a.stall_number).trim().toUpperCase())
+  );
 
   // Live Stage Mode State
   const [isStageMode, setIsStageMode] = useState(false);
@@ -252,6 +262,102 @@ export default function AdminLotteryPage() {
               </div>
             </div>
             <span className="text-[11px] text-purple-400/80 mt-1">2-Side Open L-Shape</span>
+          </div>
+        </div>
+
+        {/* Approved Floor Plan — allotted vs free, read off the 2026 layout */}
+        <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/80 border border-white/10 shadow-xl space-y-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                <Compass className="w-4 h-4 text-emerald-400" />
+                <span>Approved Floor Plan — Allotted vs Free</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Every stall on the printed 2026 layout: green is still free, grey
+                is seated on the layout, blue is confirmed by a live draw. Tap a
+                stall to read who holds it.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="px-4 py-2 rounded-xl bg-slate-950/70 border border-white/10 text-center">
+                <div className="text-xl font-black text-white tabular-nums">
+                  {OCCUPANCY_2026.totalUnits}
+                </div>
+                <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                  Units
+                </span>
+              </div>
+              <div className="px-4 py-2 rounded-xl bg-slate-950/70 border border-white/10 text-center">
+                <div className="text-xl font-black text-slate-300 tabular-nums">
+                  {OCCUPANCY_2026.allotted}
+                </div>
+                <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+                  Allotted
+                </span>
+              </div>
+              <div className="px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/30 text-center">
+                <div className="text-xl font-black text-blue-300 tabular-nums">
+                  {drawnUnitIds.size}
+                </div>
+                <span className="text-[10px] uppercase tracking-wider text-blue-400/80 font-bold">
+                  Drawn
+                </span>
+              </div>
+              <div className="px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-center">
+                <div className="text-xl font-black text-emerald-300 tabular-nums">
+                  {OCCUPANCY_2026.free}
+                </div>
+                <span className="text-[10px] uppercase tracking-wider text-emerald-500/80 font-bold">
+                  Free · {OCCUPANCY_2026.freeSqft.toLocaleString()} sqft
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <FloorPlan2026
+            showOccupancy
+            drawnUnitIds={drawnUnitIds}
+            selectedUnitId={focusUnitId}
+            focusLabel="Stall"
+            onSelect={(unitId) => setFocusUnitId(unitId)}
+          />
+
+          {/* The stalls still going spare, so they can be offered by hand. */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+              Remaining stalls ({OCCUPANCY_2026.free}) — nobody seated on the layout
+            </h4>
+            {freeByZone.map(({ zone, units }) => (
+              <div key={zone} className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] text-slate-500 font-semibold w-36 shrink-0">
+                  {zone}
+                </span>
+                {units.map((u) => (
+                  <button
+                    key={u.id}
+                    onClick={() => setFocusUnitId(u.id)}
+                    className={`px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-colors ${
+                      focusUnitId === u.id
+                        ? 'bg-emerald-500/25 border-emerald-400 text-emerald-200'
+                        : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
+                    }`}
+                    title={`${u.size} · ${u.zone}`}
+                  >
+                    <span className="font-mono">{u.id}</span>
+                    <span className="text-emerald-500/80 font-medium ml-1.5">
+                      {u.areaSqft} sqft
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ))}
+            {freeByZone.length === 0 && (
+              <p className="text-xs text-slate-500">
+                Every stall on the plan is allotted.
+              </p>
+            )}
           </div>
         </div>
 

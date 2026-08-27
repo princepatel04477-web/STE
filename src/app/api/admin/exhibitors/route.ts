@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
-import { REGISTERED_EXHIBITORS_LIST } from '@/data/registeredExhibitors';
+import {
+  REGISTERED_EXHIBITORS_LIST,
+  EXHIBITORS_ONLY,
+  ORGANISER_MOBILES,
+  findExhibitorByMobile,
+  canonicalMobile,
+} from '@/data/registeredExhibitors';
 import { getAuthenticatedExhibitor, isAdminMobile } from '@/lib/auth';
 
 export async function GET() {
@@ -103,15 +109,93 @@ export async function GET() {
 
     const allocationMap: Record<string, any> = {};
     lotteryAllocations.forEach((a) => {
-      if (a?.mobile) allocationMap[a.mobile] = a;
+      if (a?.mobile) allocationMap[canonicalMobile(a.mobile)] = a;
     });
 
-    // 3. Combine registered exhibitors list with db exhibitors & orders
-    const allMobiles = Array.from(new Set([
-      ...REGISTERED_EXHIBITORS_LIST.map(r => r.mobile),
-      ...Object.keys(dbExhibitorsMap),
-      ...Object.keys(ordersMap)
+    // 2c. Fold every record onto the number the master sheet gives.
+    //
+    // A firm that saved a profile, an order or a draw under a second number is
+    // one exhibitor, not two, so its records move onto its sheet number before
+    // the list is built. Whatever is left over belongs to nobody on the sheet
+    // and is reported apart rather than counted as an exhibitor.
+    const filled = (record: any) =>
+      Object.fromEntries(
+        Object.entries(record).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      );
+
+    const foldOntoSheet = (map: Record<string, any>) => {
+      const folded: Record<string, any> = {};
+      const unknown: Record<string, any> = {};
+      Object.entries(map).forEach(([mobile, record]) => {
+        const reg = findExhibitorByMobile(mobile);
+        if (!reg) {
+          unknown[mobile] = record;
+          return;
+        }
+        const prior = folded[reg.mobile];
+        if (!prior) {
+          folded[reg.mobile] = { ...record, mobile: reg.mobile, saved_under: mobile };
+          return;
+        }
+        // The sheet's own number wins; an alias only fills what it leaves empty.
+        const priorIsSheet = prior.saved_under === reg.mobile;
+        const [strong, weak] =
+          mobile === reg.mobile && !priorIsSheet ? [record, prior] : [prior, record];
+        folded[reg.mobile] = {
+          ...weak,
+          ...filled(strong),
+          mobile: reg.mobile,
+          saved_under: mobile === reg.mobile ? reg.mobile : prior.saved_under,
+        };
+      });
+      return { folded, unknown };
+    };
+
+    const foldedExhibitors = foldOntoSheet(dbExhibitorsMap);
+    const foldedOrders = foldOntoSheet(ordersMap);
+    const exhibitorRecords = foldedExhibitors.folded;
+    const orderRecords = foldedOrders.folded;
+
+    // 3. The master sheet is the list; nothing else joins it.
+    const allMobiles = REGISTERED_EXHIBITORS_LIST.map((r) => r.mobile);
+
+    // Numbers with saved data that are on neither the sheet nor an alias.
+    const unknownMobiles = Array.from(new Set([
+      ...Object.keys(foldedExhibitors.unknown),
+      ...Object.keys(foldedOrders.unknown),
+      ...lotteryAllocations
+        .map((a) => String(a?.mobile ?? ''))
+        .filter((m) => m && !findExhibitorByMobile(m)),
     ]));
+
+    // The contact someone typed is often the only clue to who a stray number
+    // is, and older profiles keep it inside the fascia blob.
+    const contactOf = (dbEx: any): string => {
+      if (dbEx?.exhibitor_name) return dbEx.exhibitor_name;
+      try {
+        const parsed =
+          typeof dbEx?.fascia_names_json === 'string'
+            ? JSON.parse(dbEx.fascia_names_json)
+            : dbEx?.fascia_names_json;
+        if (parsed && !Array.isArray(parsed) && typeof parsed === 'object') {
+          return parsed.exhibitor_name || '';
+        }
+      } catch {}
+      return '';
+    };
+
+    const unknownProfiles = unknownMobiles.map((mobile) => {
+      const dbEx = foldedExhibitors.unknown[mobile];
+      const allocation = lotteryAllocations.find((a) => a?.mobile === mobile);
+      return {
+        mobile,
+        brand_name: dbEx?.brand_name || allocation?.brand_name || '',
+        exhibitor_name: contactOf(dbEx),
+        stall_number: allocation?.stall_number || '',
+        stall_sqft: dbEx?.stall_sqft || allocation?.stall_sqft || '',
+        last_updated: dbEx?.updated_at || allocation?.allocated_at || '',
+      };
+    });
 
     // Item-wise totals catalog initialize
     const itemTotals: Record<string, { id: string; name: string; quantity: number; unit: string }> = {
@@ -138,8 +222,8 @@ export async function GET() {
 
     allMobiles.forEach(mob => {
       const reg = REGISTERED_EXHIBITORS_LIST.find(r => r.mobile === mob);
-      const dbEx = dbExhibitorsMap[mob];
-      const order = ordersMap[mob];
+      const dbEx = exhibitorRecords[mob];
+      const order = orderRecords[mob];
 
       const allocation = allocationMap[mob];
 
@@ -239,7 +323,12 @@ export async function GET() {
       totalSalesBadges,
       totalSupportBadges,
       itemTotals: Object.values(itemTotals),
-      exhibitors: formattedList
+      exhibitors: formattedList,
+      // The master sheet's own count, and the organiser logins that sit
+      // alongside it, so the panel never passes one off as the other.
+      sheetExhibitorCount: EXHIBITORS_ONLY.length,
+      organiserCount: ORGANISER_MOBILES.length,
+      unknownProfiles
     });
   } catch (error) {
     console.error('Error fetching admin exhibitors data:', error);

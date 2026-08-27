@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { normalizeExhibitorId } from '@/lib/exhibitorId';
-import { findExhibitorByMobile, isRegisteredExhibitor } from '@/data/registeredExhibitors';
+import {
+  findExhibitorByMobile,
+  isRegisteredExhibitor,
+  numbersFor,
+} from '@/data/registeredExhibitors';
 import db from '@/lib/db';
 import { performLuckyDraw, DrawContext } from '@/lib/lotteryEngine';
 import type { LotteryAllocationRecord } from '@/lib/db';
@@ -43,15 +47,19 @@ export async function POST(request: Request) {
     // The local store sits in /tmp on Vercel and is wiped per instance, so the
     // cloud database is the only reliable answer to "has this exhibitor already
     // drawn?" and "which stalls are gone?". Read both before drawing.
+    // Every number this firm is known by, so a second number cannot win a
+    // second stall.
+    const ownNumbers = registeredMaster ? numbersFor(registeredMaster) : [mobile];
+
     const context: DrawContext = {};
     if (isSupabaseConfigured && supabaseAdmin) {
       try {
-        const { data: sbExisting } = await supabaseAdmin
+        const { data: sbExistingRows } = await supabaseAdmin
           .from('lottery_allocations')
           .select('*')
-          .eq('mobile', mobile)
-          .maybeSingle();
+          .in('mobile', ownNumbers);
 
+        const sbExisting = sbExistingRows?.[0];
         if (sbExisting) {
           return NextResponse.json({
             success: true,
@@ -117,12 +125,12 @@ export async function POST(request: Request) {
         // Read back what the database actually holds. If another request got
         // there first, that row is the exhibitor's stall, not the one just
         // drawn here.
-        const { data: stored } = await supabaseAdmin
+        const { data: storedRows } = await supabaseAdmin
           .from('lottery_allocations')
           .select('*')
-          .eq('mobile', mobile)
-          .maybeSingle();
+          .in('mobile', ownNumbers);
 
+        const stored = storedRows?.[0];
         if (stored) {
           allocation = stored;
           if (stored.stall_number !== result.allocation.stall_number) {
