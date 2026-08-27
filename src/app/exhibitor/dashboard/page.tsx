@@ -98,6 +98,7 @@ export default function ExhibitorDashboardPage() {
   const [profilePicSuccess, setProfilePicSuccess] = useState('');
   const [profilePicError, setProfilePicError] = useState('');
   const profilePicInputRef = useRef<HTMLInputElement | null>(null);
+  const exhibitorNameRef = useRef<HTMLInputElement | null>(null);
 
   const handleAddFasciaName = () => {
     if (fasciaNames.length < 4) {
@@ -154,6 +155,7 @@ export default function ExhibitorDashboardPage() {
   const [salesBadgeNames, setSalesBadgeNames] = useState<string[]>([]);
   const [supportBadgeNames, setSupportBadgeNames] = useState<string[]>([]);
   const [badgeErrors, setBadgeErrors] = useState<string[]>([]);
+  const [nameError, setNameError] = useState('');
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   // Brand Logo & Vector Artwork (CDR) Upload State
@@ -369,10 +371,15 @@ export default function ExhibitorDashboardPage() {
             days: itemDays[p.id] || 2
           }));
 
-        const extrasPromise = fetch('/api/exhibitor/extras', {
+        // The order write is rejected without a name, so hold it back rather
+        // than flashing a save error at someone still filling the form in.
+        const extrasPromise = !exhibitorName.trim()
+          ? Promise.resolve(new Response(null, { status: 204 }))
+          : fetch('/api/exhibitor/extras', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            exhibitor_name: exhibitorName.trim(),
             items: selectedItems,
             special_notes: specialNotes,
             owner_badges: ownerBadges,
@@ -585,6 +592,18 @@ export default function ExhibitorDashboardPage() {
     setHasAttemptedSubmit(true);
     setExtrasSuccessMsg('');
 
+    // Nothing can be acted on at the venue without a name against the order.
+    if (!exhibitorName.trim()) {
+      setNameError('Enter your name before submitting your requirements.');
+      const profile = document.getElementById('section-profile');
+      if (profile) {
+        profile.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      exhibitorNameRef.current?.focus({ preventScroll: true });
+      return;
+    }
+    setNameError('');
+
     const errs = validateBadgeNames();
     if (errs.length > 0) {
       setBadgeErrors(errs);
@@ -635,6 +654,7 @@ export default function ExhibitorDashboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          exhibitor_name: exhibitorName.trim(),
           items: selectedItems,
           special_notes: specialNotes,
           owner_badges: ownerBadges,
@@ -1003,10 +1023,24 @@ export default function ExhibitorDashboardPage() {
                     type="text"
                     required
                     placeholder="Enter your full name (e.g. Rajesh Kumar Mehta)..."
+                    ref={exhibitorNameRef}
                     value={exhibitorName}
-                    onChange={(e) => setExhibitorName(e.target.value)}
-                    className="w-full max-w-lg px-3.5 py-2 bg-white border border-slate-300 focus:border-amber-500 rounded-xl text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 shadow-2xs"
+                    onChange={(e) => {
+                      setExhibitorName(e.target.value);
+                      if (nameError) setNameError('');
+                    }}
+                    className={`w-full max-w-lg px-3.5 py-2 bg-white border rounded-xl text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 shadow-2xs ${
+                      nameError
+                        ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
+                        : 'border-slate-300 focus:border-amber-500 focus:ring-amber-500/20'
+                    }`}
                   />
+                  {nameError && (
+                    <p className="mt-1.5 text-xs font-bold text-red-600 flex items-center gap-1.5">
+                      <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                      <span>{nameError}</span>
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

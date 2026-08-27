@@ -81,6 +81,38 @@ export async function GET() {
   }
 }
 
+/**
+ * The exhibitor's own name as already stored. Supabase keeps it inside the
+ * structured fascia payload; the local store keeps it in its own column.
+ */
+async function lookupStoredExhibitorName(mobile: string): Promise<string> {
+  if (isSupabaseConfigured && supabaseAdmin) {
+    try {
+      const { data: sbProfile } = await supabaseAdmin
+        .from('exhibitors')
+        .select('fascia_names_json')
+        .eq('mobile', mobile)
+        .maybeSingle();
+
+      const rawPayload = sbProfile?.fascia_names_json;
+      if (rawPayload) {
+        const parsed = typeof rawPayload === 'string' ? JSON.parse(rawPayload) : rawPayload;
+        if (parsed && !Array.isArray(parsed) && typeof parsed === 'object' && parsed.exhibitor_name) {
+          return String(parsed.exhibitor_name).trim();
+        }
+      }
+    } catch (err) {
+      console.warn('[Extras POST] Name lookup fell back to local store:', err);
+    }
+  }
+
+  const local = db
+    .prepare('SELECT exhibitor_name FROM exhibitors WHERE mobile = ?')
+    .get(mobile) as { exhibitor_name?: string } | undefined;
+
+  return (local?.exhibitor_name || '').trim();
+}
+
 export async function POST(request: Request) {
   try {
     const session = await getAuthenticatedExhibitor();
@@ -93,6 +125,20 @@ export async function POST(request: Request) {
 
     if (!Array.isArray(items)) {
       return NextResponse.json({ error: 'Invalid items payload' }, { status: 400 });
+    }
+
+    // An order nobody is named against cannot be acted on at the venue, so the
+    // exhibitor's own name is compulsory. Take it from the request, and fall
+    // back to the profile already on record.
+    let contactName = typeof body.exhibitor_name === 'string' ? body.exhibitor_name.trim() : '';
+    if (!contactName) {
+      contactName = await lookupStoredExhibitorName(session.mobile);
+    }
+    if (!contactName) {
+      return NextResponse.json(
+        { error: 'Your name is required before submitting your requirements.' },
+        { status: 400 }
+      );
     }
 
     const itemsJson = JSON.stringify(items);
@@ -176,7 +222,7 @@ export async function POST(request: Request) {
     const reg = findExhibitorByMobile(session.mobile);
     let finalBrand = reg?.brandName || 'Registered Exhibitor';
     let finalSqft = reg?.stallSqft || '200 sq ft';
-    let finalExhibitorName = '';
+    let finalExhibitorName = contactName;
     let finalProfilePicUrl = '';
     let finalCompanyDesc = '';
     let finalFasciaNames = [finalBrand, ''];
@@ -198,7 +244,7 @@ export async function POST(request: Request) {
               finalFasciaNames = parsed.map(n => String(n || ''));
             } else if (parsed && typeof parsed === 'object') {
               if (Array.isArray(parsed.fascia_names)) finalFasciaNames = parsed.fascia_names.map((n: any) => String(n || ''));
-              if (parsed.exhibitor_name) finalExhibitorName = parsed.exhibitor_name;
+              if (!finalExhibitorName && parsed.exhibitor_name) finalExhibitorName = parsed.exhibitor_name;
               if (parsed.profile_pic_url) finalProfilePicUrl = parsed.profile_pic_url;
               if (parsed.company_description) finalCompanyDesc = parsed.company_description;
             }
@@ -211,7 +257,7 @@ export async function POST(request: Request) {
         .get(session.mobile) as { brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string } | undefined;
       if (profile?.brand_name) finalBrand = profile.brand_name;
       if (profile?.stall_sqft) finalSqft = profile.stall_sqft;
-      if (profile?.exhibitor_name) finalExhibitorName = profile.exhibitor_name;
+      if (!finalExhibitorName && profile?.exhibitor_name) finalExhibitorName = profile.exhibitor_name;
       if (profile?.profile_pic_url) finalProfilePicUrl = profile.profile_pic_url;
       if (profile?.company_description) finalCompanyDesc = profile.company_description;
     }
@@ -220,8 +266,12 @@ export async function POST(request: Request) {
     try {
       await syncToGoogleSheets({
         mobile: session.mobile,
+        exhibitor_name: finalExhibitorName,
+        profile_pic_url: finalProfilePicUrl,
+        company_description: finalCompanyDesc,
         brand_name: finalBrand,
         stall_sqft: finalSqft,
+        fascia_names: finalFasciaNames,
         items,
         special_notes: cleanNotes,
         owner_badges: oBadges,
