@@ -29,6 +29,8 @@ export interface DrawUnit {
   group: string;
   zone: string;
   stall: Stall2026;
+  /** Hand-allotted before the draw, so no one may draw it. */
+  held: boolean;
 }
 
 /** The block an exhibitor may draw from: pool + size + trade. */
@@ -51,6 +53,7 @@ const UNITS_BY_BLOCK: Map<string, DrawUnit[]> = (() => {
       group: a.group,
       zone: a.zone,
       stall,
+      held: a.held,
     };
     const key = blockKey(a.pool, a.sheetSize, a.group);
     const list = map.get(key);
@@ -128,14 +131,19 @@ export function drawStall(
   }
 
   const block = UNITS_BY_BLOCK.get(blockKey(entry.pool, entry.sheetSize, entry.group));
-  if (!block || block.length === 0) {
+  if (!block || block.every((u) => u.held)) {
     return { error: `No ${entry.sheetSize} stalls are laid out for ${entry.group}.` };
   }
 
   const taken = new Set(
     Array.from(options.taken ?? [], (id) => String(id).trim().toUpperCase())
   );
-  const free = block.filter((u) => !taken.has(u.unitId.toUpperCase()));
+  // A held stall belongs to its exhibitor whether or not they have drawn yet,
+  // so it is excluded here as well as by `taken` - `taken` only lists stalls
+  // someone has already drawn, which a held stall need never have been.
+  const free = block.filter(
+    (u) => !u.held && !taken.has(u.unitId.toUpperCase())
+  );
   if (free.length === 0) {
     return {
       error: `Every ${entry.sheetSize} stall in the ${entry.group} block is already allotted.`,
