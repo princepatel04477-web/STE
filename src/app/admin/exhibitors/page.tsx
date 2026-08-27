@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store, LogOut, Printer, FolderOpen, ExternalLink, FileCode } from 'lucide-react';
+import { Building2, Phone, Ruler, ShoppingBag, Download, RefreshCw, FileText, Search, PackageCheck, Layers, Award, Store, LogOut, Printer, FolderOpen, ExternalLink, FileCode, Trophy } from 'lucide-react';
 import BillModal from '@/components/extras/BillModal';
 import { EXTRAS_RATES } from '@/data/extras-rates';
 
@@ -209,6 +209,14 @@ export default function AdminExhibitorsPage() {
           </Link>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/admin/lottery"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700 text-xs font-bold transition-all"
+            >
+              <Trophy className="w-4 h-4 text-amber-400" />
+              <span>Lucky Draw Panel</span>
+            </Link>
+
             <Link
               href="/exhibitor/dashboard"
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-bold transition-all"
