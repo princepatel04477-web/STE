@@ -143,6 +143,51 @@ export async function recordStallAllocation(
 }
 
 /**
+ * Take the stall back off an exhibitor's profile.
+ *
+ * The other half of recordStallAllocation: a reset that removed the draw has
+ * to remove the copy too, or the exhibitor keeps seeing a stall that is no
+ * longer theirs. Pass no mobile to clear every profile, which is what a full
+ * reset of the draw needs.
+ */
+export async function clearStallAllocation(mobile?: string): Promise<void> {
+  const blank = {
+    stall_number: '',
+    stall_hall: '',
+    stall_zone: '',
+    stall_dimensions: '',
+    stall_allocated_at: null,
+  };
+
+  const targets = mobile ? [canonicalMobile(mobile)] : [];
+
+  try {
+    for (const target of targets) {
+      db.prepare(
+        `UPDATE exhibitors SET stall_number = ?, stall_hall = ?, stall_zone = ?,
+         stall_dimensions = ?, stall_allocated_at = ? WHERE mobile = ?`
+      ).run('', '', '', '', '', target);
+    }
+  } catch (err) {
+    console.warn('[Stall] Local clear skipped:', err);
+  }
+
+  if (!isSupabaseConfigured || !supabaseAdmin) return;
+
+  try {
+    const query = supabaseAdmin.from('exhibitors').update(blank);
+    const { error } = mobile
+      ? await query.eq('mobile', targets[0])
+      : await query.neq('stall_number', '');
+    if (error) {
+      console.warn(`[Stall] Could not clear the stall copy: ${error.message}`);
+    }
+  } catch (err) {
+    console.warn('[Stall] Cloud clear failed:', err);
+  }
+}
+
+/**
  * The stall an exhibitor holds, written onto their profile on the way out.
  *
  * This is what the portal calls: it answers "which stall is theirs?" and

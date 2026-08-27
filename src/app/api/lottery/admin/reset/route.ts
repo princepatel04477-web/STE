@@ -3,6 +3,7 @@ import db from '@/lib/db';
 import { getAuthenticatedExhibitor, isAdminMobile } from '@/lib/auth';
 import { normalizeExhibitorId } from '@/lib/exhibitorId';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
+import { clearStallAllocation } from '@/lib/stallAssignment';
 
 export async function POST(request: Request) {
   try {
@@ -30,6 +31,9 @@ export async function POST(request: Request) {
           console.error('[SupabaseDB] Reset all allocations error:', sbErr);
         }
       }
+      // The stall copy on each profile goes with the draw it came from.
+      await clearStallAllocation();
+
       return NextResponse.json({
         success: true,
         message: 'All lottery allocations have been successfully reset.'
@@ -46,6 +50,8 @@ export async function POST(request: Request) {
           console.error('[SupabaseDB] Reset allocation error:', sbErr);
         }
       }
+      await clearStallAllocation(cleanMobile);
+
       return NextResponse.json({
         success: true,
         message: `Lottery allocation for exhibitor ${cleanMobile} has been reset.`
