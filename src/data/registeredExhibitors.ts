@@ -47,12 +47,12 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9586899777", brandName: "Gauri Putra", stallSqft: "400 sq ft", category: "Lehanga", market: "M1" },
   { mobile: "9879688431", brandName: "Geeta Tex (Ambika)", stallSqft: "1000 sq ft", category: "Suit", market: "Kuberji Houses" },
   { mobile: "9638338014", brandName: "Glorry Creation", stallSqft: "200 sq ft", category: "Kurtis", market: "Surana 101" },
-  { mobile: "9601700354", brandName: "Gopal Hari", stallSqft: "200 sq ft", category: "Sarees", market: "" },
   { mobile: "9909648249", brandName: "Hanumanta Lehanga", stallSqft: "600 sq ft", category: "Lehanga", market: "De Ventura" },
   { mobile: "8866666650", brandName: "Heirlooms", stallSqft: "600 sq ft", category: "Saree", market: "M1" },
   { mobile: "9824150667", brandName: "Inder silk mills", stallSqft: "200 sq ft", category: "Sarees", market: "Regent" },
   { mobile: "9727256154", brandName: "Indian Women", stallSqft: "1000 sq ft", category: "Sarees", market: "RRTM 1" },
   { mobile: "9821349444", brandName: "Israni Entertainment", stallSqft: "300 sq ft", category: "Entertainment", market: "Mumbai" },
+  { mobile: "9898866093", brandName: "Jyotsana", stallSqft: "200 sq ft", category: "Saree", market: "" },
   { mobile: "9545612026", brandName: "J B Designer", stallSqft: "300 sq ft", category: "Kurti", market: "" },
   { mobile: "9586921213", brandName: "Janani Designer World / Janani Dreams Texfab Ltd", stallSqft: "300 sq ft", category: "Saree / Lengha", market: "M4" },
   { mobile: "9999991375", brandName: "Jindal Saree Center", stallSqft: "400 sq ft", category: "Sarees", market: "" },
@@ -157,6 +157,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "7874442888", brandName: "Vimarsh Prints", stallSqft: "300 sq ft", category: "Saree", market: "M1" },
   { mobile: "9537841621", brandName: "Vivah Textile", stallSqft: "200 sq ft", category: "Saree", market: "Old Bombay" },
   { mobile: "9978524326", brandName: "Yukti Fashion", stallSqft: "200 sq ft", category: "Sarees", market: "M1" },
+  { mobile: "8141335505", brandName: "Sweety Fashion", stallSqft: "600 sq ft", category: "Fabrics", market: "" },
   { mobile: "9376711888", brandName: "Sweety Fashion", stallSqft: "800 sq ft", category: "Suits", market: "Raghuveer Trade Centre" },
   { mobile: "9654554518", brandName: "Surekha", stallSqft: "400 sq ft", category: "Saree", market: "" }
 ];

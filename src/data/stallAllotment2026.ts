@@ -2,7 +2,7 @@
  * STE 2026 demo allotment - generated from STE_data_sheet.xlsx and the
  * stall map. Do not hand-edit; rerun scripts/number_stalls.py.
  *
- * 148 exhibitors on 147 stalls. Saree brands (sarees, lehengas and the
+ * 150 exhibitors on 149 stalls. Saree brands (sarees, lehengas and the
  * uniform-saree firms) draw from stalls 1-107 less 27, 28, 29; everyone else
  * takes the south hall and those three big blocks.
  *
@@ -14,6 +14,9 @@
  *   111  Sweety Fashion (Fabrics), moved off 121
  *   121  Radhey Silk Weaves, seated on the bay 111 vacated
  *   151  Dream Delta, on a 3m x 3m bay the draw had left empty
+ *   100A Jyotsana, on the 200 sqft cut from the empty 800 sqft bay 100
+ *   137  Gopal Hari, placed in the south hall rather than the saree band
+ *        (no mobile yet - the sheet gives him Gauri Ganesh's number)
  */
 
 export type AllotmentPool = "Saree" | "General";
@@ -236,6 +239,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "7383001130",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "99",    stallNumber: 99,   brand: "Saaj Creations", category: "Saree/other",
     group: "Saree",                     mobile: "9737404150",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
+  { unitId: "100A",  stallNumber: 100,  brand: "Jyotsana", category: "Saree",
+    group: "Saree",                     mobile: "9898866093",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "101",   stallNumber: 101,  brand: "Sahil Creation", category: "Sareee",
     group: "Saree",                     mobile: "9825130650",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "102",   stallNumber: 102,  brand: "Shankh Designer", category: "Sarees",
@@ -257,7 +262,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "110",   stallNumber: 110,  brand: "Dream Home Fab", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "7016067015",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "111",   stallNumber: 111,  brand: "Sweety Fashion", category: "Fabrics",
-    group: "Dress Material & Fabrics",  mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: true },
+    group: "Dress Material & Fabrics",  mobile: "8141335505",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "112",   stallNumber: 112,  brand: "Sweety Fashion", category: "Suits",
     group: "Suits",                     mobile: "9376711888",  sheetSize: "3m x 24m",  areaSqft: 800,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "113",   stallNumber: 113,  brand: "Ethnico by Laxmi", category: "Men's Wear",
@@ -306,6 +311,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Suits",                     mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "136",   stallNumber: 136,  brand: "Kalavilla", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "7016061443",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
+  { unitId: "137",   stallNumber: 137,  brand: "Gopal Hari", category: "Sarees",
+    group: "Saree",                     mobile: "",            sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "138",   stallNumber: 138,  brand: "Bhagvad Fabrics", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "9377855666",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "139",   stallNumber: 139,  brand: "Shakambari Lace House", category: "Lace Materials",
@@ -337,8 +344,10 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
 /** Stalls the saree brands drew from. */
 export const SAREE_POOL_STALLS: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107];
 
-/** The only 200 sqft bays cut into A/B halves. */
-export const SPLIT_BAYS_2026: number[] = [91, 107];
+/** Bays cut into lettable parts. 91 and 107 are 200 sqft bays halved to
+ *  cover the saree pool's 100 sqft demand; 100 is the empty 800 sqft bay cut
+ *  to seat a 200 sqft saree exhibitor the band had no room for. */
+export const SPLIT_BAYS_2026: number[] = [91, 100, 107];
 
 export function findAllotmentByMobile(mobile: string) {
   const key = mobile.replace(/\D/g, "").slice(-10);

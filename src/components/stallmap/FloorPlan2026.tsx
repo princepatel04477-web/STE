@@ -43,7 +43,7 @@ const SPLIT = new Set(SPLIT_BAYS_2026);
 type Unit = {
   id: string;
   stall: Stall2026;
-  /** The unit's own size - a split half is 3M x 3M, not the bay's 6M x 3M. */
+  /** The unit's own size - the cut part, not the whole bay it sits in. */
   size: string;
   x: number;
   y: number;
@@ -60,7 +60,7 @@ function buildUnits(): Unit[] {
         out.push({
           id: half.id,
           stall,
-          size: '3M x 3M',
+          size: half.size ?? '3M x 3M',
           x: half.x,
           y: half.y,
           w: half.w,

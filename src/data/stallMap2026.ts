@@ -22,10 +22,12 @@
 
 export type StallZone = "North Wall Strip" | "North Hall" | "South Hall";
 
-/** One 100 sqft module of a 200 sqft bay that was split. */
+/** One lettable part of a bay that was cut. */
 export interface StallHalf {
   /** The bay number with an A or B suffix, e.g. "91A". */
   id: string;
+  /** The part's own size. Defaults to 3M x 3M, the half of a 200 sqft bay. */
+  size?: string;
   x: number;
   y: number;
   w: number;
@@ -159,7 +161,7 @@ export const STALL_MAP_2026: Stall2026[] = [
   { stallNumber: 97,  size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "North Hall",         widthM:  3, depthM:  3, x:  734.40, y: 114.96, w:  16.20, h:  15.96, legacyNumber: undefined },
   { stallNumber: 98,  size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "North Hall",         widthM:  3, depthM:  3, x:  734.40, y:  98.28, w:  16.20, h:  15.96, legacyNumber: undefined },
   { stallNumber: 99,  size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "North Hall",         widthM:  3, depthM:  3, x:  734.40, y:  81.36, w:  16.20, h:  16.20, legacyNumber: undefined },
-  { stallNumber: 100, size: "24M x 3M",  sheetSize: "3m x 24m",  areaSqm: 72,   areaSqft: 800,   zone: "North Hall",         widthM:  3, depthM: 24, x:  751.32, y: 182.40, w:  16.20, h: 134.64, legacyNumber: undefined },
+  { stallNumber: 100, size: "24M x 3M",  sheetSize: "3m x 24m",  areaSqm: 72,   areaSqft: 800,   zone: "North Hall",         widthM:  3, depthM: 24, x:  751.32, y: 182.40, w:  16.20, h: 134.64, legacyNumber: undefined, halves: [{ id: "100A", size: "6M x 3M", x: 751.32, y: 283.38, w: 16.20, h: 33.66 }, { id: "100B", size: "18M x 3M", x: 751.32, y: 182.40, w: 16.20, h: 100.98 }] },
   { stallNumber: 101, size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "North Hall",         widthM:  3, depthM:  3, x:  751.32, y: 165.48, w:  16.20, h:  16.20, legacyNumber: undefined },
   { stallNumber: 102, size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "North Hall",         widthM:  3, depthM:  3, x:  751.32, y: 148.56, w:  16.20, h:  16.20, legacyNumber: undefined },
   { stallNumber: 103, size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "North Hall",         widthM:  3, depthM:  3, x:  751.32, y: 131.64, w:  16.20, h:  16.20, legacyNumber: undefined },
