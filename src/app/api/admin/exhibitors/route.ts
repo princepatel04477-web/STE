@@ -213,6 +213,45 @@ export async function GET() {
       'brochure-stand': { id: 'brochure-stand', name: 'Acrylic Catalogue / Brochure Stand', quantity: 0, unit: 'pcs' }
     };
 
+    /**
+     * Has this exhibitor actually filled the portal in?
+     *
+     * Everyone starts with a row seeded from the master sheet - a brand name
+     * and a stall size - so those cannot be the test. What only the exhibitor
+     * can put there counts: the contact name the form makes compulsory, the
+     * company blurb, a fascia name they typed rather than the brand default,
+     * an extras order, a note, or uploaded artwork. Badges are not a test:
+     * every exhibitor is counted one owner badge by default.
+     */
+    const hasFilledPortal = (row: {
+      brand_name: string;
+      exhibitor_name: string;
+      company_description: string;
+      fascia_names: string[];
+      items: unknown[];
+      special_notes: string;
+      logo_file_url: string | null;
+      cdr_file_url: string | null;
+      drive_file_url: string | null;
+      drive_folder_url: string | null;
+    }): boolean => {
+      const brand = row.brand_name.trim().toLowerCase();
+      const typedFascia = row.fascia_names.some(
+        (n) => n.trim() !== '' && n.trim().toLowerCase() !== brand
+      );
+      return Boolean(
+        row.exhibitor_name.trim() ||
+          row.company_description.trim() ||
+          typedFascia ||
+          row.items.length > 0 ||
+          row.special_notes.trim() ||
+          row.logo_file_url ||
+          row.cdr_file_url ||
+          row.drive_file_url ||
+          row.drive_folder_url
+      );
+    };
+
     let totalSqftSum = 0;
     let totalOwnerBadges = 0;
     let totalSalesBadges = 0;
@@ -287,7 +326,7 @@ export async function GET() {
       totalSalesBadges += sBadges;
       totalSupportBadges += supBadges;
 
-      formattedList.push({
+      const row = {
         mobile: mob,
         brand_name: brandName,
         exhibitor_name: exhibitorName,
@@ -314,6 +353,14 @@ export async function GET() {
         drive_folder_url: dbEx?.drive_folder_url || null,
         rental_days: order?.rental_days ?? 2,
         last_updated: order?.order_updated || dbEx?.updated_at || new Date().toISOString()
+      };
+
+      formattedList.push({
+        ...row,
+        portal_filled: hasFilledPortal(row),
+        // The two organiser logins are not exhibitors, so they are left out of
+        // the portal-filled tally and of the list of people to chase.
+        is_organiser: ORGANISER_MOBILES.includes(mob),
       });
     });
 
@@ -330,6 +377,14 @@ export async function GET() {
       // alongside it, so the panel never passes one off as the other.
       sheetExhibitorCount: EXHIBITORS_ONLY.length,
       organiserCount: ORGANISER_MOBILES.length,
+      // How many of those exhibitors have filled the portal in. The organiser
+      // logins are left out of both figures - they are not exhibitors.
+      portalFilledCount: formattedList.filter(
+        (e) => e.portal_filled && !ORGANISER_MOBILES.includes(e.mobile)
+      ).length,
+      portalPendingCount: formattedList.filter(
+        (e) => !e.portal_filled && !ORGANISER_MOBILES.includes(e.mobile)
+      ).length,
       unknownProfiles
     });
   } catch (error) {

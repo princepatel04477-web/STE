@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   Building2,
+  Contact,
   Phone,
   Ruler,
   ShoppingBag,
@@ -90,6 +91,10 @@ interface ExhibitorRecord {
   drive_file_url?: string;
   drive_folder_url?: string;
   rental_days?: number;
+  /** They have put something of their own into the portal. */
+  portal_filled?: boolean;
+  /** One of the two organiser logins, not an exhibitor. */
+  is_organiser?: boolean;
   last_updated: string;
 }
 
@@ -103,7 +108,14 @@ interface UnknownProfile {
   last_updated: string;
 }
 
-type FilterTab = 'all' | 'with-extras' | 'no-extras' | 'with-artwork' | 'stall-drawn';
+type FilterTab =
+  | 'all'
+  | 'portal-filled'
+  | 'portal-pending'
+  | 'with-extras'
+  | 'no-extras'
+  | 'with-artwork'
+  | 'stall-drawn';
 type DensityMode = 'comfortable' | 'compact';
 
 export default function AdminExhibitorsPage() {
@@ -111,6 +123,8 @@ export default function AdminExhibitorsPage() {
   const [exhibitors, setExhibitors] = useState<ExhibitorRecord[]>([]);
   const [unknownProfiles, setUnknownProfiles] = useState<UnknownProfile[]>([]);
   const [sheetExhibitorCount, setSheetExhibitorCount] = useState(0);
+  const [portalFilledCount, setPortalFilledCount] = useState(0);
+  const [portalPendingCount, setPortalPendingCount] = useState(0);
   const [organiserCount, setOrganiserCount] = useState(0);
   const [itemTotals, setItemTotals] = useState<ItemTotal[]>([]);
   const [totalSqftSum, setTotalSqftSum] = useState<number>(0);
@@ -163,6 +177,8 @@ export default function AdminExhibitorsPage() {
       }
       setUnknownProfiles(data.unknownProfiles || []);
       setSheetExhibitorCount(data.sheetExhibitorCount || 0);
+      setPortalFilledCount(data.portalFilledCount || 0);
+      setPortalPendingCount(data.portalPendingCount || 0);
       setOrganiserCount(data.organiserCount || 0);
       if (data.itemTotals) {
         setItemTotals(data.itemTotals);
@@ -261,6 +277,9 @@ export default function AdminExhibitorsPage() {
       if (!matchesSearch) return false;
 
       // Tab filters
+      // Both portal tabs are about exhibitors, so the organiser logins sit out.
+      if (activeTab === 'portal-filled' && (!ex.portal_filled || ex.is_organiser)) return false;
+      if (activeTab === 'portal-pending' && (ex.portal_filled || ex.is_organiser)) return false;
       if (activeTab === 'with-extras' && (!ex.items || ex.items.length === 0)) return false;
       if (activeTab === 'no-extras' && ex.items && ex.items.length > 0) return false;
       if (
@@ -291,8 +310,12 @@ export default function AdminExhibitorsPage() {
       (e) => e.cdr_file_url || e.logo_file_url || e.drive_folder_url || e.drive_file_url
     ).length;
     const stallDrawn = exhibitors.filter((e) => !!e.stall_number).length;
+    const onlyExhibitors = exhibitors.filter((e) => !e.is_organiser);
+    const portalFilled = onlyExhibitors.filter((e) => e.portal_filled).length;
     return {
       all: exhibitors.length,
+      portalFilled,
+      portalPending: onlyExhibitors.length - portalFilled,
       withExtras,
       noExtras: exhibitors.length - withExtras,
       withArtwork,
@@ -322,7 +345,8 @@ export default function AdminExhibitorsPage() {
       'Vector CDR URL',
       'Logo URL',
       'Drive Folder URL',
-      'Special Notes'
+      'Special Notes',
+      'Portal Filled'
     ];
 
     const rows = filteredExhibitors.map((ex) => {
@@ -359,7 +383,8 @@ export default function AdminExhibitorsPage() {
         esc(ex.cdr_file_url || ''),
         esc(ex.logo_file_url || ''),
         esc(ex.drive_folder_url || ex.drive_file_url || ''),
-        esc(ex.special_notes || '')
+        esc(ex.special_notes || ''),
+        esc(ex.portal_filled ? 'YES' : 'NO')
       ];
     });
 
@@ -515,6 +540,33 @@ export default function AdminExhibitorsPage() {
                   </span>
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab(activeTab === 'portal-filled' ? 'all' : 'portal-filled')}
+                className={`bg-white border p-4 sm:p-5 rounded-2xl flex items-center gap-4 shadow-xs text-left transition-colors ${
+                  activeTab === 'portal-filled'
+                    ? 'border-emerald-500 ring-1 ring-emerald-200'
+                    : 'border-slate-200 hover:border-emerald-300'
+                }`}
+              >
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 shrink-0">
+                  <Contact className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-xs text-slate-500 font-semibold block">Portal Filled</span>
+                  <span className="text-2xl font-black text-slate-900 font-mono">
+                    {portalFilledCount}
+                    <span className="text-base text-slate-400"> / {sheetExhibitorCount}</span>
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium block mt-0.5">
+                    {portalPendingCount} still to fill in
+                    {sheetExhibitorCount > 0
+                      ? ` · ${Math.round((portalFilledCount / sheetExhibitorCount) * 100)}% done`
+                      : ''}
+                  </span>
+                </div>
+              </button>
 
               <div className="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl flex items-center gap-4 shadow-xs">
                 <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700 shrink-0">
@@ -721,6 +773,28 @@ export default function AdminExhibitorsPage() {
                 }`}
               >
                 All Exhibitors ({tabCounts.all})
+              </button>
+
+              <button
+                onClick={() => setActiveTab('portal-filled')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'portal-filled'
+                    ? 'bg-emerald-700 text-white shadow-xs'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                Portal Filled ({tabCounts.portalFilled})
+              </button>
+
+              <button
+                onClick={() => setActiveTab('portal-pending')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'portal-pending'
+                    ? 'bg-rose-600 text-white shadow-xs'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                Not Filled ({tabCounts.portalPending})
               </button>
 
               <button
