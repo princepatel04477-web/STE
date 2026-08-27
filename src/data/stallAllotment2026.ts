@@ -17,6 +17,14 @@
  *   100A Jyotsana, on the 200 sqft cut from the empty 800 sqft bay 100
  *   137  Gopal Hari, placed in the south hall rather than the saree band
  *        (no mobile yet - the sheet gives him Gauri Ganesh's number)
+ *
+ * One row corrects the sheet rather than following it:
+ *   141  Shiv Vardhaan books 200 sqft, not the 100 the sheet carries
+ *        (organisers, 28 Aug 2026). Moved off the 3m x 3m bay 103 onto 141,
+ *        the 200 sqft bay the draw had left empty, and kept in the saree pool
+ *        so 141 belongs to the saree 200 block and the draw - not the
+ *        organisers - decides who ends up in the south hall. A rerun of
+ *        scripts/number_stalls.py must not send them back to 100 sqft.
  */
 
 export type AllotmentPool = "Saree" | "General";
@@ -245,8 +253,6 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "9825130650",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "102",   stallNumber: 102,  brand: "Shankh Designer", category: "Sarees",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "103",   stallNumber: 103,  brand: "Shiv Vardhaan", category: "Saree",
-    group: "Saree",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "104",   stallNumber: 104,  brand: "Shreya Silk Sarees", category: "Saree",
     group: "Saree",                     mobile: "7487991498",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "105",   stallNumber: 105,  brand: "Talreeja Sarees", category: "Sarees",
@@ -319,6 +325,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Dress Material & Fabrics",  mobile: "9982170219",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "140",   stallNumber: 140,  brand: "Pearly Pink", category: "Kids Wear",
     group: "Kids Wear",                 mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
+  { unitId: "141",   stallNumber: 141,  brand: "Shiv Vardhaan", category: "Saree",
+    group: "Saree",                     mobile: "7874363994",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "South Hall",         held: false },
   { unitId: "142",   stallNumber: 142,  brand: "Kunj Bihari Creations", category: "Dress Matterial",
     group: "Dress Material & Fabrics",  mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "143",   stallNumber: 143,  brand: "Mahadev Fabrics", category: "Fabrics",

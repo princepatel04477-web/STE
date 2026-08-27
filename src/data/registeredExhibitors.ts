@@ -139,7 +139,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9099009117", brandName: "Shayam Fabrics", stallSqft: "200 sq ft", category: "Fabrics", market: "Raghukul" },
   { mobile: "9924438132", brandName: "Shiv Fashion C K", stallSqft: "100 sq ft", category: "Fabrics", market: "" },
   { mobile: "9638143399", brandName: "Shiv Tex", stallSqft: "1000 sq ft", category: "Sarees", market: "Anmol" },
-  { mobile: "7874363994", brandName: "Shiv Vardhaan", stallSqft: "100 sq ft", category: "Saree", market: "M4", aliases: ["8804754940"] },
+  { mobile: "7874363994", brandName: "Shiv Vardhaan", stallSqft: "200 sq ft", category: "Saree", market: "M4", aliases: ["8804754940"] },
   { mobile: "9825182005", brandName: "Shree Laxmi", stallSqft: "600 sq ft", category: "Lehenga/Saree", market: "M1" },
   { mobile: "9687014347", brandName: "Shreeji Designer / Khushi Fashion", stallSqft: "200 sq ft", category: "Saree", market: "Globale" },
   { mobile: "7487991498", brandName: "Shreya Silk Sarees", stallSqft: "100 sq ft", category: "Saree", market: "Raghukul", aliases: ["7487991497"] },
