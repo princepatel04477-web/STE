@@ -76,6 +76,12 @@ export interface ExhibitorRecord {
   drive_file_url?: string;
   drive_folder_id?: string;
   drive_folder_url?: string;
+  /** The stall the draw seated them on - see lib/stallAssignment. */
+  stall_number?: string;
+  stall_hall?: string;
+  stall_zone?: string;
+  stall_dimensions?: string;
+  stall_allocated_at?: string;
   updated_at: string;
 }
 
@@ -315,6 +321,25 @@ export const db = {
             }
             saveData(data);
             return { changes: 1 };
+          }
+
+          // Allotted stall. Its own branch because the fallback below reads
+          // arguments by position and would otherwise write a stall number
+          // into brand_name.
+          // Handles: UPDATE exhibitors SET stall_number = ?, stall_hall = ?, stall_zone = ?, stall_dimensions = ?, stall_allocated_at = ? WHERE mobile = ?
+          if (q.includes('stall_number = ?')) {
+            const mobile = String(args[args.length - 1]);
+            const ex = data.exhibitors.find(e => e.mobile === mobile);
+            if (ex) {
+              ex.stall_number = String(args[0] || '');
+              ex.stall_hall = String(args[1] || '');
+              ex.stall_zone = String(args[2] || '');
+              ex.stall_dimensions = String(args[3] || '');
+              ex.stall_allocated_at = String(args[4] || '');
+              ex.updated_at = new Date().toISOString();
+              saveData(data);
+            }
+            return { changes: ex ? 1 : 0 };
           }
 
           // Full Profile Update

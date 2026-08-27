@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { normalizeExhibitorId } from '@/lib/exhibitorId';
-import { findExhibitorByMobile, numbersFor } from '@/data/registeredExhibitors';
-import db, { LotteryAllocationRecord } from '@/lib/db';
-import { getAllocatedStallForMobile } from '@/lib/lotteryEngine';
+import { findExhibitorByMobile } from '@/data/registeredExhibitors';
+import db from '@/lib/db';
+import { resolveAndRecordStall } from '@/lib/stallAssignment';
 import { normalizeSqftCategory } from '@/data/stallInventory';
-import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function GET(request: Request) {
   try {
@@ -36,27 +35,9 @@ export async function GET(request: Request) {
     const categorySqft = normalizeSqftCategory(rawSqft);
     const market = registeredMaster?.market || '';
 
-    // 2. Check allocation status from Supabase (source of truth) or local
-    // fallback. A firm that drew on a second number has drawn, so every number
-    // on its master-sheet row is looked at, not just the one it logged in with.
-    const ownNumbers = registeredMaster ? numbersFor(registeredMaster) : [mobile];
-    let allocation =
-      ownNumbers.map(getAllocatedStallForMobile).find(Boolean) ?? null;
-    if (isSupabaseConfigured && supabaseAdmin) {
-      try {
-        const { data: sbAllocs } = await supabaseAdmin
-          .from('lottery_allocations')
-          .select('*')
-          .in('mobile', ownNumbers);
-
-        const sbAlloc = sbAllocs?.[0];
-        if (sbAlloc) {
-          allocation = sbAlloc;
-        }
-      } catch (sbErr) {
-        console.warn('[Lottery Status] Supabase fetch fallback:', sbErr);
-      }
-    }
+    // 2. The stall this exhibitor holds, under any of the numbers they answer
+    // to, written onto their profile on the way out.
+    const allocation = await resolveAndRecordStall(mobile);
 
     return NextResponse.json({
       success: true,

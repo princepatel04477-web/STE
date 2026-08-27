@@ -294,9 +294,11 @@ export async function GET() {
         profile_pic_url: profilePicUrl,
         company_description: companyDescription,
         stall_sqft: stallSqft,
-        stall_number: allocation?.stall_number || '',
-        stall_hall: allocation?.hall || '',
-        stall_allocated_at: allocation?.allocated_at || '',
+        // The draw is the record; the copy on the profile answers when a
+        // stall was seated by hand rather than drawn.
+        stall_number: allocation?.stall_number || dbEx?.stall_number || '',
+        stall_hall: allocation?.hall || dbEx?.stall_hall || '',
+        stall_allocated_at: allocation?.allocated_at || dbEx?.stall_allocated_at || '',
         category: reg?.category || '',
         market: reg?.market || '',
         fascia_names: fasciaNames,

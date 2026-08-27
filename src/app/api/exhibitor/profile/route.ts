@@ -4,6 +4,7 @@ import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
+import { resolveAndRecordStall } from '@/lib/stallAssignment';
 
 // The write touches Supabase and then the Google Sheet; the platform default is
 // tight enough that a slow Apps Script can abort a request whose data was
@@ -110,10 +111,19 @@ export async function GET() {
       fascia_names = [brand_name, ''];
     }
 
+    // The stall they were allotted travels with the profile, so the dashboard
+    // shows a stall number without asking the draw table itself.
+    const stall = await resolveAndRecordStall(session.mobile);
+
     return NextResponse.json({
       mobile: session.mobile,
       brand_name,
       stall_sqft,
+      stall_number: stall?.stall_number || '',
+      stall_hall: stall?.hall || '',
+      stall_zone: stall?.zone || '',
+      stall_dimensions: stall?.dimensions || '',
+      stall_allocated_at: stall?.allocated_at || '',
       exhibitor_name: extractedExhibitorName,
       profile_pic_url: extractedProfilePicUrl,
       company_description: extractedCompanyDesc,

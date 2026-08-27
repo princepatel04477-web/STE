@@ -99,6 +99,14 @@ export default function StallAllocationPage() {
     }
   };
 
+  // An exhibitor who already holds a stall has nothing left to draw, so the
+  // Lucky Box is closed to them and the floor plan takes its place.
+  const hasStall = Boolean(allocation?.stall_number);
+
+  // The tab actually shown: an exhibitor holding a stall never lands on the
+  // draw, however they got there.
+  const tab = hasStall && activeTab === 'luckybox' ? 'sitemap' : activeTab;
+
   // A few firms are registered under a short user ID rather than a number;
   // the +91 prefix only belongs on the numeric case.
   const isNumericEntry = mobile.trim() === '' || /^[0-9+\-\s()]+$/.test(mobile.trim());
@@ -355,7 +363,7 @@ export default function StallAllocationPage() {
                 <button
                   onClick={() => setActiveTab('profile')}
                   className={`w-full px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-between transition-all ${
-                    activeTab === 'profile'
+                    tab === 'profile'
                       ? 'bg-amber-500 text-slate-950 shadow-md font-extrabold'
                       : 'text-slate-300 hover:bg-white/5'
                   }`}
@@ -367,33 +375,46 @@ export default function StallAllocationPage() {
                   <span className="text-[10px] opacity-70">Details</span>
                 </button>
 
-                <button
-                  onClick={() => setActiveTab('luckybox')}
-                  className={`w-full px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-between transition-all ${
-                    activeTab === 'luckybox'
-                      ? 'bg-emerald-500 text-slate-950 shadow-md font-extrabold'
-                      : 'text-slate-300 hover:bg-white/5'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span>Lucky Box</span>
-                  </div>
-                  {allocation ? (
+                {hasStall ? (
+                  <button
+                    onClick={() => setActiveTab('sitemap')}
+                    className={`w-full px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-between transition-all ${
+                      tab === 'sitemap'
+                        ? 'bg-emerald-500 text-slate-950 shadow-md font-extrabold'
+                        : 'text-slate-300 hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <MapPin className="w-4 h-4 text-emerald-400" />
+                      <span>My Stall</span>
+                    </div>
                     <span className="px-2 py-0.5 rounded-full bg-slate-950 text-emerald-300 font-mono text-[10px]">
-                      {allocation.stall_number}
+                      {allocation?.stall_number}
                     </span>
-                  ) : (
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setActiveTab('luckybox')}
+                    className={`w-full px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-between transition-all ${
+                      tab === 'luckybox'
+                        ? 'bg-emerald-500 text-slate-950 shadow-md font-extrabold'
+                        : 'text-slate-300 hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Sparkles className="w-4 h-4 text-amber-400" />
+                      <span>Lucky Box</span>
+                    </div>
                     <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] animate-pulse">
                       Ready
                     </span>
-                  )}
-                </button>
+                  </button>
+                )}
 
                 <button
                   onClick={() => setActiveTab('sitemap')}
                   className={`w-full px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-between transition-all ${
-                    activeTab === 'sitemap'
+                    tab === 'sitemap'
                       ? 'bg-blue-500 text-white shadow-md font-extrabold'
                       : 'text-slate-300 hover:bg-white/5'
                   }`}
@@ -449,7 +470,7 @@ export default function StallAllocationPage() {
             <section className="lg:col-span-8 xl:col-span-9">
               
               {/* Tab 1: Profile View (Matching Video) */}
-              {activeTab === 'profile' && (
+              {tab === 'profile' && (
                 <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-white/10 shadow-xl relative animate-in fade-in">
                   
                   <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
@@ -593,7 +614,7 @@ export default function StallAllocationPage() {
               )}
 
               {/* Tab 2: Lucky Box View (Matching Video Experience) */}
-              {activeTab === 'luckybox' && (
+              {tab === 'luckybox' && !hasStall && (
                 <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/90 border border-white/10 shadow-xl animate-in fade-in">
                   <LuckyBox
                     categorySqft={categorySqft}
@@ -609,8 +630,36 @@ export default function StallAllocationPage() {
               )}
 
               {/* Tab 3: Sitemap / Floor Plan View */}
-              {activeTab === 'sitemap' && (
-                <div className="animate-in fade-in">
+              {tab === 'sitemap' && (
+                <div className="animate-in fade-in space-y-4">
+                  {hasStall && (
+                    <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-slate-900/60 to-amber-500/15 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                          Your allotted stall
+                        </span>
+                        <div className="flex items-baseline gap-3 mt-1">
+                          <span className="text-4xl font-display font-black text-white tabular-nums">
+                            {allocation?.stall_number}
+                          </span>
+                          <span className="text-xs text-slate-300">
+                            {allocation?.stall_sqft} &middot; {allocation?.dimensions}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-1">
+                          {allocation?.hall} &middot; {allocation?.zone} &middot; marked on the plan below
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowSlipModal(true)}
+                        className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[11px] uppercase tracking-wider flex items-center gap-2 transition-colors"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                        <span>Allotment slip</span>
+                      </button>
+                    </div>
+                  )}
                   <FloorPlan2026
                     selectedUnitId={allocation?.stall_number || null}
                   />

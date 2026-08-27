@@ -38,6 +38,7 @@ import {
   Store,
   Calendar,
   ArrowRight,
+  MapPin,
   Upload,
   ExternalLink,
   FileCode,
@@ -170,6 +171,10 @@ export default function ExhibitorDashboardPage() {
   const [brandName, setBrandName] = useState('');
   const [category, setCategory] = useState('');
   const [market, setMarket] = useState('');
+  // The stall the draw seated them on, empty until they have drawn.
+  const [stallNumber, setStallNumber] = useState('');
+  const [stallHall, setStallHall] = useState('');
+  const [stallZone, setStallZone] = useState('');
   const [selectedSqftOption, setSelectedSqftOption] = useState<string>('200');
   const [customSqft, setCustomSqft] = useState<string>('');
   const [fasciaNames, setFasciaNames] = useState<string[]>(['', '']);
@@ -453,6 +458,9 @@ export default function ExhibitorDashboardPage() {
       setCompanyDescription(profData.company_description || '');
       setCategory(profData.category || '');
       setMarket(profData.market || '');
+      setStallNumber(profData.stall_number || '');
+      setStallHall(profData.stall_hall || '');
+      setStallZone(profData.stall_zone || '');
 
       const existingSqft = normalizeSqft(profData.stall_sqft || '200 sq ft');
       if (SQFT_PRESETS.includes(existingSqft)) {
@@ -1201,32 +1209,67 @@ export default function ExhibitorDashboardPage() {
           </div>
         </div>
 
-        {/* Lucky Draw / Stall Allocation Banner */}
+        {/* Stall banner: the draw before it is run, the stall itself after */}
         <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-amber-500/40 rounded-2xl p-5 sm:p-6 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg relative overflow-hidden">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
-              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
-            </div>
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-1">
-                <span>Official Lucky Draw System Live</span>
+          {stallNumber ? (
+            <>
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 shrink-0">
+                  <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
+                </div>
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-1">
+                    <span>Stall Allotted</span>
+                  </div>
+                  <h2 className="text-base sm:text-lg font-bold text-white leading-snug">
+                    Your stall is
+                    <span className="font-mono font-black text-amber-300 text-xl align-middle ml-2">
+                      {stallNumber}
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {[stallHall, stallZone].filter(Boolean).join(' • ') ||
+                      'See exactly where it sits on the SIECC floor plan.'}
+                  </p>
+                </div>
               </div>
-              <h2 className="text-base sm:text-lg font-bold text-white leading-snug">
-                Participate in Stall Allocation & Lucky Draw
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Open your digital Lucky Box to claim your allocated booth on the SIECC floor plan.
-              </p>
-            </div>
-          </div>
 
-          <Link
-            href="/stall-allocation"
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            <span>Open Lucky Box</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
-          </Link>
+              <Link
+                href="/stall-allocation"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-emerald-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <span>See it on the floor plan</span>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
+              </Link>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
+                </div>
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-1">
+                    <span>Official Lucky Draw System Live</span>
+                  </div>
+                  <h2 className="text-base sm:text-lg font-bold text-white leading-snug">
+                    Participate in Stall Allocation & Lucky Draw
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Open your digital Lucky Box to claim your allocated booth on the SIECC floor plan.
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                href="/stall-allocation"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                <span>Open Lucky Box</span>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Section 1: Official Exhibitor Profile & Stall Allocation */}
@@ -1398,6 +1441,36 @@ export default function ExhibitorDashboardPage() {
                   </span>
                 </div>
               )}
+            </div>
+
+            {/* Allotted Stall Number Card */}
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col justify-between">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-1">
+                  Allotted Stall Number
+                </span>
+                {stallNumber ? (
+                  <>
+                    <h3 className="text-2xl font-black text-slate-900 font-mono leading-snug">
+                      {stallNumber}
+                    </h3>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      {[stallHall, stallZone].filter(Boolean).join(' • ')}
+                    </p>
+                  </>
+                ) : (
+                  <h3 className="text-lg font-bold text-slate-400 font-mono leading-snug">
+                    Not drawn yet
+                  </h3>
+                )}
+              </div>
+              <Link
+                href="/stall-allocation"
+                className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-800 hover:text-amber-900"
+              >
+                <span>{stallNumber ? 'View on the floor plan' : 'Go to the lucky draw'}</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
             </div>
 
             {/* Stall Size Card */}

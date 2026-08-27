@@ -117,6 +117,16 @@ export default function FloorPlan2026({
     centreOnSelection();
   }, [centreOnSelection]);
 
+  // Land an exhibitor on their own stall: close enough to read the number,
+  // without them having to hunt for it first.
+  const zoomedToOwn = useRef(false);
+  React.useEffect(() => {
+    if (!selectedUnitId || zoomedToOwn.current) return;
+    zoomedToOwn.current = true;
+    setZoom((z) => Math.max(z, 3));
+    window.setTimeout(centreOnSelection, 120);
+  }, [selectedUnitId, centreOnSelection]);
+
   function reset() {
     setZoom(1);
     scrollRef.current?.scrollTo({ left: 0, top: 0, behavior: 'smooth' });

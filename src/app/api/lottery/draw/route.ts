@@ -10,6 +10,7 @@ import db from '@/lib/db';
 import { performLuckyDraw, DrawContext } from '@/lib/lotteryEngine';
 import type { LotteryAllocationRecord } from '@/lib/db';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
+import { recordStallAllocation } from '@/lib/stallAssignment';
 
 export async function POST(request: Request) {
   try {
@@ -61,6 +62,9 @@ export async function POST(request: Request) {
 
         const sbExisting = sbExistingRows?.[0];
         if (sbExisting) {
+          // Already seated: make sure their profile carries the stall, then
+          // hand back the stall they hold rather than drawing a second one.
+          await recordStallAllocation(sbExisting);
           return NextResponse.json({
             success: true,
             isExisting: true,
@@ -144,6 +148,10 @@ export async function POST(request: Request) {
         console.error('[SupabaseDB] Lottery allocation upsert error:', sbErr);
       }
     }
+
+    // The one write-back: whatever stall the exhibitor ends up holding is
+    // copied onto their profile, so every view can read it without a join.
+    await recordStallAllocation(allocation);
 
     const isExisting =
       result.isExisting ||
