@@ -7,6 +7,21 @@ import {
   heldUnitFor
 } from '@/lib/drawEngine2026';
 
+/**
+ * What the caller already knows from the cloud database.
+ *
+ * The local store lives in /tmp on Vercel, which is per-instance and wiped
+ * between cold starts, so it can never be trusted to answer "has this
+ * exhibitor already drawn?". The route reads Supabase first and hands the
+ * answer down here.
+ */
+export interface DrawContext {
+  /** The allocation already on record for this exhibitor, if any. */
+  existing?: LotteryAllocationRecord | null;
+  /** Every stall number already allotted, from the cloud database. */
+  taken?: string[];
+}
+
 export interface LotteryResult {
   success: boolean;
   isExisting: boolean;
@@ -30,7 +45,8 @@ export function generateSlipId(mobile: string, stallNumber: string): string {
 export function performLuckyDraw(
   mobile: string,
   brandName: string,
-  rawSqft: string | number
+  rawSqft: string | number,
+  context: DrawContext = {}
 ): LotteryResult {
   const cleanMobile = normalizeExhibitorId(mobile);
 
@@ -42,10 +58,12 @@ export function performLuckyDraw(
     };
   }
 
-  // 1. Check if already drawn
-  const existing = db.prepare(
-    'SELECT * FROM lottery_allocations WHERE mobile = ?'
-  ).get(cleanMobile) as LotteryAllocationRecord | undefined;
+  // 1. Check if already drawn. One exhibitor draws exactly once, so the cloud
+  //    record wins over the local store, which may be an empty cold instance.
+  const existing =
+    context.existing ??
+    (db.prepare('SELECT * FROM lottery_allocations WHERE mobile = ?')
+      .get(cleanMobile) as LotteryAllocationRecord | undefined);
 
   if (existing) {
     return {
@@ -60,8 +78,9 @@ export function performLuckyDraw(
   //    draw can only ever return a stall of the right size standing among the
   //    same trade.
   const held = heldUnitFor(cleanMobile, brandName);
-  const occupied = ((db.prepare('SELECT stall_number FROM lottery_allocations')
+  const localTaken = ((db.prepare('SELECT stall_number FROM lottery_allocations')
     .all() as Array<{ stall_number: string }>) || []).map((a) => a.stall_number);
+  const occupied = Array.from(new Set([...(context.taken ?? []), ...localTaken]));
 
   let chosen: DrawUnit;
   if (held) {
