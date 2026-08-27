@@ -33,6 +33,9 @@ interface ExhibitorRecord {
   profile_pic_url?: string | null;
   company_description?: string;
   stall_sqft: string;
+  stall_number?: string;
+  stall_hall?: string;
+  stall_allocated_at?: string;
   category?: string;
   market?: string;
   fascia_names?: string[];
@@ -125,78 +128,43 @@ export default function AdminExhibitorsPage() {
   });
 
   const exportCSV = () => {
+    const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+
     const headers = [
-      'Mobile Number / User ID',
-      'Exhibitor Representative Name',
+      'Time Stamp',
       'Brand Name',
-      'Category',
-      'Market',
-      'Allocated Stall Size (Sq Ft)',
-      'Exhibitor Profile Picture URL',
-      'Company Description / Bio (Max 400 Chars)',
-      'Fascia Main Header (Option 1)',
-      'Fascia Main Header (Option 2)',
-      'Fascia Main Header (Option 3)',
-      'Fascia Main Header (Option 4)',
-      'Owner Badges Count',
-      'Owner Badge Names',
-      'Sales Badges Count',
-      'Sales Badge Names',
-      'Support Badges Count',
-      'Support Badge Names',
-      'Rental Duration (Days)',
-      'Extras Requested',
-      'Logo File URL',
-      'Artwork / CDR URL',
-      'Google Drive Folder URL',
-      'Google Drive Direct File Link',
-      'Special Notes',
-      'Last Updated'
+      'Stall Size',
+      'Stall Number',
+      'Fascia Name',
+      'Extras Requirement',
+      'Logo File URL'
     ];
+
     const rows = filteredExhibitors.map((ex) => {
-      const extrasStr = ex.items.map((i) => `${i.name} x${i.quantity} (${i.days || 2}d)`).join('; ');
-      const ownerNamesStr = (ex.badge_names?.owner || []).filter(Boolean).join(', ');
-      const salesNamesStr = (ex.badge_names?.sales || []).filter(Boolean).join(', ');
-      const supportNamesStr = (ex.badge_names?.support || []).filter(Boolean).join(', ');
-      const f1 = ex.fascia_names?.[0] || ex.brand_name || '';
-      const f2 = ex.fascia_names?.[1] || '';
-      const f3 = ex.fascia_names?.[2] || '';
-      const f4 = ex.fascia_names?.[3] || '';
-      const profilePic = ex.profile_pic_url || '';
-      const exhibitorName = ex.exhibitor_name || '';
-      const companyBio = ex.company_description || '';
-      const logoUrl = ex.logo_file_url || '';
-      const cdrUrl = ex.cdr_file_url || '';
-      const driveFolderUrl = ex.drive_folder_url || ex.drive_file_url || '';
-      const driveFileUrl = ex.drive_file_url || '';
+      const timeStamp = ex.last_updated
+        ? new Date(ex.last_updated).toLocaleString('en-IN')
+        : '';
+      const fasciaStr = (ex.fascia_names || [])
+        .map((f) => (f || '').trim())
+        .filter(Boolean)
+        .join(' | ');
+      const extrasStr = ex.items
+        .map((i) => `${i.name} x${i.quantity} (${i.days || 2}d)`)
+        .join('; ');
+      const logoUrl = [ex.logo_file_url, ex.drive_file_url, ex.drive_folder_url]
+        .map((u) => (u || '').trim())
+        .filter(Boolean)
+        .filter((u, idx, arr) => arr.indexOf(u) === idx)
+        .join(' | ');
 
       return [
-        `"${ex.mobile}"`,
-        `"${exhibitorName.replace(/"/g, '""')}"`,
-        `"${ex.brand_name.replace(/"/g, '""')}"`,
-        `"${(ex.category || '').replace(/"/g, '""')}"`,
-        `"${(ex.market || '').replace(/"/g, '""')}"`,
-        `"${ex.stall_sqft.replace(/"/g, '""')}"`,
-        `"${profilePic.replace(/"/g, '""')}"`,
-        `"${companyBio.replace(/"/g, '""')}"`,
-        `"${f1.replace(/"/g, '""')}"`,
-        `"${f2.replace(/"/g, '""')}"`,
-        `"${f3.replace(/"/g, '""')}"`,
-        `"${f4.replace(/"/g, '""')}"`,
-        `"${ex.owner_badges || 0}"`,
-        `"${ownerNamesStr.replace(/"/g, '""')}"`,
-        `"${ex.sales_badges || 0}"`,
-        `"${salesNamesStr.replace(/"/g, '""')}"`,
-        `"${ex.support_badges || 0}"`,
-        `"${supportNamesStr.replace(/"/g, '""')}"`,
-        `"${ex.rental_days || 2}"`,
-        `"${extrasStr.replace(/"/g, '""')}"`,
-        `"${logoUrl.replace(/"/g, '""')}"`,
-        `"${cdrUrl.replace(/"/g, '""')}"`,
-        `"${driveFolderUrl.replace(/"/g, '""')}"`,
-        `"${driveFileUrl.replace(/"/g, '""')}"`,
-        `"${(ex.special_notes || '').replace(/"/g, '""')}"`,
-        `"${ex.last_updated || ''}"`
+        esc(timeStamp),
+        esc(ex.brand_name),
+        esc(ex.stall_sqft),
+        esc(ex.stall_number || 'Not Drawn'),
+        esc(fasciaStr || ex.brand_name),
+        esc(extrasStr),
+        esc(logoUrl)
       ];
     });
 

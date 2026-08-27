@@ -82,6 +82,30 @@ export async function GET() {
       }
     }
 
+    // 2b. Lucky draw allotments (stall numbers) keyed by mobile
+    let lotteryAllocations: Array<any> = [];
+    try {
+      lotteryAllocations = (db.prepare(`SELECT * FROM lottery_allocations`).all() as Array<any>) || [];
+    } catch {
+      lotteryAllocations = [];
+    }
+
+    if (isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbAllocations } = await supabaseAdmin.from('lottery_allocations').select('*');
+        if (sbAllocations && Array.isArray(sbAllocations)) {
+          lotteryAllocations = sbAllocations;
+        }
+      } catch (sbErr) {
+        console.warn('[Admin API] Note on lottery allocation merge:', sbErr);
+      }
+    }
+
+    const allocationMap: Record<string, any> = {};
+    lotteryAllocations.forEach((a) => {
+      if (a?.mobile) allocationMap[a.mobile] = a;
+    });
+
     // 3. Combine registered exhibitors list with db exhibitors & orders
     const allMobiles = Array.from(new Set([
       ...REGISTERED_EXHIBITORS_LIST.map(r => r.mobile),
@@ -116,6 +140,8 @@ export async function GET() {
       const reg = REGISTERED_EXHIBITORS_LIST.find(r => r.mobile === mob);
       const dbEx = dbExhibitorsMap[mob];
       const order = ordersMap[mob];
+
+      const allocation = allocationMap[mob];
 
       const brandName = reg?.brandName || dbEx?.brand_name || 'Registered Exhibitor';
       const stallSqft = reg?.stallSqft || dbEx?.stall_sqft || '200 sq ft';
@@ -184,6 +210,9 @@ export async function GET() {
         profile_pic_url: profilePicUrl,
         company_description: companyDescription,
         stall_sqft: stallSqft,
+        stall_number: allocation?.stall_number || '',
+        stall_hall: allocation?.hall || '',
+        stall_allocated_at: allocation?.allocated_at || '',
         category: reg?.category || '',
         market: reg?.market || '',
         fascia_names: fasciaNames,
