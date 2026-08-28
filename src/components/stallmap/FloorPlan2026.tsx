@@ -89,14 +89,46 @@ export default function FloorPlan2026({
   );
   /** What the viewer last tapped. Falls back to the stall they were allotted. */
   const [picked, setPicked] = useState<string | null>(null);
+  /**
+   * Whether the current selection was handed to the map from outside it - the
+   * exhibitor's own allotment, or a stall chosen from the remaining-stalls
+   * list - as opposed to tapped on the plan. Only an outside mark is labelled
+   * "Yours" / "Marked".
+   */
+  const [markedFromOutside, setMarkedFromOutside] = useState(false);
+  /** The id we last sent up through onSelect, so the parent echoing it back is
+   *  recognised as our own tap rather than a fresh outside mark. */
+  const lastTapRef = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // An outside mark has to win over whatever was last tapped here. Without
+  // this, one tap on the plan pinned `picked` forever and every later press of
+  // a remaining-stalls button changed nothing on screen.
+  React.useEffect(() => {
+    if (!selectedUnitId) return;
+
+    if (
+      lastTapRef.current &&
+      lastTapRef.current.toUpperCase() === selectedUnitId.toUpperCase()
+    ) {
+      // The parent is just echoing back the stall we reported a moment ago.
+      lastTapRef.current = null;
+      return;
+    }
+
+    setPicked(selectedUnitId);
+    setMarkedFromOutside(true);
+  }, [selectedUnitId]);
 
   const activeId = picked ?? selectedUnitId;
   const selected = activeId
     ? units.find((u) => u.id.toUpperCase() === activeId.toUpperCase())
     : undefined;
   const isOwnStall = Boolean(
-    selectedUnitId && selected && selected.id.toUpperCase() === selectedUnitId.toUpperCase()
+    markedFromOutside &&
+      selectedUnitId &&
+      selected &&
+      selected.id.toUpperCase() === selectedUnitId.toUpperCase()
   );
   const selectedAllotment = selected
     ? ALLOTMENT_BY_UNIT.get(selected.id.toUpperCase())
@@ -209,17 +241,8 @@ export default function FloorPlan2026({
           Trade colours
         </button>
 
-        <p className="text-[11px] sm:text-xs text-slate-400 tabular-nums truncate">
-          {selected
-            ? `Stall ${selected.id} · ${selected.size} · ${selected.stall.zone}` +
-              (showOccupancy
-                ? selectedAllotment
-                  ? ` · ${selectedAllotment.brand}`
-                  : ' · free'
-                : '') +
-              (drawnUnitIds?.has(selected.id.toUpperCase()) ? ' · drawn' : '') +
-              (isOwnStall ? (focusLabel ? ' · marked' : ' · yours') : '')
-            : 'Tap a stall to identify it'}
+        <p className="text-[11px] sm:text-xs text-slate-400 truncate">
+          Tap a stall to identify it
         </p>
       </div>
 
@@ -272,6 +295,16 @@ export default function FloorPlan2026({
                 stroke = '#B87333';
                 strokeWidth = 2;
               }
+              // Carried on an aria-label, deliberately NOT an SVG <title>:
+              // a <title> is what makes the browser float its own tooltip
+              // beside the cursor on hover. Screen readers still announce
+              // this, and the readable copy now lives in the fixed row
+              // under the plan instead.
+              const label =
+                `Stall ${u.id} · ${u.size} · ${u.areaSqft} sqft` +
+                (showOccupancy
+                  ? ` · ${allotment ? allotment.brand : 'Free'}` + (drawn ? ' · drawn' : '')
+                  : '');
               return (
                 <rect
                   key={u.id}
@@ -284,22 +317,64 @@ export default function FloorPlan2026({
                   strokeWidth={strokeWidth}
                   style={{ cursor: onSelect ? 'pointer' : 'default' }}
                   onClick={() => {
+                    lastTapRef.current = u.id;
                     setPicked(u.id);
+                    setMarkedFromOutside(false);
                     onSelect?.(u.id);
                   }}
-                >
-                  <title>
-                    {`Stall ${u.id} · ${u.size} · ${u.areaSqft} sqft` +
-                      (showOccupancy
-                        ? ` · ${allotment ? allotment.brand : 'Free'}` +
-                          (drawn ? ' · drawn' : '')
-                        : '')}
-                  </title>
-                </rect>
+                  aria-label={label}
+                />
               );
             })}
           </svg>
         </div>
+      </div>
+
+      {/* Static stall readout.
+          This is what replaced the browser's own hover tooltip, which floated
+          beside the cursor and vanished the moment you moved away. The same
+          detail now sits in one fixed place, filled in by tapping a stall and
+          staying there until another is tapped. The row holds a constant
+          height so picking a stall never shifts the rest of the page. */}
+      <div className="border-t border-white/10 px-3 py-2.5 min-h-[3.25rem] flex items-center">
+        {selected ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="text-sm font-bold text-white tabular-nums">
+              Stall {selected.id}
+            </span>
+            <span className="text-[11px] text-slate-400 tabular-nums">
+              {selected.size} &middot; {selected.areaSqft} sqft
+            </span>
+            <span className="text-[11px] text-slate-400">{selected.stall.zone}</span>
+
+            {showOccupancy &&
+              (selectedAllotment ? (
+                <span className="rounded-md border border-white/15 bg-white/5 px-2 py-0.5 text-[11px] font-medium text-slate-200">
+                  {selectedAllotment.brand}
+                </span>
+              ) : (
+                <span className="rounded-md border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
+                  Free
+                </span>
+              ))}
+
+            {drawnUnitIds?.has(selected.id.toUpperCase()) && (
+              <span className="rounded-md border border-blue-400/40 bg-blue-400/10 px-2 py-0.5 text-[11px] font-semibold text-blue-300">
+                Drawn
+              </span>
+            )}
+
+            {isOwnStall && (
+              <span className="rounded-md border border-amber-400/40 bg-amber-400/10 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
+                {focusLabel ? 'Marked' : 'Yours'}
+              </span>
+            )}
+          </div>
+        ) : (
+          <span className="text-[11px] text-slate-500">
+            Tap any stall on the plan to read its number, size and who holds it.
+          </span>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-3 py-2 border-t border-white/10 text-[10px] sm:text-[11px] text-slate-400">

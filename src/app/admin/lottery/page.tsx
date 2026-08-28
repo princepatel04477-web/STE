@@ -186,7 +186,7 @@ export default function AdminLotteryPage() {
           <Link
             href="/admin/exhibitors"
             className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors border border-white/10"
-            title="Back to Exhibitors"
+            aria-label="Back to Exhibitors"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -223,7 +223,7 @@ export default function AdminLotteryPage() {
           <button
             onClick={fetchReport}
             className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors"
-            title="Refresh Data"
+            aria-label="Refresh Data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -343,7 +343,7 @@ export default function AdminLotteryPage() {
                         ? 'bg-emerald-500/25 border-emerald-400 text-emerald-200'
                         : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
                     }`}
-                    title={`${u.size} · ${u.zone}`}
+                    aria-label={`Stall ${u.id} · ${u.size} · ${u.areaSqft} sqft · ${u.zone}`}
                   >
                     <span className="font-mono">{u.id}</span>
                     <span className="text-emerald-500/80 font-medium ml-1.5">
@@ -444,7 +444,7 @@ export default function AdminLotteryPage() {
               <button
                 onClick={handleResetAll}
                 className="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold transition-colors flex items-center gap-1.5"
-                title="Reset All Allocations"
+                aria-label="Reset All Allocations"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset All</span>
@@ -495,14 +495,14 @@ export default function AdminLotteryPage() {
                         <button
                           onClick={() => setSelectedSlip(a)}
                           className="p-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors"
-                          title="View & Print Slip"
+                          aria-label={`View and print slip for ${a.brand_name}`}
                         >
                           <Printer className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleResetSingle(a.mobile, a.brand_name)}
                           className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 transition-colors"
-                          title="Reset This Allocation"
+                          aria-label={`Reset the allocation for ${a.brand_name}`}
                         >
                           <RotateCcw className="w-3.5 h-3.5" />
                         </button>
