@@ -18,7 +18,11 @@
  *   137  Gopal Hari, placed in the south hall rather than the saree band
  *        (no mobile yet - the sheet gives him Gauri Ganesh's number)
  *
- * One row corrects the sheet rather than following it:
+ * Two rows correct the sheet rather than following it:
+ *   122  Vaani NX, not the "Vani NX" the sheet spells (organisers,
+ *        28 Aug 2026) - the firm's own fascia name reads Vaani. A rerun of
+ *        scripts/number_stalls.py takes the brand straight from the sheet,
+ *        so correct the sheet too or this comes back misspelt.
  *   141  Shiv Vardhaan books 200 sqft, not the 100 the sheet carries
  *        (organisers, 28 Aug 2026). Moved off the 3m x 3m bay 103 onto 141,
  *        the 200 sqft bay the draw had left empty, and kept in the saree pool
@@ -287,7 +291,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Dress Material & Fabrics",  mobile: "9099009117",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "121",   stallNumber: 121,  brand: "Radhey Silk Weaves", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "9374072626",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: true },
-  { unitId: "122",   stallNumber: 122,  brand: "Vani NX", category: "Fabrics",
+  { unitId: "122",   stallNumber: 122,  brand: "Vaani NX", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "9726277110",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "123",   stallNumber: 123,  brand: "Shaurya Silk Mills", category: "Men's Wear",
     group: "Men's Wear",                mobile: "7359330135",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
