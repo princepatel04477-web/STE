@@ -102,7 +102,7 @@ export default function AdminLotteryPage() {
       const res = await fetch('/api/lottery/admin/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobile, adminKey: 'ste@2026' })
+        body: JSON.stringify({ mobile })
       });
       if (res.ok) {
         fetchReport();
@@ -118,7 +118,7 @@ export default function AdminLotteryPage() {
       const res = await fetch('/api/lottery/admin/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resetAll: true, adminKey: 'ste@2026' })
+        body: JSON.stringify({ resetAll: true })
       });
       if (res.ok) {
         fetchReport();

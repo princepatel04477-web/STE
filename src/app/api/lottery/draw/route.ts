@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { normalizeExhibitorId } from '@/lib/exhibitorId';
 import {
+  canonicalMobile,
   findExhibitorByMobile,
   isRegisteredExhibitor,
   numbersFor,
@@ -24,6 +25,10 @@ const MAX_DRAW_ATTEMPTS = 8;
 function allocationRow(allocation: LotteryAllocationRecord) {
   return {
     mobile: allocation.mobile,
+    // The firm behind the number. Unique in the table, so a firm drawing at
+    // the same moment on two of its own numbers is refused the second stall
+    // rather than seated on it (migration 20260828000008).
+    firm_mobile: canonicalMobile(allocation.mobile),
     brand_name: allocation.brand_name,
     stall_sqft: allocation.stall_sqft,
     stall_number: allocation.stall_number,
@@ -75,11 +80,17 @@ export async function POST(request: Request) {
     // final, and ordering makes sure the same one comes back every time rather
     // than whichever the database happened to return first.
     const ownNumbers = registeredMaster ? numbersFor(registeredMaster) : [mobile];
+    const firmMobile = canonicalMobile(mobile);
     const readOwnAllocation = async (): Promise<LotteryAllocationRecord | null> => {
+      // Matched on firm_mobile as well as on every number the firm answers
+      // to: the column is the guarantee, and the number list still finds a
+      // row written before the column existed.
       const { data, error } = await supabaseAdmin!
         .from('lottery_allocations')
         .select('*')
-        .in('mobile', ownNumbers)
+        .or(
+          `firm_mobile.eq.${firmMobile},mobile.in.(${ownNumbers.join(',')})`
+        )
         .order('allocated_at', { ascending: true })
         .limit(1);
       if (error) throw error;

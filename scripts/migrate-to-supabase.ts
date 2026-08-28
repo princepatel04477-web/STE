@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
-import { REGISTERED_EXHIBITORS_LIST } from '../src/data/registeredExhibitors';
+import { REGISTERED_EXHIBITORS_LIST, canonicalMobile } from '../src/data/registeredExhibitors';
 
 // Simple .env parser to load .env.local if not already in process.env
 function loadEnv() {
@@ -266,6 +266,8 @@ async function runMigration() {
   if (localStore.lottery_allocations && localStore.lottery_allocations.length > 0) {
     const allocData = localStore.lottery_allocations.map((l: any) => ({
       mobile: l.mobile,
+      // NOT NULL and unique - one firm, one stall (migration 20260828000008).
+      firm_mobile: canonicalMobile(l.mobile),
       brand_name: l.brand_name,
       stall_sqft: l.stall_sqft,
       stall_number: l.stall_number,

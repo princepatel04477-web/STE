@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { Sparkles, Trophy, CheckCircle2, Store, Compass, Layers, ShieldCheck, Printer, ArrowRight } from 'lucide-react';
 import { LotteryAllocationRecord } from '@/lib/db';
@@ -98,12 +98,6 @@ export default function LuckyBox({
    */
   const drawing = useRef(false);
 
-  // A stall confirmed elsewhere - the page re-reading it from the database
-  // after the draw - is the one to show.
-  useEffect(() => {
-    if (allocation) setCurrentAllocation(allocation);
-  }, [allocation]);
-
   const isCornerEligible = parseInt(categorySqft.replace(/\D/g, ''), 10) >= 600;
 
   const handleOpenBox = async () => {
@@ -155,7 +149,12 @@ export default function LuckyBox({
     }
   };
 
-  const activeRecord = currentAllocation || allocation;
+  // The stall the page holds wins, because that is the one it read back from
+  // the database after the draw; the local copy only covers the moment
+  // between the reveal and the page being told. Deriving it beats syncing the
+  // prop into state in an effect, which rendered twice and let the local copy
+  // outrank a stall the database had since corrected.
+  const activeRecord = allocation ?? currentAllocation;
 
   return (
     <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
