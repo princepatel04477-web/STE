@@ -15,13 +15,17 @@
  *   111  Sweety Fashion (Fabrics), moved off 121
  *   121  Radhey Silk Weaves, seated on the bay 111 vacated
  *   151  Dream Delta, on a 3m x 3m bay the draw had left empty
- *   60   Jyotsana, on a whole 3m x 6m bay rather than a cut piece of bay
+ *   60   Jyotsna, on a whole 3m x 6m bay rather than a cut piece of bay
  *        100 (organisers, 28 Aug 2026). Surat Saree House, who had drawn 60,
  *        is not confirmed yet and so holds no stall for now.
  *   137  Gopal Hari, placed in the south hall rather than the saree band
  *        (no mobile yet - the sheet gives him Gauri Ganesh's number)
  *
- * Two rows correct the sheet rather than following it:
+ * Three rows correct the sheet rather than following it:
+ *   60   Jyotsna, not the "Jyotsana" the sheet spells (organisers,
+ *        28 Aug 2026). A rerun of scripts/number_stalls.py takes the brand
+ *        straight from the sheet, so correct the sheet too or this comes
+ *        back misspelt.
  *   122  Vaani NX, not the "Vani NX" the sheet spells (organisers,
  *        28 Aug 2026) - the firm's own fascia name reads Vaani. A rerun of
  *        scripts/number_stalls.py takes the brand straight from the sheet,
@@ -172,7 +176,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "59",    stallNumber: 59,   brand: "Mahadev Creations", category: "Sarees",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "60",    stallNumber: 60,   brand: "Jyotsana", category: "Saree",
+  { unitId: "60",    stallNumber: 60,   brand: "Jyotsna", category: "Saree",
     group: "Saree",                     mobile: "9898866093",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "61",    stallNumber: 61,   brand: "Navdurga", category: "Sarees",
     group: "Saree",                     mobile: "9714604040",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
