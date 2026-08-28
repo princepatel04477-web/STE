@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { Sparkles, Trophy, CheckCircle2, Store, Compass, Layers, ShieldCheck, Printer, ArrowRight } from 'lucide-react';
 import { LotteryAllocationRecord } from '@/lib/db';
@@ -88,10 +88,27 @@ export default function LuckyBox({
   const [errorMsg, setErrorMsg] = useState('');
   const [currentAllocation, setCurrentAllocation] = useState<LotteryAllocationRecord | null>(allocation);
 
+  /**
+   * The draw is in flight.
+   *
+   * `opening` cannot guard this on its own: a double tap on a phone fires two
+   * clicks before React has re-rendered the disabled button, so both handlers
+   * read the old `false` and two draws go out. A ref is written the instant
+   * the first tap is handled, so the second one finds the box already open.
+   */
+  const drawing = useRef(false);
+
+  // A stall confirmed elsewhere - the page re-reading it from the database
+  // after the draw - is the one to show.
+  useEffect(() => {
+    if (allocation) setCurrentAllocation(allocation);
+  }, [allocation]);
+
   const isCornerEligible = parseInt(categorySqft.replace(/\D/g, ''), 10) >= 600;
 
   const handleOpenBox = async () => {
-    if (opening || hasDrawn || currentAllocation) return;
+    if (drawing.current || opening || hasDrawn || currentAllocation) return;
+    drawing.current = true;
     setOpening(true);
     setErrorMsg('');
 
@@ -108,8 +125,12 @@ export default function LuckyBox({
 
       const data = await res.json();
 
-      if (!res.ok || !data.success) {
+      // Nothing was allotted, so the box stays shut and the exhibitor can try
+      // again. The draw only reports success once the allotment is on record,
+      // so a failure here means there is no stall to lose.
+      if (!res.ok || !data.success || !data.allocation?.stall_number) {
         setErrorMsg(data.error || 'Lucky draw allocation failed. Please try again.');
+        drawing.current = false;
         setOpening(false);
         return;
       }
@@ -118,6 +139,9 @@ export default function LuckyBox({
       triggerConfettiBurst();
       playCelebrationChime();
 
+      // Allotted, and it stays allotted: `drawing` is deliberately not
+      // released, so nothing that happens between here and the reveal can
+      // start a second draw.
       setTimeout(() => {
         setCurrentAllocation(data.allocation);
         onDrawComplete(data.allocation);
@@ -126,6 +150,7 @@ export default function LuckyBox({
     } catch (err) {
       console.error(err);
       setErrorMsg('Connection error. Please try again.');
+      drawing.current = false;
       setOpening(false);
     }
   };
@@ -190,6 +215,10 @@ export default function LuckyBox({
           <button
             onClick={handleOpenBox}
             disabled={opening}
+            // Phones raise a second click on a double tap and zoom the page
+            // between the two; this asks the browser for the single tap the
+            // draw expects.
+            style={{ touchAction: 'manipulation' }}
             className={`w-full max-w-sm py-4 px-8 rounded-2xl font-black text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-xl flex items-center justify-center gap-3 ${
               opening
                 ? 'bg-slate-700 text-slate-400 cursor-not-allowed'

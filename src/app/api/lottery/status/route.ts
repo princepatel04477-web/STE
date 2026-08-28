@@ -11,13 +11,15 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const queryMobile = searchParams.get('mobile');
 
-    let mobile = '';
+    // The number the caller asked about wins, and the session answers only
+    // when none was given. /api/lottery/draw resolves identity the same way,
+    // so the two can never disagree about who is being seated: a phone still
+    // carrying an earlier session used to be shown that firm's stall while the
+    // draw ran for the number actually typed in.
     const session = await getAuthenticatedExhibitor();
-    if (session?.mobile) {
-      mobile = normalizeExhibitorId(session.mobile);
-    } else if (queryMobile) {
-      mobile = normalizeExhibitorId(queryMobile);
-    }
+    const mobile =
+      normalizeExhibitorId(queryMobile) ||
+      (session?.mobile ? normalizeExhibitorId(session.mobile) : '');
 
     if (!mobile) {
       return NextResponse.json(

@@ -39,11 +39,23 @@ export async function getStallForExhibitor(
 
   if (isSupabaseConfigured && supabaseAdmin) {
     try {
-      const { data } = await supabaseAdmin
+      // Ordered, so the answer cannot change between two reads. A firm should
+      // only ever have one row, but if a second one exists under another of
+      // its numbers the earliest draw is the one that stands - unordered, the
+      // database is free to return either, and the exhibitor watches their
+      // stall number change from one refresh to the next.
+      const { data, error } = await supabaseAdmin
         .from('lottery_allocations')
         .select('*')
-        .in('mobile', numbers);
-      if (data?.[0]) return data[0] as LotteryAllocationRecord;
+        .in('mobile', numbers)
+        .order('allocated_at', { ascending: true });
+      if (error) throw error;
+
+      // An answer, including "none". The local store is not consulted after
+      // one: it lives in /tmp per instance, so a draw the organisers have
+      // since reset can survive there and would otherwise be handed back as
+      // the exhibitor's stall long after it stopped being theirs.
+      return (data?.[0] as LotteryAllocationRecord) ?? null;
     } catch (err) {
       console.warn('[Stall] Cloud lookup failed, falling back locally:', err);
     }

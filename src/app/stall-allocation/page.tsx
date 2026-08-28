@@ -99,6 +99,28 @@ export default function StallAllocationPage() {
     }
   };
 
+  /**
+   * Read back the stall the database holds for this number.
+   *
+   * The draw already returns the allotment, but reading it back is what proves
+   * it was written rather than merely drawn - the exhibitor sees the number
+   * the database will still be showing tomorrow, not one that quietly failed
+   * to save and left them looking at "Not assigned" a minute later.
+   */
+  const refreshAllocation = async (forMobile: string) => {
+    try {
+      const res = await fetch(`/api/lottery/status?mobile=${encodeURIComponent(forMobile)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.success && data.allocation?.stall_number) {
+        setAllocation(data.allocation);
+        setHasDrawn(true);
+      }
+    } catch (e) {
+      console.error('Allotment re-check error:', e);
+    }
+  };
+
   // An exhibitor who already holds a stall has nothing left to draw, so the
   // Lucky Box is closed to them and the floor plan takes its place.
   const hasStall = Boolean(allocation?.stall_number);
@@ -128,6 +150,9 @@ export default function StallAllocationPage() {
       const data = await res.json();
 
       if (data.success) {
+        // The draw posts this value, so keep the normalised form rather than
+        // whatever spacing or +91 prefix was typed in.
+        setMobile(data.mobile || clean);
         setBrandName(data.brandName || registered?.brandName || 'STE Exhibitor');
         setContactName(data.brandName || registered?.brandName || 'Exhibitor Contact');
         setCategorySqft(data.rawSqft || registered?.stallSqft || '200 sq ft');
@@ -181,6 +206,9 @@ export default function StallAllocationPage() {
   const handleDrawComplete = (newAllocation: LotteryAllocationRecord) => {
     setAllocation(newAllocation);
     setHasDrawn(true);
+    // One stall, drawn once: confirm it is the one on record before the
+    // exhibitor walks away with the number.
+    void refreshAllocation(normalizeExhibitorId(mobile) || mobile);
   };
 
   const isCornerEligible = parseInt(categorySqft.replace(/\D/g, ''), 10) >= 600;

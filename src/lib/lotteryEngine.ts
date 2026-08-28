@@ -16,9 +16,23 @@ import {
  * answer down here.
  */
 export interface DrawContext {
-  /** The allocation already on record for this exhibitor, if any. */
+  /**
+   * The allocation already on record for this exhibitor.
+   *
+   * `null` means the cloud has been asked and there is none - which is not
+   * the same as not knowing, so the local store is not consulted. A local row
+   * can outlive a reset on another instance, and trusting it would hand back
+   * a stall that now belongs to someone else. Leave undefined only when there
+   * is no cloud to ask.
+   */
   existing?: LotteryAllocationRecord | null;
-  /** Every stall number already allotted, from the cloud database. */
+  /**
+   * Every stall number already allotted, from the cloud database.
+   *
+   * Authoritative when present: the local store is not merged in, because a
+   * stall left behind on one instance would be withheld from the whole floor
+   * and can exhaust a block that is in fact free.
+   */
   taken?: string[];
 }
 
@@ -61,9 +75,10 @@ export function performLuckyDraw(
   // 1. Check if already drawn. One exhibitor draws exactly once, so the cloud
   //    record wins over the local store, which may be an empty cold instance.
   const existing =
-    context.existing ??
-    (db.prepare('SELECT * FROM lottery_allocations WHERE mobile = ?')
-      .get(cleanMobile) as LotteryAllocationRecord | undefined);
+    context.existing !== undefined
+      ? context.existing
+      : (db.prepare('SELECT * FROM lottery_allocations WHERE mobile = ?')
+          .get(cleanMobile) as LotteryAllocationRecord | undefined);
 
   if (existing) {
     return {
@@ -78,9 +93,10 @@ export function performLuckyDraw(
   //    draw can only ever return a stall of the right size standing among the
   //    same trade.
   const held = heldUnitFor(cleanMobile, brandName);
-  const localTaken = ((db.prepare('SELECT stall_number FROM lottery_allocations')
-    .all() as Array<{ stall_number: string }>) || []).map((a) => a.stall_number);
-  const occupied = Array.from(new Set([...(context.taken ?? []), ...localTaken]));
+  const occupied =
+    context.taken ??
+    ((db.prepare('SELECT stall_number FROM lottery_allocations')
+      .all() as Array<{ stall_number: string }>) || []).map((a) => a.stall_number);
 
   let chosen: DrawUnit;
   if (held) {
@@ -116,7 +132,9 @@ export function performLuckyDraw(
   const slipId = generateSlipId(cleanMobile, chosenStall.stallNumber);
   const allocatedAt = new Date().toISOString();
 
-  // 6. Persist allocation
+  // The drawn stall, not yet anyone's. Nothing is written here: the caller
+  // offers it to the register of record first and only what that accepts is
+  // kept (see saveAllocationLocally).
   const newAllocation: LotteryAllocationRecord = {
     id: 0, // will be assigned in db
     mobile: cleanMobile,
@@ -132,29 +150,46 @@ export function performLuckyDraw(
     allocated_at: allocatedAt
   };
 
-  db.prepare(
-    `INSERT INTO lottery_allocations 
-     (mobile, brand_name, stall_sqft, stall_number, is_corner, shape, hall, zone, dimensions, slip_id, allocated_at) 
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).run(
-    cleanMobile,
-    newAllocation.brand_name,
-    newAllocation.stall_sqft,
-    newAllocation.stall_number,
-    newAllocation.is_corner,
-    newAllocation.shape,
-    newAllocation.hall,
-    newAllocation.zone,
-    newAllocation.dimensions,
-    newAllocation.slip_id,
-    newAllocation.allocated_at
-  );
-
   return {
     success: true,
     isExisting: false,
     allocation: newAllocation
   };
+}
+
+/**
+ * Keep a stall that has been confirmed, in the local store.
+ *
+ * Called once the allotment is settled - accepted by the cloud database, or
+ * drawn on a machine that has no cloud at all. It used to run inside
+ * performLuckyDraw, before anyone knew whether the stall had been accepted,
+ * which left a losing draw on record: the exhibitor was shown one stall and
+ * the fallback read another back, and the stall itself was withheld from the
+ * floor for good.
+ */
+export function saveAllocationLocally(allocation: LotteryAllocationRecord): void {
+  try {
+    db.prepare(
+      `INSERT INTO lottery_allocations
+       (mobile, brand_name, stall_sqft, stall_number, is_corner, shape, hall, zone, dimensions, slip_id, allocated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      allocation.mobile,
+      allocation.brand_name,
+      allocation.stall_sqft,
+      allocation.stall_number,
+      allocation.is_corner,
+      allocation.shape,
+      allocation.hall,
+      allocation.zone,
+      allocation.dimensions,
+      allocation.slip_id,
+      allocation.allocated_at
+    );
+  } catch (err) {
+    // The cloud row is the allotment; this copy is a convenience.
+    console.warn('[Lottery] Local copy of the allotment skipped:', err);
+  }
 }
 
 export function getAllocatedStallForMobile(mobile: string): LotteryAllocationRecord | null {

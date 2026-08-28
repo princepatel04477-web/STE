@@ -7,6 +7,26 @@ const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabase
 export const isSupabaseConfigured = Boolean(supabaseUrl && (supabaseAnonKey || supabaseServiceRoleKey));
 
 /**
+ * Whether supabaseAdmin is actually privileged.
+ *
+ * Without SUPABASE_SERVICE_ROLE_KEY the admin client falls back to the anon
+ * key above, and row-level security then answers every read with an empty
+ * list and a 200 - no error to catch. A draw run on that client would be told
+ * the exhibitor has never drawn and that no stall on the floor is taken, then
+ * have its write silently refused. Callers that must not run half-blind check
+ * this first and refuse rather than guess.
+ */
+export const hasServiceRoleKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+if (isSupabaseConfigured && !hasServiceRoleKey) {
+  console.error(
+    '[Supabase] SUPABASE_SERVICE_ROLE_KEY is not set. The admin client is ' +
+    'running on the anon key, which row-level security answers with empty ' +
+    'results rather than errors. Writes will not persist.'
+  );
+}
+
+/**
  * Public client for client-side or anon interactions.
  */
 export const supabase = isSupabaseConfigured
