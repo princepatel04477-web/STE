@@ -35,6 +35,8 @@ export interface DriveUploadParams {
   fileBuffer: Buffer;
   mimeType: string;
   category?: AssetCategory;
+  /** 1-based position within the exhibitor's files of this category. */
+  slot?: number;
 }
 
 export interface DriveUploadResult {
@@ -93,19 +95,24 @@ export function fileExtension(fileName: string): string {
  * Deterministic, human-readable asset name so every exhibitor folder looks the
  * same: 'Apple Lifestyle - Logo.png' / 'Apple Lifestyle - Artwork.cdr' / 'Apple Lifestyle - ProfilePhoto.jpg'.
  *
- * Because the name is deterministic, re-uploading the same category replaces
- * the previous file in place instead of stacking 'logo (1).png' duplicates.
+ * An exhibitor may keep several logos and several artwork files, so the name
+ * carries the slot they occupy: the first is unnumbered and the rest read
+ * 'Apple Lifestyle - Logo 2.png', 'Apple Lifestyle - Logo 3.png'. The name is
+ * still derived rather than random, so re-uploading into a slot replaces that
+ * file in place instead of stacking 'logo (1).png' duplicates beside it.
  */
 export function buildAssetFileName(
   brandName: string,
   originalFileName: string,
-  category?: AssetCategory
+  category?: AssetCategory,
+  slot?: number
 ): string {
   const brand = sanitizeFolderName(brandName);
   const ext = fileExtension(originalFileName) || '.bin';
   const resolved: AssetCategory = category || (ext === '.cdr' ? 'cdr' : 'logo');
   const label = resolved === 'cdr' ? 'Artwork' : (resolved === 'profile_pic' ? 'ProfilePhoto' : 'Logo');
-  return brand + ' - ' + label + ext;
+  const suffix = slot && slot > 1 ? ' ' + slot : '';
+  return brand + ' - ' + label + suffix + ext;
 }
 
 /** Escapes a value for use inside a Drive `q=` search string. */
@@ -275,7 +282,7 @@ async function uploadViaDriveApi(
   params: DriveUploadParams
 ): Promise<DriveUploadResult> {
   const folderName = sanitizeFolderName(params.brandName);
-  const assetName = buildAssetFileName(params.brandName, params.fileName, params.category);
+  const assetName = buildAssetFileName(params.brandName, params.fileName, params.category, params.slot);
 
   // 1. Root folder ("STE Logos"), by configured id where available.
   const configuredRootId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID?.trim();
@@ -330,7 +337,7 @@ async function uploadViaAppsScript(params: DriveUploadParams): Promise<DriveUplo
   if (!webhookUrl || !webhookUrl.startsWith('http')) return null;
 
   const folderName = sanitizeFolderName(params.brandName);
-  const assetName = buildAssetFileName(params.brandName, params.fileName, params.category);
+  const assetName = buildAssetFileName(params.brandName, params.fileName, params.category, params.slot);
 
   const res = await fetch(webhookUrl, {
     method: 'POST',
@@ -458,4 +465,36 @@ export async function syncExhibitorFileToDrive(
 
   console.warn('[GoogleDrive] Drive sync skipped for "' + brand + '": ' + error);
   return { success: false, error };
+}
+
+/**
+ * Removes a mirrored file from Drive when the exhibitor deletes it in the
+ * portal. Never throws: Supabase Storage is the source of truth, so a Drive
+ * that cannot be reached must not block the deletion the exhibitor asked for.
+ * The Apps Script strategy has no delete endpoint, so an Apps-Script-only
+ * deployment leaves the mirrored copy behind and says so.
+ */
+export async function deleteExhibitorFileFromDrive(
+  fileId: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!fileId) return { success: false, error: 'No Drive file id recorded for this asset.' };
+
+  const client = getDriveClient();
+  if (!client) {
+    return { success: false, error: 'No Drive API credentials configured; mirrored copy left in place.' };
+  }
+
+  try {
+    // Trash rather than purge, so an accidental delete stays recoverable.
+    await client.drive.files.update({
+      fileId,
+      requestBody: { trashed: true },
+      supportsAllDrives: true
+    });
+    return { success: true };
+  } catch (error: any) {
+    const message = error?.errors?.[0]?.message || error?.message || String(error);
+    console.warn('[GoogleDrive] Could not trash file ' + fileId + ': ' + message);
+    return { success: false, error: message };
+  }
 }

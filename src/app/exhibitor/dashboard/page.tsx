@@ -54,6 +54,28 @@ import {
 
 const STRICT_CUTOFF_DATE = '5th September 2026, 12:00 PM';
 
+/**
+ * Brand files one exhibitor may keep. Mirrors MAX_ASSETS_PER_EXHIBITOR in
+ * src/lib/exhibitorAssets.ts, which is what actually enforces the limit; this
+ * copy only decides what the portal says before the upload is attempted, and
+ * the server's own count replaces it as soon as the file list is loaded.
+ */
+const MAX_BRAND_FILES = 10;
+
+interface UploadedAsset {
+  id: number;
+  category: 'logo' | 'cdr' | 'profile_pic';
+  slot: number;
+  originalFileName: string;
+  assetFileName: string;
+  fileSize: number | null;
+  storageUrl: string | null;
+  driveFileUrl: string | null;
+  driveFolderUrl: string | null;
+  driveSynced: boolean;
+  uploadedAt: string | null;
+}
+
 interface Product {
   id: string;
   name: string;
@@ -248,15 +270,20 @@ export default function ExhibitorDashboardPage() {
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   // Brand Logo & Vector Artwork (CDR) Upload State
-  const [logoFileUrl, setLogoFileUrl] = useState<string | null>(null);
-  const [cdrFileUrl, setCdrFileUrl] = useState<string | null>(null);
   const [driveFileUrl, setDriveFileUrl] = useState<string | null>(null);
   const [driveFolderUrl, setDriveFolderUrl] = useState<string | null>(null);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatusLabel, setUploadStatusLabel] = useState('');
   const [uploadSuccessMsg, setUploadSuccessMsg] = useState('');
   const [uploadError, setUploadError] = useState('');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Every brand file the exhibitor currently keeps, so several logos and
+  // artwork files can sit side by side instead of each replacing the last.
+  const [uploadedAssets, setUploadedAssets] = useState<UploadedAsset[]>([]);
+  const [maxUploadFiles, setMaxUploadFiles] = useState(MAX_BRAND_FILES);
+  const [deletingAssetId, setDeletingAssetId] = useState<number | null>(null);
 
   // General Loading & Auth check
   const [initialLoading, setInitialLoading] = useState(true);
@@ -486,10 +513,11 @@ export default function ExhibitorDashboardPage() {
         setFasciaNames(['', '']);
       }
 
-      setLogoFileUrl(profData.logo_file_url || null);
-      setCdrFileUrl(profData.cdr_file_url || null);
       setDriveFileUrl(profData.drive_file_url || null);
       setDriveFolderUrl(profData.drive_folder_url || null);
+
+      // The exhibitor's full set of brand files, not just the newest of each.
+      await fetchUploadedAssets();
 
       // 2. Fetch Extras Catalog & existing order
       const catRes = await fetch('/api/exhibitor/extras');
@@ -776,61 +804,149 @@ export default function ExhibitorDashboardPage() {
     }
   };
 
+  /** Re-reads the exhibitor's brand files after an upload, a delete or a reload. */
+  const fetchUploadedAssets = async () => {
+    try {
+      const res = await fetch('/api/exhibitor/upload');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data.assets)) setUploadedAssets(data.assets);
+      if (typeof data.maxFiles === 'number') setMaxUploadFiles(data.maxFiles);
+    } catch {
+      // The list is a convenience; a failed read must not break the dashboard.
+    }
+  };
+
+  const handleDeleteAsset = async (asset: UploadedAsset) => {
+    if (!confirm('Remove "' + asset.originalFileName + '" from your uploaded files?')) return;
+
+    setUploadError('');
+    setUploadSuccessMsg('');
+    setDeletingAssetId(asset.id);
+
+    try {
+      const res = await fetch('/api/exhibitor/upload?id=' + asset.id, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not remove that file.');
+
+      if (Array.isArray(data.assets)) setUploadedAssets(data.assets);
+      if (typeof data.maxFiles === 'number') setMaxUploadFiles(data.maxFiles);
+
+      setUploadSuccessMsg(
+        data.driveWarning
+          ? 'Removed "' + asset.originalFileName + '". ' + data.driveWarning
+          : 'Removed "' + asset.originalFileName + '".'
+      );
+      setTimeout(() => setUploadSuccessMsg(''), 5000);
+    } catch (err: any) {
+      setUploadError(err.message || 'Could not remove that file. Please try again.');
+    } finally {
+      setDeletingAssetId(null);
+    }
+  };
+
+  /**
+   * Uploads every file the exhibitor picked or dropped.
+   *
+   * One request per file rather than one big batch: a fascia artwork file runs
+   * to tens of megabytes, and sending ten at once over an exhibition-hall
+   * connection times out and loses all of them. Sending them in turn means a
+   * failure costs only the file it happened on, and the ones already stored
+   * stay stored.
+   */
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>,
     directFile?: File
   ) => {
-    let file: File | null = null;
+    let files: File[] = [];
     if (directFile) {
-      file = directFile;
-    } else if ('dataTransfer' in e && e.dataTransfer.files?.[0]) {
-      file = e.dataTransfer.files[0];
-    } else if ('target' in e && (e.target as HTMLInputElement).files?.[0]) {
-      file = (e.target as HTMLInputElement).files![0];
+      files = [directFile];
+    } else if ('dataTransfer' in e && e.dataTransfer.files?.length) {
+      files = Array.from(e.dataTransfer.files);
+    } else if ('target' in e && (e.target as HTMLInputElement).files?.length) {
+      files = Array.from((e.target as HTMLInputElement).files!);
     }
 
-    if (!file) return;
+    if (files.length === 0) return;
 
     setUploadError('');
     setUploadSuccessMsg('');
+
+    const roomLeft = maxUploadFiles - uploadedAssets.length;
+    const namesHeld = new Set(uploadedAssets.map((a) => a.originalFileName.trim().toLowerCase()));
+    const newNames = files.filter((f) => !namesHeld.has(f.name.trim().toLowerCase())).length;
+
+    if (newNames > roomLeft) {
+      setUploadError(
+        'You can keep up to ' + maxUploadFiles + ' files and already have ' +
+          uploadedAssets.length + '. Please remove ' + (newNames - roomLeft) +
+          ' file(s) first, or select fewer.'
+      );
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
     setUploadingFile(true);
-    setUploadProgress(25);
+    setUploadProgress(0);
+
+    const succeeded: string[] = [];
+    let failure = '';
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const ext = file.name.split('.').pop()?.toLowerCase();
-      const isCdr = ext === 'cdr';
-      formData.append('category', isCdr ? 'cdr' : 'logo');
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setUploadStatusLabel(
+          files.length > 1
+            ? 'Uploading ' + (i + 1) + ' of ' + files.length + ': ' + file.name
+            : 'Uploading ' + file.name
+        );
+        // Progress marks completed files, plus a nudge so the bar moves while
+        // the current file is in flight.
+        setUploadProgress(Math.round((i / files.length) * 100) + Math.round(40 / files.length));
 
-      setUploadProgress(55);
+        const formData = new FormData();
+        formData.append('file', file);
+        const ext = file.name.split('.').pop()?.toLowerCase();
+        formData.append('category', ext === 'cdr' ? 'cdr' : 'logo');
 
-      const res = await fetch('/api/exhibitor/upload', {
-        method: 'POST',
-        body: formData,
-      });
+        const res = await fetch('/api/exhibitor/upload', { method: 'POST', body: formData });
+        const data = await res.json();
 
-      setUploadProgress(85);
+        if (!res.ok) {
+          failure = data.error || 'Failed to upload "' + file.name + '".';
+          break;
+        }
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to upload file');
+        if (data.driveFileUrl) setDriveFileUrl(data.driveFileUrl);
+        if (data.driveFolderUrl) setDriveFolderUrl(data.driveFolderUrl);
+        if (Array.isArray(data.assets)) setUploadedAssets(data.assets);
+        if (typeof data.maxFiles === 'number') setMaxUploadFiles(data.maxFiles);
+
+        succeeded.push(file.name);
+        setUploadProgress(Math.round(((i + 1) / files.length) * 100));
       }
 
-      if (data.logoUrl) setLogoFileUrl(data.logoUrl);
-      if (data.cdrUrl) setCdrFileUrl(data.cdrUrl);
-      if (data.profilePicUrl) setProfilePicUrl(data.profilePicUrl);
-      if (data.driveFileUrl) setDriveFileUrl(data.driveFileUrl);
-      if (data.driveFolderUrl) setDriveFolderUrl(data.driveFolderUrl);
-
-      setUploadSuccessMsg(data.message || 'File uploaded successfully and synced to Google Drive!');
-      setUploadProgress(100);
+      // Say what actually happened: a part-finished batch must not read as a
+      // clean success, and the files that did land must not read as lost.
+      if (failure) {
+        setUploadError(
+          succeeded.length > 0
+            ? succeeded.length + ' of ' + files.length + ' files uploaded. ' + failure
+            : failure
+        );
+      } else if (succeeded.length === 1) {
+        setUploadSuccessMsg('"' + succeeded[0] + '" uploaded and synced to Google Drive.');
+      } else {
+        setUploadSuccessMsg(succeeded.length + ' files uploaded and synced to Google Drive.');
+      }
     } catch (err: any) {
       setUploadError(err.message || 'Failed to upload file. Please try again.');
     } finally {
       setUploadingFile(false);
+      setUploadStatusLabel('');
       setTimeout(() => setUploadProgress(0), 1500);
       if (fileInputRef.current) fileInputRef.current.value = '';
+      void fetchUploadedAssets();
     }
   };
 
@@ -1766,11 +1882,12 @@ export default function ExhibitorDashboardPage() {
                 <input
                   ref={fileInputRef}
                   type="file"
+                  multiple
                   accept=".png,.jpg,.jpeg,.cdr"
                   onChange={handleFileUpload}
                   className="hidden"
                   id="cdr-logo-file-input"
-                  disabled={uploadingFile}
+                  disabled={uploadingFile || uploadedAssets.length >= maxUploadFiles}
                 />
 
                 <div className="w-14 h-14 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800 shadow-xs">
@@ -1783,10 +1900,14 @@ export default function ExhibitorDashboardPage() {
 
                 <div>
                   <h4 className="text-sm font-bold text-slate-900">
-                    {uploadingFile ? 'Uploading file...' : 'Drag & drop your CDR / Logo file here'}
+                    {uploadingFile
+                      ? uploadStatusLabel || 'Uploading files...'
+                      : 'Drag & drop your CDR / Logo files here'}
                   </h4>
                   <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                    Supported formats: <strong className="text-slate-800">.PNG, .JPG, .JPEG, .CDR</strong> (Up to 50MB)
+                    Supported formats: <strong className="text-slate-800">.PNG, .JPG, .JPEG, .CDR</strong> (Up to 50MB each).
+                    You can select several at once — up to{' '}
+                    <strong className="text-slate-800">{maxUploadFiles} files</strong> in total.
                   </p>
                 </div>
 
@@ -1798,17 +1919,25 @@ export default function ExhibitorDashboardPage() {
                         style={{ width: `${uploadProgress}%` }}
                       />
                     </div>
-                    <span className="text-[11px] font-mono text-amber-800 font-bold block">
-                      Uploading: {uploadProgress}%
+                    <span className="text-[11px] font-mono text-amber-800 font-bold block truncate">
+                      {uploadStatusLabel || 'Uploading'}: {uploadProgress}%
                     </span>
                   </div>
                 ) : (
                   <label
                     htmlFor="cdr-logo-file-input"
-                    className="mt-2 px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                    className={`mt-2 px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-md transition-all flex items-center gap-2 ${
+                      uploadedAssets.length >= maxUploadFiles
+                        ? 'bg-slate-300 text-slate-600 cursor-not-allowed'
+                        : 'bg-slate-950 hover:bg-slate-800 text-white cursor-pointer hover:scale-105 active:scale-95'
+                    }`}
                   >
                     <Upload className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Choose CDR or Logo File</span>
+                    <span>
+                      {uploadedAssets.length >= maxUploadFiles
+                        ? 'File limit reached — remove one to add more'
+                        : 'Choose CDR or Logo Files'}
+                    </span>
                   </label>
                 )}
 
@@ -1831,47 +1960,70 @@ export default function ExhibitorDashboardPage() {
             {/* Uploaded File Status & Information Card */}
             <div className="lg:col-span-5 space-y-4">
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-xs">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-2">
-                  Uploaded Brand Artwork
-                </span>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700">
+                    Uploaded Brand Artwork
+                  </span>
+                  <span className="text-[11px] font-bold font-mono text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                    {uploadedAssets.length} / {maxUploadFiles}
+                  </span>
+                </div>
 
-                {cdrFileUrl || logoFileUrl ? (
-                  <div className="space-y-3">
-                    <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 text-slate-950 font-black text-xs flex items-center justify-center uppercase shadow-xs">
-                          {cdrFileUrl ? 'CDR' : 'IMG'}
+                {uploadedAssets.length > 0 ? (
+                  <div className="space-y-2.5 max-h-80 overflow-y-auto pr-0.5">
+                    {uploadedAssets.map((asset) => (
+                      <div
+                        key={asset.id}
+                        className="p-3 rounded-xl bg-white border border-slate-200 flex items-start justify-between gap-3"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 shrink-0 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 text-slate-950 font-black text-[10px] flex items-center justify-center uppercase shadow-xs">
+                            {asset.category === 'cdr' ? 'CDR' : 'IMG'}
+                          </div>
+                          <div className="min-w-0">
+                            <h5 className="text-xs font-bold text-slate-900 leading-snug truncate">
+                              {asset.originalFileName}
+                            </h5>
+                            <span className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1 mt-0.5">
+                              <Check className="w-3 h-3 text-emerald-600 shrink-0" />
+                              {asset.driveSynced ? 'Saved & synced to Drive' : 'Saved — Drive sync pending'}
+                            </span>
+                          </div>
                         </div>
-                        <div>
-                          <h5 className="text-xs font-bold text-slate-900 leading-snug">
-                            {brandName || 'Brand'} Artwork File
-                          </h5>
-                          <span className="text-[11px] text-emerald-700 font-semibold flex items-center gap-1 mt-0.5">
-                            <Check className="w-3 h-3 text-emerald-600" />
-                            Uploaded & Saved Successfully
-                          </span>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <a
+                            href={asset.storageUrl || asset.driveFileUrl || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold border border-slate-300 transition-all flex items-center gap-1"
+                          >
+                            <span>View</span>
+                            <ExternalLink className="w-3 h-3 text-slate-500" />
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteAsset(asset)}
+                            disabled={deletingAssetId === asset.id}
+                            aria-label={'Remove ' + asset.originalFileName}
+                            className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 transition-all disabled:opacity-50"
+                          >
+                            {deletingAssetId === asset.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3.5 h-3.5" />
+                            )}
+                          </button>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-1.5">
-                        <a
-                          href={cdrFileUrl || logoFileUrl || '#'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold border border-slate-300 transition-all flex items-center gap-1"
-                        >
-                          <span>View</span>
-                          <ExternalLink className="w-3 h-3 text-slate-500" />
-                        </a>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="py-6 text-center text-slate-400">
                     <ImageIcon className="w-8 h-8 mx-auto text-slate-300 mb-2" />
                     <p className="text-xs font-semibold text-slate-600">No artwork file uploaded yet</p>
                     <p className="text-[11px] text-slate-400 mt-0.5">
-                      Upload your CorelDRAW (.cdr) or high-resolution brand logo file.
+                      Upload your CorelDRAW (.cdr) or high-resolution brand logo files.
                     </p>
                   </div>
                 )}
@@ -1884,7 +2036,9 @@ export default function ExhibitorDashboardPage() {
                   <span>Artwork Guidelines</span>
                 </div>
                 <p className="text-slate-600 text-[11px] leading-relaxed">
-                  Please upload your vector CorelDRAW (.CDR) or high-resolution logo (.PNG / .JPG). This will be used by the organizing team for your stall fascia printing and promotional catalogue.
+                  Please upload your vector CorelDRAW (.CDR) or high-resolution logo (.PNG / .JPG). You may
+                  upload up to {maxUploadFiles} files — a logo per sub-brand and artwork per fascia. These
+                  will be used by the organizing team for your stall fascia printing and promotional catalogue.
                 </p>
               </div>
             </div>

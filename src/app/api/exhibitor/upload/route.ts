@@ -6,9 +6,14 @@ import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import {
   storeExhibitorAsset,
+  listExhibitorAssets,
+  deleteExhibitorAsset,
   resolveCategory,
+  AssetLimitReachedError,
   ALLOWED_EXTENSIONS,
-  MAX_FILE_SIZE
+  MAX_FILE_SIZE,
+  MAX_ASSETS_PER_EXHIBITOR,
+  MAX_FILES_PER_UPLOAD
 } from '@/lib/exhibitorAssets';
 import { fileExtension } from '@/lib/googleDrive';
 
@@ -16,6 +21,32 @@ import { fileExtension } from '@/lib/googleDrive';
 // large logo over a phone connection needs more than the platform default.
 export const maxDuration = 60;
 
+/** Rejects a file the portal cannot accept, or returns null when it is fine. */
+function validateFile(file: File): string | null {
+  if (file.size === 0) return 'The file "' + file.name + '" is empty.';
+
+  if (file.size > MAX_FILE_SIZE) {
+    return 'The file "' + file.name + '" exceeds the 50MB maximum size limit.';
+  }
+
+  const ext = fileExtension(file.name);
+  if (!ALLOWED_EXTENSIONS.includes(ext)) {
+    return 'File format "' + (ext || 'unknown') + '" of "' + file.name +
+      '" is not allowed. Only .PNG, .JPG, .JPEG, and .CDR files are accepted.';
+  }
+
+  return null;
+}
+
+/**
+ * Stores one or more brand files.
+ *
+ * The portal sends a batch, so every file is validated up front and the whole
+ * request is refused if any one of them is unusable - an exhibitor who picked
+ * six files should not discover afterwards that the fourth was silently
+ * dropped. The profile, database and sheet are then synced once for the batch
+ * rather than once per file.
+ */
 export async function POST(request: Request) {
   try {
     const session = await getAuthenticatedExhibitor();
@@ -27,34 +58,28 @@ export async function POST(request: Request) {
     }
 
     const formData = await request.formData();
-    const file = formData.get('file') as File | null;
+    const files = formData.getAll('file').filter((f): f is File => f instanceof File);
     const requestedCategory = (formData.get('category') as string) || undefined;
 
-    if (!file) {
+    if (files.length === 0) {
       return NextResponse.json({ error: 'No file was provided for upload.' }, { status: 400 });
     }
 
-    if (file.size === 0) {
-      return NextResponse.json({ error: 'The selected file is empty.' }, { status: 400 });
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'File exceeds 50MB maximum size limit.' }, { status: 400 });
-    }
-
-    const ext = fileExtension(file.name);
-    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+    if (files.length > MAX_FILES_PER_UPLOAD) {
       return NextResponse.json(
         {
           error:
-            'File format "' + (ext || 'unknown') +
-            '" is not allowed. Only .PNG, .JPG, .JPEG, and .CDR files are accepted.'
+            'You selected ' + files.length + ' files. Please upload at most ' +
+            MAX_FILES_PER_UPLOAD + ' at a time.'
         },
         { status: 400 }
       );
     }
 
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    for (const file of files) {
+      const problem = validateFile(file);
+      if (problem) return NextResponse.json({ error: problem }, { status: 400 });
+    }
 
     // Resolve the brand name that names the exhibitor's folder.
     const existingExhibitor = db
@@ -66,39 +91,97 @@ export async function POST(request: Request) {
     const reg = findExhibitorByMobile(session.mobile);
     let brandName = existingExhibitor?.brand_name?.trim() || reg?.brandName || 'Exhibitor';
 
-    const category = resolveCategory(file.name, requestedCategory);
+    // A profile photograph replaces the portrait on the profile; brand files
+    // take a numbered slot, and only those count against the allowance.
+    const isProfilePicUpload = resolveCategory(files[0].name, requestedCategory) === 'profile_pic';
 
-    // Store in Supabase Storage and mirror into STE Logos/<Brand Name>/.
-    const result = await storeExhibitorAsset({
-      mobile: session.mobile,
-      brandName,
-      originalFileName: file.name,
-      fileBuffer,
-      browserMimeType: file.type,
-      category
-    });
-
-    if (!result.storageUrl) {
-      return NextResponse.json(
-        {
-          error:
-            'Could not save your file to secure storage. Please try again. (' +
-            (result.storageError || 'unknown error') +
-            ')'
-        },
-        { status: 502 }
+    if (!isProfilePicUpload) {
+      const alreadyHeld = (await listExhibitorAssets(session.mobile)).map(
+        (a) => a.category + '::' + a.originalFileName.trim().toLowerCase()
       );
+      const incomingNew = new Set<string>();
+      for (const file of files) {
+        const key =
+          resolveCategory(file.name, requestedCategory) + '::' + file.name.trim().toLowerCase();
+        if (!alreadyHeld.includes(key)) incomingNew.add(key);
+      }
+      const projected = alreadyHeld.length + incomingNew.size;
+      if (projected > MAX_ASSETS_PER_EXHIBITOR) {
+        return NextResponse.json(
+          {
+            error:
+              'You can keep up to ' + MAX_ASSETS_PER_EXHIBITOR + ' files. You already have ' +
+              alreadyHeld.length + ', so these ' + incomingNew.size +
+              ' new files would take you to ' + projected +
+              '. Please remove some files you no longer need, or upload fewer.'
+          },
+          { status: 409 }
+        );
+      }
     }
 
-    const isProfilePic = result.category === 'profile_pic';
-    const isCdr = result.category === 'cdr';
-    const cdrUrl = isCdr ? result.storageUrl : existingExhibitor?.cdr_file_url || null;
-    const logoUrl = (!isCdr && !isProfilePic) ? result.storageUrl : existingExhibitor?.logo_file_url || null;
-    const profilePicUrl = isProfilePic ? result.storageUrl : existingExhibitor?.profile_pic_url || null;
+    // Sequential rather than parallel: slots are allocated from the ledger, so
+    // two files racing for the same one would collide on the unique index.
+    const stored: Array<{ file: File; result: Awaited<ReturnType<typeof storeExhibitorAsset>> }> = [];
 
-    const driveFileUrl = result.drive.webViewLink || existingExhibitor?.drive_file_url || null;
-    const driveFolderId = result.drive.folderId || existingExhibitor?.drive_folder_id || null;
-    const driveFolderUrl = result.drive.folderViewLink || existingExhibitor?.drive_folder_url || null;
+    for (const file of files) {
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+      const category = resolveCategory(file.name, requestedCategory);
+
+      let result;
+      try {
+        result = await storeExhibitorAsset({
+          mobile: session.mobile,
+          brandName,
+          originalFileName: file.name,
+          fileBuffer,
+          browserMimeType: file.type,
+          category
+        });
+      } catch (err) {
+        if (err instanceof AssetLimitReachedError) {
+          return NextResponse.json({ error: err.message, uploaded: stored.length }, { status: 409 });
+        }
+        throw err;
+      }
+
+      if (!result.storageUrl) {
+        return NextResponse.json(
+          {
+            error:
+              'Could not save "' + file.name + '" to secure storage. Please try again. (' +
+              (result.storageError || 'unknown error') +
+              ')',
+            uploaded: stored.length
+          },
+          { status: 502 }
+        );
+      }
+
+      stored.push({ file, result });
+    }
+
+    // The exhibitor row keeps a link to the most recent file of each kind; the
+    // full set lives in the asset ledger and is read back by GET.
+    const newestOfCategory = (category: string) => {
+      for (let i = stored.length - 1; i >= 0; i--) {
+        if (stored[i].result.category === category) return stored[i].result;
+      }
+      return null;
+    };
+
+    const newestProfilePic = newestOfCategory('profile_pic');
+    const newestCdr = newestOfCategory('cdr');
+    const newestLogo = newestOfCategory('logo');
+
+    const cdrUrl = newestCdr?.storageUrl || existingExhibitor?.cdr_file_url || null;
+    const logoUrl = newestLogo?.storageUrl || existingExhibitor?.logo_file_url || null;
+    const profilePicUrl = newestProfilePic?.storageUrl || existingExhibitor?.profile_pic_url || null;
+
+    const newest = stored[stored.length - 1].result;
+    const driveFileUrl = newest.drive.webViewLink || existingExhibitor?.drive_file_url || null;
+    const driveFolderId = newest.drive.folderId || existingExhibitor?.drive_folder_id || null;
+    const driveFolderUrl = newest.drive.folderViewLink || existingExhibitor?.drive_folder_url || null;
 
     updateExhibitorFiles(session.mobile, {
       logo_file_url: logoUrl || undefined,
@@ -185,14 +268,14 @@ export async function POST(request: Request) {
         if (sbUpdateErr) {
           console.error('[SupabaseDB] Upload update error:', sbUpdateErr);
           return NextResponse.json(
-            { error: `Upload succeeded in storage, but database link failed: ${sbUpdateErr.message}` },
+            { error: 'Upload succeeded in storage, but database link failed: ' + sbUpdateErr.message },
             { status: 500 }
           );
         }
       } catch (dbErr: any) {
         console.error('[SupabaseDB] Fatal database update error on upload:', dbErr);
         return NextResponse.json(
-          { error: `Database persistence error: ${dbErr?.message || 'Unknown error'}` },
+          { error: 'Database persistence error: ' + (dbErr?.message || 'Unknown error') },
           { status: 500 }
         );
       }
@@ -218,27 +301,144 @@ export async function POST(request: Request) {
       console.warn('[GoogleSheets] Upload sync note:', sheetErr);
     }
 
-    return NextResponse.json({
-      success: true,
+    const uploadedFiles = stored.map(({ file, result }) => ({
       fileName: result.assetFileName,
       originalFileName: file.name,
       fileSize: file.size,
-      fileType: ext.replace('.', '').toUpperCase(),
+      fileType: fileExtension(file.name).replace('.', '').toUpperCase(),
       category: result.category,
+      slot: result.slot,
+      replacedExisting: result.replacedExisting,
       folderName: result.folderName,
       fileUrl: result.storageUrl,
+      driveFileUrl: result.drive.webViewLink || null,
+      isDriveSynced: result.drive.success
+    }));
+
+    const assets = isProfilePicUpload ? [] : await listExhibitorAssets(session.mobile);
+
+    const message =
+      uploadedFiles.length === 1
+        ? 'File "' + uploadedFiles[0].originalFileName + '" uploaded successfully and saved to the ' +
+          uploadedFiles[0].folderName + ' folder.'
+        : uploadedFiles.length + ' files uploaded successfully and saved to the ' +
+          uploadedFiles[0].folderName + ' folder.';
+
+    return NextResponse.json({
+      success: true,
+      files: uploadedFiles,
+      assets,
+      maxFiles: MAX_ASSETS_PER_EXHIBITOR,
+      remainingSlots: isProfilePicUpload
+        ? MAX_ASSETS_PER_EXHIBITOR
+        : Math.max(0, MAX_ASSETS_PER_EXHIBITOR - assets.length),
+
+      // Single-file fields, kept so the profile picture uploader and anything
+      // else reading the old shape keeps working unchanged.
+      fileName: uploadedFiles[0].fileName,
+      originalFileName: uploadedFiles[0].originalFileName,
+      fileSize: uploadedFiles[0].fileSize,
+      fileType: uploadedFiles[0].fileType,
+      category: uploadedFiles[0].category,
+      folderName: uploadedFiles[0].folderName,
+      fileUrl: uploadedFiles[0].fileUrl,
       logoUrl,
       cdrUrl,
       profilePicUrl,
       driveFileUrl,
       driveFolderUrl,
-      isDriveSynced: result.drive.success,
-      message:
-        'File "' + file.name + '" uploaded successfully and saved to the ' +
-        result.folderName + ' folder.'
+      isDriveSynced: stored.every((s) => s.result.drive.success),
+      message
     });
   } catch (error: any) {
     console.error('Error handling exhibitor file upload:', error);
     return NextResponse.json({ error: 'Failed to upload file. Please try again.' }, { status: 500 });
+  }
+}
+
+/** The exhibitor's current brand files, so the dashboard can list them. */
+export async function GET() {
+  try {
+    const session = await getAuthenticatedExhibitor();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const assets = await listExhibitorAssets(session.mobile);
+
+    return NextResponse.json({
+      assets,
+      maxFiles: MAX_ASSETS_PER_EXHIBITOR,
+      remainingSlots: Math.max(0, MAX_ASSETS_PER_EXHIBITOR - assets.length)
+    });
+  } catch (error) {
+    console.error('Error listing exhibitor files:', error);
+    return NextResponse.json({ error: 'Failed to load your uploaded files.' }, { status: 500 });
+  }
+}
+
+/**
+ * Removes one uploaded file, freeing its slot. Without this the cap of
+ * MAX_ASSETS_PER_EXHIBITOR would be a dead end rather than a limit.
+ */
+export async function DELETE(request: Request) {
+  try {
+    const session = await getAuthenticatedExhibitor();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const assetId = Number(searchParams.get('id'));
+
+    if (!Number.isInteger(assetId) || assetId <= 0) {
+      return NextResponse.json({ error: 'Which file should be removed?' }, { status: 400 });
+    }
+
+    const outcome = await deleteExhibitorAsset(session.mobile, assetId);
+    if (!outcome.deleted) {
+      return NextResponse.json(
+        { error: outcome.error || 'Could not remove that file.' },
+        { status: 400 }
+      );
+    }
+
+    const assets = await listExhibitorAssets(session.mobile);
+
+    // Keep the exhibitor row's links pointing at files that still exist.
+    const newestOf = (category: string) =>
+      [...assets].reverse().find((a) => a.category === category)?.storageUrl || null;
+
+    const logoUrl = newestOf('logo');
+    const cdrUrl = newestOf('cdr');
+
+    updateExhibitorFiles(session.mobile, {
+      logo_file_url: logoUrl || '',
+      cdr_file_url: cdrUrl || ''
+    });
+
+    if (isSupabaseConfigured && supabaseAdmin) {
+      const { error } = await supabaseAdmin
+        .from('exhibitors')
+        .update({
+          logo_file_url: logoUrl,
+          cdr_file_url: cdrUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('mobile', session.mobile);
+      if (error) console.warn('[SupabaseDB] Could not clear deleted file link:', error.message);
+    }
+
+    return NextResponse.json({
+      success: true,
+      assets,
+      maxFiles: MAX_ASSETS_PER_EXHIBITOR,
+      remainingSlots: Math.max(0, MAX_ASSETS_PER_EXHIBITOR - assets.length),
+      driveWarning: outcome.driveWarning || null,
+      message: 'File removed.'
+    });
+  } catch (error) {
+    console.error('Error deleting exhibitor file:', error);
+    return NextResponse.json({ error: 'Failed to remove the file. Please try again.' }, { status: 500 });
   }
 }
