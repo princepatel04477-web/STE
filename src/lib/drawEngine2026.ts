@@ -18,6 +18,7 @@
 import { STALL_MAP_2026, Stall2026, getStall } from '@/data/stallMap2026';
 import { ALLOTMENTS_2026, Allotment2026 } from '@/data/stallAllotment2026';
 import { normalizeExhibitorId } from '@/lib/exhibitorId';
+import { findExhibitorByMobile, numbersFor } from '@/data/registeredExhibitors';
 
 export interface DrawUnit {
   /** Stall number, or a split bay half such as "91A". */
@@ -81,13 +82,32 @@ function normaliseBrand(name: string) {
   return name.replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
-/** The exhibitor's row on the plan, by mobile first and brand name second. */
+/**
+ * The exhibitor's row on the plan, by mobile first and brand name second.
+ *
+ * Every number the firm answers to is tried, not just the one they signed in
+ * on. The plan carries a single number per row, so a firm registered under two
+ * - or under a portal ID with a number added later, as Saraogi is - would
+ * otherwise miss on the one the plan does not hold and fall through to the
+ * brand name. That fallback is the weak one: a firm that has edited its brand
+ * name in its own profile no longer matches, and a held stall found by neither
+ * key is a held stall its owner cannot be seated on.
+ */
 export function findOnPlan(mobile: string, brandName?: string) {
   const key = normalizeExhibitorId(mobile);
-  return (
-    (key && BY_MOBILE.get(key)) ||
-    (brandName ? BY_BRAND.get(normaliseBrand(brandName)) : undefined)
-  );
+  if (key) {
+    const direct = BY_MOBILE.get(key);
+    if (direct) return direct;
+
+    const registered = findExhibitorByMobile(key);
+    if (registered) {
+      for (const number of numbersFor(registered)) {
+        const viaAlias = BY_MOBILE.get(normalizeExhibitorId(number));
+        if (viaAlias) return viaAlias;
+      }
+    }
+  }
+  return brandName ? BY_BRAND.get(normaliseBrand(brandName)) : undefined;
 }
 
 /** Stalls hand-allotted before the draw; these never go into a draw. */

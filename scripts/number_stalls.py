@@ -133,6 +133,24 @@ RESERVED = {
     46: "Bahubali",                           # 18M x 3M, swapped with 43
 }
 
+# Brands the organisers spell differently from the sheet, keyed by the sheet's
+# own spelling. The name here is what the floor plan, the allotment slip and
+# the fascia are printed from, so it has to be the firm's own.
+#
+#   Aalingan Art  the second name is Nidhanam, and the firm writes the pair
+#                 with a slash rather than in brackets (organisers,
+#                 29 Aug 2026).
+#   Jyotsana      spells itself Jyotsna (organisers, 28 Aug 2026).
+#   Vani NX       the firm's own fascia reads Vaani (organisers, 28 Aug 2026).
+#
+# The corrected name is what allot() then keys RESERVED on, so a brand listed
+# in both maps wants its corrected spelling there. None is, today.
+BRAND_CORRECTIONS = {
+    "Aalingan Art (Nidhidham)": "Aalingan Art / Nidhanam",
+    "Jyotsana": "Jyotsna",
+    "Vani NX": "Vaani NX",
+}
+
 # Numbers the organisers have corrected since the sheet was filed, keyed by the
 # sheet's own spelling of the brand. The sheet is the exhibitor list, not the
 # contact book, and a number that has been given up is worse than none: it can
@@ -140,11 +158,16 @@ RESERVED = {
 #
 #   Apple lifestyle  gave up 9099140404 and answer on 9825398582 (organisers,
 #                    29 Aug 2026). The old number is retired, not aliased.
+#   Saraogi          the sheet leaves their number blank; they answer on
+#                    9810550285 (organisers, 29 Aug 2026). Worth carrying
+#                    because 39 is held, and a held stall is looked up by
+#                    mobile before brand name.
 #
 # Keep registeredExhibitors.ts in step - that is the list the portal actually
 # lets people in on.
 MOBILE_CORRECTIONS = {
     "Apple lifestyle": "9825398582",
+    "SARAOGI SUPER SALES PRIVATE LIMITED": "9810550285",
 }
 
 # The organiser's size ladder: sqm -> (sqft, dimension, aliases).
@@ -411,13 +434,16 @@ def read_exhibitors():
         if not brand:
             continue
         size = str(dims).strip().lower()
-        brand_name = re.sub(r"\s+", " ", str(brand)).strip()
+        # The sheet's spelling is the key both correction maps are written
+        # against; the corrected one is what everything downstream reads.
+        sheet_brand = re.sub(r"\s+", " ", str(brand)).strip()
+        brand_name = BRAND_CORRECTIONS.get(sheet_brand, sheet_brand)
         out.append({
             "brand": brand_name,
             "category": str(category or "").strip(),
             "sheetSize": SHEET_SIZE_ALIASES.get(size, size),
             "areaSqft": int(sqft),
-            "mobile": MOBILE_CORRECTIONS.get(brand_name, normalise_mobile(mobile)),
+            "mobile": MOBILE_CORRECTIONS.get(sheet_brand, normalise_mobile(mobile)),
             "isSaree": bool(SAREE_CATEGORY.search(str(category or ""))),
             "group": trade_group(category),
         })

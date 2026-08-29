@@ -27,7 +27,17 @@
  *   137  Gopal Hari, placed in the south hall rather than the saree band
  *        (no mobile yet - the sheet gives him Gauri Ganesh's number)
  *
- * Four rows correct the sheet rather than following it:
+ * Six rows correct the sheet rather than following it:
+ *   1    Aalingan Art / Nidhanam, not the "Aalingan Art (Nidhidham)" the sheet
+ *        spells (organisers, 29 Aug 2026) - the second name is Nidhanam, and
+ *        the firm writes the pair with a slash, the way every other joint name
+ *        on this floor is written.
+ *   39   Saraogi Super Sales answer on 9810550285, where the sheet gives no
+ *        number at all (organisers, 29 Aug 2026). They were registered under
+ *        the portal ID "SSS" for want of one; the ID still opens the portal
+ *        and the number is now a second way in. The number is on this row so
+ *        the hold on 39 - the 2600 sqft anchor, the largest stall on the
+ *        floor - is found by mobile rather than by brand name alone.
  *   38   Apple lifestyle answer on 9825398582, not the 9099140404 the sheet
  *        carries (organisers, 29 Aug 2026). The old number has been given up
  *        and may be reassigned, so it is retired rather than kept as an
@@ -35,13 +45,12 @@
  *        scripts/number_stalls.py holds the new number so a rerun does not
  *        put the dead one back.
  *   60   Jyotsna, not the "Jyotsana" the sheet spells (organisers,
- *        28 Aug 2026). A rerun of scripts/number_stalls.py takes the brand
- *        straight from the sheet, so correct the sheet too or this comes
- *        back misspelt.
+ *        28 Aug 2026). BRAND_CORRECTIONS in scripts/number_stalls.py holds
+ *        the spelling, so a rerun no longer brings the sheet's back.
  *   122  Vaani NX, not the "Vani NX" the sheet spells (organisers,
- *        28 Aug 2026) - the firm's own fascia name reads Vaani. A rerun of
- *        scripts/number_stalls.py takes the brand straight from the sheet,
- *        so correct the sheet too or this comes back misspelt.
+ *        28 Aug 2026) - the firm's own fascia name reads Vaani.
+ *        BRAND_CORRECTIONS in scripts/number_stalls.py holds the spelling,
+ *        so a rerun no longer brings the sheet's back.
  *   141  Shiv Vardhaan books 200 sqft, not the 100 the sheet carries
  *        (organisers, 28 Aug 2026). Moved off the 3m x 3m bay 103 onto 141,
  *        the 200 sqft bay the draw had left empty, and kept in the saree pool
@@ -70,7 +79,7 @@ export interface Allotment2026 {
 }
 
 export const ALLOTMENTS_2026: Allotment2026[] = [
-  { unitId: "1",     stallNumber: 1,    brand: "Aalingan Art (Nidhidham)", category: "Saree",
+  { unitId: "1",     stallNumber: 1,    brand: "Aalingan Art / Nidhanam", category: "Saree",
     group: "Saree",                     mobile: "9824886668",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
   { unitId: "2",     stallNumber: 2,    brand: "Abhiraj Fashion", category: "Sarees",
     group: "Saree",                     mobile: "9506455565",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
@@ -147,7 +156,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "38",    stallNumber: 38,   brand: "Apple lifestyle", category: "Sarees",
     group: "Saree",                     mobile: "9825398582",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "39",    stallNumber: 39,   brand: "SARAOGI SUPER SALES PRIVATE LIMITED", category: "Sarees",
-    group: "Saree",                     mobile: "",            sheetSize: "42m x 6m",  areaSqft: 2600,  pool: "Saree",    zone: "North Hall",         held: true },
+    group: "Saree",                     mobile: "9810550285",  sheetSize: "42m x 6m",  areaSqft: 2600,  pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "40",    stallNumber: 40,   brand: "Murtidhara Sarees / Shyamraj", category: "Lehenga",
     group: "Lehenga",                   mobile: "",            sheetSize: "30m x 6m",  areaSqft: 2000,  pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "41",    stallNumber: 41,   brand: "Sristi Sarees", category: "Sarees",

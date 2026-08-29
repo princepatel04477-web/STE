@@ -20,7 +20,7 @@ export interface RegisteredExhibitor {
 export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9106139666", brandName: "Varunya Admin Demo", stallSqft: "400 sq ft", category: "Demo", market: "Organizer" },
   { mobile: "9950787787", brandName: "AKAS Organizer Main", stallSqft: "1000 sq ft", category: "Organizer", market: "Organizer" },
-  { mobile: "9824886668", brandName: "Aalingan Art (Nidhidham)", stallSqft: "200 sq ft", category: "Saree", market: "M1" },
+  { mobile: "9824886668", brandName: "Aalingan Art / Nidhanam", stallSqft: "200 sq ft", category: "Saree", market: "M1" },
   { mobile: "9274669399", brandName: "Aashirwad Creation  (Aahira)", stallSqft: "100 sq ft", category: "Men's Wear / Ethnic Fabric", market: "RRTM" },
   { mobile: "9979940730", brandName: "Abhaar Vastram", stallSqft: "400 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9824131004", brandName: "Abhilasha Enterprises", stallSqft: "100 sq ft", category: "Home Furnishing", market: "" },
@@ -127,7 +127,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9316721800", brandName: "Sambhav Saree (Samita & Dharaa)", stallSqft: "800 sq ft", category: "Saree", market: "Surana 101" },
   { mobile: "6353511883", brandName: "Samta Sarees", stallSqft: "400 sq ft", category: "Sarees", market: "M2" },
   { mobile: "7719063355", brandName: "SANKALP", stallSqft: "200 sq ft", category: "Sarees", market: "STM" },
-  { mobile: "SSS", brandName: "Saraogi Super Sales Private Limited", stallSqft: "2600 sq ft", category: "Sarees", market: "" },
+  { mobile: "SSS", brandName: "Saraogi Super Sales Private Limited", stallSqft: "2600 sq ft", category: "Sarees", market: "", aliases: ["9810550285"] },
   { mobile: "9978655007", brandName: "Sarv Kala (V.D)", stallSqft: "600 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9825122634", brandName: "Satish Dresses", stallSqft: "300 sq ft", category: "Uniform Saree", market: "Regent", aliases: ["9825900000"] },
   { mobile: "9099941185", brandName: "Satyavachan", stallSqft: "600 sq ft", category: "Sarees", market: "Raghukul" },
