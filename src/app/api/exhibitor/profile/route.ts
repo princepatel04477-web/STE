@@ -4,7 +4,10 @@ import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
-import { resolveAndRecordStall } from '@/lib/stallAssignment';
+import {
+  resolveAndRecordStall,
+  StallLookupUnavailableError,
+} from '@/lib/stallAssignment';
 
 // The write touches Supabase and then the Google Sheet; the platform default is
 // tight enough that a slow Apps Script can abort a request whose data was
@@ -20,7 +23,7 @@ export async function GET() {
 
     let exhibitor = db
       .prepare('SELECT mobile, brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url, updated_at FROM exhibitors WHERE mobile = ?')
-      .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string; fascia_names_json?: string; logo_file_url?: string; cdr_file_url?: string; drive_file_url?: string; drive_folder_id?: string; drive_folder_url?: string; updated_at: string } | undefined;
+      .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string; fascia_names_json?: string; logo_file_url?: string; cdr_file_url?: string; drive_file_url?: string; drive_folder_id?: string; drive_folder_url?: string; updated_at: string; stall_number?: string; stall_hall?: string; stall_zone?: string; stall_dimensions?: string; stall_allocated_at?: string } | undefined;
 
     let extractedExhibitorName = exhibitor?.exhibitor_name || '';
     let extractedProfilePicUrl = exhibitor?.profile_pic_url || null;
@@ -48,7 +51,14 @@ export async function GET() {
             cdr_file_url: sbExhibitor.cdr_file_url ?? exhibitor?.cdr_file_url,
             drive_file_url: sbExhibitor.drive_file_url ?? exhibitor?.drive_file_url,
             drive_folder_url: sbExhibitor.drive_folder_url ?? exhibitor?.drive_folder_url,
-            updated_at: sbExhibitor.updated_at || exhibitor?.updated_at || new Date().toISOString()
+            updated_at: sbExhibitor.updated_at || exhibitor?.updated_at || new Date().toISOString(),
+            // The stall copy migration 20260827000006 keeps on the profile.
+            // Read here so it is to hand if the draw table cannot be reached.
+            stall_number: sbExhibitor.stall_number ?? exhibitor?.stall_number,
+            stall_hall: sbExhibitor.stall_hall ?? exhibitor?.stall_hall,
+            stall_zone: sbExhibitor.stall_zone ?? exhibitor?.stall_zone,
+            stall_dimensions: sbExhibitor.stall_dimensions ?? exhibitor?.stall_dimensions,
+            stall_allocated_at: sbExhibitor.stall_allocated_at ?? exhibitor?.stall_allocated_at
           };
 
           if (sbExhibitor.fascia_names_json) {
@@ -113,17 +123,36 @@ export async function GET() {
 
     // The stall they were allotted travels with the profile, so the dashboard
     // shows a stall number without asking the draw table itself.
-    const stall = await resolveAndRecordStall(session.mobile);
+    //
+    // If the draw table cannot be read, the copy already written onto this
+    // profile answers instead. Nothing here offers a draw, so an out-of-date
+    // stall number is the worst this can show - where the portal does offer
+    // one, /api/lottery/status refuses rather than guesses.
+    let stall = null;
+    let stallFallback: Record<string, string> | null = null;
+    try {
+      stall = await resolveAndRecordStall(session.mobile);
+    } catch (err) {
+      if (!(err instanceof StallLookupUnavailableError)) throw err;
+      console.warn('[Profile GET] Allotment read failed; using the profile copy.');
+      stallFallback = {
+        stall_number: exhibitor?.stall_number || '',
+        stall_hall: exhibitor?.stall_hall || '',
+        stall_zone: exhibitor?.stall_zone || '',
+        stall_dimensions: exhibitor?.stall_dimensions || '',
+        stall_allocated_at: exhibitor?.stall_allocated_at || '',
+      };
+    }
 
     return NextResponse.json({
       mobile: session.mobile,
       brand_name,
       stall_sqft,
-      stall_number: stall?.stall_number || '',
-      stall_hall: stall?.hall || '',
-      stall_zone: stall?.zone || '',
-      stall_dimensions: stall?.dimensions || '',
-      stall_allocated_at: stall?.allocated_at || '',
+      stall_number: stall?.stall_number || stallFallback?.stall_number || '',
+      stall_hall: stall?.hall || stallFallback?.stall_hall || '',
+      stall_zone: stall?.zone || stallFallback?.stall_zone || '',
+      stall_dimensions: stall?.dimensions || stallFallback?.stall_dimensions || '',
+      stall_allocated_at: stall?.allocated_at || stallFallback?.stall_allocated_at || '',
       exhibitor_name: extractedExhibitorName,
       profile_pic_url: extractedProfilePicUrl,
       company_description: extractedCompanyDesc,

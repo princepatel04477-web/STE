@@ -116,10 +116,35 @@ SHEET_SIZE_ALIASES = {"3m x 60m": "30m x 6m", "3m x 78m": "42m x 6m"}
 
 # Hand-allotted before the draw - these three do not go into the lucky draw.
 # Each is the only stall on the floor of the size that exhibitor booked.
+# Brands seated by hand before the draw runs, so their stall number is fixed
+# rather than drawn. Keyed by the sheet's own spelling of the brand, which is
+# how allot() looks them up, and the stall has to be the size they booked.
+#
+# 43 and 46 are an exchange the organisers asked for on 29 Aug 2026: Earth
+# Fabrics take the 43 they are already allotted and Bahubali take the 46 Earth
+# Fabrics had drawn. Both are 3m x 18m, 600 sqft in the north hall saree band,
+# so neither firm changes size, and both are listed here so a rerun seats them
+# again instead of drawing either number afresh.
 RESERVED = {
     27: "K.K. Garments",                      # 36M x 3M
     39: "SARAOGI SUPER SALES PRIVATE LIMITED",  # 42M x 6M, the largest stall
     40: "Murtidhara Sarees / Shyamraj",       # 30M x 6M
+    43: "Earth Fabrics",                      # 18M x 3M, swapped with 46
+    46: "Bahubali",                           # 18M x 3M, swapped with 43
+}
+
+# Numbers the organisers have corrected since the sheet was filed, keyed by the
+# sheet's own spelling of the brand. The sheet is the exhibitor list, not the
+# contact book, and a number that has been given up is worse than none: it can
+# be reassigned to a stranger who would then answer for the firm.
+#
+#   Apple lifestyle  gave up 9099140404 and answer on 9825398582 (organisers,
+#                    29 Aug 2026). The old number is retired, not aliased.
+#
+# Keep registeredExhibitors.ts in step - that is the list the portal actually
+# lets people in on.
+MOBILE_CORRECTIONS = {
+    "Apple lifestyle": "9825398582",
 }
 
 # The organiser's size ladder: sqm -> (sqft, dimension, aliases).
@@ -386,12 +411,13 @@ def read_exhibitors():
         if not brand:
             continue
         size = str(dims).strip().lower()
+        brand_name = re.sub(r"\s+", " ", str(brand)).strip()
         out.append({
-            "brand": re.sub(r"\s+", " ", str(brand)).strip(),
+            "brand": brand_name,
             "category": str(category or "").strip(),
             "sheetSize": SHEET_SIZE_ALIASES.get(size, size),
             "areaSqft": int(sqft),
-            "mobile": normalise_mobile(mobile),
+            "mobile": MOBILE_CORRECTIONS.get(brand_name, normalise_mobile(mobile)),
             "isSaree": bool(SAREE_CATEGORY.search(str(category or ""))),
             "group": trade_group(category),
         })
@@ -399,7 +425,20 @@ def read_exhibitors():
 
 
 def normalise_mobile(raw):
-    """First 10-digit run in the cell. Partner numbers are ignored."""
+    """The exhibitor's own 10-digit mobile, or "" if the cell does not hold one.
+
+    A cell carrying two numbers is read as the first of them, so a partner's
+    number is ignored. Only when there is no unbroken run does the whole cell
+    get read as one number: the sheet groups a good half of its numbers for
+    legibility - "98209-35033", "94292 22300" - and reading a run at a time
+    dropped every one of them, which left 46 exhibitors on the floor plan with
+    no number to be found by.
+
+    Anything that is not ten digits after the country code is dropped rather
+    than trimmed to fit. "98988666093" is a mistyped number, not a prefixed
+    one, and there is no way to tell which digit is the spare - guessing would
+    file a firm under a mobile that is not theirs.
+    """
     if raw is None:
         return ""
     if isinstance(raw, float) and raw.is_integer():
@@ -409,7 +448,12 @@ def normalise_mobile(raw):
             run = run[2:]
         if len(run) == 10:
             return run
-    return ""
+    digits = re.sub(r"\D", "", str(raw))
+    if len(digits) == 12 and digits.startswith("91"):
+        digits = digits[2:]
+    elif len(digits) == 11 and digits.startswith("0"):
+        digits = digits[1:]
+    return digits if len(digits) == 10 else ""
 
 
 def size_pool_and_splits(stalls, saree):

@@ -3,7 +3,10 @@ import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { normalizeExhibitorId } from '@/lib/exhibitorId';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import db from '@/lib/db';
-import { resolveAndRecordStall } from '@/lib/stallAssignment';
+import {
+  resolveAndRecordStall,
+  StallLookupUnavailableError,
+} from '@/lib/stallAssignment';
 import { normalizeSqftCategory } from '@/data/stallInventory';
 
 export async function GET(request: Request) {
@@ -39,7 +42,28 @@ export async function GET(request: Request) {
 
     // 2. The stall this exhibitor holds, under any of the numbers they answer
     // to, written onto their profile on the way out.
-    const allocation = await resolveAndRecordStall(mobile);
+    //
+    // A read that could not be made is refused rather than answered. This is
+    // what the page opens the Lucky Box on, so "we could not tell" must never
+    // reach it as "you have not drawn": that is what let an exhibitor whose
+    // phone dropped one read draw a second time.
+    let allocation;
+    try {
+      allocation = await resolveAndRecordStall(mobile);
+    } catch (err) {
+      if (err instanceof StallLookupUnavailableError) {
+        console.error('[Lottery Status] Allotment read failed for', mobile, err.cause);
+        return NextResponse.json(
+          {
+            error:
+              'The allotment database could not be reached, so your stall could ' +
+              'not be confirmed. Please try again in a moment.'
+          },
+          { status: 503 }
+        );
+      }
+      throw err;
+    }
 
     return NextResponse.json({
       success: true,

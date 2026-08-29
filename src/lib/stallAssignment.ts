@@ -27,18 +27,47 @@ export function allNumbersFor(mobile: string): string[] {
 }
 
 /**
+ * Raised when the register of record could not be read.
+ *
+ * Distinct from a null answer on purpose: "this firm holds no stall" and "no
+ * one could tell whether they do" have to lead to different screens, and the
+ * caller cannot tell them apart from a return value alone.
+ */
+export class StallLookupUnavailableError extends Error {
+  constructor(cause?: unknown) {
+    super('The allotment database could not be read.');
+    this.name = 'StallLookupUnavailableError';
+    this.cause = cause;
+  }
+}
+
+/**
  * The stall an exhibitor holds, or null if they have not drawn.
  *
- * The cloud table is the source of truth - the local store is wiped per
- * instance on Vercel - so it answers first and the local copy is the fallback.
+ * The cloud table is the source of truth. A read that fails throws rather than
+ * answering null, because on Vercel the local store is an empty /tmp file on
+ * all but the instance that served the draw: falling back to it turned a
+ * momentary network fault into "you have not drawn yet", and the portal then
+ * offered the Lucky Box to a firm that was already seated. Phones on mobile
+ * data lose a read often enough that this was reported as exhibitors being
+ * able to draw a second time.
+ *
+ * The local store answers only where there is no cloud to ask - a dev machine
+ * - which is the one case where it is the whole record rather than a copy.
  */
 export async function getStallForExhibitor(
   mobile: string
 ): Promise<LotteryAllocationRecord | null> {
   const numbers = allNumbersFor(mobile);
+  const firm = canonicalMobile(mobile);
 
   if (isSupabaseConfigured && supabaseAdmin) {
     try {
+      // Matched on firm_mobile as well as on every number the firm answers
+      // to, which is what /api/lottery/draw matches on. Read the narrower way,
+      // the two could disagree about whether a firm has drawn - and the one
+      // that says "no" is the one that reopens the draw.
+      //
       // Ordered, so the answer cannot change between two reads. A firm should
       // only ever have one row, but if a second one exists under another of
       // its numbers the earliest draw is the one that stands - unordered, the
@@ -47,7 +76,7 @@ export async function getStallForExhibitor(
       const { data, error } = await supabaseAdmin
         .from('lottery_allocations')
         .select('*')
-        .in('mobile', numbers)
+        .or(`firm_mobile.eq.${firm},mobile.in.(${numbers.join(',')})`)
         .order('allocated_at', { ascending: true });
       if (error) throw error;
 
@@ -57,7 +86,8 @@ export async function getStallForExhibitor(
       // the exhibitor's stall long after it stopped being theirs.
       return (data?.[0] as LotteryAllocationRecord) ?? null;
     } catch (err) {
-      console.warn('[Stall] Cloud lookup failed, falling back locally:', err);
+      console.error('[Stall] Cloud lookup failed:', err);
+      throw new StallLookupUnavailableError(err);
     }
   }
 

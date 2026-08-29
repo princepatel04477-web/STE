@@ -12,6 +12,12 @@
  *
  * Rows with held: true are hand-allotted and sit outside the seeded draw, so
  * a rerun of scripts/number_stalls.py must not reassign them:
+ *   43   Earth Fabrics, the stall the organisers have already allotted them
+ *        (organisers, 29 Aug 2026). Both this row and 46 are held, so neither
+ *        firm's number can move once it is on the slip.
+ *   46   Bahubali, seated on the 43 they vacated - the same 3m x 18m,
+ *        600 sqft size in the same north hall saree band, so the swap is an
+ *        exchange rather than a resize.
  *   111  Sweety Fashion (Fabrics), moved off 121
  *   121  Radhey Silk Weaves, seated on the bay 111 vacated
  *   151  Dream Delta, on a 3m x 3m bay the draw had left empty
@@ -21,7 +27,13 @@
  *   137  Gopal Hari, placed in the south hall rather than the saree band
  *        (no mobile yet - the sheet gives him Gauri Ganesh's number)
  *
- * Three rows correct the sheet rather than following it:
+ * Four rows correct the sheet rather than following it:
+ *   38   Apple lifestyle answer on 9825398582, not the 9099140404 the sheet
+ *        carries (organisers, 29 Aug 2026). The old number has been given up
+ *        and may be reassigned, so it is retired rather than kept as an
+ *        alias - it no longer opens the portal. MOBILE_CORRECTIONS in
+ *        scripts/number_stalls.py holds the new number so a rerun does not
+ *        put the dead one back.
  *   60   Jyotsna, not the "Jyotsana" the sheet spells (organisers,
  *        28 Aug 2026). A rerun of scripts/number_stalls.py takes the brand
  *        straight from the sheet, so correct the sheet too or this comes
@@ -133,7 +145,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "37",    stallNumber: 37,   brand: "Suparshva", category: "Saree",
     group: "Saree",                     mobile: "6353582439",  sheetSize: "3m x 24m",  areaSqft: 800,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "38",    stallNumber: 38,   brand: "Apple lifestyle", category: "Sarees",
-    group: "Saree",                     mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
+    group: "Saree",                     mobile: "9825398582",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "39",    stallNumber: 39,   brand: "SARAOGI SUPER SALES PRIVATE LIMITED", category: "Sarees",
     group: "Saree",                     mobile: "",            sheetSize: "42m x 6m",  areaSqft: 2600,  pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "40",    stallNumber: 40,   brand: "Murtidhara Sarees / Shyamraj", category: "Lehenga",
@@ -142,14 +154,14 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "42",    stallNumber: 42,   brand: "Shubh Saachi/Shiv Ganges", category: "Sarees",
     group: "Saree",                     mobile: "7405442380",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "43",    stallNumber: 43,   brand: "Bahubali", category: "Sarees",
-    group: "Saree",                     mobile: "9825231170",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
+  { unitId: "43",    stallNumber: 43,   brand: "Earth Fabrics", category: "Sarees",
+    group: "Saree",                     mobile: "9820935033",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "44",    stallNumber: 44,   brand: "Sukhdev Textile", category: "Sarees",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "45",    stallNumber: 45,   brand: "Surekha", category: "Saree",
     group: "Saree",                     mobile: "9654554518",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "46",    stallNumber: 46,   brand: "Earth Fabrics", category: "Sarees",
-    group: "Saree",                     mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
+  { unitId: "46",    stallNumber: 46,   brand: "Bahubali", category: "Sarees",
+    group: "Saree",                     mobile: "9825231170",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "47",    stallNumber: 47,   brand: "Swamee", category: "Saree",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "48",    stallNumber: 48,   brand: "Gauri Putra", category: "Lehanga",

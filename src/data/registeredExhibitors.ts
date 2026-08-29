@@ -33,7 +33,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9898016566", brandName: "Amipara Sarees", stallSqft: "100 sq ft", category: "Sarees", market: "Abhinandan" },
   { mobile: "9265618713", brandName: "Amyraa Trends / Pagaria Fashion", stallSqft: "200 sq ft", category: "Saree", market: "Globale" },
   { mobile: "9726603807", brandName: "Anjali Creation", stallSqft: "300 sq ft", category: "Sarees", market: "M1" },
-  { mobile: "9099140404", brandName: "Apple lifestyle", stallSqft: "600 sq ft", category: "Sarees", market: "Aashirwad Market" },
+  { mobile: "9825398582", brandName: "Apple lifestyle", stallSqft: "600 sq ft", category: "Sarees", market: "Aashirwad Market" },
   { mobile: "9725147177", brandName: "Ashirwad Textiles", stallSqft: "100 sq ft", category: "Fabrics", market: "" },
   { mobile: "9825231170", brandName: "Bahubali", stallSqft: "600 sq ft", category: "Sarees", market: "Kohinoor Textile Market" },
   { mobile: "9377609280", brandName: "Bansi Sarees", stallSqft: "1000 sq ft", category: "Uniform Saree", market: "Gurukrupa" },
