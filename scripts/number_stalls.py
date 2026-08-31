@@ -133,6 +133,24 @@ RESERVED = {
     46: "Bahubali",                           # 18M x 3M, swapped with 43
 }
 
+# Firms that have pulled out since the floor was drawn, against the unit they
+# were holding. Keyed by the sheet's own spelling, the way RESERVED is.
+#
+# Both the firm and its unit come out of the draw together, and that pairing is
+# the point: the draw hands a band's free units to that band's brands in order,
+# so dropping the firm alone would pull every brand behind it one stall
+# forward, off the number already on their slip. Dropping the unit with them
+# keeps the two lists in step and leaves the stall standing empty.
+#
+# The saree pool is still sized against the full sheet list, withdrawals
+# included, so the pool end and the split bays do not move either.
+#
+#   Navdurga  withdrew (organisers, 31 Aug 2026). Stall 61, a 3m x 18m,
+#             600 sqft bay in the north hall saree band, goes back empty.
+WITHDRAWN = {
+    "Navdurga": "61",                         # 18M x 3M
+}
+
 # Brands the organisers spell differently from the sheet, keyed by the sheet's
 # own spelling. The name here is what the floor plan, the allotment slip and
 # the fascia are printed from, so it has to be the firm's own.
@@ -536,9 +554,12 @@ def allot(stalls, exhibitors, pool_end, split_bays):
     menswear 600s side by side, and keeps the two apart, in every size.
 
     Counts match exactly per size, so nobody is left over and nobody is moved
-    to a size they did not book."""
+    to a size they did not book. A withdrawn firm and the unit it held both sit
+    this out, which leaves that stall empty without moving anyone else."""
     order = [name for name, _ in TRADE_GROUPS]
-    units = build_units(stalls, split_bays)
+    units = [u for u in build_units(stalls, split_bays)
+             if u["unitId"] not in set(WITHDRAWN.values())]
+    exhibitors = [e for e in exhibitors if e["brand"] not in WITHDRAWN]
 
     def in_saree_pool(number):
         return number <= pool_end and number not in SAREE_POOL_EXCLUDES

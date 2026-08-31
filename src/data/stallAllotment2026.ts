@@ -2,10 +2,10 @@
  * STE 2026 demo allotment - generated from STE_data_sheet.xlsx and the
  * stall map. Do not hand-edit; rerun scripts/number_stalls.py.
  *
- * 149 of the 150 sheet exhibitors on 148 stalls - Surat Saree House is not
- * confirmed yet and holds none. Saree brands (sarees, lehengas and the
- * uniform-saree firms) draw from stalls 1-107 less 27, 28, 29; everyone else
- * takes the south hall and those three big blocks.
+ * 148 of the 150 sheet exhibitors on 147 stalls - Surat Saree House is not
+ * confirmed yet and Navdurga has withdrawn, so neither holds one. Saree brands
+ * (sarees, lehengas and the uniform-saree firms) draw from stalls 1-107 less
+ * 27, 28, 29; everyone else takes the south hall and those three big blocks.
  *
  * The draw order is seeded, so the same floor comes back every run.
  * This is a demo allotment, not a live draw result.
@@ -26,6 +26,13 @@
  *        is not confirmed yet and so holds no stall for now.
  *   137  Gopal Hari, placed in the south hall rather than the saree band
  *        (no mobile yet - the sheet gives him Gauri Ganesh's number)
+ *
+ * Stall 61 stands empty. Navdurga withdrew (organisers, 31 Aug 2026) and the
+ * bay is not reallotted: the draw hands a band's stalls out in order, so
+ * filling 61 would pull every 600 sqft saree brand behind it one number
+ * forward, off the stall already on their slip. WITHDRAWN in
+ * scripts/number_stalls.py takes the firm and the bay out together, so a rerun
+ * leaves 61 empty rather than drawing someone onto it.
  *
  * Six rows correct the sheet rather than following it:
  *   1    Aalingan Art / Nidhanam, not the "Aalingan Art (Nidhidham)" the sheet
@@ -199,8 +206,6 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "60",    stallNumber: 60,   brand: "Jyotsna", category: "Saree",
     group: "Saree",                     mobile: "9898866093",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: true },
-  { unitId: "61",    stallNumber: 61,   brand: "Navdurga", category: "Sarees",
-    group: "Saree",                     mobile: "9714604040",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "62",    stallNumber: 62,   brand: "Nidhivan / Yogayaa", category: "Sarees",
     group: "Saree",                     mobile: "7052577725",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "63",    stallNumber: 63,   brand: "Tithi Designer", category: "Saree",

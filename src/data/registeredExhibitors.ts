@@ -98,7 +98,6 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9016588151", brandName: "Murtidhara Sarees / Shyamraj", stallSqft: "2000 sq ft", category: "Lehenga", market: "Raghukul" },
   { mobile: "9924222001", brandName: "Nandani Regent", stallSqft: "100 sq ft", category: "Sarees", market: "Regent" },
   { mobile: "9375511910", brandName: "Narmada Weavetech", stallSqft: "100 sq ft", category: "Fabrics", market: "Global" },
-  { mobile: "9714604040", brandName: "Navdurga", stallSqft: "600 sq ft", category: "Sarees", market: "Regent" },
   { mobile: "9601258092", brandName: "Nidhi Creations", stallSqft: "200 sq ft", category: "Sarees", market: "M1" },
   { mobile: "7052577725", brandName: "Nidhivan / Yogayaa", stallSqft: "600 sq ft", category: "Sarees", market: "Raghkul" },
   { mobile: "8141335579", brandName: "Nirham Club Wear", stallSqft: "200 sq ft", category: "Kurti", market: "Globale" },
