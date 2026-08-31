@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { downloadXlsx, type CellValue } from '@/lib/exportXlsx';
 import {
   Building2,
   Contact,
@@ -323,9 +324,11 @@ export default function AdminExhibitorsPage() {
     };
   }, [exhibitors]);
 
-  const exportCSV = () => {
-    const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-
+  // The master report goes out as a real workbook, not a CSV: Excel treats a
+  // CSV's first line as a header band it can quietly absorb, which left the
+  // organiser looking at a sheet that opened straight onto exhibitor data with
+  // no column labels anywhere.
+  const exportExcel = () => {
     const headers = [
       'Time Stamp',
       'Brand Name',
@@ -364,40 +367,36 @@ export default function AdminExhibitorsPage() {
       const salesNames = (ex.badge_names?.sales || []).filter(Boolean).join(', ');
       const supportNames = (ex.badge_names?.support || []).filter(Boolean).join(', ');
 
+      // Mobile stays text so a number never loses its shape; badge counts go
+      // out as numbers so the organiser can total a column.
       return [
-        esc(timeStamp),
-        esc(ex.brand_name),
-        esc(ex.exhibitor_name || ''),
-        esc(ex.mobile),
-        esc(ex.stall_sqft),
-        esc(ex.stall_number || 'Not Drawn'),
-        esc(ex.stall_hall || ''),
-        esc(fasciaStr || ex.brand_name),
-        esc(ex.owner_badges || 0),
-        esc(ownerNames),
-        esc(ex.sales_badges || 0),
-        esc(salesNames),
-        esc(ex.support_badges || 0),
-        esc(supportNames),
-        esc(extrasStr),
-        esc(ex.cdr_file_url || ''),
-        esc(ex.logo_file_url || ''),
-        esc(ex.drive_folder_url || ex.drive_file_url || ''),
-        esc(ex.special_notes || ''),
-        esc(ex.portal_filled ? 'YES' : 'NO')
-      ];
+        timeStamp,
+        ex.brand_name,
+        ex.exhibitor_name || '',
+        ex.mobile,
+        ex.stall_sqft,
+        ex.stall_number || 'Not Drawn',
+        ex.stall_hall || '',
+        fasciaStr || ex.brand_name,
+        ex.owner_badges || 0,
+        ownerNames,
+        ex.sales_badges || 0,
+        salesNames,
+        ex.support_badges || 0,
+        supportNames,
+        extrasStr,
+        ex.cdr_file_url || '',
+        ex.logo_file_url || '',
+        ex.drive_folder_url || ex.drive_file_url || '',
+        ex.special_notes || '',
+        ex.portal_filled ? 'YES' : 'NO'
+      ] as CellValue[];
     });
 
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\r\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const blobUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', blobUrl);
-    link.setAttribute('download', `STE_2026_Admin_Master_Report_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(blobUrl);
+    downloadXlsx(
+      `STE_2026_Admin_Master_Report_${new Date().toISOString().slice(0, 10)}.xlsx`,
+      { sheetName: 'Exhibitor Master', headers, rows }
+    );
   };
 
   const containerWidthClass = isFullWidth ? 'w-full px-3 sm:px-6' : 'max-w-[1920px] mx-auto px-3 sm:px-6 lg:px-8';
@@ -510,12 +509,12 @@ export default function AdminExhibitorsPage() {
             </button>
 
             <button
-              onClick={exportCSV}
+              onClick={exportExcel}
               disabled={filteredExhibitors.length === 0}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
             >
               <Download className="w-4 h-4" />
-              <span>Export CSV ({filteredExhibitors.length})</span>
+              <span>Export Excel ({filteredExhibitors.length})</span>
             </button>
           </div>
         </div>
