@@ -2,10 +2,11 @@
  * STE 2026 demo allotment - generated from STE_data_sheet.xlsx and the
  * stall map. Do not hand-edit; rerun scripts/number_stalls.py.
  *
- * 148 of the 150 sheet exhibitors on 147 stalls - Surat Saree House is not
- * confirmed yet and Navdurga has withdrawn, so neither holds one. Saree brands
- * (sarees, lehengas and the uniform-saree firms) draw from stalls 1-107 less
- * 27, 28, 29; everyone else takes the south hall and those three big blocks.
+ * 149 firms on 148 stalls: 148 of the 150 on the sheet - Surat Saree House is
+ * not confirmed yet and Navdurga has withdrawn, so neither holds one - and
+ * Anaya Designer, who booked after the sheet was filed. Saree brands (sarees,
+ * lehengas and the uniform-saree firms) draw from stalls 1-107 less 27, 28,
+ * 29; everyone else takes the south hall and those three big blocks.
  *
  * The draw order is seeded, so the same floor comes back every run.
  * This is a demo allotment, not a live draw result.
@@ -26,6 +27,8 @@
  *        is not confirmed yet and so holds no stall for now.
  *   137  Gopal Hari, placed in the south hall rather than the saree band
  *        (no mobile yet - the sheet gives him Gauri Ganesh's number)
+ *   100  Anaya Designer, seated on the 800 sqft north hall anchor the draw
+ *        had left empty (organisers, 31 Aug 2026)
  *
  * Stall 61 stands empty. Navdurga withdrew (organisers, 31 Aug 2026) and the
  * bay is not reallotted: the draw hands a band's stalls out in order, so
@@ -33,6 +36,16 @@
  * forward, off the stall already on their slip. WITHDRAWN in
  * scripts/number_stalls.py takes the firm and the bay out together, so a rerun
  * leaves 61 empty rather than drawing someone onto it.
+ *
+ * Stall 100 is now let. The saree band lays out three 3m x 24m, 800 sqft bays
+ * - 35, 37 and 100 - and the sheet's saree list held only two firms that size,
+ * so the draw filled 35 and 37 and left 100 standing. Anaya Designer
+ * (9998023918) booked it after the sheet was filed (organisers, 31 Aug 2026).
+ * They are not on the sheet, so the draw could never have seated them; the
+ * organisers seated them by hand instead, which is why the row is held. It
+ * costs no one their number: 100 was the bay nobody drew, and 35 and 37 keep
+ * the firms already on them. Bay 100 is let whole, not in halves - see
+ * SPLIT_BAYS_2026 below.
  *
  * Six rows correct the sheet rather than following it:
  *   1    Aalingan Art / Nidhanam, not the "Aalingan Art (Nidhidham)" the sheet
@@ -284,6 +297,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "7383001130",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "99",    stallNumber: 99,   brand: "Saaj Creations", category: "Saree/other",
     group: "Saree",                     mobile: "9737404150",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
+  { unitId: "100",   stallNumber: 100,  brand: "Anaya Designer", category: "Saree",
+    group: "Saree",                     mobile: "9998023918",  sheetSize: "3m x 24m",  areaSqft: 800,   pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "101",   stallNumber: 101,  brand: "Sahil Creation", category: "Sareee",
     group: "Saree",                     mobile: "9825130650",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "102",   stallNumber: 102,  brand: "Shankh Designer", category: "Sarees",

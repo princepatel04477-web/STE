@@ -32,6 +32,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "8980018801", brandName: "Amaya", stallSqft: "100 sq ft", category: "Lehanga", market: "INTL Textile Hub", aliases: ["8980018808"] },
   { mobile: "9898016566", brandName: "Amipara Sarees", stallSqft: "100 sq ft", category: "Sarees", market: "Abhinandan" },
   { mobile: "9265618713", brandName: "Amyraa Trends / Pagaria Fashion", stallSqft: "200 sq ft", category: "Saree", market: "Globale" },
+  { mobile: "9998023918", brandName: "Anaya Designer", stallSqft: "800 sq ft", category: "Saree", market: "" },
   { mobile: "9726603807", brandName: "Anjali Creation", stallSqft: "300 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9825398582", brandName: "Apple lifestyle", stallSqft: "600 sq ft", category: "Sarees", market: "Aashirwad Market" },
   { mobile: "9725147177", brandName: "Ashirwad Textiles", stallSqft: "100 sq ft", category: "Fabrics", market: "" },

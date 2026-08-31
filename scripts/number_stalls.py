@@ -125,12 +125,18 @@ SHEET_SIZE_ALIASES = {"3m x 60m": "30m x 6m", "3m x 78m": "42m x 6m"}
 # Fabrics had drawn. Both are 3m x 18m, 600 sqft in the north hall saree band,
 # so neither firm changes size, and both are listed here so a rerun seats them
 # again instead of drawing either number afresh.
+#
+# 100 is neither a swap nor a size the draw could have handled: Anaya Designer
+# are not on the sheet at all (see LATE_ENTRANTS), so there was no row for the
+# draw to seat. The bay was standing free, which is why seating them by hand
+# moves nobody.
 RESERVED = {
     27: "K.K. Garments",                      # 36M x 3M
     39: "SARAOGI SUPER SALES PRIVATE LIMITED",  # 42M x 6M, the largest stall
     40: "Murtidhara Sarees / Shyamraj",       # 30M x 6M
     43: "Earth Fabrics",                      # 18M x 3M, swapped with 46
     46: "Bahubali",                           # 18M x 3M, swapped with 43
+    100: "Anaya Designer",                    # 24M x 3M, booked after the sheet
 }
 
 # Firms that have pulled out since the floor was drawn, against the unit they
@@ -150,6 +156,39 @@ RESERVED = {
 WITHDRAWN = {
     "Navdurga": "61",                         # 18M x 3M
 }
+
+# Firms that booked after the sheet was filed. They are on the floor but not in
+# STE_data_sheet.xlsx, so they are written here the way read_exhibitors()
+# returns a row - that list is the one they join.
+#
+# They join it only once size_pool_and_splits() has run. The saree pool end and
+# the split bays are sized against the sheet's own saree list, and a late
+# booking must not move either: a longer list can push the pool end out and cut
+# a different pair of bays, which would pull brands off the numbers already on
+# their slips. It is the same reasoning that keeps a withdrawal in the sizing -
+# the sheet sizes the pool, and only the sheet.
+#
+# Each one is then seated by hand through RESERVED rather than drawn. The draw
+# hands a band's free units out in order, so letting a late firm into it would
+# reorder everyone behind them; and there is nothing to draw for in any case,
+# because the organisers have already agreed the stall. RESERVED keys on the
+# sheet's spelling of a brand, and a firm the sheet does not carry has none, so
+# the name here is that key.
+#
+#   Anaya Designer  booked the 3m x 24m, 800 sqft anchor (organisers,
+#                   31 Aug 2026) and is seated on stall 100 - the one bay of
+#                   that size in the north hall saree band the draw left free,
+#                   the band laying out three (35, 37, 100) against the two
+#                   saree firms on the sheet that booked the size.
+#
+# Keep registeredExhibitors.ts in step - that is the list the portal actually
+# lets people in on - and seed the database, which stores its own copy of the
+# guest list rather than reading that one.
+LATE_ENTRANTS = [
+    {"brand": "Anaya Designer", "category": "Saree", "sheetSize": "3m x 24m",
+     "areaSqft": 800, "mobile": "9998023918", "isSaree": True,
+     "group": "Saree"},
+]
 
 # Brands the organisers spell differently from the sheet, keyed by the sheet's
 # own spelling. The name here is what the floor plan, the allotment slip and
@@ -888,6 +927,9 @@ def main():
     exhibitors = read_exhibitors()
     saree = [e for e in exhibitors if e["isSaree"]]
     pool_end, split_bays = size_pool_and_splits(stalls, saree)
+    # Only now, so a late booking cannot move the pool end or the split bays.
+    exhibitors += LATE_ENTRANTS
+    saree += [e for e in LATE_ENTRANTS if e["isSaree"]]
     split_halves(stalls, split_bays)
     allotments, unplaced = allot(stalls, exhibitors, pool_end, split_bays)
 
