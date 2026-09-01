@@ -67,6 +67,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9821349444", brandName: "Israni Entertainment", stallSqft: "300 sq ft", category: "Entertainment", market: "Mumbai" },
   { mobile: "9898866093", brandName: "Jyotsna", stallSqft: "200 sq ft", category: "Saree", market: "" },
   { mobile: "9545612026", brandName: "J B Designer", stallSqft: "300 sq ft", category: "Kurti", market: "" },
+  { mobile: "9998675623", brandName: "Jagadamba Creation", stallSqft: "100 sq ft", category: "Fabrics", market: "" },
   { mobile: "9586921213", brandName: "Janani Designer World / Janani Dreams Texfab Ltd", stallSqft: "300 sq ft", category: "Saree / Lengha", market: "M4" },
   { mobile: "9999991375", brandName: "Jindal Saree Center", stallSqft: "400 sq ft", category: "Sarees", market: "" },
   { mobile: "9414141810", brandName: "JMJ Creations", stallSqft: "200 sq ft", category: "Dress Material , Kids Wear  Fabrics", market: "" },

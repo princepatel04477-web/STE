@@ -117,8 +117,13 @@ SHEET_SIZE_ALIASES = {"3m x 60m": "30m x 6m", "3m x 78m": "42m x 6m"}
 # Hand-allotted before the draw - these three do not go into the lucky draw.
 # Each is the only stall on the floor of the size that exhibitor booked.
 # Brands seated by hand before the draw runs, so their stall number is fixed
-# rather than drawn. Keyed by the sheet's own spelling of the brand, which is
-# how allot() looks them up, and the stall has to be the size they booked.
+# rather than drawn. Values are the sheet's own spelling of the brand, which is
+# how allot() looks them up, and the unit has to be the size they booked.
+#
+# Keyed by unit id rather than stall number, so a half of a split bay can be
+# let on its own: "107B" reserves that half and leaves 107A in the draw, where
+# a bare 107 would have taken the whole bay off the floor. A unit id that is
+# not on the floor stops the run rather than quietly seating nobody.
 #
 # 43 and 46 are an exchange the organisers asked for on 29 Aug 2026: Earth
 # Fabrics take the 43 they are already allotted and Bahubali take the 46 Earth
@@ -130,15 +135,25 @@ SHEET_SIZE_ALIASES = {"3m x 60m": "30m x 6m", "3m x 78m": "42m x 6m"}
 # are not on the sheet at all (see LATE_ENTRANTS), so there was no row for the
 # draw to seat. The bay was standing free, which is why seating them by hand
 # moves nobody.
+#
+# 107B is on the sheet and still cannot be drawn for. Jagadamba Creation book
+# 100 sqft of fabrics (organisers, 1 Sep 2026), and every 100 sqft unit outside
+# the saree pool is taken - the only two standing empty, 103 and 107B, are both
+# inside it, where a general firm's draw cannot reach. Seating them by hand is
+# what puts them on the floor at all; drawn, they would come out unplaced.
+# 107B rather than 103 keeps the trade runs whole: it is the last 100 sqft unit
+# before the south hall fabrics run, where 103 sits in the middle of the north
+# hall saree squares.
 RESERVED = {
-    27: "K.K. Garments",                      # 36M x 3M
-    39: "SARAOGI SUPER SALES PRIVATE LIMITED",  # 42M x 6M, the largest stall
-    40: "Murtidhara Sarees / Shyamraj",       # 30M x 6M
-    43: "Earth Fabrics",                      # 18M x 3M, swapped with 46
-    46: "Bahubali",                           # 18M x 3M, swapped with 43
-    100: "Anaya Designer",                    # 24M x 3M, booked after the sheet
-    137: "Garden Vareli",                     # 6M x 3M, booked after the sheet
-    152: "Raghav Creation",                   # 6M x 3M, the merged 152+153
+    "27": "K.K. Garments",                    # 36M x 3M
+    "39": "SARAOGI SUPER SALES PRIVATE LIMITED",  # 42M x 6M, the largest stall
+    "40": "Murtidhara Sarees / Shyamraj",     # 30M x 6M
+    "43": "Earth Fabrics",                    # 18M x 3M, swapped with 46
+    "46": "Bahubali",                         # 18M x 3M, swapped with 43
+    "100": "Anaya Designer",                  # 24M x 3M, booked after the sheet
+    "107B": "Jagadamba Creation",             # half a 6M x 3M, the free one
+    "137": "Garden Vareli",                   # 6M x 3M, booked after the sheet
+    "152": "Raghav Creation",                 # 6M x 3M, the merged 152+153
 }
 
 # Firms that have pulled out since the floor was drawn, against the unit they
@@ -638,6 +653,11 @@ def size_pool_and_splits(stalls, saree):
     raise SystemExit("the saree list does not fit anywhere on this floor")
 
 
+def unit_number(unit_id):
+    """The stall a unit id sits on: "107B" -> 107, "137" -> 137."""
+    return int(re.match(r"\d+", unit_id).group())
+
+
 def build_units(stalls, split_bays):
     """Every lettable unit: a split bay contributes its two 100 sqft halves."""
     units = []
@@ -665,7 +685,10 @@ def allot(stalls, exhibitors, pool_end, split_bays):
 
     Counts match exactly per size, so nobody is left over and nobody is moved
     to a size they did not book. A withdrawn firm and the unit it held both sit
-    this out, which leaves that stall empty without moving anyone else."""
+    this out, which leaves that stall empty without moving anyone else.
+
+    RESERVED is seated first, off unit ids, so half a split bay can be let
+    without taking the other half out of the draw with it."""
     order = [name for name, _ in TRADE_GROUPS]
     units = [u for u in build_units(stalls, split_bays)
              if u["unitId"] not in set(WITHDRAWN.values())]
@@ -675,16 +698,21 @@ def allot(stalls, exhibitors, pool_end, split_bays):
         return number <= pool_end and number not in SAREE_POOL_EXCLUDES
 
     allotments = []
-    taken_numbers, taken_brands = set(), set()
+    taken_units, taken_brands = set(), set()
+    by_unit = {u["unitId"]: u for u in units}
     by_brand = {e["brand"]: e for e in exhibitors}
-    for number, brand in sorted(RESERVED.items()):
+    for unit_id, brand in sorted(RESERVED.items(),
+                                 key=lambda kv: (unit_number(kv[0]), kv[0])):
+        unit = by_unit.get(unit_id)
+        if unit is None:
+            raise SystemExit("RESERVED holds unit %s, which this floor does "
+                             "not lay out" % unit_id)
         ex = by_brand.get(brand)
         if not ex:
             continue
-        stall = next(s for s in stalls if s["stallNumber"] == number)
-        allotments.append({"unitId": str(number), "stall": stall, "ex": ex,
+        allotments.append({"unitId": unit_id, "stall": unit["stall"], "ex": ex,
                            "held": True})
-        taken_numbers.add(number)
+        taken_units.add(unit_id)
         taken_brands.add(brand)
 
     unplaced = []
@@ -692,7 +720,7 @@ def allot(stalls, exhibitors, pool_end, split_bays):
         free = defaultdict(list)
         for u in units:
             n = u["stall"]["stallNumber"]
-            if n in taken_numbers or in_saree_pool(n) is not saree_side:
+            if u["unitId"] in taken_units or in_saree_pool(n) is not saree_side:
                 continue
             free[u["sheetSize"]].append(u)
         for lst in free.values():

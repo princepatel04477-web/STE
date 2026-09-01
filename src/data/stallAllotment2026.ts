@@ -2,7 +2,7 @@
  * STE 2026 demo allotment - generated from STE_data_sheet.xlsx and the
  * stall map. Do not hand-edit; rerun scripts/number_stalls.py.
  *
- * 149 firms on 148 stalls: 148 of the 151 on the sheet - Navdurga, Kalavilla
+ * 150 firms on 148 stalls: 149 of the 152 on the sheet - Navdurga, Kalavilla
  * and Surat Saree House have come off, so none of the three holds one - plus
  * Anaya Designer, who booked afterwards and is still not in it. Saree brands
  * (sarees, lehengas and the uniform-saree firms) draw from stalls 1-107 less
@@ -31,6 +31,8 @@
  *        1 Sep 2026)
  *   152  Raghav Creation, seated on the bay made by throwing 152 and 153
  *        together (organisers, 1 Sep 2026)
+ *   107B Jagadamba Creation, on the half of bay 107 the saree draw left
+ *        standing (organisers, 1 Sep 2026)
  *
  * Stall 61 stands empty. Navdurga withdrew (organisers, 31 Aug 2026) and the
  * bay is not reallotted: the draw hands a band's stalls out in order, so
@@ -115,6 +117,38 @@
  * (organisers, 1 Sep 2026), so the row sits in Dress Material & Fabrics. The
  * bay is held, so the group buys them nothing in the draw; it is what the
  * plan colours them by and what the fascia and the export read.
+ *
+ * Stall 107B is let. 107 is the 3m x 6m bay at the head of the south hall, one
+ * of the two the saree pool needed cut in half (see SPLIT_BAYS_2026), and its
+ * two 100 sqft halves went out separately: Amaya drew 107A, and 107B stood
+ * empty as the half the saree list never reached. Jagadamba Creation
+ * (9998675623), a 100 sqft fabrics firm, take it (organisers, 1 Sep 2026).
+ *
+ * They take no LATE_ENTRANTS entry, unlike the three firms above. That list
+ * carries a firm the sheet did not hold when the floor was settled, and skips
+ * their sheet row if one is added later, so a late saree booking cannot
+ * lengthen the saree list and recut the pool underneath numbers already on
+ * slips. Jagadamba Creation are on the sheet and their row is safe to read
+ * straight: the pool is sized off the saree list alone, and a fabrics firm is
+ * not in it.
+ *
+ * The row is held all the same, and has to be. Every 100 sqft unit outside the
+ * saree pool is already drawn, and the only two standing empty - 103 and 107B
+ * - are both inside it, where a general firm's draw cannot reach. Left to the
+ * draw, Jagadamba Creation would have come out unplaced rather than seated.
+ *
+ * 107B rather than 103 is what keeps the trade runs whole. Inside the 100 sqft
+ * band the floor reads saree, then lehenga on 107A, then fabrics from 124 to
+ * 148: 107B is the last unit before that fabrics run and joins the head of it,
+ * while 103 sits in the middle of the north hall saree squares and would have
+ * cut them in two. So 103 is the one left standing - Shiv Vardhaan vacated it
+ * when they were moved up to the 200 sqft bay 141, and nobody has been moved
+ * onto it since.
+ *
+ * Nobody loses a number for it: 107B is a half nobody drew, and 107A keeps
+ * Amaya. The row carries pool "General" although the bay it sits on was cut
+ * for the saree pool, because pool is the block the firm would draw from
+ * rather than the pool the bay was cut for - and a held row draws from none.
  *
  * Six rows correct the sheet rather than following it:
  *   1    Aalingan Art / Nidhanam, not the "Aalingan Art (Nidhidham)" the sheet
@@ -385,6 +419,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "9979907076",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "107A",  stallNumber: 107,  brand: "Amaya", category: "Lehanga",
     group: "Lehenga",                   mobile: "8980018801",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "South Hall",         held: false },
+  { unitId: "107B",  stallNumber: 107,  brand: "Jagadamba Creation", category: "Fabrics",
+    group: "Dress Material & Fabrics",  mobile: "9998675623",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "108",   stallNumber: 108,  brand: "Glorry Creation", category: "Kurtis",
     group: "Kurti",                     mobile: "9638338014",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "109",   stallNumber: 109,  brand: "Nirham Club Wear", category: "Kurti",
