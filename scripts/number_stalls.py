@@ -151,10 +151,31 @@ RESERVED = {
 # The saree pool is still sized against the full sheet list, withdrawals
 # included, so the pool end and the split bays do not move either.
 #
-#   Navdurga  withdrew (organisers, 31 Aug 2026). Stall 61, a 3m x 18m,
-#             600 sqft bay in the north hall saree band, goes back empty.
+# A firm that held no unit maps to None: it comes out of the draw and no bay
+# comes out with it, which is the whole of the change for a firm that was never
+# seated.
+#
+#   Navdurga    withdrew (organisers, 31 Aug 2026). Stall 61, a 3m x 18m,
+#               600 sqft bay in the north hall saree band, goes back empty.
+#   Gopal Hari  withdrew (organisers, 1 Sep 2026). Stall 137, a 3m x 6m,
+#               200 sqft bay in the south hall, goes back empty. It was the
+#               only bay in its pool/size/trade block, so nobody else could
+#               ever have drawn it.
+#   Kalavilla   withdrew (organisers, 1 Sep 2026), and the bay that comes off
+#               with them is 139 rather than the 136 this plan had seated them
+#               on. Their block is two 3m x 12m bays, 136 and 139, against
+#               them and Shakambari Lace House, and Shakambari have already
+#               drawn 136 in the live lottery. Dropping 136 would leave the
+#               plan showing a stall as free that Shakambari hold a slip for;
+#               dropping 139 leaves the one bay for the one firm left, so the
+#               draw seats Shakambari on the 136 they are already on.
+#   Surat       was never confirmed and holds no bay, so None - see the plan
+#   Saree House header, where Jyotsna hold the 60 they had drawn.
 WITHDRAWN = {
     "Navdurga": "61",                         # 18M x 3M
+    "Gopal Hari": "137",                      # 6M x 3M
+    "Kalavilla": "139",                       # 12M x 3M, not the 136 they held
+    "Surat Saree House": None,                # held no bay
 }
 
 # Firms that booked after the sheet was filed. They are on the floor but not in

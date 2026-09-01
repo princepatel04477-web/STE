@@ -2,11 +2,11 @@
  * STE 2026 demo allotment - generated from STE_data_sheet.xlsx and the
  * stall map. Do not hand-edit; rerun scripts/number_stalls.py.
  *
- * 149 firms on 148 stalls: 148 of the 150 on the sheet - Surat Saree House is
- * not confirmed yet and Navdurga has withdrawn, so neither holds one - and
- * Anaya Designer, who booked after the sheet was filed. Saree brands (sarees,
- * lehengas and the uniform-saree firms) draw from stalls 1-107 less 27, 28,
- * 29; everyone else takes the south hall and those three big blocks.
+ * 147 firms on 146 stalls: 146 of the 150 on the sheet - Navdurga, Gopal Hari,
+ * Kalavilla and Surat Saree House have all come off, so none of the four holds
+ * one - and Anaya Designer, who booked after the sheet was filed. Saree brands
+ * (sarees, lehengas and the uniform-saree firms) draw from stalls 1-107 less
+ * 27, 28, 29; everyone else takes the south hall and those three big blocks.
  *
  * The draw order is seeded, so the same floor comes back every run.
  * This is a demo allotment, not a live draw result.
@@ -24,9 +24,7 @@
  *   151  Dream Delta, on a 3m x 3m bay the draw had left empty
  *   60   Jyotsna, on a whole 3m x 6m bay rather than a cut piece of bay
  *        100 (organisers, 28 Aug 2026). Surat Saree House, who had drawn 60,
- *        is not confirmed yet and so holds no stall for now.
- *   137  Gopal Hari, placed in the south hall rather than the saree band
- *        (no mobile yet - the sheet gives him Gauri Ganesh's number)
+ *        was never confirmed and has now come off the list altogether.
  *   100  Anaya Designer, seated on the 800 sqft north hall anchor the draw
  *        had left empty (organisers, 31 Aug 2026)
  *
@@ -36,6 +34,22 @@
  * forward, off the stall already on their slip. WITHDRAWN in
  * scripts/number_stalls.py takes the firm and the bay out together, so a rerun
  * leaves 61 empty rather than drawing someone onto it.
+ *
+ * Stalls 137 and 139 stand empty too. Gopal Hari and Kalavilla have both
+ * pulled out (organisers, 1 Sep 2026) and, like Navdurga, neither bay is
+ * reallotted - WITHDRAWN takes the firm and a bay out of the draw together, so
+ * the brands behind them keep the numbers already on their slips.
+ *
+ * Which bay comes off with Kalavilla is not the one the plan had them on. The
+ * 400 sqft dress-material block is two bays, 136 and 139, against Kalavilla
+ * and Shakambari Lace House; Shakambari have already drawn 136 in the live
+ * lottery, so the bay Kalavilla's exit actually frees is 139, and 136 is
+ * written to the firm sitting on it. Taking 139 out instead of 136 is what
+ * keeps this plan and the live draw saying the same thing - dropping 136
+ * would advertise as free a stall Shakambari hold a slip for.
+ *
+ * Surat Saree House take no bay off the floor with them: they were never
+ * confirmed and held none to begin with.
  *
  * Stall 100 is now let. The saree band lays out three 3m x 24m, 800 sqft bays
  * - 35, 37 and 100 - and the sheet's saree list held only two firms that size,
@@ -365,14 +379,10 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Men's Wear",                mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "135",   stallNumber: 135,  brand: "Alok Suit", category: "Suit",
     group: "Suits",                     mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "136",   stallNumber: 136,  brand: "Kalavilla", category: "Fabrics",
-    group: "Dress Material & Fabrics",  mobile: "7016061443",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "137",   stallNumber: 137,  brand: "Gopal Hari", category: "Sarees",
-    group: "Saree",                     mobile: "",            sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
+  { unitId: "136",   stallNumber: 136,  brand: "Shakambari Lace House", category: "Lace Materials",
+    group: "Dress Material & Fabrics",  mobile: "9982170219",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "138",   stallNumber: 138,  brand: "Bhagvad Fabrics", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "9377855666",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "139",   stallNumber: 139,  brand: "Shakambari Lace House", category: "Lace Materials",
-    group: "Dress Material & Fabrics",  mobile: "9982170219",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "140",   stallNumber: 140,  brand: "Pearly Pink", category: "Kids Wear",
     group: "Kids Wear",                 mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "141",   stallNumber: 141,  brand: "Shiv Vardhaan", category: "Saree",
