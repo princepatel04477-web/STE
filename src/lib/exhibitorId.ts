@@ -1,8 +1,11 @@
 /**
  * Exhibitor identity, normalised the one way the whole portal agrees on.
  *
- * Almost every exhibitor is keyed by their 10-digit mobile, but a few firms are
- * registered under a short user ID instead (Saraogi Super Sales is "SSS").
+ * Almost every exhibitor is keyed by their 10-digit mobile, but a firm the
+ * sheet gave no number for could be registered under a short user ID instead
+ * (Saraogi Super Sales were "SSS", Gopal Hari "GOPALHARI"). No firm is today -
+ * both have been retired - but the guest list still allows one, so the two
+ * kinds of identifier are still normalised the same way here.
  * Login has always accepted both; the lottery path assumed digits only, so a
  * user-ID exhibitor could sign in and then be turned away at the draw with
  * "valid 10-digit mobile number is required" — leaving their stall unallotted.

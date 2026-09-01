@@ -122,11 +122,16 @@
  *        the firm writes the pair with a slash, the way every other joint name
  *        on this floor is written.
  *   39   Saraogi Super Sales answer on 9810550285, where the sheet gives no
- *        number at all (organisers, 29 Aug 2026). They were registered under
- *        the portal ID "SSS" for want of one; the ID still opens the portal
- *        and the number is now a second way in. The number is on this row so
- *        the hold on 39 - the 2600 sqft anchor, the largest stall on the
- *        floor - is found by mobile rather than by brand name alone.
+ *        number at all (organisers, 29 Aug 2026). The number is now their
+ *        portal ID as well (organisers, 1 Sep 2026); the "SSS" they were
+ *        registered under for want of one is retired and no longer opens the
+ *        portal. Retired rather than kept as an alias because two ways in
+ *        made two profiles: the firm signed in on the number and set a
+ *        password there, and the ID's own row sat beside it holding the brand
+ *        name, so the admin console had the firm twice and neither row was
+ *        whole. The number is on this row so the hold on 39 - the 2600 sqft
+ *        anchor, the largest stall on the floor - is found by mobile rather
+ *        than by brand name alone.
  *   38   Apple lifestyle answer on 9825398582, not the 9099140404 the sheet
  *        carries (organisers, 29 Aug 2026). The old number has been given up
  *        and may be reassigned, so it is retired rather than kept as an

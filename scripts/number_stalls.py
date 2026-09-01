@@ -280,9 +280,11 @@ BRAND_CORRECTIONS = {
 #   Apple lifestyle  gave up 9099140404 and answer on 9825398582 (organisers,
 #                    29 Aug 2026). The old number is retired, not aliased.
 #   Saraogi          the sheet leaves their number blank; they answer on
-#                    9810550285 (organisers, 29 Aug 2026). Worth carrying
-#                    because 39 is held, and a held stall is looked up by
-#                    mobile before brand name.
+#                    9810550285 (organisers, 29 Aug 2026), and it is their
+#                    portal ID too since 1 Sep 2026 - the "SSS" they were
+#                    registered under is retired. Worth carrying because 39 is
+#                    held, and a held stall is looked up by mobile before
+#                    brand name.
 #
 # Keep registeredExhibitors.ts in step - that is the list the portal actually
 # lets people in on.
