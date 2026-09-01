@@ -159,12 +159,11 @@ RESERVED = {
 #
 #   Navdurga    withdrew (organisers, 31 Aug 2026). Stall 61, a 3m x 18m,
 #               600 sqft bay in the north hall saree band, goes back empty.
-#   Gopal Hari  withdrew (organisers, 1 Sep 2026), and his stall 137 is let
-#               again - Garden Vareli took it the same day, and RESERVED seats
-#               them on it - so the bay stays on the floor and he maps to None.
-#               Nobody is moved either way: 137 is the only bay in its
-#               pool/size/trade block, so no other firm could have drawn it
-#               when it stood empty, and none loses a number now it is let.
+#   Gopal Hari  withdrew (organisers, 1 Sep 2026) and needs no entry here at
+#               all: the organisers have struck his row from the sheet, so
+#               read_exhibitors() no longer returns him. That is the tidier
+#               fix, because his row carried Gauri Ganesh's number rather than
+#               one of his own. His stall 137 is let again, to Garden Vareli.
 #   Kalavilla   withdrew (organisers, 1 Sep 2026), and the bay that comes off
 #               with them is 139 rather than the 136 this plan had seated them
 #               on. Their block is two 3m x 12m bays, 136 and 139, against
@@ -177,7 +176,6 @@ RESERVED = {
 #   Saree House header, where Jyotsna hold the 60 they had drawn.
 WITHDRAWN = {
     "Navdurga": "61",                         # 18M x 3M
-    "Gopal Hari": None,                       # 137 relet, see RESERVED
     "Kalavilla": "139",                       # 12M x 3M, not the 136 they held
     "Surat Saree House": None,                # held no bay
 }
@@ -211,9 +209,7 @@ WITHDRAWN = {
 #                   the moment he withdrew and nobody else was ever in line
 #                   for it. If a Garden Vareli row is ever added to
 #                   STE_data_sheet.xlsx, this entry has to come out or the
-#                   firm is counted twice - and adding them to the sheet would
-#                   resize the saree pool, which is the thing this list exists
-#                   to prevent.
+#                   firm is counted twice.
 #   Raghav Creation booked the bay made by throwing stalls 152 and 153
 #                   together (organisers, 1 Sep 2026) and is seated on 152.
 #                   Both squares were standing free, so the merge took nothing
@@ -231,10 +227,15 @@ WITHDRAWN = {
 #                   throws away a region whose measurements do not match the
 #                   size its colour declares.
 #
-#                   Their trade is not known yet, so the row carries no
-#                   category and the catch-all group. 150 and 151 either side
-#                   are Home & Other already, so no trade run is broken, but
-#                   it wants correcting when the organisers give one.
+#
+# A firm listed here is skipped when the sheet is read, so a row the organisers
+# later add to STE_data_sheet.xlsx for the same firm does not count them twice
+# - and, more importantly, does not let them into the pool sizing by the back
+# door. The organisers have since written all three of these into the sheet
+# (1 Sep 2026); the skip is what keeps that from moving the saree pool end and
+# recutting the split bays underneath brands whose numbers are already on their
+# slips. Take a firm out of this list only when their stall numbers no longer
+# matter - never merely because the sheet has caught up with them.
 #
 # Keep registeredExhibitors.ts in step - that is the list the portal actually
 # lets people in on - and seed the database, which stores its own copy of the
@@ -246,10 +247,12 @@ LATE_ENTRANTS = [
     {"brand": "Garden Vareli", "category": "Sarees / Dress Material",
      "sheetSize": "3m x 6m", "areaSqft": 200, "mobile": "6357238663",
      "isSaree": True, "group": "Saree"},
-    {"brand": "Raghav Creation", "category": "", "sheetSize": "3m x 6m",
-     "areaSqft": 200, "mobile": "9830944345", "isSaree": False,
-     "group": "Home & Other"},
+    {"brand": "Raghav Creation", "category": "Fabrics",
+     "sheetSize": "3m x 6m", "areaSqft": 200, "mobile": "9830944345",
+     "isSaree": False, "group": "Dress Material & Fabrics"},
 ]
+
+LATE_ENTRANT_BRANDS = {e["brand"] for e in LATE_ENTRANTS}
 
 # Brands the organisers spell differently from the sheet, keyed by the sheet's
 # own spelling. The name here is what the floor plan, the allotment slip and
@@ -550,6 +553,11 @@ def read_exhibitors():
     for brand, category, sqft, dims, mobile in ws.iter_rows(min_row=2,
                                                             values_only=True):
         if not brand:
+            continue
+        # A late entrant the organisers have since written into the sheet. The
+        # LATE_ENTRANTS row is the one that counts, and it joins the list only
+        # after the pool has been sized - see that list for why.
+        if re.sub(r"\s+", " ", str(brand)).strip() in LATE_ENTRANT_BRANDS:
             continue
         size = str(dims).strip().lower()
         # The sheet's spelling is the key both correction maps are written

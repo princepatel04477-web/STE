@@ -114,7 +114,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9852146981", brandName: "Rachit Group", stallSqft: "600 sq ft", category: "Saree", market: "Annapurna", aliases: ["9825146981"] },
   { mobile: "9374072626", brandName: "Radhey Silk Weaves", stallSqft: "600 sq ft", category: "Fabrics", market: "" },
   { mobile: "9510064200", brandName: "Radhya Designer", stallSqft: "200 sq ft", category: "Sarees", market: "Raghukul" },
-  { mobile: "9830944345", brandName: "Raghav Creation", stallSqft: "200 sq ft", market: "" },
+  { mobile: "9830944345", brandName: "Raghav Creation", stallSqft: "200 sq ft", category: "Fabrics", market: "" },
   { mobile: "9825572748", brandName: "Raghav Silk Mills", stallSqft: "100 sq ft", category: "Sarees", market: "M2", aliases: ["7818968985"] },
   { mobile: "9374049925", brandName: "Ramsha (Gouri Impex)", stallSqft: "600 sq ft", category: "Kurti / Suits", market: "NTM" },
   { mobile: "7383001130", brandName: "Reyansh Creation", stallSqft: "100 sq ft", category: "Saree", market: "Globale" },

@@ -2,12 +2,11 @@
  * STE 2026 demo allotment - generated from STE_data_sheet.xlsx and the
  * stall map. Do not hand-edit; rerun scripts/number_stalls.py.
  *
- * 149 firms on 148 stalls: 146 of the 150 on the sheet - Navdurga, Gopal Hari,
- * Kalavilla and Surat Saree House have all come off, so none of the four holds
- * one - plus Anaya Designer, Garden Vareli and Raghav Creation, who booked
- * after the sheet was filed. Saree brands (sarees, lehengas and the
- * uniform-saree firms) draw from stalls 1-107 less 27, 28, 29; everyone else
- * takes the south hall and those three big blocks.
+ * 149 firms on 148 stalls: 148 of the 151 on the sheet - Navdurga, Kalavilla
+ * and Surat Saree House have come off, so none of the three holds one - plus
+ * Anaya Designer, who booked afterwards and is still not in it. Saree brands
+ * (sarees, lehengas and the uniform-saree firms) draw from stalls 1-107 less
+ * 27, 28, 29; everyone else takes the south hall and those three big blocks.
  *
  * The draw order is seeded, so the same floor comes back every run.
  * This is a demo allotment, not a live draw result.
@@ -46,15 +45,31 @@
  * behind them keep the numbers already on their slips. Gopal Hari's 137 has
  * since been let again, to Garden Vareli; Kalavilla's 139 has not.
  *
+ * Gopal Hari alone is gone from the sheet as well as the floor (organisers,
+ * 1 Sep 2026), which is why he wants no WITHDRAWN entry: the row is not there
+ * to withdraw. Striking him is the tidier fix in his case, because the row
+ * carried Gauri Ganesh's number rather than one of his own, and 9601700354 now
+ * answers for one firm only. Navdurga, Kalavilla and Surat Saree House stay in
+ * the sheet - it is the list the organisers drew up, not the floor.
+ *
  * Stall 137 is let to Garden Vareli (6357238663), a 200 sqft saree and dress
- * material firm who booked after the sheet was filed (organisers,
- * 1 Sep 2026). Seating them costs nobody their number, for the same reason
- * Gopal Hari's leaving cost nobody theirs: 137 is the only bay in its
- * pool/size/trade block, so no other firm could ever have drawn it. The row is
- * held rather than drawn - they are not on the sheet, so the draw has no row
- * to seat, and heldUnitFor() hands 137 straight back when they open the Lucky
- * Box. LATE_ENTRANTS in scripts/number_stalls.py keeps them out of the pool
- * sizing, so the pool end and the split bays do not move.
+ * material firm who booked after the sheet was filed and have since been
+ * written into it (organisers, 1 Sep 2026). Seating them costs nobody their
+ * number, for the same reason Gopal Hari's leaving cost nobody theirs: 137 is
+ * the only bay in its pool/size/trade block, so no other firm could ever have
+ * drawn it. The row is held rather than drawn - the floor was settled before
+ * they booked, and letting them into the draw now would hand a band's free
+ * units out in a different order - and heldUnitFor() gives them 137 with
+ * nothing to draw for.
+ *
+ * Their sheet row changes none of that. LATE_ENTRANTS in
+ * scripts/number_stalls.py is what seats a late firm, and read_exhibitors()
+ * skips the sheet row of any firm named there, so a firm the organisers have
+ * caught up on is still counted once and still joins the list only after the
+ * saree pool has been sized. That is the point of the skip rather than a
+ * tidiness: Garden Vareli are a saree firm, and letting them into the sizing
+ * could push the pool end out and cut a different pair of bays, pulling brands
+ * off numbers already on their slips.
  *
  * Which bay comes off with Kalavilla is not the one the plan had them on. The
  * 400 sqft dress-material block is two bays, 136 and 139, against Kalavilla
@@ -96,10 +111,10 @@
  * colour alone would have made classify() throw the bay away as a 3m x 3m
  * region measuring 3m x 6m.
  *
- * Their trade is not known yet. The row carries no category and sits in the
- * catch-all Home & Other group, which costs nothing on the floor - 150 and 151
- * either side of it are Home & Other already, so no trade run is broken - but
- * it wants correcting when the organisers give one.
+ * Raghav Creation are a fabrics firm, which the sheet gives as their trade
+ * (organisers, 1 Sep 2026), so the row sits in Dress Material & Fabrics. The
+ * bay is held, so the group buys them nothing in the draw; it is what the
+ * plan colours them by and what the fascia and the export read.
  *
  * Six rows correct the sheet rather than following it:
  *   1    Aalingan Art / Nidhanam, not the "Aalingan Art (Nidhidham)" the sheet
@@ -449,8 +464,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Home & Other",              mobile: "9824131004",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "151",   stallNumber: 151,  brand: "Dream Delta", category: "Books",
     group: "Home & Other",              mobile: "8200203732",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: true },
-  { unitId: "152",   stallNumber: 152,  brand: "Raghav Creation", category: "",
-    group: "Home & Other",              mobile: "9830944345",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
+  { unitId: "152",   stallNumber: 152,  brand: "Raghav Creation", category: "Fabrics",
+    group: "Dress Material & Fabrics",  mobile: "9830944345",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
 ];
 
 /** Stalls the saree brands drew from. */
