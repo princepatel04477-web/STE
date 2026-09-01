@@ -55,6 +55,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9712366161", brandName: "Ethnico by Laxmi", stallSqft: "800 sq ft", category: "Men's Wear", market: "Ved Road" },
   { mobile: "8980835552", brandName: "Ganesh Fashion", stallSqft: "200 sq ft", category: "Sarees", market: "" },
   { mobile: "9375022000", brandName: "Ganga Sarees", stallSqft: "100 sq ft", category: "Sarees", market: "Raghukul" },
+  { mobile: "6357238663", brandName: "Garden Vareli", stallSqft: "200 sq ft", category: "Sarees / Dress Material", market: "" },
   { mobile: "9601700354", brandName: "Gauri Ganesh", stallSqft: "200 sq ft", category: "Sarees", market: "429 A M2" },
   { mobile: "9586899777", brandName: "Gauri Putra", stallSqft: "400 sq ft", category: "Lehanga", market: "M1" },
   { mobile: "9879688431", brandName: "Geeta Tex (Ambika)", stallSqft: "1000 sq ft", category: "Suit", market: "Kuberji Houses" },

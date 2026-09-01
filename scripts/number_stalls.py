@@ -137,6 +137,7 @@ RESERVED = {
     43: "Earth Fabrics",                      # 18M x 3M, swapped with 46
     46: "Bahubali",                           # 18M x 3M, swapped with 43
     100: "Anaya Designer",                    # 24M x 3M, booked after the sheet
+    137: "Garden Vareli",                     # 6M x 3M, booked after the sheet
 }
 
 # Firms that have pulled out since the floor was drawn, against the unit they
@@ -157,10 +158,12 @@ RESERVED = {
 #
 #   Navdurga    withdrew (organisers, 31 Aug 2026). Stall 61, a 3m x 18m,
 #               600 sqft bay in the north hall saree band, goes back empty.
-#   Gopal Hari  withdrew (organisers, 1 Sep 2026). Stall 137, a 3m x 6m,
-#               200 sqft bay in the south hall, goes back empty. It was the
-#               only bay in its pool/size/trade block, so nobody else could
-#               ever have drawn it.
+#   Gopal Hari  withdrew (organisers, 1 Sep 2026), and his stall 137 is let
+#               again - Garden Vareli took it the same day, and RESERVED seats
+#               them on it - so the bay stays on the floor and he maps to None.
+#               Nobody is moved either way: 137 is the only bay in its
+#               pool/size/trade block, so no other firm could have drawn it
+#               when it stood empty, and none loses a number now it is let.
 #   Kalavilla   withdrew (organisers, 1 Sep 2026), and the bay that comes off
 #               with them is 139 rather than the 136 this plan had seated them
 #               on. Their block is two 3m x 12m bays, 136 and 139, against
@@ -173,7 +176,7 @@ RESERVED = {
 #   Saree House header, where Jyotsna hold the 60 they had drawn.
 WITHDRAWN = {
     "Navdurga": "61",                         # 18M x 3M
-    "Gopal Hari": "137",                      # 6M x 3M
+    "Gopal Hari": None,                       # 137 relet, see RESERVED
     "Kalavilla": "139",                       # 12M x 3M, not the 136 they held
     "Surat Saree House": None,                # held no bay
 }
@@ -201,14 +204,22 @@ WITHDRAWN = {
 #                   that size in the north hall saree band the draw left free,
 #                   the band laying out three (35, 37, 100) against the two
 #                   saree firms on the sheet that booked the size.
-#
-# Keep registeredExhibitors.ts in step - that is the list the portal actually
-# lets people in on - and seed the database, which stores its own copy of the
-# guest list rather than reading that one.
+#   Garden Vareli   booked the 3m x 6m, 200 sqft bay Gopal Hari left
+#                   (organisers, 1 Sep 2026) and is seated on stall 137. It is
+#                   the only bay in its pool/size/trade block, so it was free
+#                   the moment he withdrew and nobody else was ever in line
+#                   for it. If a Garden Vareli row is ever added to
+#                   STE_data_sheet.xlsx, this entry has to come out or the
+#                   firm is counted twice - and adding them to the sheet would
+#                   resize the saree pool, which is the thing this list exists
+#                   to prevent.
 LATE_ENTRANTS = [
     {"brand": "Anaya Designer", "category": "Saree", "sheetSize": "3m x 24m",
      "areaSqft": 800, "mobile": "9998023918", "isSaree": True,
      "group": "Saree"},
+    {"brand": "Garden Vareli", "category": "Sarees / Dress Material",
+     "sheetSize": "3m x 6m", "areaSqft": 200, "mobile": "6357238663",
+     "isSaree": True, "group": "Saree"},
 ]
 
 # Brands the organisers spell differently from the sheet, keyed by the sheet's
