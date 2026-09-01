@@ -138,6 +138,7 @@ RESERVED = {
     46: "Bahubali",                           # 18M x 3M, swapped with 43
     100: "Anaya Designer",                    # 24M x 3M, booked after the sheet
     137: "Garden Vareli",                     # 6M x 3M, booked after the sheet
+    152: "Raghav Creation",                   # 6M x 3M, the merged 152+153
 }
 
 # Firms that have pulled out since the floor was drawn, against the unit they
@@ -213,6 +214,31 @@ WITHDRAWN = {
 #                   firm is counted twice - and adding them to the sheet would
 #                   resize the saree pool, which is the thing this list exists
 #                   to prevent.
+#   Raghav Creation booked the bay made by throwing stalls 152 and 153
+#                   together (organisers, 1 Sep 2026) and is seated on 152.
+#                   Both squares were standing free, so the merge took nothing
+#                   off anyone's slip, and they were the last pair on the
+#                   floor, so nothing renumbers behind them.
+#
+#                   The merge is in the drawing, not here: a stall is marked
+#                   off by the black border lines around it and sized by the
+#                   colour it is painted, so the line between the two is
+#                   deleted from Final-Layout-STE-2026.svg and the bay is
+#                   repainted in the legend's 6M x 3M pink. read_shapes() and
+#                   classify() then read one 3m x 6m, 200 sqft bay where there
+#                   were two 3m x 3m ones, and the floor comes back 152 stalls
+#                   rather than 153. Repainting is not cosmetic: classify()
+#                   throws away a region whose measurements do not match the
+#                   size its colour declares.
+#
+#                   Their trade is not known yet, so the row carries no
+#                   category and the catch-all group. 150 and 151 either side
+#                   are Home & Other already, so no trade run is broken, but
+#                   it wants correcting when the organisers give one.
+#
+# Keep registeredExhibitors.ts in step - that is the list the portal actually
+# lets people in on - and seed the database, which stores its own copy of the
+# guest list rather than reading that one.
 LATE_ENTRANTS = [
     {"brand": "Anaya Designer", "category": "Saree", "sheetSize": "3m x 24m",
      "areaSqft": 800, "mobile": "9998023918", "isSaree": True,
@@ -220,6 +246,9 @@ LATE_ENTRANTS = [
     {"brand": "Garden Vareli", "category": "Sarees / Dress Material",
      "sheetSize": "3m x 6m", "areaSqft": 200, "mobile": "6357238663",
      "isSaree": True, "group": "Saree"},
+    {"brand": "Raghav Creation", "category": "", "sheetSize": "3m x 6m",
+     "areaSqft": 200, "mobile": "9830944345", "isSaree": False,
+     "group": "Home & Other"},
 ]
 
 # Brands the organisers spell differently from the sheet, keyed by the sheet's

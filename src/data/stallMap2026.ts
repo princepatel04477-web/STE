@@ -3,9 +3,9 @@
  *
  * Do not hand-edit. Regenerate with:  python scripts/number_stalls.py
  *
- * 153 stalls, 5229 sqm:
- *   6M x 3M     47
- *   3M x 3M     29
+ * 152 stalls, 5229 sqm:
+ *   6M x 3M     48
+ *   3M x 3M     27
  *   18M x 3M    26
  *   12M x 3M    19
  *   9M x 3M     16
@@ -14,6 +14,13 @@
  *   36M x 3M     1
  *   42M x 6M     1
  *   30M x 6M     1
+ *
+ * Stall 152 is the one bay here the drawing does not draw on its own: 152 and
+ * 153 were a pair of 3m x 3m squares at the foot of the east column, and the
+ * organisers threw them together into a single 3m x 6m, 200 sqft bay under the
+ * lower number (organisers, 1 Sep 2026). The line between them is gone from
+ * the printed plan too, and 153 is not a stall any more - the floor now
+ * numbers 1..152 with no gap, because 153 was the last.
  *
  * x/y/w/h are the stall's rectangle in the floor-plan SVG's own
  * coordinate space (1 metre = 5.638 units), so they can be used to draw
@@ -213,8 +220,7 @@ export const STALL_MAP_2026: Stall2026[] = [
   { stallNumber: 149, size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "South Hall",         widthM:  3, depthM:  3, x:  773.88, y: 453.12, w:  15.96, h:  16.20, legacyNumber: undefined },
   { stallNumber: 150, size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "South Hall",         widthM:  3, depthM:  3, x:  773.88, y: 470.04, w:  15.96, h:  16.20, legacyNumber: undefined },
   { stallNumber: 151, size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "South Hall",         widthM:  3, depthM:  3, x:  773.88, y: 486.96, w:  15.96, h:  16.20, legacyNumber: undefined },
-  { stallNumber: 152, size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "South Hall",         widthM:  3, depthM:  3, x:  773.88, y: 503.88, w:  15.96, h:  16.20, legacyNumber: undefined },
-  { stallNumber: 153, size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "South Hall",         widthM:  3, depthM:  3, x:  773.88, y: 520.80, w:  15.96, h:  15.96, legacyNumber: undefined },
+  { stallNumber: 152, size: "6M x 3M",   sheetSize: "3m x 6m",   areaSqm: 18,   areaSqft: 200,   zone: "South Hall",         widthM:  3, depthM:  6, x:  773.88, y: 503.88, w:  15.96, h:  32.88, legacyNumber: undefined },
 ];
 
 export const TOTAL_STALLS_2026 = STALL_MAP_2026.length;

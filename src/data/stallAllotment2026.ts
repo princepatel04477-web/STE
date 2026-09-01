@@ -2,12 +2,12 @@
  * STE 2026 demo allotment - generated from STE_data_sheet.xlsx and the
  * stall map. Do not hand-edit; rerun scripts/number_stalls.py.
  *
- * 148 firms on 147 stalls: 146 of the 150 on the sheet - Navdurga, Gopal Hari,
+ * 149 firms on 148 stalls: 146 of the 150 on the sheet - Navdurga, Gopal Hari,
  * Kalavilla and Surat Saree House have all come off, so none of the four holds
- * one - plus Anaya Designer and Garden Vareli, who booked after the sheet was
- * filed. Saree brands (sarees, lehengas and the uniform-saree firms) draw from
- * stalls 1-107 less 27, 28, 29; everyone else takes the south hall and those
- * three big blocks.
+ * one - plus Anaya Designer, Garden Vareli and Raghav Creation, who booked
+ * after the sheet was filed. Saree brands (sarees, lehengas and the
+ * uniform-saree firms) draw from stalls 1-107 less 27, 28, 29; everyone else
+ * takes the south hall and those three big blocks.
  *
  * The draw order is seeded, so the same floor comes back every run.
  * This is a demo allotment, not a live draw result.
@@ -30,6 +30,8 @@
  *        had left empty (organisers, 31 Aug 2026)
  *   137  Garden Vareli, seated on the bay Gopal Hari left (organisers,
  *        1 Sep 2026)
+ *   152  Raghav Creation, seated on the bay made by throwing 152 and 153
+ *        together (organisers, 1 Sep 2026)
  *
  * Stall 61 stands empty. Navdurga withdrew (organisers, 31 Aug 2026) and the
  * bay is not reallotted: the draw hands a band's stalls out in order, so
@@ -74,6 +76,30 @@
  * costs no one their number: 100 was the bay nobody drew, and 35 and 37 keep
  * the firms already on them. Bay 100 is let whole, not in halves - see
  * SPLIT_BAYS_2026 below.
+ *
+ * Stall 153 no longer exists. 152 and 153 were the last two 3m x 3m squares
+ * at the foot of the east column of the south hall, and the organisers threw
+ * them together into one 3m x 6m, 200 sqft bay under the lower number
+ * (organisers, 1 Sep 2026). Raghav Creation (9830944345) take it, held.
+ *
+ * The merge costs nobody a number. Both squares were standing free - nobody
+ * had drawn either, and no firm on the sheet was in line for them - so joining
+ * them takes nothing off anyone's slip, and it is the last pair on the floor,
+ * so no stall renumbers behind it: the floor now runs 1..152 with no gap.
+ *
+ * The drawing carries the merge, not just this table. A stall on this plan is
+ * marked off by the black border lines around it and sized by the colour it is
+ * painted, so the line between 152 and 153 is deleted from
+ * Final-Layout-STE-2026.svg and the bay is repainted in the legend's 6M x 3M
+ * pink instead of its 3M x 3M pink. Both are what a rerun of
+ * scripts/number_stalls.py reads, so the merged bay survives one; leaving the
+ * colour alone would have made classify() throw the bay away as a 3m x 3m
+ * region measuring 3m x 6m.
+ *
+ * Their trade is not known yet. The row carries no category and sits in the
+ * catch-all Home & Other group, which costs nothing on the floor - 150 and 151
+ * either side of it are Home & Other already, so no trade run is broken - but
+ * it wants correcting when the organisers give one.
  *
  * Six rows correct the sheet rather than following it:
  *   1    Aalingan Art / Nidhanam, not the "Aalingan Art (Nidhidham)" the sheet
@@ -423,6 +449,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Home & Other",              mobile: "9824131004",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "151",   stallNumber: 151,  brand: "Dream Delta", category: "Books",
     group: "Home & Other",              mobile: "8200203732",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: true },
+  { unitId: "152",   stallNumber: 152,  brand: "Raghav Creation", category: "",
+    group: "Home & Other",              mobile: "9830944345",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
 ];
 
 /** Stalls the saree brands drew from. */
