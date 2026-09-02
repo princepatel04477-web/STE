@@ -328,7 +328,14 @@ export default function LuckyBox({
 
           <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-500">
             <span>Pass ID: <strong className="text-slate-400">{activeRecord.slip_id}</strong></span>
-            <span>Date: {new Date(activeRecord.allocated_at).toLocaleDateString('en-IN')}</span>
+            <span>Date: {(() => {
+              try {
+                const d = new Date(String(activeRecord.allocated_at || '').replace(' ', 'T'));
+                return isNaN(d.getTime()) ? String(activeRecord.allocated_at) : d.toLocaleDateString('en-IN');
+              } catch {
+                return String(activeRecord.allocated_at || '');
+              }
+            })()}</span>
           </div>
         </div>
       )}

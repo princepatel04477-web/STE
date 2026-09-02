@@ -71,7 +71,7 @@ export default function ExhibitorLoginPage() {
           setShowResetModal(false);
           setShowAdminChoiceModal(true);
         } else {
-          router.push('/exhibitor/dashboard');
+          window.location.href = '/exhibitor/dashboard';
         }
       }, 1200);
     } catch (err) {
@@ -105,7 +105,7 @@ export default function ExhibitorLoginPage() {
         setLoading(false);
         setShowAdminChoiceModal(true);
       } else {
-        router.push('/exhibitor/dashboard');
+        window.location.href = '/exhibitor/dashboard';
       }
     } catch (err) {
       console.error(err);
@@ -169,10 +169,13 @@ export default function ExhibitorLoginPage() {
                   name="mobile"
                   type="text"
                   required
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   placeholder="Enter 10-digit mobile number or User ID (e.g. SSS)"
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:bg-white transition-all text-base md:text-sm font-medium"
+                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:bg-white transition-all text-base font-medium"
                 />
               </div>
             </div>
@@ -190,10 +193,13 @@ export default function ExhibitorLoginPage() {
                   name="password"
                   type="password"
                   required
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:bg-white transition-all text-base md:text-sm font-medium"
+                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 focus:bg-white transition-all text-base font-medium"
                 />
               </div>
               <div className="mt-2 flex items-center justify-between text-xs">
@@ -303,10 +309,13 @@ export default function ExhibitorLoginPage() {
                   <input
                     type="text"
                     required
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     placeholder="Enter registered mobile number or User ID (e.g. SSS)"
                     value={resetMobile}
                     onChange={(e) => setResetMobile(e.target.value)}
-                    className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-xs font-mono"
+                    className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-base sm:text-xs font-mono"
                   />
                 </div>
               </div>
@@ -322,10 +331,13 @@ export default function ExhibitorLoginPage() {
                   <input
                     type="password"
                     required
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     placeholder="Type new password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-xs"
+                    className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-base sm:text-xs"
                   />
                 </div>
               </div>
@@ -341,10 +353,13 @@ export default function ExhibitorLoginPage() {
                   <input
                     type="password"
                     required
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     placeholder="Re-type new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-xs"
+                    className="block w-full pl-10 pr-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 text-base sm:text-xs"
                   />
                 </div>
               </div>
@@ -353,9 +368,9 @@ export default function ExhibitorLoginPage() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-amber-500/30 rounded-xl shadow-lg text-xs font-bold text-neutral-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition-all disabled:opacity-50"
+                  className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider text-neutral-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 transition-all shadow-lg active:scale-95 disabled:opacity-50 cursor-pointer"
                 >
-                  {resetLoading ? 'Saving Password...' : 'Save New Password & Log In'}
+                  {resetLoading ? 'Updating Password...' : 'Save & Login'}
                 </button>
               </div>
             </form>
@@ -363,31 +378,25 @@ export default function ExhibitorLoginPage() {
         </div>
       )}
 
-      {/* Admin Access Choice Modal */}
+      {/* Admin Quick Choice Modal */}
       {showAdminChoiceModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 md:backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-neutral-900 border border-amber-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-center relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 blur-2xl rounded-full pointer-events-none" />
-
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-500/5 border border-amber-500/30 flex items-center justify-center mx-auto mb-4 text-amber-400 shadow-inner">
-              <Crown className="w-7 h-7" />
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border border-amber-500/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-4 text-amber-400">
+              <Crown className="w-6 h-6" />
             </div>
 
-            <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-widest rounded-full inline-block mb-2">
-              Admin Access Granted
-            </span>
-
             <h3 className="text-2xl font-bold text-white mb-2 font-serif tracking-tight">
-              Select Your Destination
+              Welcome, Organiser
             </h3>
             <p className="text-xs text-neutral-400 mb-6 leading-relaxed">
-              Logged in as Admin Mobile <span className="font-mono text-amber-300 font-bold">{mobile}</span>. Choose which console to open:
+              You are logged in with an administrator account. Where would you like to proceed?
             </p>
 
             <div className="space-y-3">
               <button
                 type="button"
-                onClick={() => router.push('/admin/exhibitors')}
+                onClick={() => { window.location.href = '/admin/exhibitors'; }}
                 className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent hover:from-amber-500/30 hover:to-amber-500/10 border border-amber-500/40 rounded-2xl text-left transition-all group shadow-md"
               >
                 <div className="flex items-center gap-3.5">
@@ -408,7 +417,7 @@ export default function ExhibitorLoginPage() {
 
               <button
                 type="button"
-                onClick={() => router.push('/exhibitor/dashboard')}
+                onClick={() => { window.location.href = '/exhibitor/dashboard'; }}
                 className="w-full flex items-center justify-between p-4 bg-neutral-950/80 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 rounded-2xl text-left transition-all group"
               >
                 <div className="flex items-center gap-3.5">

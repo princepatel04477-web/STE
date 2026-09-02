@@ -45,9 +45,11 @@ function scrollToSection(href: string) {
     const header = document.querySelector("header");
     const offset = header ? header.getBoundingClientRect().height : 0;
     const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - offset);
-    // "instant", not "auto": auto defers to the computed scroll-behavior, which
-    // is smooth here, so each re-aim would restart the animation we are avoiding.
-    window.scrollTo({ top, behavior: "instant" });
+    try {
+      window.scrollTo({ top, behavior: "auto" });
+    } catch {
+      window.scrollTo(0, top);
+    }
   };
 
   aim();

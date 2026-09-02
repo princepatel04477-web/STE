@@ -32,7 +32,7 @@ function validateFile(file: File): string | null {
   const ext = fileExtension(file.name);
   if (!ALLOWED_EXTENSIONS.includes(ext)) {
     return 'File format "' + (ext || 'unknown') + '" of "' + file.name +
-      '" is not allowed. Only .PNG, .JPG, .JPEG, and .CDR files are accepted.';
+      '" is not allowed. Only .PNG, .JPG, .JPEG, .WEBP, .HEIC, and .CDR files are accepted.';
   }
 
   return null;

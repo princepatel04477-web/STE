@@ -28,7 +28,7 @@ import {
 
 export const STORAGE_BUCKET = 'exhibitor-assets';
 
-export const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.cdr'];
+export const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.cdr', '.heic', '.heif'];
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB, matches the bucket limit
 
 /** Brand files one exhibitor may keep at once (logo and artwork together). */
@@ -113,6 +113,10 @@ export function canonicalMimeType(fileName: string, browserMimeType?: string): s
       return 'image/jpeg';
     case '.webp':
       return 'image/webp';
+    case '.heic':
+      return 'image/heic';
+    case '.heif':
+      return 'image/heif';
     case '.cdr':
       return 'application/octet-stream';
     default:

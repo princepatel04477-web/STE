@@ -1418,7 +1418,7 @@ export default function ExhibitorDashboardPage() {
                   type="file"
                   ref={profilePicInputRef}
                   onChange={handleProfilePicUpload}
-                  accept="image/png, image/jpeg, image/jpg, image/webp"
+                  accept="image/png, image/jpeg, image/jpg, image/webp, image/heic, image/heif, .heic, .heif"
                   className="hidden"
                 />
 
@@ -1871,7 +1871,7 @@ export default function ExhibitorDashboardPage() {
                   ref={fileInputRef}
                   type="file"
                   multiple
-                  accept=".png,.jpg,.jpeg,.cdr"
+                  accept=".png,.jpg,.jpeg,.webp,.cdr,.heic,.heif,image/*"
                   onChange={handleFileUpload}
                   className="hidden"
                   id="cdr-logo-file-input"

@@ -1,23 +1,31 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { masterRAF } from "@/hooks/useMasterRAF";
 
 export default function GlobalVisuals() {
+  const pathname = usePathname();
+  const isToolPage = pathname?.startsWith('/exhibitor')
+    || pathname?.startsWith('/admin')
+    || pathname?.startsWith('/stall-allocation');
+
   const [mounted, setMounted] = useState(false);
   const [introDone, setIntroDone] = useState(false);
   const orbitRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Setup mounted state asynchronously to avoid lint warnings
   useEffect(() => {
+    if (isToolPage) return;
     const timer = setTimeout(() => {
       setMounted(true);
     }, 0);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isToolPage]);
 
   // Monitor preloader state
   useEffect(() => {
+    if (isToolPage) return;
     if (typeof window !== "undefined") {
       const checkIntro = () => {
         if (sessionStorage.getItem("ste_intro_seen") === "true") {
@@ -30,10 +38,10 @@ export default function GlobalVisuals() {
       window.addEventListener("ste-intro-done", checkIntro);
       return () => window.removeEventListener("ste-intro-done", checkIntro);
     }
-  }, []);
+  }, [isToolPage]);
 
   useEffect(() => {
-    if (!introDone) return;
+    if (isToolPage || !introDone) return;
 
     // ─── 1. Existing Editorial Setup Logic (Headings, Cards, Images) ───
     const setupElements = () => {
@@ -256,7 +264,7 @@ export default function GlobalVisuals() {
     };
   }, [introDone]);
 
-  if (!mounted) return null;
+  if (!mounted || isToolPage) return null;
 
   return (
     <div className="fixed inset-0 w-full h-full pointer-events-none overflow-hidden z-[1]"

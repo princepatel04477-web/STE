@@ -18,6 +18,7 @@ const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "600", "
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   // Do NOT set maximumScale/userScalable — blocking pinch-zoom is an a11y failure.
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#D4AF37" },

@@ -125,7 +125,14 @@ export default function AllotmentSlipModal({
               <div>
                 <span className="text-slate-400 print:text-slate-500 text-[10px] uppercase font-bold block mb-1">Draw Timestamp</span>
                 <p className="font-mono text-slate-300 print:text-slate-800 text-[11px]">
-                  {new Date(allocation.allocated_at).toLocaleString('en-IN')}
+                  {(() => {
+                    try {
+                      const d = new Date(String(allocation.allocated_at || '').replace(' ', 'T'));
+                      return isNaN(d.getTime()) ? String(allocation.allocated_at) : d.toLocaleString('en-IN');
+                    } catch {
+                      return String(allocation.allocated_at || '—');
+                    }
+                  })()}
                 </p>
                 <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 print:text-emerald-700 font-bold mt-1">
                   <CheckCircle2 className="w-3 h-3" /> Digitally Verified
