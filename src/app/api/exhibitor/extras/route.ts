@@ -3,7 +3,7 @@ import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
-import { checkGstin, normalizeGstin } from '@/lib/gstin';
+import { checkGstin, normalizeGstin, verifyGstinWithPortal } from '@/lib/gstin';
 
 // The write touches Supabase and then the Google Sheet; the platform default is
 // tight enough that a slow Apps Script can abort a request whose data was
@@ -179,6 +179,14 @@ export async function POST(request: Request) {
       const gstinCheck = checkGstin(orderGstin);
       if (!gstinCheck.valid) {
         return NextResponse.json({ error: gstinCheck.reason, field: 'gstin' }, { status: 400 });
+      }
+
+      const portal = await verifyGstinWithPortal(orderGstin);
+      if (portal.checked && portal.active === false) {
+        return NextResponse.json(
+          { error: 'That GSTIN is not active on the GST portal. Please check the number or contact your tax advisor.', field: 'gstin' },
+          { status: 400 }
+        );
       }
     }
 
