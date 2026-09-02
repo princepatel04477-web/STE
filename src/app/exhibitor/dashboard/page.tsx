@@ -1919,7 +1919,53 @@ export default function ExhibitorDashboardPage() {
           </div>
         </section>
 
-        {/* Section 3: Extras Catalog Store */}
+        {/* Section 3: Exhibitor Entry Badges Registration */}
+        <section id="section-badges" className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xs scroll-mt-20 sm:scroll-mt-24">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
+                <Contact className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <span>3. Exhibitor &amp; Staff Badges Registration</span>
+                  <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-amber-200 text-amber-900 border border-amber-300">
+                    Official Form
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500">Register owner, sales staff, and support team badges for official STE 2026 entry passes</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-xl">
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 inline-block shadow-xs">
+                Online Registration Required
+              </span>
+              <h3 className="text-lg sm:text-xl font-extrabold text-white">
+                Submit Your Exhibitor &amp; Staff Badges
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Badges are issued from the official STE 2026 registration portal, not from this
+                dashboard. Complete your team&rsquo;s badge registration there to receive your digital
+                and physical entry passes.
+              </p>
+            </div>
+
+            <a
+              href="https://eventmanagement.isavgo.com/ste2026-registration"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400"
+            >
+              <span>Fill Badge Form</span>
+              <ExternalLink className="w-4 h-4 text-slate-950" />
+            </a>
+          </div>
+        </section>
+
+        {/* Section 4: Extras Catalog Store */}
         <section id="section-extras" className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xs scroll-mt-20 sm:scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
             <div className="flex items-center gap-3">
@@ -1927,7 +1973,7 @@ export default function ExhibitorDashboardPage() {
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900">3. Additional Requirements & Extras</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900">4. Additional Requirements & Extras</h2>
                 <p className="text-xs text-slate-500">Select extra furniture, display fixtures, audio-visual gear, and electrical connections</p>
               </div>
             </div>
@@ -2329,11 +2375,11 @@ export default function ExhibitorDashboardPage() {
           </div>
         </section>
 
-        {/* Section 4: Live Order Summary */}
+        {/* Section 5: Live Order Summary */}
         <section id="section-summary" className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 space-y-6 scroll-mt-20 sm:scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900">4. Overall Requisition Summary</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">5. Overall Requisition Summary</h2>
               <p className="text-xs text-slate-500">Review your booth configuration, fascia details, and extra amenities</p>
             </div>
             {lastSubmittedAt && (
