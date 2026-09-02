@@ -122,7 +122,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "7383001130", brandName: "Reyansh Creation", stallSqft: "100 sq ft", category: "Saree", market: "Globale" },
   { mobile: "9825424890", brandName: "Roots Fabrics", stallSqft: "600 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9829085935", brandName: "Ruby", stallSqft: "300 sq ft", category: "Saree", market: "Globale" },
-  { mobile: "9979691230", brandName: "Rudra Creation", stallSqft: "600 sq ft", category: "Sarees", market: "NTM" },
+  { mobile: "9979691230", brandName: "R.Rudra Creation", stallSqft: "600 sq ft", category: "Sarees", market: "NTM" },
   { mobile: "9737404150", brandName: "Saaj Creations", stallSqft: "100 sq ft", category: "Saree/other", market: "M2" },
   { mobile: "9825130650", brandName: "Sahil Creation", stallSqft: "100 sq ft", category: "Sareee", market: "Raghukul" },
   { mobile: "8980254587", brandName: "Samarth Creations", stallSqft: "200 sq ft", category: "Fabrics", market: "Globale" },

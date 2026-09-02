@@ -339,7 +339,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "",            sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "67",    stallNumber: 67,   brand: "Roots Fabrics", category: "Sarees",
     group: "Saree",                     mobile: "9825424890",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "68",    stallNumber: 68,   brand: "Rudra Creation", category: "Sarees",
+  { unitId: "68",    stallNumber: 68,   brand: "R.Rudra Creation", category: "Sarees",
     group: "Saree",                     mobile: "9979691230",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "69",    stallNumber: 69,   brand: "Vani Designer", category: "Sarees",
     group: "Saree",                     mobile: "9328539215",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: false },
