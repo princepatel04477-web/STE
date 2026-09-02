@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { getStallPackageBySqft, STALL_PACKAGES, StallPackage } from '@/data/stallPackages';
 import { getProductImage, DISCLAIMER_TEXT } from '@/data/productImages';
 import BillModal from '@/components/extras/BillModal';
+import { checkGstin, isValidGstin, normalizeGstin } from '@/lib/gstin';
 import {
   Building2,
   Phone,
@@ -54,9 +55,6 @@ import {
 } from 'lucide-react';
 
 const STRICT_CUTOFF_DATE = '5th September 2026, 12:00 PM';
-
-/** Standard 15-character GSTIN, e.g. 24AAAAA1111A1Z1. */
-const GSTIN_PATTERN = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
 /**
  * Brand files one exhibitor may keep. Mirrors MAX_ASSETS_PER_EXHIBITOR in
@@ -111,6 +109,7 @@ interface ProfileSavePayload {
 
 interface ExtrasSavePayload {
   exhibitor_name: string;
+  gstin: string;
   items: OrderItem[];
   special_notes: string;
   rental_days: number;
@@ -515,13 +514,30 @@ export default function ExhibitorDashboardPage() {
    * Keeps the box to the shape of a GSTIN as it is typed: upper case,
    * alphanumeric, fifteen characters. The server checks the format again.
    */
+  const totalSelectedItemsCount = Object.values(quantities).reduce((a, b) => a + b, 0);
+
   const handleGstinChange = (value: string) => {
-    setGstin(value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15));
+    setGstin(normalizeGstin(value));
     if (gstinError) setGstinError('');
   };
 
-  /** Empty is fine — a GSTIN is optional. A part-typed one is not. */
-  const gstinIsUsable = gstin === '' || GSTIN_PATTERN.test(gstin);
+  /**
+   * Extras are chargeable, so ordering one turns the GST number from a nicety
+   * into the thing the invoice is raised against. Someone ordering nothing is
+   * still free to leave it blank.
+   */
+  const gstinRequired = totalSelectedItemsCount > 0;
+  const gstinIsComplete = isValidGstin(gstin);
+
+  /** Why the GSTIN as it stands would be refused, or '' if it would not be. */
+  const gstinProblem = (): string => {
+    if (!gstin) {
+      return gstinRequired
+        ? 'Your GST number is required for an order of extra items. Add it here, or remove the extras.'
+        : '';
+    }
+    return checkGstin(gstin).reason || '';
+  };
 
   const buildProfilePayload = (): ProfileSavePayload => ({
     exhibitor_name: exhibitorName.trim(),
@@ -547,6 +563,7 @@ export default function ExhibitorDashboardPage() {
 
   const buildExtrasPayload = (): ExtrasSavePayload => ({
     exhibitor_name: exhibitorName.trim(),
+    gstin,
     items: buildSelectedItems(),
     special_notes: specialNotes,
     rental_days: 2
@@ -577,9 +594,13 @@ export default function ExhibitorDashboardPage() {
     if (!isInitializedRef.current || initialLoading) return;
 
     const profilePayload = buildProfilePayload();
-    // The order write is rejected without a name, so hold it back rather than
-    // flashing a save error at someone still filling the form in.
-    const extrasPayload = exhibitorName.trim() ? buildExtrasPayload() : null;
+    // The order write is rejected without a name, and again without a GSTIN
+    // once there are extras on it, so hold it back rather than flashing a save
+    // error at someone still filling the form in.
+    const extrasPayload =
+      exhibitorName.trim() && !(gstinRequired && !gstinIsComplete)
+        ? buildExtrasPayload()
+        : null;
 
     latestPayloadRef.current = { profile: profilePayload, extras: extrasPayload };
     hasUnsavedEditsRef.current = true;
@@ -587,6 +608,19 @@ export default function ExhibitorDashboardPage() {
 
     if (autosaveTimeoutRef.current) {
       clearTimeout(autosaveTimeoutRef.current);
+    }
+
+    // A GSTIN is invalid for the first fourteen of its fifteen characters, and
+    // the profile route refuses one that does not check out. Sending each
+    // keystroke would paint a save error over somebody who is simply still
+    // typing, so wait until the box is either right or empty. The draft
+    // remembered just above keeps the edit safe in the meantime.
+    if (gstin !== '' && !gstinIsComplete) {
+      return () => {
+        if (autosaveTimeoutRef.current) {
+          clearTimeout(autosaveTimeoutRef.current);
+        }
+      };
     }
 
     autosaveTimeoutRef.current = setTimeout(async () => {
@@ -867,9 +901,11 @@ export default function ExhibitorDashboardPage() {
       return;
     }
 
-    if (!gstinIsUsable) {
-      setGstinError('Enter the full 15-character GSTIN, or leave it blank.');
+    const profileGstinProblem = gstinProblem();
+    if (profileGstinProblem) {
+      setGstinError(profileGstinProblem);
       document.getElementById('section-summary')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('exhibitor-gstin')?.focus({ preventScroll: true });
       return;
     }
 
@@ -942,11 +978,14 @@ export default function ExhibitorDashboardPage() {
     }
     setNameError('');
 
-    // A GSTIN half typed and forgotten would reach the organiser's invoice as
-    // a number they cannot bill against, so it stops the submission.
-    if (!gstinIsUsable) {
-      setGstinError('Enter the full 15-character GSTIN, or leave it blank.');
+    // An order of extras is an order for an invoice, and an invoice needs a
+    // GSTIN that is real. A missing or mistyped one stops the submission here
+    // rather than at the server, which would say the same thing more slowly.
+    const submitGstinProblem = gstinProblem();
+    if (submitGstinProblem) {
+      setGstinError(submitGstinProblem);
       document.getElementById('section-summary')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('exhibitor-gstin')?.focus({ preventScroll: true });
       return;
     }
     setGstinError('');
@@ -1040,8 +1079,6 @@ export default function ExhibitorDashboardPage() {
       p.category.toLowerCase().includes(searchFilter.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
-  const totalSelectedItemsCount = Object.values(quantities).reduce((a, b) => a + b, 0);
 
   if (initialLoading) {
     return (
@@ -1238,6 +1275,43 @@ export default function ExhibitorDashboardPage() {
             <span>Cutoff: {STRICT_CUTOFF_DATE}</span>
           </div>
         </div>
+
+        {/* Extras ordered with no usable GSTIN — the one thing holding up the order */}
+        {gstinRequired && !gstinIsComplete && (
+          <div
+            role="alert"
+            className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
+          >
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-xl bg-red-100 text-red-700 border border-red-300 shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-extrabold text-red-900">
+                  Your GST number is missing
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-700 font-medium mt-0.5 max-w-2xl leading-relaxed">
+                  You have {totalSelectedItemsCount} extra item{totalSelectedItemsCount === 1 ? '' : 's'} on
+                  order. Extras are billed to you, so your requirements{' '}
+                  <strong className="text-red-800 font-black">cannot be submitted</strong> until a valid
+                  GSTIN is on record — and it must be in before {STRICT_CUTOFF_DATE}.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                document.getElementById('section-summary')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('exhibitor-gstin')?.focus({ preventScroll: true });
+              }}
+              className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-red-600"
+            >
+              <span>Add GST number</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
         {/* Stall banner: the draw before it is run, the stall itself after */}
         <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-amber-500/40 rounded-2xl p-5 sm:p-6 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg relative overflow-hidden">
@@ -2468,20 +2542,32 @@ export default function ExhibitorDashboardPage() {
           </div>
 
           {/* Billing GSTIN — the exhibitor's own number, printed on their bill */}
-          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-xs">
+          <div
+            className={`p-4 sm:p-5 rounded-xl border shadow-xs transition-colors ${
+              gstinRequired && !gstinIsComplete
+                ? 'bg-amber-50 border-amber-300'
+                : 'bg-white border-slate-200'
+            }`}
+          >
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
               <div>
                 <span className="text-xs text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
                   <Receipt className="w-3.5 h-3.5 text-amber-700" />
                   Your GST Number
-                  <span className="text-[10px] font-bold text-slate-400 normal-case tracking-normal">
-                    (optional)
-                  </span>
+                  {gstinRequired ? (
+                    <span className="text-[10px] font-black text-red-700 normal-case tracking-normal">
+                      (required for extras)
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold text-slate-400 normal-case tracking-normal">
+                      (optional)
+                    </span>
+                  )}
                 </span>
                 <p className="text-xs text-slate-500 mt-1 max-w-md leading-relaxed">
-                  Add your firm&rsquo;s GSTIN and it is printed on your extras tax bill,
-                  so the invoice can be claimed against your own GST. Leave it blank
-                  if you would rather be billed without one.
+                  {gstinRequired
+                    ? 'Extra items are billed to you, so your firm’s GSTIN is needed before this order can be submitted. It is printed on your tax bill, which is what lets you claim the GST back.'
+                    : 'Add your firm’s GSTIN and it is printed on your extras tax bill, so the invoice can be claimed against your own GST. It becomes compulsory as soon as you order an extra item.'}
                 </p>
               </div>
 
@@ -2498,14 +2584,18 @@ export default function ExhibitorDashboardPage() {
                   maxLength={15}
                   value={gstin}
                   onChange={(e) => handleGstinChange(e.target.value)}
-                  placeholder="e.g. 24AAAAA1111A1Z1"
+                  placeholder="e.g. 24AFOFS4061C1Z3"
+                  required={gstinRequired}
+                  aria-required={gstinRequired || undefined}
                   aria-invalid={gstinError ? true : undefined}
                   aria-describedby={gstinError ? 'exhibitor-gstin-error' : 'exhibitor-gstin-hint'}
                   className={`w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border font-mono text-sm tracking-wider text-slate-900 placeholder-slate-400 uppercase focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                     gstinError
                       ? 'border-red-400 focus:ring-red-500/40 focus:border-red-500'
-                      : GSTIN_PATTERN.test(gstin)
+                      : gstinIsComplete
                       ? 'border-emerald-400 focus:ring-emerald-500/40 focus:border-emerald-500'
+                      : gstinRequired
+                      ? 'border-amber-400 focus:ring-amber-500/50 focus:border-amber-500'
                       : 'border-slate-300 focus:ring-amber-500/50 focus:border-amber-500'
                   }`}
                 />
@@ -2515,10 +2605,15 @@ export default function ExhibitorDashboardPage() {
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     <span>{gstinError}</span>
                   </p>
-                ) : GSTIN_PATTERN.test(gstin) ? (
+                ) : gstinIsComplete ? (
                   <p id="exhibitor-gstin-hint" className="mt-1.5 text-[11px] font-bold text-emerald-700 flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                     <span>Valid GSTIN — it will appear on your bill</span>
+                  </p>
+                ) : gstin.length === 15 ? (
+                  <p id="exhibitor-gstin-hint" className="mt-1.5 text-[11px] font-bold text-red-700 flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{checkGstin(gstin).reason}</span>
                   </p>
                 ) : (
                   <p id="exhibitor-gstin-hint" className="mt-1.5 text-[11px] text-slate-500 font-medium">
@@ -2588,6 +2683,11 @@ export default function ExhibitorDashboardPage() {
                 <span className="text-slate-500 ml-1.5 hidden xs:inline">
                   • {totalSelectedItemsCount} extra{totalSelectedItemsCount === 1 ? '' : 's'}
                 </span>
+                {gstinRequired && !gstinIsComplete && (
+                  <span className="ml-1.5 text-red-700 font-black whitespace-nowrap">
+                    • GST number needed
+                  </span>
+                )}
               </div>
             </div>
 
@@ -2692,7 +2792,7 @@ export default function ExhibitorDashboardPage() {
         mobile={mobile}
         stallSqft={selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : '200 sq ft') : `${selectedSqftOption} sq ft`}
         fasciaNames={fasciaNames}
-        gstin={GSTIN_PATTERN.test(gstin) ? gstin : ''}
+        gstin={gstinIsComplete ? gstin : ''}
         items={products
           .filter((p) => (quantities[p.id] || 0) > 0)
           .map((p) => ({

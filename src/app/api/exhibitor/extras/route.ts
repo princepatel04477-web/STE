@@ -3,6 +3,7 @@ import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
+import { checkGstin, normalizeGstin } from '@/lib/gstin';
 
 // The write touches Supabase and then the Google Sheet; the platform default is
 // tight enough that a slow Apps Script can abort a request whose data was
@@ -102,6 +103,38 @@ async function lookupStoredExhibitorName(mobile: string): Promise<string> {
   return (local?.exhibitor_name || '').trim();
 }
 
+/**
+ * The GSTIN already stored against this exhibitor. Supabase keeps it inside
+ * the structured fascia payload; the local store keeps it in its own column.
+ */
+async function lookupStoredGstin(mobile: string): Promise<string> {
+  if (isSupabaseConfigured && supabaseAdmin) {
+    try {
+      const { data: sbProfile } = await supabaseAdmin
+        .from('exhibitors')
+        .select('fascia_names_json')
+        .eq('mobile', mobile)
+        .maybeSingle();
+
+      const rawPayload = sbProfile?.fascia_names_json;
+      if (rawPayload) {
+        const parsed = typeof rawPayload === 'string' ? JSON.parse(rawPayload) : rawPayload;
+        if (parsed && !Array.isArray(parsed) && typeof parsed === 'object' && parsed.gstin) {
+          return normalizeGstin(parsed.gstin);
+        }
+      }
+    } catch (err) {
+      console.warn('[Extras POST] GSTIN lookup fell back to local store:', err);
+    }
+  }
+
+  const local = db
+    .prepare('SELECT gstin FROM exhibitors WHERE mobile = ?')
+    .get(mobile) as { gstin?: string } | undefined;
+
+  return normalizeGstin(local?.gstin || '');
+}
+
 export async function POST(request: Request) {
   try {
     const session = await getAuthenticatedExhibitor();
@@ -128,6 +161,25 @@ export async function POST(request: Request) {
         { error: 'Your name is required before submitting your requirements.' },
         { status: 400 }
       );
+    }
+
+    // Extras are chargeable, so an order for them is an order for an invoice,
+    // and an invoice needs the GSTIN it is raised against. An order with no
+    // items is somebody clearing their basket, which needs nothing.
+    if (items.length > 0) {
+      const orderGstin = normalizeGstin(body.gstin) || (await lookupStoredGstin(session.mobile));
+
+      if (!orderGstin) {
+        return NextResponse.json(
+          { error: 'Your GST number is required before ordering extra items. Add it in the requisition summary.', field: 'gstin' },
+          { status: 400 }
+        );
+      }
+
+      const gstinCheck = checkGstin(orderGstin);
+      if (!gstinCheck.valid) {
+        return NextResponse.json({ error: gstinCheck.reason, field: 'gstin' }, { status: 400 });
+      }
     }
 
     const itemsJson = JSON.stringify(items);

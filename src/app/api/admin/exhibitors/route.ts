@@ -9,6 +9,7 @@ import {
   canonicalMobile,
 } from '@/data/registeredExhibitors';
 import { getAuthenticatedExhibitor, isAdminMobile } from '@/lib/auth';
+import { isValidGstin } from '@/lib/gstin';
 
 export async function GET() {
   try {
@@ -328,6 +329,11 @@ export async function GET() {
 
       formattedList.push({
         ...row,
+        // Extras are chargeable, so an order without a usable GSTIN is an
+        // invoice the organiser cannot raise properly. Flagged here so the
+        // console can list who still has to be chased for one.
+        gstin_missing:
+          items.length > 0 && !isValidGstin(exhibitorGstin) && !ORGANISER_MOBILES.includes(mob),
         portal_filled: hasFilledPortal(row),
         // The two organiser logins are not exhibitors, so they are left out of
         // the portal-filled tally and of the list of people to chase.
@@ -350,6 +356,8 @@ export async function GET() {
       portalFilledCount: formattedList.filter(
         (e) => e.portal_filled && !ORGANISER_MOBILES.includes(e.mobile)
       ).length,
+      // Exhibitors carrying extras with no usable GSTIN against them.
+      gstinMissingCount: formattedList.filter((e) => e.gstin_missing).length,
       portalPendingCount: formattedList.filter(
         (e) => !e.portal_filled && !ORGANISER_MOBILES.includes(e.mobile)
       ).length,

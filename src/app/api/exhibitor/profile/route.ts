@@ -8,14 +8,12 @@ import {
   resolveAndRecordStall,
   StallLookupUnavailableError,
 } from '@/lib/stallAssignment';
+import { checkGstin, normalizeGstin, verifyGstinWithPortal } from '@/lib/gstin';
 
 // The write touches Supabase and then the Google Sheet; the platform default is
 // tight enough that a slow Apps Script can abort a request whose data was
 // already saved, which the portal then reports as a failed save.
 export const maxDuration = 30;
-
-/** Standard 15-character GSTIN, e.g. 24AAAAA1111A1Z1. */
-const GSTIN_PATTERN = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
 export async function GET() {
   try {
@@ -202,18 +200,32 @@ export async function POST(request: Request) {
     const cleanExhibitorName = typeof exhibitor_name === 'string' ? exhibitor_name.trim() : '';
     const cleanCompanyDesc = typeof company_description === 'string' ? company_description.trim().slice(0, 400) : '';
 
-    // The exhibitor's own GSTIN, which their extras bill is raised against. It
-    // is optional — plenty of firms bill without one — but a value that is
-    // present has to be a real GSTIN, or the bill carries a number the
-    // organiser cannot claim input credit against.
-    const rawGstin = typeof gstin === 'string' ? gstin.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15) : '';
-    if (rawGstin && !GSTIN_PATTERN.test(rawGstin)) {
-      return NextResponse.json(
-        { error: 'That GSTIN is not valid. It must be 15 characters, e.g. 24AAAAA1111A1Z1.' },
-        { status: 400 }
-      );
+    // The exhibitor's own GSTIN, which their extras bill is raised against.
+    // Whether it is required is decided where the order is saved — extras
+    // cannot be ordered without one. Here it only has to be real if given:
+    // shape, state code and check digit, so a mistyped number cannot reach an
+    // invoice the organiser can claim no input credit against.
+    const cleanGstin = normalizeGstin(gstin);
+    if (cleanGstin) {
+      const gstinCheck = checkGstin(cleanGstin);
+      if (!gstinCheck.valid) {
+        return NextResponse.json({ error: gstinCheck.reason, field: 'gstin' }, { status: 400 });
+      }
+
+      // Where a verification service is configured, a number that passes every
+      // offline check but is not actually registered is turned away too. With
+      // none configured this returns unchecked and changes nothing.
+      const portal = await verifyGstinWithPortal(cleanGstin);
+      if (portal.checked && portal.active === false) {
+        return NextResponse.json(
+          { error: 'The GST portal does not show that GSTIN as active. Please check it against your GST certificate.', field: 'gstin' },
+          { status: 400 }
+        );
+      }
+      if (!portal.checked && portal.note && process.env.GST_VERIFY_API_URL) {
+        console.warn('[Profile POST] GSTIN portal check skipped:', portal.note);
+      }
     }
-    const cleanGstin = rawGstin;
     
     // Sanitize dynamic fascia names options (up to 4, minimum 2)
     let cleanFasciaNames: string[] = ['', ''];

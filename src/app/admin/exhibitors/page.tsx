@@ -84,6 +84,10 @@ interface ExhibitorRecord {
   drive_file_url?: string;
   drive_folder_url?: string;
   rental_days?: number;
+  /** The exhibitor's own GSTIN, as given on their extras bill. */
+  gstin?: string;
+  /** Extras ordered with no usable GSTIN against them — somebody to chase. */
+  gstin_missing?: boolean;
   /** They have put something of their own into the portal. */
   portal_filled?: boolean;
   /** One of the two organiser logins, not an exhibitor. */
@@ -107,6 +111,7 @@ type FilterTab =
   | 'portal-pending'
   | 'with-extras'
   | 'no-extras'
+  | 'gstin-missing'
   | 'with-artwork'
   | 'stall-drawn';
 type DensityMode = 'comfortable' | 'compact';
@@ -263,6 +268,7 @@ export default function AdminExhibitorsPage() {
       if (activeTab === 'portal-pending' && (ex.portal_filled || ex.is_organiser)) return false;
       if (activeTab === 'with-extras' && (!ex.items || ex.items.length === 0)) return false;
       if (activeTab === 'no-extras' && ex.items && ex.items.length > 0) return false;
+      if (activeTab === 'gstin-missing' && !ex.gstin_missing) return false;
       if (
         activeTab === 'with-artwork' &&
         !ex.cdr_file_url &&
@@ -293,11 +299,13 @@ export default function AdminExhibitorsPage() {
     const stallDrawn = exhibitors.filter((e) => !!e.stall_number).length;
     const onlyExhibitors = exhibitors.filter((e) => !e.is_organiser);
     const portalFilled = onlyExhibitors.filter((e) => e.portal_filled).length;
+    const gstinMissing = exhibitors.filter((e) => e.gstin_missing).length;
     return {
       all: exhibitors.length,
       portalFilled,
       portalPending: onlyExhibitors.length - portalFilled,
       withExtras,
+      gstinMissing,
       noExtras: exhibitors.length - withExtras,
       withArtwork,
       stallDrawn
@@ -318,6 +326,7 @@ export default function AdminExhibitorsPage() {
       'Stall Number',
       'Stall Hall',
       'Fascia Names',
+      'GST Number',
       'Extras Requirements',
       'Vector CDR URL',
       'Logo URL',
@@ -347,6 +356,7 @@ export default function AdminExhibitorsPage() {
         ex.stall_number || 'Not Drawn',
         ex.stall_hall || '',
         fasciaStr || ex.brand_name,
+        ex.gstin || (ex.gstin_missing ? 'MISSING' : ''),
         extrasStr,
         ex.cdr_file_url || '',
         ex.logo_file_url || '',
@@ -725,6 +735,20 @@ export default function AdminExhibitorsPage() {
                 }`}
               >
                 Extras Ordered ({tabCounts.withExtras})
+              </button>
+
+              <button
+                onClick={() => setActiveTab('gstin-missing')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  activeTab === 'gstin-missing'
+                    ? 'bg-red-600 text-white shadow-xs'
+                    : tabCounts.gstinMissing > 0
+                    ? 'bg-red-100 hover:bg-red-200 text-red-800 border border-red-300'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+                title="Ordered extras but has given no valid GST number"
+              >
+                GST Missing ({tabCounts.gstinMissing})
               </button>
 
               <button
