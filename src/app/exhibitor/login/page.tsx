@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Lock, Phone, ArrowRight, ShieldCheck, Sparkles, Building2, Crown, Store, KeyRound, CheckCircle2, X } from 'lucide-react';
+import { Lock, Phone, ArrowRight, ShieldCheck, Sparkles, Building2, Crown, Store, KeyRound, CheckCircle2, X, Headset } from 'lucide-react';
 
 export default function ExhibitorLoginPage() {
   const router = useRouter();
@@ -229,6 +229,24 @@ export default function ExhibitorLoginPage() {
               </button>
             </div>
           </form>
+
+          {/* Website help desk — portal problems only, not event enquiries */}
+          <div className="mt-8 rounded-xl bg-amber-50 border border-amber-200 p-4 text-center">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-amber-800">
+              <Headset className="w-3.5 h-3.5 text-amber-700" />
+              Website Help Desk
+            </span>
+            <a
+              href="tel:9106139666"
+              className="mt-1 block font-mono text-xl font-black text-slate-900 hover:text-amber-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-500 rounded-sm"
+            >
+              9106139666
+            </a>
+            <p className="mt-1.5 text-[11px] text-slate-600 font-medium leading-snug">
+              For website queries only — trouble logging in, or a page that will not
+              load. Stall, payment and event questions go to the STE 2026 organisers.
+            </p>
+          </div>
 
           <div className="mt-8 border-t border-neutral-800/80 pt-6 text-center text-xs text-neutral-500 flex justify-center items-center gap-2">
             <Building2 className="w-4 h-4 text-neutral-400" />
