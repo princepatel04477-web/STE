@@ -31,6 +31,8 @@ interface BillModalProps {
   fasciaNames?: string[];
   days?: number;
   items: InvoiceItem[];
+  /** The exhibitor's own GSTIN, if they have given one. */
+  gstin?: string;
 }
 
 export default function BillModal({
@@ -41,6 +43,7 @@ export default function BillModal({
   stallSqft = "200 sq ft",
   fasciaNames,
   items = [],
+  gstin = "",
 }: BillModalProps) {
   const [mounted, setMounted] = useState(false);
   const [downloadingDocx, setDownloadingDocx] = useState(false);
@@ -82,6 +85,7 @@ export default function BillModal({
         mobile,
         stall_sqft: stallSqft,
         fascia_names: fasciaNames || [],
+        gstin,
         items: items.map((i) => ({
           code: i.code || "DP",
           name: i.name,
@@ -309,6 +313,19 @@ export default function BillModal({
                     <p>
                       <span className="text-slate-500">Mobile No:</span>{" "}
                       <strong className="font-mono text-slate-950">{mobile}</strong>
+                    </p>
+                  )}
+                  {gstin ? (
+                    <p>
+                      <span className="text-slate-500">GSTIN:</span>{" "}
+                      <strong className="font-mono text-amber-800">{gstin}</strong>
+                    </p>
+                  ) : (
+                    <p className="print:hidden">
+                      <span className="text-slate-500">GSTIN:</span>{" "}
+                      <span className="text-slate-400 italic">
+                        Not given — add it in the requisition summary
+                      </span>
                     </p>
                   )}
                   <p>

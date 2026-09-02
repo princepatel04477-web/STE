@@ -35,6 +35,7 @@ import {
   Check,
   X,
   FileText,
+  Receipt,
   Store,
   Calendar,
   ArrowRight,
@@ -53,6 +54,9 @@ import {
 } from 'lucide-react';
 
 const STRICT_CUTOFF_DATE = '5th September 2026, 12:00 PM';
+
+/** Standard 15-character GSTIN, e.g. 24AAAAA1111A1Z1. */
+const GSTIN_PATTERN = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
 /**
  * Brand files one exhibitor may keep. Mirrors MAX_ASSETS_PER_EXHIBITOR in
@@ -99,6 +103,7 @@ interface OrderItem {
 interface ProfileSavePayload {
   exhibitor_name: string;
   company_description: string;
+  gstin: string;
   brand_name: string;
   stall_sqft: string;
   fascia_names: string[];
@@ -180,6 +185,10 @@ export default function ExhibitorDashboardPage() {
   const [exhibitorName, setExhibitorName] = useState('');
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
   const [companyDescription, setCompanyDescription] = useState('');
+  // The exhibitor's own GSTIN for their extras bill. Optional, so an empty box
+  // is a valid answer; a filled one has to be a real GSTIN.
+  const [gstin, setGstin] = useState('');
+  const [gstinError, setGstinError] = useState('');
   const [brandName, setBrandName] = useState('');
   const [category, setCategory] = useState('');
   const [market, setMarket] = useState('');
@@ -302,6 +311,7 @@ export default function ExhibitorDashboardPage() {
 
     if (typeof profile.exhibitor_name === 'string') setExhibitorName(profile.exhibitor_name);
     if (typeof profile.company_description === 'string') setCompanyDescription(profile.company_description);
+    if (typeof profile.gstin === 'string') setGstin(profile.gstin);
     if (typeof profile.brand_name === 'string' && profile.brand_name) setBrandName(profile.brand_name);
 
     if (typeof profile.stall_sqft === 'string' && profile.stall_sqft) {
@@ -412,6 +422,7 @@ export default function ExhibitorDashboardPage() {
       setExhibitorName(profData.exhibitor_name || '');
       setProfilePicUrl(profData.profile_pic_url || null);
       setCompanyDescription(profData.company_description || '');
+      setGstin(profData.gstin || '');
       setCategory(profData.category || '');
       setMarket(profData.market || '');
       setStallNumber(profData.stall_number || '');
@@ -500,9 +511,22 @@ export default function ExhibitorDashboardPage() {
         : 'Other'
       : selectedSqftOption;
 
+  /**
+   * Keeps the box to the shape of a GSTIN as it is typed: upper case,
+   * alphanumeric, fifteen characters. The server checks the format again.
+   */
+  const handleGstinChange = (value: string) => {
+    setGstin(value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15));
+    if (gstinError) setGstinError('');
+  };
+
+  /** Empty is fine — a GSTIN is optional. A part-typed one is not. */
+  const gstinIsUsable = gstin === '' || GSTIN_PATTERN.test(gstin);
+
   const buildProfilePayload = (): ProfileSavePayload => ({
     exhibitor_name: exhibitorName.trim(),
     company_description: companyDescription.trim(),
+    gstin,
     brand_name: brandName,
     stall_sqft: buildFinalSqft(),
     fascia_names: fasciaNames
@@ -600,6 +624,7 @@ export default function ExhibitorDashboardPage() {
   }, [
     exhibitorName,
     companyDescription,
+    gstin,
     brandName,
     selectedSqftOption,
     customSqft,
@@ -842,6 +867,12 @@ export default function ExhibitorDashboardPage() {
       return;
     }
 
+    if (!gstinIsUsable) {
+      setGstinError('Enter the full 15-character GSTIN, or leave it blank.');
+      document.getElementById('section-summary')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
     setProfileSaving(true);
     setProfileSuccessMsg('');
     setProfileError('');
@@ -910,6 +941,15 @@ export default function ExhibitorDashboardPage() {
       return;
     }
     setNameError('');
+
+    // A GSTIN half typed and forgotten would reach the organiser's invoice as
+    // a number they cannot bill against, so it stops the submission.
+    if (!gstinIsUsable) {
+      setGstinError('Enter the full 15-character GSTIN, or leave it blank.');
+      document.getElementById('section-summary')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    setGstinError('');
 
     // A pending autosave holds the same edits. Cancel it so it cannot fire
     // behind this submission and race it against the same row.
@@ -2427,6 +2467,68 @@ export default function ExhibitorDashboardPage() {
             </div>
           </div>
 
+          {/* Billing GSTIN — the exhibitor's own number, printed on their bill */}
+          <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+              <div>
+                <span className="text-xs text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <Receipt className="w-3.5 h-3.5 text-amber-700" />
+                  Your GST Number
+                  <span className="text-[10px] font-bold text-slate-400 normal-case tracking-normal">
+                    (optional)
+                  </span>
+                </span>
+                <p className="text-xs text-slate-500 mt-1 max-w-md leading-relaxed">
+                  Add your firm&rsquo;s GSTIN and it is printed on your extras tax bill,
+                  so the invoice can be claimed against your own GST. Leave it blank
+                  if you would rather be billed without one.
+                </p>
+              </div>
+
+              <div className="w-full sm:w-72 shrink-0">
+                <label htmlFor="exhibitor-gstin" className="sr-only">
+                  Your firm&rsquo;s GSTIN
+                </label>
+                <input
+                  id="exhibitor-gstin"
+                  type="text"
+                  inputMode="text"
+                  autoComplete="off"
+                  spellCheck={false}
+                  maxLength={15}
+                  value={gstin}
+                  onChange={(e) => handleGstinChange(e.target.value)}
+                  placeholder="e.g. 24AAAAA1111A1Z1"
+                  aria-invalid={gstinError ? true : undefined}
+                  aria-describedby={gstinError ? 'exhibitor-gstin-error' : 'exhibitor-gstin-hint'}
+                  className={`w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border font-mono text-sm tracking-wider text-slate-900 placeholder-slate-400 uppercase focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                    gstinError
+                      ? 'border-red-400 focus:ring-red-500/40 focus:border-red-500'
+                      : GSTIN_PATTERN.test(gstin)
+                      ? 'border-emerald-400 focus:ring-emerald-500/40 focus:border-emerald-500'
+                      : 'border-slate-300 focus:ring-amber-500/50 focus:border-amber-500'
+                  }`}
+                />
+
+                {gstinError ? (
+                  <p id="exhibitor-gstin-error" className="mt-1.5 text-[11px] font-bold text-red-700 flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{gstinError}</span>
+                  </p>
+                ) : GSTIN_PATTERN.test(gstin) ? (
+                  <p id="exhibitor-gstin-hint" className="mt-1.5 text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                    <span>Valid GSTIN — it will appear on your bill</span>
+                  </p>
+                ) : (
+                  <p id="exhibitor-gstin-hint" className="mt-1.5 text-[11px] text-slate-500 font-medium">
+                    {gstin ? `${gstin.length} / 15 characters` : '15 characters, saved with your requirements'}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Selected Extra Items Breakdown */}
           {totalSelectedItemsCount > 0 && (
             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
@@ -2590,6 +2692,7 @@ export default function ExhibitorDashboardPage() {
         mobile={mobile}
         stallSqft={selectedSqftOption === 'Other' ? (customSqft ? `${customSqft} sq ft` : '200 sq ft') : `${selectedSqftOption} sq ft`}
         fasciaNames={fasciaNames}
+        gstin={GSTIN_PATTERN.test(gstin) ? gstin : ''}
         items={products
           .filter((p) => (quantities[p.id] || 0) > 0)
           .map((p) => ({

@@ -258,6 +258,7 @@ export async function GET() {
       let exhibitorName = dbEx?.exhibitor_name || '';
       let profilePicUrl = dbEx?.profile_pic_url || null;
       let companyDescription = dbEx?.company_description || '';
+      let exhibitorGstin = dbEx?.gstin || '';
       let fasciaNames = ['', '', '', ''];
 
       if (dbEx?.fascia_names_json) {
@@ -272,6 +273,7 @@ export async function GET() {
             if (parsed.exhibitor_name && !exhibitorName) exhibitorName = parsed.exhibitor_name;
             if (parsed.profile_pic_url && !profilePicUrl) profilePicUrl = parsed.profile_pic_url;
             if (parsed.company_description && !companyDescription) companyDescription = parsed.company_description;
+            if (parsed.gstin && !exhibitorGstin) exhibitorGstin = parsed.gstin;
           }
         } catch {}
       } else {
@@ -304,6 +306,7 @@ export async function GET() {
         exhibitor_name: exhibitorName,
         profile_pic_url: profilePicUrl,
         company_description: companyDescription,
+        gstin: exhibitorGstin,
         stall_sqft: stallSqft,
         // The draw is the record; the copy on the profile answers when a
         // stall was seated by hand rather than drawn.

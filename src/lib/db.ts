@@ -69,6 +69,8 @@ export interface ExhibitorRecord {
   exhibitor_name?: string;
   profile_pic_url?: string;
   company_description?: string;
+  /** The exhibitor's own GSTIN, for the extras bill. Theirs, not the event's. */
+  gstin?: string;
   custom_password?: string;
   fascia_names_json?: string;
   logo_file_url?: string;
@@ -247,6 +249,7 @@ export const db = {
               exhibitor_name: ex.exhibitor_name ?? '',
               profile_pic_url: ex.profile_pic_url ?? null,
               company_description: ex.company_description ?? '',
+              gstin: ex.gstin ?? '',
               fascia_names_json: ex.fascia_names_json ?? null,
               logo_file_url: ex.logo_file_url ?? null,
               cdr_file_url: ex.cdr_file_url ?? null,
@@ -339,13 +342,14 @@ export const db = {
           }
 
           // Full Profile Update
-          // Handles: UPDATE exhibitors SET brand_name = ?, stall_sqft = ?, fascia_names_json = ?, exhibitor_name = ?, company_description = ?, updated_at = ... WHERE mobile = ?
+          // Handles: UPDATE exhibitors SET brand_name = ?, stall_sqft = ?, fascia_names_json = ?, exhibitor_name = ?, company_description = ?, gstin = ?, updated_at = ... WHERE mobile = ?
           const mobile = String(args[args.length - 1]);
           let brand_name = '';
           let stall_sqft = '';
           let fascia_names_json: string | undefined = undefined;
           let exhibitor_name: string | undefined = undefined;
           let company_description: string | undefined = undefined;
+          let gstin: string | undefined = undefined;
 
           if (args.length >= 6) {
             brand_name = String(args[0] || '');
@@ -353,6 +357,9 @@ export const db = {
             fascia_names_json = String(args[2] || '');
             exhibitor_name = String(args[3] || '');
             company_description = String(args[4] || '');
+            // The GSTIN column joined this statement later, so a six-argument
+            // call is the older shape and simply carries no GSTIN.
+            if (args.length >= 7) gstin = String(args[5] || '');
           } else if (args.length === 4) {
             brand_name = String(args[0] || '');
             stall_sqft = String(args[1] || '');
@@ -369,6 +376,7 @@ export const db = {
             if (fascia_names_json !== undefined) ex.fascia_names_json = fascia_names_json;
             if (exhibitor_name !== undefined) ex.exhibitor_name = exhibitor_name;
             if (company_description !== undefined) ex.company_description = company_description;
+            if (gstin !== undefined) ex.gstin = gstin;
             ex.updated_at = new Date().toISOString();
           } else {
             data.exhibitors.push({
@@ -379,6 +387,7 @@ export const db = {
               fascia_names_json,
               exhibitor_name: exhibitor_name || '',
               company_description: company_description || '',
+              gstin: gstin || '',
               updated_at: new Date().toISOString()
             });
           }
@@ -393,6 +402,7 @@ export const db = {
           const fascia_names_json = args[3] ? String(args[3]) : undefined;
           const exhibitor_name = args[4] ? String(args[4]) : undefined;
           const company_description = args[5] ? String(args[5]) : undefined;
+          const gstin = args[6] ? String(args[6]) : undefined;
           data.exhibitors.push({
             id: data.exhibitors.length + 1,
             mobile,
@@ -401,6 +411,7 @@ export const db = {
             fascia_names_json,
             exhibitor_name: exhibitor_name || '',
             company_description: company_description || '',
+            gstin: gstin || '',
             updated_at: new Date().toISOString()
           });
           saveData(data);

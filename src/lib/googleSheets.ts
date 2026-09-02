@@ -3,6 +3,8 @@ export interface SyncPayload {
   exhibitor_name?: string;
   profile_pic_url?: string;
   company_description?: string;
+  /** The exhibitor's own GSTIN, taken on the extras bill. */
+  gstin?: string;
   brand_name?: string;
   stall_sqft?: string;
   fascia_names?: string[];
@@ -76,6 +78,7 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
       exhibitor_name: payload.exhibitor_name || '',
       profile_pic_url: payload.profile_pic_url || '',
       company_description: payload.company_description || '',
+      gstin: payload.gstin || '',
       brand_name: payload.brand_name || '',
       stall_sqft: payload.stall_sqft || '',
       // Facia / Banner Firm Name Options
@@ -194,6 +197,7 @@ interface ExhibitorRow {
   exhibitor_name?: string;
   profile_pic_url?: string;
   company_description?: string;
+  gstin?: string;
   fascia_names_json?: unknown;
   logo_file_url?: string;
   cdr_file_url?: string;
@@ -224,7 +228,7 @@ export async function buildExhibitorRow(
 
   let profile: ExhibitorRow | undefined = db
     .prepare(
-      'SELECT brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_url, updated_at FROM exhibitors WHERE mobile = ?'
+      'SELECT brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description, gstin, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_url, updated_at FROM exhibitors WHERE mobile = ?'
     )
     .get(mobile) as ExhibitorRow | undefined;
 
@@ -252,6 +256,7 @@ export async function buildExhibitorRow(
   let exhibitorName = profile?.exhibitor_name || '';
   let companyDescription = profile?.company_description || '';
   let profilePicUrl = profile?.profile_pic_url || '';
+  let gstin = profile?.gstin || '';
   let fasciaNames: string[] = [];
 
   const parsedFascia = parseJsonish(profile?.fascia_names_json);
@@ -264,6 +269,7 @@ export async function buildExhibitorRow(
     if (asText(parsedFascia.exhibitor_name)) exhibitorName = asText(parsedFascia.exhibitor_name);
     if (asText(parsedFascia.company_description)) companyDescription = asText(parsedFascia.company_description);
     if (asText(parsedFascia.profile_pic_url)) profilePicUrl = asText(parsedFascia.profile_pic_url);
+    if (asText(parsedFascia.gstin)) gstin = asText(parsedFascia.gstin);
   }
 
   const brandName = profile?.brand_name?.trim() || reg?.brandName || '';
@@ -279,6 +285,7 @@ export async function buildExhibitorRow(
     exhibitor_name: exhibitorName,
     profile_pic_url: profilePicUrl,
     company_description: companyDescription,
+    gstin,
     brand_name: brandName,
     stall_sqft: profile?.stall_sqft?.trim() || reg?.stallSqft || '',
     fascia_names: fasciaNames,

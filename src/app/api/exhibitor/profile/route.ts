@@ -14,6 +14,9 @@ import {
 // already saved, which the portal then reports as a failed save.
 export const maxDuration = 30;
 
+/** Standard 15-character GSTIN, e.g. 24AAAAA1111A1Z1. */
+const GSTIN_PATTERN = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
 export async function GET() {
   try {
     const session = await getAuthenticatedExhibitor();
@@ -22,12 +25,13 @@ export async function GET() {
     }
 
     let exhibitor = db
-      .prepare('SELECT mobile, brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url, updated_at FROM exhibitors WHERE mobile = ?')
-      .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string; fascia_names_json?: string; logo_file_url?: string; cdr_file_url?: string; drive_file_url?: string; drive_folder_id?: string; drive_folder_url?: string; updated_at: string; stall_number?: string; stall_hall?: string; stall_zone?: string; stall_dimensions?: string; stall_allocated_at?: string } | undefined;
+      .prepare('SELECT mobile, brand_name, stall_sqft, exhibitor_name, profile_pic_url, company_description, gstin, fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url, updated_at FROM exhibitors WHERE mobile = ?')
+      .get(session.mobile) as { mobile: string; brand_name: string; stall_sqft: string; exhibitor_name?: string; profile_pic_url?: string; company_description?: string; gstin?: string; fascia_names_json?: string; logo_file_url?: string; cdr_file_url?: string; drive_file_url?: string; drive_folder_id?: string; drive_folder_url?: string; updated_at: string; stall_number?: string; stall_hall?: string; stall_zone?: string; stall_dimensions?: string; stall_allocated_at?: string } | undefined;
 
     let extractedExhibitorName = exhibitor?.exhibitor_name || '';
     let extractedProfilePicUrl = exhibitor?.profile_pic_url || null;
     let extractedCompanyDesc = exhibitor?.company_description || '';
+    let extractedGstin = exhibitor?.gstin || '';
     let extractedFasciaNames = ['', ''];
 
     // If Supabase is active, ensure we load latest remote data (source of truth)
@@ -75,6 +79,7 @@ export async function GET() {
               if (parsed.exhibitor_name) extractedExhibitorName = parsed.exhibitor_name;
               if (parsed.profile_pic_url) extractedProfilePicUrl = parsed.profile_pic_url;
               if (parsed.company_description) extractedCompanyDesc = parsed.company_description;
+              if (parsed.gstin) extractedGstin = parsed.gstin;
             }
           }
         }
@@ -156,6 +161,7 @@ export async function GET() {
       exhibitor_name: extractedExhibitorName,
       profile_pic_url: extractedProfilePicUrl,
       company_description: extractedCompanyDesc,
+      gstin: extractedGstin,
       fascia_names,
       logo_file_url: exhibitor?.logo_file_url || null,
       cdr_file_url: exhibitor?.cdr_file_url || null,
@@ -182,7 +188,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { brand_name, stall_sqft, fascia_names, exhibitor_name, company_description } = body;
+    const { brand_name, stall_sqft, fascia_names, exhibitor_name, company_description, gstin } = body;
 
     const reg = findExhibitorByMobile(session.mobile);
     const cleanBrand = (typeof brand_name === 'string' && brand_name.trim())
@@ -195,6 +201,19 @@ export async function POST(request: Request) {
 
     const cleanExhibitorName = typeof exhibitor_name === 'string' ? exhibitor_name.trim() : '';
     const cleanCompanyDesc = typeof company_description === 'string' ? company_description.trim().slice(0, 400) : '';
+
+    // The exhibitor's own GSTIN, which their extras bill is raised against. It
+    // is optional — plenty of firms bill without one — but a value that is
+    // present has to be a real GSTIN, or the bill carries a number the
+    // organiser cannot claim input credit against.
+    const rawGstin = typeof gstin === 'string' ? gstin.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15) : '';
+    if (rawGstin && !GSTIN_PATTERN.test(rawGstin)) {
+      return NextResponse.json(
+        { error: 'That GSTIN is not valid. It must be 15 characters, e.g. 24AAAAA1111A1Z1.' },
+        { status: 400 }
+      );
+    }
+    const cleanGstin = rawGstin;
     
     // Sanitize dynamic fascia names options (up to 4, minimum 2)
     let cleanFasciaNames: string[] = ['', ''];
@@ -252,6 +271,7 @@ export async function POST(request: Request) {
       fascia_names: cleanFasciaNames,
       exhibitor_name: cleanExhibitorName,
       company_description: cleanCompanyDesc,
+      gstin: cleanGstin,
       profile_pic_url: profilePicUrl
     };
 
@@ -259,12 +279,12 @@ export async function POST(request: Request) {
 
     if (existing) {
       db.prepare(
-        'UPDATE exhibitors SET brand_name = ?, stall_sqft = ?, fascia_names_json = ?, exhibitor_name = ?, company_description = ?, updated_at = CURRENT_TIMESTAMP WHERE mobile = ?'
-      ).run(cleanBrand, cleanSqft, fasciaNamesJson, cleanExhibitorName, cleanCompanyDesc, session.mobile);
+        'UPDATE exhibitors SET brand_name = ?, stall_sqft = ?, fascia_names_json = ?, exhibitor_name = ?, company_description = ?, gstin = ?, updated_at = CURRENT_TIMESTAMP WHERE mobile = ?'
+      ).run(cleanBrand, cleanSqft, fasciaNamesJson, cleanExhibitorName, cleanCompanyDesc, cleanGstin, session.mobile);
     } else {
       db.prepare(
-        'INSERT INTO exhibitors (mobile, brand_name, stall_sqft, fascia_names_json, exhibitor_name, company_description) VALUES (?, ?, ?, ?, ?, ?)'
-      ).run(session.mobile, cleanBrand, cleanSqft, fasciaNamesJson, cleanExhibitorName, cleanCompanyDesc);
+        'INSERT INTO exhibitors (mobile, brand_name, stall_sqft, fascia_names_json, exhibitor_name, company_description, gstin) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      ).run(session.mobile, cleanBrand, cleanSqft, fasciaNamesJson, cleanExhibitorName, cleanCompanyDesc, cleanGstin);
     }
 
     // Direct cloud sync to Supabase Database
@@ -303,6 +323,7 @@ export async function POST(request: Request) {
         exhibitor_name: cleanExhibitorName,
         profile_pic_url: profilePicUrl || '',
         company_description: cleanCompanyDesc,
+        gstin: cleanGstin,
         brand_name: cleanBrand,
         stall_sqft: cleanSqft,
         fascia_names: cleanFasciaNames,
@@ -321,6 +342,7 @@ export async function POST(request: Request) {
       brand_name: cleanBrand,
       exhibitor_name: cleanExhibitorName,
       company_description: cleanCompanyDesc,
+      gstin: cleanGstin,
       stall_sqft: cleanSqft,
       message: 'Exhibitor profile updated successfully.'
     });

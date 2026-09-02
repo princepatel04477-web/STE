@@ -106,13 +106,21 @@ def generate_invoice_docx(data, output_file):
     stall_sqft = data.get("stall_sqft", "200 sq ft")
     fascia_names = data.get("fascia_names", [])
     fascia_str = " | ".join([f for f in fascia_names if f]) if isinstance(fascia_names, list) and any(fascia_names) else ""
+    # The exhibitor's own GSTIN, when they have given one. The event's own GSTIN
+    # is printed in the header above and is a different number.
+    buyer_gstin = str(data.get("gstin", "") or "").strip()
     invoice_no = data.get("invoice_no", f"STE/INV/2026/{mobile[-4:] if len(mobile)>=4 else '0001'}")
     date_str = data.get("date", "22-Aug-2026")
     days = int(data.get("days", 2))
 
     p_bill = meta_table.cell(0, 0).paragraphs[0]
     p_bill.add_run("BILLED TO (EXHIBITOR):\n").font.bold = True
-    p_bill.add_run(f"Brand: {brand_name}\nMobile: {mobile}\nStall Size: {stall_sqft}" + (f"\nFascia: {fascia_str}" if fascia_str else "")).font.size = Pt(8.5)
+    p_bill.add_run(
+        f"Brand: {brand_name}\nMobile: {mobile}"
+        + (f"\nGSTIN: {buyer_gstin}" if buyer_gstin else "")
+        + f"\nStall Size: {stall_sqft}"
+        + (f"\nFascia: {fascia_str}" if fascia_str else "")
+    ).font.size = Pt(8.5)
 
     p_inv = meta_table.cell(0, 1).paragraphs[0]
     p_inv.add_run("INVOICE DETAILS:\n").font.bold = True

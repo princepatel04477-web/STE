@@ -41,6 +41,8 @@ export interface ExhibitorDetailData {
   exhibitor_name?: string;
   profile_pic_url?: string | null;
   company_description?: string;
+  /** The exhibitor's own GSTIN, as given on their extras bill. */
+  gstin?: string;
   stall_sqft: string;
   stall_number?: string;
   stall_hall?: string;
@@ -172,6 +174,14 @@ export default function ExhibitorDetailModal({
                   <span>{exhibitor.mobile}</span>
                   {copiedMobile ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-slate-400" />}
                 </button>
+                {exhibitor.gstin && (
+                  <>
+                    <span className="text-slate-500">•</span>
+                    <span className="font-mono text-slate-200" title="The exhibitor's own GSTIN">
+                      GSTIN: <span className="text-amber-300 font-bold">{exhibitor.gstin}</span>
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
