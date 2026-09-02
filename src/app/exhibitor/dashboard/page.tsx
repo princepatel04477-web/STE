@@ -104,20 +104,10 @@ interface ProfileSavePayload {
   fascia_names: string[];
 }
 
-interface BadgeNames {
-  owner: string[];
-  sales: string[];
-  support: string[];
-}
-
 interface ExtrasSavePayload {
   exhibitor_name: string;
   items: OrderItem[];
   special_notes: string;
-  owner_badges: number;
-  sales_badges: number;
-  support_badges: number;
-  badge_names: BadgeNames;
   rental_days: number;
 }
 
@@ -258,14 +248,6 @@ export default function ExhibitorDashboardPage() {
     setExpandedMobileCards((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Exhibitor Entry Badges State (Owner, Sales Staff, Support Staff & Names)
-  const [ownerBadges, setOwnerBadges] = useState<number>(1);
-  const [salesBadges, setSalesBadges] = useState<number>(0);
-  const [supportBadges, setSupportBadges] = useState<number>(0);
-  const [ownerBadgeNames, setOwnerBadgeNames] = useState<string[]>(['']);
-  const [salesBadgeNames, setSalesBadgeNames] = useState<string[]>([]);
-  const [supportBadgeNames, setSupportBadgeNames] = useState<string[]>([]);
-  const [badgeErrors, setBadgeErrors] = useState<string[]>([]);
   const [nameError, setNameError] = useState('');
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
@@ -310,43 +292,6 @@ export default function ExhibitorDashboardPage() {
     fetchInitialData();
   }, []);
 
-  const handleOwnerBadgesChange = (count: number) => {
-    const val = Math.min(5, Math.max(0, count));
-    setOwnerBadges(val);
-    setOwnerBadgeNames((prev) => {
-      const copy = [...prev];
-      while (copy.length < val) copy.push('');
-      return copy.slice(0, val);
-    });
-    if (badgeErrors.length > 0) setBadgeErrors([]);
-  };
-
-  const handleSalesBadgesChange = (count: number) => {
-    const val = Math.min(5, Math.max(0, count));
-    setSalesBadges(val);
-    setSalesBadgeNames((prev) => {
-      const copy = [...prev];
-      while (copy.length < val) copy.push('');
-      return copy.slice(0, val);
-    });
-    if (badgeErrors.length > 0) setBadgeErrors([]);
-  };
-
-  const handleSupportBadgesChange = (count: number) => {
-    const val = Math.min(5, Math.max(0, count));
-    setSupportBadges(val);
-    setSupportBadgeNames((prev) => {
-      const copy = [...prev];
-      while (copy.length < val) copy.push('');
-      return copy.slice(0, val);
-    });
-    if (badgeErrors.length > 0) setBadgeErrors([]);
-  };
-
-  const validateBadgeNames = (): string[] => {
-    return [];
-  };
-
   /**
    * Puts a saved draft back into the form. Used only when the draft is newer
    * than what the server holds, so it can never undo an edit made elsewhere.
@@ -389,22 +334,6 @@ export default function ExhibitorDashboardPage() {
     }
 
     if (typeof extras.special_notes === 'string') setSpecialNotes(extras.special_notes);
-
-    const oCount = Number(extras.owner_badges) || 0;
-    const sCount = Number(extras.sales_badges) || 0;
-    const supCount = Number(extras.support_badges) || 0;
-    setOwnerBadges(oCount);
-    setSalesBadges(sCount);
-    setSupportBadges(supCount);
-
-    const padded = (names: string[] | undefined, count: number) => {
-      const arr = Array.isArray(names) ? names.map((n) => String(n || '')) : [];
-      while (arr.length < count) arr.push('');
-      return arr.slice(0, count);
-    };
-    setOwnerBadgeNames(padded(extras.badge_names?.owner, oCount));
-    setSalesBadgeNames(padded(extras.badge_names?.sales, sCount));
-    setSupportBadgeNames(padded(extras.badge_names?.support, supCount));
   };
 
   /**
@@ -543,36 +472,6 @@ export default function ExhibitorDashboardPage() {
         setQuantities(qMap);
         setItemDays(dMap);
         setSpecialNotes(catData.existingOrder.special_notes || '');
-        const oCount = catData.existingOrder.owner_badges ?? 1;
-        const sCount = catData.existingOrder.sales_badges ?? 0;
-        const supCount = catData.existingOrder.support_badges ?? 0;
-        setOwnerBadges(oCount);
-        setSalesBadges(sCount);
-        setSupportBadges(supCount);
-
-        if (catData.existingOrder.badge_names) {
-          const bn = catData.existingOrder.badge_names;
-          if (Array.isArray(bn.owner)) {
-            const arr = [...bn.owner];
-            while (arr.length < oCount) arr.push('');
-            setOwnerBadgeNames(arr.slice(0, oCount));
-          }
-          if (Array.isArray(bn.sales)) {
-            const arr = [...bn.sales];
-            while (arr.length < sCount) arr.push('');
-            setSalesBadgeNames(arr.slice(0, sCount));
-          }
-          if (Array.isArray(bn.support)) {
-            const arr = [...bn.support];
-            while (arr.length < supCount) arr.push('');
-            setSupportBadgeNames(arr.slice(0, supCount));
-          }
-        } else {
-          setOwnerBadgeNames(Array(oCount).fill(''));
-          setSalesBadgeNames(Array(sCount).fill(''));
-          setSupportBadgeNames(Array(supCount).fill(''));
-        }
-
         setLastSubmittedAt(catData.existingOrder.updated_at || null);
       }
 
@@ -626,14 +525,6 @@ export default function ExhibitorDashboardPage() {
     exhibitor_name: exhibitorName.trim(),
     items: buildSelectedItems(),
     special_notes: specialNotes,
-    owner_badges: ownerBadges,
-    sales_badges: salesBadges,
-    support_badges: supportBadges,
-    badge_names: {
-      owner: ownerBadgeNames.slice(0, ownerBadges),
-      sales: salesBadgeNames.slice(0, salesBadges),
-      support: supportBadgeNames.slice(0, supportBadges)
-    },
     rental_days: 2
   });
 
@@ -717,12 +608,6 @@ export default function ExhibitorDashboardPage() {
     quantities,
     itemDays,
     specialNotes,
-    ownerBadges,
-    salesBadges,
-    supportBadges,
-    ownerBadgeNames,
-    salesBadgeNames,
-    supportBadgeNames,
     initialLoading
   ]);
 
@@ -1026,17 +911,6 @@ export default function ExhibitorDashboardPage() {
     }
     setNameError('');
 
-    const errs = validateBadgeNames();
-    if (errs.length > 0) {
-      setBadgeErrors(errs);
-      const section = document.getElementById('section-badges');
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      return;
-    }
-    setBadgeErrors([]);
-
     // A pending autosave holds the same edits. Cancel it so it cannot fire
     // behind this submission and race it against the same row.
     if (autosaveTimeoutRef.current) {
@@ -1314,7 +1188,7 @@ export default function ExhibitorDashboardPage() {
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-700 font-medium">
-                Exhibitor stall details, entry badges, and extra requirements <strong className="text-red-700 font-black">CANNOT be edited or modified after {STRICT_CUTOFF_DATE}</strong>.
+                Exhibitor stall details and extra requirements <strong className="text-red-700 font-black">CANNOT be edited or modified after {STRICT_CUTOFF_DATE}</strong>.
               </p>
             </div>
           </div>
@@ -2045,51 +1919,7 @@ export default function ExhibitorDashboardPage() {
           </div>
         </section>
 
-        {/* Section 3: Exhibitor Entry Badges Registration */}
-        <section id="section-badges" className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xs scroll-mt-20 sm:scroll-mt-24">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
-                <Contact className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                  <span>3. Exhibitor & Staff Badges Registration</span>
-                  <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-amber-200 text-amber-900 border border-amber-300">
-                    Official Form
-                  </span>
-                </h2>
-                <p className="text-xs text-slate-500">Register owner, sales staff, and support team badges for official STE 2026 entry passes</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-xl">
-              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 inline-block shadow-xs">
-                Online Registration Required
-              </span>
-              <h3 className="text-lg sm:text-xl font-extrabold text-white">
-                Submit Your Exhibitor & Staff Badges
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Please complete your team’s badge registration on the official STE 2026 registration portal for your digital and physical entry passes.
-              </p>
-            </div>
-
-            <a
-              href="https://eventmanagement.isavgo.com/ste2026-registration"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 shrink-0"
-            >
-              <span>Fill Badge Form</span>
-              <ExternalLink className="w-4 h-4 text-slate-950" />
-            </a>
-          </div>
-        </section>
-
-        {/* Section 4: Extras Catalog Store */}
+        {/* Section 3: Extras Catalog Store */}
         <section id="section-extras" className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xs scroll-mt-20 sm:scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
             <div className="flex items-center gap-3">
@@ -2097,7 +1927,7 @@ export default function ExhibitorDashboardPage() {
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900">4. Additional Requirements & Extras</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900">3. Additional Requirements & Extras</h2>
                 <p className="text-xs text-slate-500">Select extra furniture, display fixtures, audio-visual gear, and electrical connections</p>
               </div>
             </div>
@@ -2499,12 +2329,12 @@ export default function ExhibitorDashboardPage() {
           </div>
         </section>
 
-        {/* Section 5: Live Order & Badges Summary */}
+        {/* Section 4: Live Order Summary */}
         <section id="section-summary" className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 space-y-6 scroll-mt-20 sm:scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900">5. Overall Requisition Summary</h2>
-              <p className="text-xs text-slate-500">Review your booth configuration, fascia details, entry badges, and extra amenities</p>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">4. Overall Requisition Summary</h2>
+              <p className="text-xs text-slate-500">Review your booth configuration, fascia details, and extra amenities</p>
             </div>
             {lastSubmittedAt && (
               <span className="text-xs text-emerald-700 font-medium flex items-center gap-1.5 self-start sm:self-auto bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
@@ -2550,58 +2380,6 @@ export default function ExhibitorDashboardPage() {
               </div>
             </div>
           </div>
-
-          {/* Badges Summary */}
-          {(ownerBadges > 0 || salesBadges > 0 || supportBadges > 0) && (
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
-              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block">
-                Exhibitor Entry Badges Allocation ({ownerBadges + salesBadges + supportBadges} Total Badges)
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {ownerBadges > 0 && (
-                  <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-lg text-xs">
-                    <div className="flex items-center justify-between font-bold text-amber-950 mb-1">
-                      <span>👑 Owner Badges:</span>
-                      <span>{ownerBadges}</span>
-                    </div>
-                    <ul className="text-[11px] text-slate-700 space-y-0.5 mt-1 list-disc list-inside">
-                      {ownerBadgeNames.slice(0, ownerBadges).map((n, i) => (
-                        <li key={i}>{n.trim() ? n : `Owner ${i + 1} (Name not set)`}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {salesBadges > 0 && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                    <div className="flex items-center justify-between font-bold text-slate-900 mb-1">
-                      <span>💼 Sales Staff:</span>
-                      <span>{salesBadges}</span>
-                    </div>
-                    <ul className="text-[11px] text-slate-700 space-y-0.5 mt-1 list-disc list-inside">
-                      {salesBadgeNames.slice(0, salesBadges).map((n, i) => (
-                        <li key={i}>{n.trim() ? n : `Sales Staff ${i + 1} (Name not set)`}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {supportBadges > 0 && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                    <div className="flex items-center justify-between font-bold text-slate-900 mb-1">
-                      <span>🔧 Support Staff:</span>
-                      <span>{supportBadges}</span>
-                    </div>
-                    <ul className="text-[11px] text-slate-700 space-y-0.5 mt-1 list-disc list-inside">
-                      {supportBadgeNames.slice(0, supportBadges).map((n, i) => (
-                        <li key={i}>{n.trim() ? n : `Support Staff ${i + 1} (Name not set)`}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Selected Extra Items Breakdown */}
           {totalSelectedItemsCount > 0 && (
@@ -2715,7 +2493,7 @@ export default function ExhibitorDashboardPage() {
               Requirements submitted
             </h2>
             <p className="mt-2 text-sm text-slate-600 font-medium">
-              Everything you filled in — your details, stall and fascia names, badges and
+              Everything you filled in — your details, stall and fascia names and
               extra items — has been saved to the STE 2026 organisers.
             </p>
 
@@ -2727,8 +2505,6 @@ export default function ExhibitorDashboardPage() {
               <p className="text-xs text-slate-700 font-semibold flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>
-                  {ownerBadges + salesBadges + supportBadges} badge
-                  {ownerBadges + salesBadges + supportBadges === 1 ? '' : 's'} and{' '}
                   {totalSelectedItemsCount} extra item
                   {totalSelectedItemsCount === 1 ? '' : 's'} recorded
                 </span>

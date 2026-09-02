@@ -21,8 +21,8 @@ export async function GET() {
       .all();
 
     let order = db
-      .prepare('SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json, rental_days, updated_at FROM exhibitor_orders WHERE mobile = ?')
-      .get(session.mobile) as { items_json: string | any; special_notes: string; owner_badges?: number; sales_badges?: number; support_badges?: number; badge_names_json?: string | any; rental_days?: number; updated_at: string } | undefined;
+      .prepare('SELECT items_json, special_notes, rental_days, updated_at FROM exhibitor_orders WHERE mobile = ?')
+      .get(session.mobile) as { items_json: string | any; special_notes: string; rental_days?: number; updated_at: string } | undefined;
 
     if (isSupabaseConfigured && supabaseAdmin) {
       try {
@@ -37,10 +37,6 @@ export async function GET() {
             ...order,
             items_json: sbOrder.items_json,
             special_notes: sbOrder.special_notes ?? order?.special_notes ?? '',
-            owner_badges: sbOrder.owner_badges ?? order?.owner_badges ?? 0,
-            sales_badges: sbOrder.sales_badges ?? order?.sales_badges ?? 0,
-            support_badges: sbOrder.support_badges ?? order?.support_badges ?? 0,
-            badge_names_json: sbOrder.badge_names_json ?? order?.badge_names_json,
             rental_days: sbOrder.rental_days ?? order?.rental_days ?? 2,
             updated_at: sbOrder.updated_at || order?.updated_at || null
           };
@@ -59,22 +55,11 @@ export async function GET() {
       }
     }
 
-    let badgeNames = { owner: [] as string[], sales: [] as string[], support: [] as string[] };
-    if (order && order.badge_names_json) {
-      try {
-        badgeNames = typeof order.badge_names_json === 'string' ? JSON.parse(order.badge_names_json) : order.badge_names_json;
-      } catch {}
-    }
-
     return NextResponse.json({
       products,
       existingOrder: {
         items,
         special_notes: order?.special_notes || '',
-        owner_badges: order?.owner_badges ?? 0,
-        sales_badges: order?.sales_badges ?? 0,
-        support_badges: order?.support_badges ?? 0,
-        badge_names: badgeNames,
         rental_days: order?.rental_days ?? 2,
         updated_at: order?.updated_at || null
       }
@@ -125,7 +110,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { items, special_notes, owner_badges, sales_badges, support_badges, badge_names, rental_days, days } = body;
+    const { items, special_notes, rental_days, days } = body;
 
     if (!Array.isArray(items)) {
       return NextResponse.json({ error: 'Invalid items payload' }, { status: 400 });
@@ -148,37 +133,6 @@ export async function POST(request: Request) {
     const itemsJson = JSON.stringify(items);
     const cleanNotes = typeof special_notes === 'string' ? special_notes.trim() : '';
 
-    const oBadges = Math.min(5, Math.max(0, Number(owner_badges || 0)));
-    const sBadges = Math.min(5, Math.max(0, Number(sales_badges || 0)));
-    const supBadges = Math.min(5, Math.max(0, Number(support_badges || 0)));
-
-    // Validate compulsory badge names
-    if (oBadges > 0) {
-      const oNames = Array.isArray(badge_names?.owner) ? badge_names.owner : [];
-      for (let i = 0; i < oBadges; i++) {
-        if (!oNames[i] || !oNames[i].trim()) {
-          return NextResponse.json({ error: `Owner Badge #${i + 1} name is compulsory.` }, { status: 400 });
-        }
-      }
-    }
-    if (sBadges > 0) {
-      const sNames = Array.isArray(badge_names?.sales) ? badge_names.sales : [];
-      for (let i = 0; i < sBadges; i++) {
-        if (!sNames[i] || !sNames[i].trim()) {
-          return NextResponse.json({ error: `Sales Staff Badge #${i + 1} name is compulsory.` }, { status: 400 });
-        }
-      }
-    }
-    if (supBadges > 0) {
-      const supNames = Array.isArray(badge_names?.support) ? badge_names.support : [];
-      for (let i = 0; i < supBadges; i++) {
-        if (!supNames[i] || !supNames[i].trim()) {
-          return NextResponse.json({ error: `Support Staff Badge #${i + 1} name is compulsory.` }, { status: 400 });
-        }
-      }
-    }
-
-    const badgeNamesJson = badge_names ? JSON.stringify(badge_names) : '';
     const rDays = Math.max(1, Math.min(30, Number(rental_days || days || 2)));
 
     const existing = db
@@ -187,12 +141,12 @@ export async function POST(request: Request) {
 
     if (existing) {
       db.prepare(
-        'UPDATE exhibitor_orders SET items_json = ?, special_notes = ?, owner_badges = ?, sales_badges = ?, support_badges = ?, badge_names_json = ?, rental_days = ? WHERE mobile = ?'
-      ).run(itemsJson, cleanNotes, oBadges, sBadges, supBadges, badgeNamesJson, rDays, session.mobile);
+        'UPDATE exhibitor_orders SET items_json = ?, special_notes = ?, rental_days = ? WHERE mobile = ?'
+      ).run(itemsJson, cleanNotes, rDays, session.mobile);
     } else {
       db.prepare(
-        'INSERT INTO exhibitor_orders (mobile, items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json, rental_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-      ).run(session.mobile, itemsJson, cleanNotes, oBadges, sBadges, supBadges, badgeNamesJson, rDays);
+        'INSERT INTO exhibitor_orders (mobile, items_json, special_notes, rental_days) VALUES (?, ?, ?, ?)'
+      ).run(session.mobile, itemsJson, cleanNotes, rDays);
     }
 
     // Direct cloud sync to Supabase Database
@@ -204,10 +158,6 @@ export async function POST(request: Request) {
             mobile: session.mobile,
             items_json: items,
             special_notes: cleanNotes,
-            owner_badges: oBadges,
-            sales_badges: sBadges,
-            support_badges: supBadges,
-            badge_names_json: badge_names || {},
             rental_days: rDays,
             updated_at: new Date().toISOString()
           }, { onConflict: 'mobile' });
@@ -230,10 +180,6 @@ export async function POST(request: Request) {
         exhibitor_name: contactName,
         items,
         special_notes: cleanNotes,
-        owner_badges: oBadges,
-        sales_badges: sBadges,
-        support_badges: supBadges,
-        badge_names: badge_names || undefined,
         rental_days: rDays
       });
     } catch (err) {

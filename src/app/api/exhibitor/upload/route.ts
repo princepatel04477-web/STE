@@ -282,8 +282,7 @@ export async function POST(request: Request) {
     }
 
     // Push the exhibitor's COMPLETE row to the sheet. Sending only the artwork
-    // fields blanked every extra item, badge count and badge name they had
-    // already submitted.
+    // fields blanked every extra item they had already submitted.
     try {
       await syncExhibitorRowToSheets(session.mobile, {
         exhibitor_name: currentExhibitorName,

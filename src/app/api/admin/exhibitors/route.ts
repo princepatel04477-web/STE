@@ -26,10 +26,6 @@ export async function GET() {
         mobile, 
         items_json, 
         special_notes, 
-        owner_badges,
-        sales_badges,
-        support_badges,
-        badge_names_json,
         rental_days,
         updated_at as order_updated
       FROM exhibitor_orders
@@ -37,10 +33,6 @@ export async function GET() {
       mobile: string;
       items_json: string | null;
       special_notes: string | null;
-      owner_badges?: number;
-      sales_badges?: number;
-      support_badges?: number;
-      badge_names_json?: string | null;
       rental_days?: number;
       order_updated: string | null;
     }>;
@@ -78,7 +70,6 @@ export async function GET() {
               ...ordersMap[sbo.mobile],
               ...sbo,
               items_json: sbo.items_json ? JSON.stringify(sbo.items_json) : ordersMap[sbo.mobile]?.items_json,
-              badge_names_json: sbo.badge_names_json ? JSON.stringify(sbo.badge_names_json) : ordersMap[sbo.mobile]?.badge_names_json,
               order_updated: sbo.updated_at || ordersMap[sbo.mobile]?.order_updated
             };
           });
@@ -220,8 +211,7 @@ export async function GET() {
      * and a stall size - so those cannot be the test. What only the exhibitor
      * can put there counts: the contact name the form makes compulsory, the
      * company blurb, a fascia name they typed rather than the brand default,
-     * an extras order, a note, or uploaded artwork. Badges are not a test:
-     * every exhibitor is counted one owner badge by default.
+     * an extras order, a note, or uploaded artwork.
      */
     const hasFilledPortal = (row: {
       brand_name: string;
@@ -253,9 +243,6 @@ export async function GET() {
     };
 
     let totalSqftSum = 0;
-    let totalOwnerBadges = 0;
-    let totalSalesBadges = 0;
-    let totalSupportBadges = 0;
 
     const formattedList: any[] = [];
 
@@ -311,21 +298,6 @@ export async function GET() {
         if (!isNaN(sq)) totalSqftSum += sq;
       }
 
-      const oBadges = Number(order?.owner_badges ?? (reg ? 1 : 0));
-      const sBadges = Number(order?.sales_badges ?? 0);
-      const supBadges = Number(order?.support_badges ?? 0);
-
-      let badgeNames = { owner: [] as string[], sales: [] as string[], support: [] as string[] };
-      if (order && order.badge_names_json) {
-        try {
-          badgeNames = typeof order.badge_names_json === 'string' ? JSON.parse(order.badge_names_json) : order.badge_names_json;
-        } catch {}
-      }
-
-      totalOwnerBadges += oBadges;
-      totalSalesBadges += sBadges;
-      totalSupportBadges += supBadges;
-
       const row = {
         mobile: mob,
         brand_name: brandName,
@@ -343,10 +315,6 @@ export async function GET() {
         fascia_names: fasciaNames,
         items,
         special_notes: order?.special_notes || '',
-        owner_badges: oBadges,
-        sales_badges: sBadges,
-        support_badges: supBadges,
-        badge_names: badgeNames,
         logo_file_url: dbEx?.logo_file_url || null,
         cdr_file_url: dbEx?.cdr_file_url || null,
         drive_file_url: dbEx?.drive_file_url || null,
@@ -368,9 +336,6 @@ export async function GET() {
       success: true,
       count: formattedList.length,
       totalSqftSum,
-      totalOwnerBadges,
-      totalSalesBadges,
-      totalSupportBadges,
       itemTotals: Object.values(itemTotals),
       exhibitors: formattedList,
       // The master sheet's own count, and the organiser logins that sit

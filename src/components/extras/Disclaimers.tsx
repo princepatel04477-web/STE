@@ -12,7 +12,7 @@ export default function Disclaimers() {
             <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950">5 SEPT 2026, 12:00 PM</span>
           </h4>
           <p className="text-xs text-slate-700 mt-1 font-medium">
-            All exhibitor stall details, entry badges, and extra requirement orders <strong className="text-amber-950 underline font-black">CANNOT be edited or modified after 5th September 2026 at 12:00 PM (IST)</strong>.
+            All exhibitor stall details and extra requirement orders <strong className="text-amber-950 underline font-black">CANNOT be edited or modified after 5th September 2026 at 12:00 PM (IST)</strong>.
           </p>
         </div>
       </div>

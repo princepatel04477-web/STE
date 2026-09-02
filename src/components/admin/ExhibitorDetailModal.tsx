@@ -11,9 +11,6 @@ import {
   FileCode,
   FolderOpen,
   ExternalLink,
-  Crown,
-  Users,
-  Wrench,
   Calendar,
   FileText,
   Clock,
@@ -53,14 +50,6 @@ export interface ExhibitorDetailData {
   fascia_names?: string[];
   items: ExhibitorDetailItem[];
   special_notes: string;
-  owner_badges?: number;
-  sales_badges?: number;
-  support_badges?: number;
-  badge_names?: {
-    owner?: string[];
-    sales?: string[];
-    support?: string[];
-  };
   logo_file_url?: string;
   cdr_file_url?: string;
   drive_file_url?: string;
@@ -210,16 +199,6 @@ export default function ExhibitorDetailModal({
             </div>
 
             <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Total Badges</span>
-              <div className="text-lg font-black text-slate-900 font-mono mt-0.5">
-                {(exhibitor.owner_badges || 0) + (exhibitor.sales_badges || 0) + (exhibitor.support_badges || 0)}
-              </div>
-              <span className="text-[10px] text-amber-700 font-semibold">
-                👑{exhibitor.owner_badges || 0} • 👥{exhibitor.sales_badges || 0} • 🛠️{exhibitor.support_badges || 0}
-              </span>
-            </div>
-
-            <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Extra Amenities</span>
               <div className="text-lg font-black text-slate-900 font-mono mt-0.5">
                 {exhibitor.items.reduce((s, i) => s + (i.quantity || 0), 0)} items
@@ -269,90 +248,6 @@ export default function ExhibitorDetailModal({
                 Default header: <strong>{exhibitor.brand_name}</strong>
               </div>
             )}
-          </div>
-
-          {/* Entry Badges Details */}
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-amber-600" />
-              Entry Badges & Personnel Passes
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {/* Owner Pass */}
-              <div className="p-3 bg-amber-50/50 rounded-xl border border-amber-200">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-extrabold text-amber-900 flex items-center gap-1">
-                    <Crown className="w-3.5 h-3.5 text-amber-600" />
-                    Owner Badges
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-amber-200 text-amber-900 font-mono font-bold text-xs">
-                    {exhibitor.owner_badges || 0}
-                  </span>
-                </div>
-                {exhibitor.badge_names?.owner && exhibitor.badge_names.owner.filter(Boolean).length > 0 ? (
-                  <ul className="text-xs space-y-1 text-slate-800">
-                    {exhibitor.badge_names.owner.filter(Boolean).map((n, i) => (
-                      <li key={i} className="flex items-center gap-1.5 font-medium">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                        {n}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span className="text-[11px] text-slate-400 italic">No specific names submitted</span>
-                )}
-              </div>
-
-              {/* Sales Pass */}
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-extrabold text-slate-800 flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5 text-slate-600" />
-                    Sales Staff Badges
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-800 font-mono font-bold text-xs">
-                    {exhibitor.sales_badges || 0}
-                  </span>
-                </div>
-                {exhibitor.badge_names?.sales && exhibitor.badge_names.sales.filter(Boolean).length > 0 ? (
-                  <ul className="text-xs space-y-1 text-slate-800">
-                    {exhibitor.badge_names.sales.filter(Boolean).map((n, i) => (
-                      <li key={i} className="flex items-center gap-1.5 font-medium">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                        {n}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span className="text-[11px] text-slate-400 italic">No sales staff requested</span>
-                )}
-              </div>
-
-              {/* Support Pass */}
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-extrabold text-slate-800 flex items-center gap-1">
-                    <Wrench className="w-3.5 h-3.5 text-slate-600" />
-                    Support Staff Badges
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-800 font-mono font-bold text-xs">
-                    {exhibitor.support_badges || 0}
-                  </span>
-                </div>
-                {exhibitor.badge_names?.support && exhibitor.badge_names.support.filter(Boolean).length > 0 ? (
-                  <ul className="text-xs space-y-1 text-slate-800">
-                    {exhibitor.badge_names.support.filter(Boolean).map((n, i) => (
-                      <li key={i} className="flex items-center gap-1.5 font-medium">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                        {n}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span className="text-[11px] text-slate-400 italic">No support staff requested</span>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* Requested Extra Amenities Table */}

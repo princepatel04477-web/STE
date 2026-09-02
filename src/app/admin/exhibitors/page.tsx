@@ -79,14 +79,6 @@ interface ExhibitorRecord {
   fascia_names?: string[];
   items: ExhibitorItem[];
   special_notes: string;
-  owner_badges?: number;
-  sales_badges?: number;
-  support_badges?: number;
-  badge_names?: {
-    owner?: string[];
-    sales?: string[];
-    support?: string[];
-  };
   logo_file_url?: string;
   cdr_file_url?: string;
   drive_file_url?: string;
@@ -129,9 +121,6 @@ export default function AdminExhibitorsPage() {
   const [organiserCount, setOrganiserCount] = useState(0);
   const [itemTotals, setItemTotals] = useState<ItemTotal[]>([]);
   const [totalSqftSum, setTotalSqftSum] = useState<number>(0);
-  const [totalOwnerBadges, setTotalOwnerBadges] = useState<number>(0);
-  const [totalSalesBadges, setTotalSalesBadges] = useState<number>(0);
-  const [totalSupportBadges, setTotalSupportBadges] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   // Search & Filter state
@@ -187,9 +176,6 @@ export default function AdminExhibitorsPage() {
       if (data.totalSqftSum) {
         setTotalSqftSum(data.totalSqftSum);
       }
-      setTotalOwnerBadges(data.totalOwnerBadges || 0);
-      setTotalSalesBadges(data.totalSalesBadges || 0);
-      setTotalSupportBadges(data.totalSupportBadges || 0);
     } catch (err) {
       console.error('Failed to load admin exhibitors:', err);
     } finally {
@@ -254,9 +240,6 @@ export default function AdminExhibitorsPage() {
       const desc = (ex.company_description || '').toLowerCase();
       const stallNo = (ex.stall_number || '').toLowerCase();
       const stallHall = (ex.stall_hall || '').toLowerCase();
-      const ownerNames = (ex.badge_names?.owner || []).join(' ').toLowerCase();
-      const salesNames = (ex.badge_names?.sales || []).join(' ').toLowerCase();
-      const supportNames = (ex.badge_names?.support || []).join(' ').toLowerCase();
       const fasciaStr = (ex.fascia_names || []).join(' ').toLowerCase();
       const notes = (ex.special_notes || '').toLowerCase();
 
@@ -270,9 +253,6 @@ export default function AdminExhibitorsPage() {
         stallNo.includes(q) ||
         stallHall.includes(q) ||
         fasciaStr.includes(q) ||
-        ownerNames.includes(q) ||
-        salesNames.includes(q) ||
-        supportNames.includes(q) ||
         notes.includes(q);
 
       if (!matchesSearch) return false;
@@ -338,12 +318,6 @@ export default function AdminExhibitorsPage() {
       'Stall Number',
       'Stall Hall',
       'Fascia Names',
-      'Owner Badges',
-      'Owner Names',
-      'Sales Badges',
-      'Sales Names',
-      'Support Badges',
-      'Support Names',
       'Extras Requirements',
       'Vector CDR URL',
       'Logo URL',
@@ -363,12 +337,7 @@ export default function AdminExhibitorsPage() {
       const extrasStr = ex.items
         .map((i) => `${i.name} x${i.quantity} (${i.days || 2}d)`)
         .join('; ');
-      const ownerNames = (ex.badge_names?.owner || []).filter(Boolean).join(', ');
-      const salesNames = (ex.badge_names?.sales || []).filter(Boolean).join(', ');
-      const supportNames = (ex.badge_names?.support || []).filter(Boolean).join(', ');
-
-      // Mobile stays text so a number never loses its shape; badge counts go
-      // out as numbers so the organiser can total a column.
+      // Mobile stays text so a long number never loses its shape.
       return [
         timeStamp,
         ex.brand_name,
@@ -378,12 +347,6 @@ export default function AdminExhibitorsPage() {
         ex.stall_number || 'Not Drawn',
         ex.stall_hall || '',
         fasciaStr || ex.brand_name,
-        ex.owner_badges || 0,
-        ownerNames,
-        ex.sales_badges || 0,
-        salesNames,
-        ex.support_badges || 0,
-        supportNames,
         extrasStr,
         ex.cdr_file_url || '',
         ex.logo_file_url || '',
@@ -425,7 +388,7 @@ export default function AdminExhibitorsPage() {
                 </span>
               </h1>
               <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
-                Exhibitor Management, Extra Amenities, Badges & Tax Invoices
+                Exhibitor Management, Extra Amenities & Tax Invoices
               </p>
             </div>
           </Link>
@@ -486,7 +449,7 @@ export default function AdminExhibitorsPage() {
               Exhibitors Management & Requirements Overview
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-              Real-time directory of exhibitor profiles, allocated stall numbers, requested badges, amenities, and artwork files.
+              Real-time directory of exhibitor profiles, allocated stall numbers, amenities, and artwork files.
             </p>
           </div>
 
@@ -588,62 +551,19 @@ export default function AdminExhibitorsPage() {
                   </span>
                 </div>
               </div>
-
-              <div className="bg-white border border-amber-300 p-4 sm:p-5 rounded-2xl flex items-center gap-4 shadow-xs bg-gradient-to-br from-amber-50/60 to-white">
-                <div className="p-3 bg-amber-100 border border-amber-300 rounded-xl text-amber-800 shrink-0">
-                  <Award className="w-6 h-6" />
-                </div>
-                <div>
-                  <span className="text-xs text-amber-900 font-bold block">Total Entry Badges</span>
-                  <span className="text-2xl font-black text-slate-900 font-mono">
-                    {totalOwnerBadges + totalSalesBadges + totalSupportBadges} passes
-                  </span>
-                </div>
-              </div>
             </div>
 
-            {/* Badges & Item Breakdown Grid */}
+            {/* Item Breakdown Grid */}
             <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                   <Award className="w-4 h-4 text-amber-600" />
-                  Total Amenity & Badges Demand Aggregates
+                  Total Amenity Demand Aggregates
                 </h3>
                 <span className="text-[11px] text-slate-500">Live tally across all booths</span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
-                {/* Badges Cards */}
-                <div className="bg-amber-50/70 border border-amber-200 p-3 rounded-xl flex flex-col justify-between">
-                  <span className="text-[11px] font-extrabold text-amber-900 flex items-center gap-1">
-                    👑 Owner Passes
-                  </span>
-                  <div className="flex items-baseline justify-between mt-1">
-                    <span className="text-xl font-black text-slate-900 font-mono">{totalOwnerBadges}</span>
-                    <span className="text-[10px] font-mono uppercase font-bold text-amber-700">passes</span>
-                  </div>
-                </div>
-
-                <div className="bg-amber-50/70 border border-amber-200 p-3 rounded-xl flex flex-col justify-between">
-                  <span className="text-[11px] font-extrabold text-amber-900 flex items-center gap-1">
-                    👥 Sales Passes
-                  </span>
-                  <div className="flex items-baseline justify-between mt-1">
-                    <span className="text-xl font-black text-slate-900 font-mono">{totalSalesBadges}</span>
-                    <span className="text-[10px] font-mono uppercase font-bold text-amber-700">passes</span>
-                  </div>
-                </div>
-
-                <div className="bg-amber-50/70 border border-amber-200 p-3 rounded-xl flex flex-col justify-between">
-                  <span className="text-[11px] font-extrabold text-amber-900 flex items-center gap-1">
-                    🛠️ Support Passes
-                  </span>
-                  <div className="flex items-baseline justify-between mt-1">
-                    <span className="text-xl font-black text-slate-900 font-mono">{totalSupportBadges}</span>
-                    <span className="text-[10px] font-mono uppercase font-bold text-amber-700">passes</span>
-                  </div>
-                </div>
-
                 {/* Items */}
                 {itemTotals.map((item) => (
                   <div
@@ -903,7 +823,6 @@ export default function AdminExhibitorsPage() {
                       <th className="py-3.5 px-4 min-w-[130px]">Mobile (ID)</th>
                       <th className="py-3.5 px-4 min-w-[220px]">Brand / Company</th>
                       <th className="py-3.5 px-4 min-w-[140px]">Stall Space & Draw</th>
-                      <th className="py-3.5 px-4 min-w-[190px]">Entry Badges</th>
                       <th className="py-3.5 px-4 min-w-[240px]">Requested Extras</th>
                       <th className="py-3.5 px-4 min-w-[160px]">Artwork (CDR / Drive)</th>
                       <th className="py-3.5 px-4 min-w-[180px]">Special Notes</th>
@@ -1045,25 +964,7 @@ export default function AdminExhibitorsPage() {
                             </div>
                           </td>
 
-                          {/* 5. Entry Badges */}
-                          <td className={`${paddingClass} min-w-[190px]`}>
-                            <div className="flex flex-col gap-1 text-[11px]">
-                              <div className="flex items-center justify-between gap-1">
-                                <span className="text-amber-900 font-bold">👑 Owner:</span>
-                                <strong className="font-mono text-slate-900 font-black">{ex.owner_badges || 0}</strong>
-                              </div>
-                              <div className="flex items-center justify-between gap-1">
-                                <span className="text-slate-700 font-medium">👥 Sales:</span>
-                                <strong className="font-mono text-slate-900 font-black">{ex.sales_badges || 0}</strong>
-                              </div>
-                              <div className="flex items-center justify-between gap-1">
-                                <span className="text-slate-600 font-medium">🛠️ Support:</span>
-                                <strong className="font-mono text-slate-900 font-black">{ex.support_badges || 0}</strong>
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* 6. Requested Extras */}
+                          {/* 5. Requested Extras */}
                           <td className={`${paddingClass} max-w-[280px]`}>
                             {ex.items && ex.items.length > 0 ? (
                               <div className="space-y-1">
@@ -1089,7 +990,7 @@ export default function AdminExhibitorsPage() {
                             )}
                           </td>
 
-                          {/* 7. Artwork (CDR / Drive) */}
+                          {/* 6. Artwork (CDR / Drive) */}
                           <td className={`${paddingClass} whitespace-nowrap`}>
                             {ex.cdr_file_url || ex.logo_file_url || ex.drive_file_url || ex.drive_folder_url ? (
                               <div className="flex flex-col gap-1">
@@ -1125,19 +1026,19 @@ export default function AdminExhibitorsPage() {
                             )}
                           </td>
 
-                          {/* 8. Special Notes */}
+                          {/* 7. Special Notes */}
                           <td className={`${paddingClass} max-w-[180px]`}>
                             <p className="text-slate-600 truncate text-[11px]" title={ex.special_notes || 'None'}>
                               {ex.special_notes || '—'}
                             </p>
                           </td>
 
-                          {/* 9. Last Updated */}
+                          {/* 8. Last Updated */}
                           <td className={`${paddingClass} text-slate-500 whitespace-nowrap text-[11px] font-mono`}>
                             {ex.last_updated ? new Date(ex.last_updated).toLocaleString('en-IN') : '—'}
                           </td>
 
-                          {/* 10. Actions (Sticky Right Column) */}
+                          {/* 9. Actions (Sticky Right Column) */}
                           <td
                             className={`${paddingClass} sticky right-0 z-20 bg-white group-hover:bg-amber-50/40 transition-colors border-l border-slate-200 text-center whitespace-nowrap shadow-[-6px_0_12px_rgba(0,0,0,0.03)]`}
                           >

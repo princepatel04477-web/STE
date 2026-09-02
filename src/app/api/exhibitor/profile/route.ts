@@ -295,8 +295,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Push the exhibitor's COMPLETE row to the sheet — profile, artwork links,
-    // extras and badges together. Sending only the profile fields blanked the
+    // Push the exhibitor's COMPLETE row to the sheet — profile, artwork links
+    // and extras together. Sending only the profile fields blanked the
     // uploaded logo, the Drive links and every extra item in the sheet.
     try {
       await syncExhibitorRowToSheets(session.mobile, {

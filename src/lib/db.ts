@@ -256,10 +256,6 @@ export const db = {
               profile_updated: ex.updated_at,
               items_json: order ? order.items_json : null,
               special_notes: order ? order.special_notes : null,
-              owner_badges: order ? (order.owner_badges ?? 0) : 0,
-              sales_badges: order ? (order.sales_badges ?? 0) : 0,
-              support_badges: order ? (order.support_badges ?? 0) : 0,
-              badge_names_json: order ? (order.badge_names_json ?? null) : null,
               rental_days: order ? (order.rental_days ?? 2) : 2,
               order_updated: order ? order.updated_at : null
             };
@@ -414,32 +410,13 @@ export const db = {
         if (q.includes('update exhibitor_orders')) {
           const items_json = String(args[0]);
           const special_notes = String(args[1]);
-          const owner_badges = Number(args[2] ?? 0);
-          const sales_badges = Number(args[3] ?? 0);
-          const support_badges = Number(args[4] ?? 0);
-          let badge_names_json = '';
-          let rental_days = 2;
-          let mobile = '';
-
-          if (args.length >= 8) {
-            badge_names_json = String(args[5] || '');
-            rental_days = Number(args[6] || 2);
-            mobile = String(args[7]);
-          } else if (args.length === 7) {
-            badge_names_json = String(args[5] || '');
-            mobile = String(args[6]);
-          } else {
-            mobile = String(args[args.length - 1]);
-          }
+          const rental_days = Number(args[2] || 2);
+          const mobile = String(args[args.length - 1]);
 
           const order = data.exhibitor_orders.find(o => o.mobile === mobile);
           if (order) {
             order.items_json = items_json;
             order.special_notes = special_notes;
-            order.owner_badges = owner_badges;
-            order.sales_badges = sales_badges;
-            order.support_badges = support_badges;
-            if (badge_names_json) order.badge_names_json = badge_names_json;
             if (rental_days) order.rental_days = rental_days;
             order.updated_at = new Date().toISOString();
           } else {
@@ -448,10 +425,6 @@ export const db = {
               mobile,
               items_json,
               special_notes,
-              owner_badges,
-              sales_badges,
-              support_badges,
-              badge_names_json: badge_names_json || undefined,
               rental_days,
               updated_at: new Date().toISOString()
             });
@@ -461,42 +434,15 @@ export const db = {
         }
 
         if (q.includes('insert into exhibitor_orders')) {
-          let mobile = '';
-          let items_json = '';
-          let special_notes = '';
-          let owner_badges = 0;
-          let sales_badges = 0;
-          let support_badges = 0;
-          let badge_names_json: string | undefined = undefined;
-          let rental_days = 2;
-
-          if (args.length >= 8) {
-            mobile = String(args[0]);
-            items_json = String(args[1]);
-            special_notes = String(args[2]);
-            owner_badges = Number(args[3] ?? 0);
-            sales_badges = Number(args[4] ?? 0);
-            support_badges = Number(args[5] ?? 0);
-            badge_names_json = typeof args[6] === 'string' ? args[6] : undefined;
-            rental_days = Number(args[7] || 2);
-          } else {
-            mobile = String(args[0]);
-            items_json = String(args[1]);
-            special_notes = String(args[2]);
-            owner_badges = Number(args[3] ?? 0);
-            sales_badges = Number(args[4] ?? 0);
-            support_badges = Number(args[5] ?? 0);
-            badge_names_json = typeof args[6] === 'string' ? args[6] : undefined;
-          }
+          const mobile = String(args[0]);
+          const items_json = String(args[1]);
+          const special_notes = String(args[2]);
+          const rental_days = Number(args[3] || 2);
 
           const existing = data.exhibitor_orders.find(o => o.mobile === mobile);
           if (existing) {
             existing.items_json = items_json;
             existing.special_notes = special_notes;
-            existing.owner_badges = owner_badges;
-            existing.sales_badges = sales_badges;
-            existing.support_badges = support_badges;
-            if (badge_names_json) existing.badge_names_json = badge_names_json;
             if (rental_days) existing.rental_days = rental_days;
             existing.updated_at = new Date().toISOString();
           } else {
@@ -505,10 +451,6 @@ export const db = {
               mobile,
               items_json,
               special_notes,
-              owner_badges,
-              sales_badges,
-              support_badges,
-              badge_names_json,
               rental_days,
               updated_at: new Date().toISOString()
             });

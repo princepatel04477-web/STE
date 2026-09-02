@@ -8,14 +8,6 @@ export interface SyncPayload {
   fascia_names?: string[];
   items?: Array<{ id: string; name: string; quantity: number; unit: string; days?: number }>;
   special_notes?: string;
-  owner_badges?: number;
-  sales_badges?: number;
-  support_badges?: number;
-  badge_names?: {
-    owner?: string[];
-    sales?: string[];
-    support?: string[];
-  };
   rental_days?: number;
   logo_file_url?: string;
   cdr_file_url?: string;
@@ -72,10 +64,6 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
       ? new Date(payload.updated_at).toLocaleString()
       : new Date().toLocaleString();
 
-    const ownerNamesStr = (payload.badge_names?.owner || []).filter(Boolean).join(', ');
-    const salesNamesStr = (payload.badge_names?.sales || []).filter(Boolean).join(', ');
-    const supportNamesStr = (payload.badge_names?.support || []).filter(Boolean).join(', ');
-
     const fascia1 = payload.fascia_names?.[0] || payload.brand_name || '';
     const fascia2 = payload.fascia_names?.[1] || '';
     const fascia3 = payload.fascia_names?.[2] || '';
@@ -110,13 +98,6 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
       tv_screen: itemMap['tv-screen'] || 0,
       display_rack: itemMap['display-rack'] || 0,
       brochure_stand: itemMap['brochure-stand'] || 0,
-      // Exhibitor Entry Badges
-      owner_badges: payload.owner_badges || 0,
-      owner_badge_names: ownerNamesStr,
-      sales_badges: payload.sales_badges || 0,
-      sales_badge_names: salesNamesStr,
-      support_badges: payload.support_badges || 0,
-      support_badge_names: supportNamesStr,
       // Summary & Notes
       items_summary: formattedItemsSummary,
       special_notes: payload.special_notes || '',
@@ -175,7 +156,7 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
  * sheet. Three routes write that row — profile, extras and upload — and each
  * one used to send only the fields it happened to own, wiping the other two's
  * columns: saving a name erased the uploaded logo and Drive links, uploading a
- * logo erased every extra item and badge name.
+ * logo erased every extra item.
  *
  * Everything now goes through buildExhibitorRow(), which reads the complete
  * current state of the exhibitor (profile + assets + order) from the cloud
@@ -223,10 +204,6 @@ interface ExhibitorRow {
 interface OrderRow {
   items_json?: unknown;
   special_notes?: string;
-  owner_badges?: number;
-  sales_badges?: number;
-  support_badges?: number;
-  badge_names_json?: unknown;
   rental_days?: number;
 }
 
@@ -253,7 +230,7 @@ export async function buildExhibitorRow(
 
   let order: OrderRow | undefined = db
     .prepare(
-      'SELECT items_json, special_notes, owner_badges, sales_badges, support_badges, badge_names_json, rental_days FROM exhibitor_orders WHERE mobile = ?'
+      'SELECT items_json, special_notes, rental_days FROM exhibitor_orders WHERE mobile = ?'
     )
     .get(mobile) as OrderRow | undefined;
 
@@ -297,11 +274,6 @@ export async function buildExhibitorRow(
     return Array.isArray(parsed) ? (parsed as SyncPayload['items']) : [];
   })();
 
-  const badgeNames = (() => {
-    const parsed = parseJsonish(order?.badge_names_json);
-    return isPlainObject(parsed) ? (parsed as SyncPayload['badge_names']) : undefined;
-  })();
-
   const composed: SyncPayload = {
     mobile,
     exhibitor_name: exhibitorName,
@@ -312,10 +284,6 @@ export async function buildExhibitorRow(
     fascia_names: fasciaNames,
     items,
     special_notes: order?.special_notes || '',
-    owner_badges: asCount(order?.owner_badges, 0),
-    sales_badges: asCount(order?.sales_badges, 0),
-    support_badges: asCount(order?.support_badges, 0),
-    badge_names: badgeNames,
     rental_days: asCount(order?.rental_days, 2),
     logo_file_url: profile?.logo_file_url || '',
     cdr_file_url: profile?.cdr_file_url || '',
