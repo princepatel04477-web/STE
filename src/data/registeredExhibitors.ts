@@ -148,6 +148,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9081277726", brandName: "Shritik Designer", stallSqft: "200 sq ft", category: "Saree", market: "Someshwar 2", aliases: ["9978912068"] },
   { mobile: "9998626756", brandName: "Siddharth Blouse", stallSqft: "600 sq ft", category: "Blouses", market: "Globale" },
   { mobile: "9913314440", brandName: "Sitaram Creations", stallSqft: "200 sq ft", category: "Sarees", market: "M1" },
+  { mobile: "7874253511", brandName: "Siyaram Fabrics", stallSqft: "100 sq ft", category: "Fabrics", market: "" },
   { mobile: "9913590154", brandName: "Sristi Sarees", stallSqft: "400 sq ft", category: "Sarees", market: "Raghukul" },
   { mobile: "7405442380", brandName: "Shubh Saachi/Shiv Ganges", stallSqft: "400 sq ft", category: "Sarees", market: "M2", aliases: ["9687609749"] },
   { mobile: "9033339606", brandName: "Sukhdev Textile", stallSqft: "400 sq ft", category: "Sarees", market: "M1" },

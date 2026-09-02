@@ -141,9 +141,8 @@
  * band the floor reads saree, then lehenga on 107A, then fabrics from 124 to
  * 148: 107B is the last unit before that fabrics run and joins the head of it,
  * while 103 sits in the middle of the north hall saree squares and would have
- * cut them in two. So 103 is the one left standing - Shiv Vardhaan vacated it
- * when they were moved up to the 200 sqft bay 141, and nobody has been moved
- * onto it since.
+ * cut them in two. Shiv Vardhaan vacated 103 when they were moved up to the 200 sqft
+ * bay 141; stall 103 was later hand-allotted to Siyaram Fabrics (7874253511, 100 sqft Fabrics).
  *
  * Nobody loses a number for it: 107B is a half nobody drew, and 107A keeps
  * Amaya. The row carries pool "General" although the bay it sits on was cut
@@ -411,6 +410,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "9825130650",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "102",   stallNumber: 102,  brand: "Shankh Designer", category: "Sarees",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
+  { unitId: "103",   stallNumber: 103,  brand: "Siyaram Fabrics", category: "Fabrics",
+    group: "Dress Material & Fabrics",  mobile: "7874253511",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
   { unitId: "104",   stallNumber: 104,  brand: "Shreya Silk Sarees", category: "Saree",
     group: "Saree",                     mobile: "7487991498",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "105",   stallNumber: 105,  brand: "Talreeja Sarees", category: "Sarees",
