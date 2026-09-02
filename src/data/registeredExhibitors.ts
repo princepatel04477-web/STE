@@ -20,6 +20,7 @@ export interface RegisteredExhibitor {
 export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9106139666", brandName: "Varunya Admin Demo", stallSqft: "400 sq ft", category: "Demo", market: "Organizer" },
   { mobile: "9950787787", brandName: "AKAS Organizer Main", stallSqft: "1000 sq ft", category: "Organizer", market: "Organizer" },
+  { mobile: "9712327649", brandName: "STE Organiser Admin", stallSqft: "", category: "Organizer", market: "Organizer" },
   { mobile: "9824886668", brandName: "Aalingan Art / Nidhanam", stallSqft: "200 sq ft", category: "Saree", market: "M1" },
   { mobile: "9274669399", brandName: "Aashirwad Creation  (Aahira)", stallSqft: "100 sq ft", category: "Men's Wear / Ethnic Fabric", market: "RRTM" },
   { mobile: "9979940730", brandName: "Abhaar Vastram", stallSqft: "400 sq ft", category: "Sarees", market: "M1" },
@@ -208,7 +209,7 @@ export function canonicalMobile(identifier: string | null | undefined): string {
 }
 
 /** The organiser logins, which are not exhibitors. */
-export const ORGANISER_MOBILES = ["9106139666", "9950787787"];
+export const ORGANISER_MOBILES = ["9106139666", "9950787787", "9712327649"];
 
 /** The exhibitors alone - the master sheet's own list, without the organisers. */
 export const EXHIBITORS_ONLY: RegisteredExhibitor[] = REGISTERED_EXHIBITORS_LIST.filter(
@@ -219,7 +220,7 @@ export const EXHIBITORS_ONLY: RegisteredExhibitor[] = REGISTERED_EXHIBITORS_LIST
  * The portal is closed to everyone who is not on the master sheet.
  *
  * REGISTERED_EXHIBITORS_LIST is the whole guest list - the exhibitors, plus the
- * two organiser numbers - so membership of it is the single test every entry
+ * organiser numbers - so membership of it is the single test every entry
  * point applies. There is no sign-up path: a number that is not here cannot log
  * in, cannot draw a stall, and cannot be added by the sheet webhook. To admit a
  * new exhibitor, add their row above; to admit a second number for an
