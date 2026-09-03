@@ -2050,6 +2050,17 @@ export default function ExhibitorDashboardPage() {
                 <p className="text-xs text-slate-500">Register owner, sales staff, and support team badges for official STE 2026 entry passes</p>
               </div>
             </div>
+            <div className="flex items-center gap-2">
+              <a
+                href="tel:9727746787"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-xs font-semibold transition-colors"
+                title="Call for badge queries"
+              >
+                <Phone className="w-3.5 h-3.5 text-amber-700" />
+                <span className="text-slate-600 font-normal">Badge Queries:</span>
+                <span className="font-mono font-bold">9727746787</span>
+              </a>
+            </div>
           </div>
 
           <div className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -2065,17 +2076,38 @@ export default function ExhibitorDashboardPage() {
                 dashboard. Complete your team&rsquo;s badge registration there to receive your digital
                 and physical entry passes.
               </p>
+              <div className="pt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-slate-300">
+                <span className="text-slate-400">For any queries:</span>
+                <a
+                  href="tel:9727746787"
+                  className="inline-flex items-center gap-1.5 font-bold text-amber-400 hover:text-amber-300 transition-colors font-mono"
+                >
+                  <Phone className="w-3.5 h-3.5 text-amber-400" />
+                  <span>9727746787</span>
+                </a>
+              </div>
             </div>
 
-            <a
-              href="https://eventmanagement.isavgo.com/ste2026-registration"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400"
-            >
-              <span>Fill Badge Form</span>
-              <ExternalLink className="w-4 h-4 text-slate-950" />
-            </a>
+            <div className="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
+              <a
+                href="https://eventmanagement.isavgo.com/ste2026-registration"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400"
+              >
+                <span>Fill Badge Form</span>
+                <ExternalLink className="w-4 h-4 text-slate-950" />
+              </a>
+              <span className="text-[11px] text-slate-400 text-center sm:text-right">
+                For any queries:{' '}
+                <a
+                  href="tel:9727746787"
+                  className="text-amber-400 hover:text-amber-300 font-bold underline underline-offset-2 font-mono"
+                >
+                  9727746787
+                </a>
+              </span>
+            </div>
           </div>
         </section>
 
