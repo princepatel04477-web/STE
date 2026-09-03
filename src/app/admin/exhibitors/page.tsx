@@ -328,8 +328,6 @@ export default function AdminExhibitorsPage() {
       'Fascia Names',
       'GST Number',
       'Extras Requirements',
-      'Vector CDR URL',
-      'Logo URL',
       'Drive Folder URL',
       'Special Notes',
       'Portal Filled'
@@ -358,8 +356,6 @@ export default function AdminExhibitorsPage() {
         fasciaStr || ex.brand_name,
         ex.gstin || (ex.gstin_missing ? 'MISSING' : ''),
         extrasStr,
-        ex.cdr_file_url || '',
-        ex.logo_file_url || '',
         ex.drive_folder_url || ex.drive_file_url || '',
         ex.special_notes || '',
         ex.portal_filled ? 'YES' : 'NO'

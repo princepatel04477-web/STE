@@ -35,6 +35,7 @@ export const EXTRAS_RATES: ExtraItem[] = [
   { id: "metal-halide",      code: "DP 25", name: "Metal Halide Light",      spec: "Spotlight / 50W LED fixture", rateInr: 1500, rateUsd: 13, basis: "per-day", category: "electrical", image: getProductImage("metal-halide") },
   { id: "plasma-32",         code: "DP 26", name: "32\" Plasma Screen with Stand", spec: "32-inch display with floor stand", rateInr: 3500, rateUsd: 27, basis: "per-day", category: "display-av", image: getProductImage("plasma-32") },
   { id: "garment-stand",     code: "DP 27", name: "Garment Stand",           spec: "Display rack for fabric/garment hangers", rateInr: 900,  rateUsd: 7,  basis: "per-day", category: "display-av", image: getProductImage("garment-stand") },
+  { id: "mannequin",         code: "DP 28", name: "Mannequin",               spec: "Full-body garment display mannequin", rateInr: 1500, rateUsd: 16, basis: "per-day", category: "display-av", image: null },
 ];
 
 export const CATEGORY_LABELS: Record<ExtraCategory, string> = {
