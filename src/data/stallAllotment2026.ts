@@ -38,6 +38,9 @@
  * 31 (slip STE-2026-31-0730-5198) and Bharti Sarees stall 44, leaving stall 30
  * free/unallotted.
  *
+ * Stall 117 stands empty. JMJ Creations (9414141810) stall allotment was
+ * removed (organisers, 3 Sep 2026), leaving the 200 sqft bay free/unallotted.
+ *
  * Stall 61 stands empty. Navdurga withdrew (organisers, 31 Aug 2026) and the
  * bay is not reallotted: the draw hands a band's stalls out in order, so
  * filling 61 would pull every 600 sqft saree brand behind it one number
@@ -440,8 +443,6 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Kurti",                     mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "116",   stallNumber: 116,  brand: "Etallica", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "",            sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "117",   stallNumber: 117,  brand: "JMJ Creations", category: "Dress Material , Kids Wear  Fabrics",
-    group: "Dress Material & Fabrics",  mobile: "9414141810",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "118",   stallNumber: 118,  brand: "Ramsha (Gouri Impex)", category: "Kurti / Suits",
     group: "Kurti",                     mobile: "9374049925",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "119",   stallNumber: 119,  brand: "Samarth Creations", category: "Fabrics",
