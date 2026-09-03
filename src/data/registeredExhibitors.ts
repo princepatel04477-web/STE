@@ -42,7 +42,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9377855666", brandName: "Bhagvad Fabrics", stallSqft: "100 sq ft", category: "Fabrics", market: "" },
   { mobile: "9825156704", brandName: "Bharti Sarees", stallSqft: "400 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9377418152", brandName: "Chandwani Silk Mills", stallSqft: "200 sq ft", category: "Saree", market: "M1" },
-  { mobile: "9408990045", brandName: "Charchita Designer", stallSqft: "100 sq ft", category: "Saree", market: "M1" },
+  { mobile: "9408990045", brandName: "Charchita Designer", stallSqft: "200 sq ft", category: "Saree", market: "M1" },
   { mobile: "7878279828", brandName: "Dev Mata Creation", stallSqft: "100 sq ft", category: "Rajputi Poshak", market: "RKTM" },
   { mobile: "9375793060", brandName: "Dhanlaxmi Silk Mills", stallSqft: "100 sq ft", category: "Sarees", market: "JJ Market" },
   { mobile: "9879360089", brandName: "Dharam Art (S)", stallSqft: "400 sq ft", category: "Dress Matterial, Kurtie", market: "Globale" },
@@ -62,6 +62,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9879688431", brandName: "Geeta Tex (Ambika)", stallSqft: "1000 sq ft", category: "Suit", market: "Kuberji Houses" },
   { mobile: "9638338014", brandName: "Glorry Creation", stallSqft: "200 sq ft", category: "Kurtis", market: "Surana 101" },
   { mobile: "9909648249", brandName: "Hanumanta Lehanga", stallSqft: "600 sq ft", category: "Lehanga", market: "De Ventura" },
+  { mobile: "9586746162", brandName: "Hariom Trendz", stallSqft: "100 sq ft", category: "Saree", market: "" },
   { mobile: "8866666650", brandName: "Heirlooms", stallSqft: "600 sq ft", category: "Saree", market: "M1", aliases: ["9904566650"] },
   { mobile: "9824150667", brandName: "Inder silk mills", stallSqft: "200 sq ft", category: "Sarees", market: "Regent" },
   { mobile: "9727256154", brandName: "Indian Women", stallSqft: "1000 sq ft", category: "Sarees", market: "RRTM 1" },
@@ -128,7 +129,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "8980254587", brandName: "Samarth Creations", stallSqft: "200 sq ft", category: "Fabrics", market: "Globale" },
   { mobile: "9316721800", brandName: "Sambhav Saree (Samita & Dharaa)", stallSqft: "800 sq ft", category: "Saree", market: "Surana 101" },
   { mobile: "6353511883", brandName: "Samta Sarees", stallSqft: "400 sq ft", category: "Sarees", market: "M2" },
-  { mobile: "7719063355", brandName: "SANKALP", stallSqft: "200 sq ft", category: "Sarees", market: "STM" },
+  { mobile: "7719063355", brandName: "SANKALP", stallSqft: "400 sq ft", category: "Sarees", market: "STM" },
   { mobile: "9810550285", brandName: "Saraogi Super Sales Private Limited", stallSqft: "2600 sq ft", category: "Sarees", market: "" },
   { mobile: "9978655007", brandName: "Sarv Kala (V.D)", stallSqft: "600 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9825122634", brandName: "Satish Dresses", stallSqft: "300 sq ft", category: "Uniform Saree", market: "Regent", aliases: ["9825900000"] },
@@ -169,8 +170,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "7874442888", brandName: "Vimarsh Prints", stallSqft: "300 sq ft", category: "Saree", market: "M1" },
   { mobile: "9537841621", brandName: "Vivah Textile", stallSqft: "200 sq ft", category: "Saree", market: "Old Bombay" },
   { mobile: "9978524326", brandName: "Yukti Fashion", stallSqft: "200 sq ft", category: "Sarees", market: "M1" },
-  { mobile: "8141335505", brandName: "Sweety Fashion", stallSqft: "800 sq ft", category: "Fabrics", market: "" },
-  { mobile: "9376711888", brandName: "Sweety Fashion", stallSqft: "800 sq ft", category: "Suits", market: "Raghuveer Trade Centre" },
+  { mobile: "9376711888", brandName: "Sweety Fashion", stallSqft: "800 sq ft", category: "Suits", market: "Raghuveer Trade Centre", aliases: ["8141335505"] },
   { mobile: "9654554518", brandName: "Surekha", stallSqft: "400 sq ft", category: "Saree", market: "" }
 ];
 

@@ -19,7 +19,6 @@
  *   46   Bahubali, seated on the 43 they vacated - the same 3m x 18m,
  *        600 sqft size in the same north hall saree band, so the swap is an
  *        exchange rather than a resize.
- *   114  Sweety Fashion (Fabrics), moved off 111 (previously moved off 121)
  *   121  Radhey Silk Weaves, seated on the bay 111 vacated
  *   151  Dream Delta, on a 3m x 3m bay the draw had left empty
  *   60   Jyotsna, on a whole 3m x 6m bay rather than a cut piece of bay
@@ -33,10 +32,44 @@
  *        together (organisers, 1 Sep 2026)
  *   107B Jagadamba Creation, on the half of bay 107 the saree draw left
  *        standing (organisers, 1 Sep 2026)
+ *   30   SANKALP, moved up off the 200 sqft bay 18 onto the 3m x 12m,
+ *        400 sqft bay the draw had left empty (organisers, 3 Sep 2026).
+ *        A resize, not a swap: they book 400 sqft now, so
+ *        registeredExhibitors.ts carries the new size too.
+ *   18   Charchita Designer, moved up off the 100 sqft bay 92 onto the
+ *        3m x 6m, 200 sqft bay SANKALP vacated (organisers, 3 Sep 2026).
+ *        A resize as well, and registeredExhibitors.ts carries it.
+ *   92   Hariom Trendz, seated on the 3m x 3m bay Charchita Designer
+ *        vacated (organisers, 3 Sep 2026). They are not on
+ *        STE_data_sheet.xlsx, so the draw had no row to seat them.
  *
- * Stall 30 stands empty. In the live draw, Abhaar Vastram was allotted stall
- * 31 (slip STE-2026-31-0730-5198) and Bharti Sarees stall 44, leaving stall 30
- * free/unallotted.
+ * The three moves are one chain and are held together. Each firm steps onto
+ * the bay the one before it left, so the floor gains and loses nothing: no
+ * bay stands empty at the end that did not before, and no firm outside the
+ * chain changes number. Held is what keeps it that way - drawn, the vacated
+ * bays would go back into their blocks and be handed out in draw order,
+ * pulling brands off numbers already on their slips.
+ *
+ * Stall 114 stands empty. Sweety Fashion holds stall 112 (Suits), and the
+ * duplicate/extra stall 114 (8141335505) allotment was removed (organisers, 3 Sep 2026),
+ * leaving the 800 sqft bay free/unallotted.
+ *
+ * Stall 30 is now let. In the live draw, Abhaar Vastram were allotted stall 31
+ * (slip STE-2026-31-0730-5198) and Bharti Sarees stall 44, which left 30 - one
+ * of the two 3m x 12m, 400 sqft bays at the head of the north hall - standing
+ * free. SANKALP (7719063355) take it, moving up from the 200 sqft bay 18
+ * (organisers, 3 Sep 2026), and 18 and 92 move with them: Charchita Designer
+ * (9408990045) take 18, and Hariom Trendz (9586746162) take the 100 sqft bay
+ * 92 Charchita leave. All three rows are held.
+ *
+ * Nobody outside the chain moves. 30 was the bay nobody drew, so seating
+ * SANKALP on it costs no one a number; 18 and 92 are then filled by the firm
+ * stepping up behind, so neither goes back into its block to be redrawn. Two
+ * of the three are resizes rather than swaps - SANKALP 200 -> 400 sqft and
+ * Charchita 100 -> 200 sqft - so registeredExhibitors.ts carries the new sizes
+ * as well, the way it does for Shiv Vardhaan on 141. Hariom Trendz are not on
+ * STE_data_sheet.xlsx at all; they join the guest list here, and 92 is a bay
+ * inside the saree band that only a hand-seating can reach.
  *
  * Stall 117 stands empty. JMJ Creations (9414141810) stall allotment was
  * removed (organisers, 3 Sep 2026), leaving the 200 sqft bay free/unallotted.
@@ -247,8 +280,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "",            sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
   { unitId: "17",    stallNumber: 17,   brand: "Radhya Designer", category: "Sarees",
     group: "Saree",                     mobile: "9510064200",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
-  { unitId: "18",    stallNumber: 18,   brand: "SANKALP", category: "Sarees",
-    group: "Saree",                     mobile: "7719063355",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
+  { unitId: "18",    stallNumber: 18,   brand: "Charchita Designer", category: "Saree",
+    group: "Saree",                     mobile: "9408990045",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: true },
   { unitId: "19",    stallNumber: 19,   brand: "Shalini Fashions", category: "Sarees",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
   { unitId: "20",    stallNumber: 20,   brand: "Shangar Tex", category: "Sarees",
@@ -271,6 +304,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Kurti",                     mobile: "9722771233",  sheetSize: "3m x 30m",  areaSqft: 1000,  pool: "General",  zone: "North Hall",         held: false },
   { unitId: "29",    stallNumber: 29,   brand: "Geeta Tex (Ambika)", category: "Suit",
     group: "Suits",                     mobile: "",            sheetSize: "3m x 30m",  areaSqft: 1000,  pool: "General",  zone: "North Hall",         held: false },
+  { unitId: "30",    stallNumber: 30,   brand: "SANKALP", category: "Sarees",
+    group: "Saree",                     mobile: "7719063355",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "31",    stallNumber: 31,   brand: "Abhaar Vastram", category: "Sarees",
     group: "Saree",                     mobile: "9979940730",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "32",    stallNumber: 32,   brand: "Jindal Saree Center", category: "Sarees",
@@ -393,8 +428,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "9374498302",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "91B",   stallNumber: 91,   brand: "Amipara Sarees", category: "Sarees",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "92",    stallNumber: 92,   brand: "Charchita Designer", category: "Saree",
-    group: "Saree",                     mobile: "9408990045",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
+  { unitId: "92",    stallNumber: 92,   brand: "Hariom Trendz", category: "Saree",
+    group: "Saree",                     mobile: "9586746162",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "93",    stallNumber: 93,   brand: "Dhanlaxmi Silk Mills", category: "Sarees",
     group: "Saree",                     mobile: "9375793060",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "94",    stallNumber: 94,   brand: "Ganga Sarees", category: "Sarees",
@@ -437,8 +472,6 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Suits",                     mobile: "9376711888",  sheetSize: "3m x 24m",  areaSqft: 800,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "113",   stallNumber: 113,  brand: "Ethnico by Laxmi", category: "Men's Wear",
     group: "Men's Wear",                mobile: "9712366161",  sheetSize: "3m x 24m",  areaSqft: 800,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "114",   stallNumber: 114,  brand: "Sweety Fashion", category: "Fabrics",
-    group: "Dress Material & Fabrics",  mobile: "8141335505",  sheetSize: "3m x 24m",  areaSqft: 800,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "115",   stallNumber: 115,  brand: "Mittoo Suits (Khantil E Com)", category: "Kurties/Suit",
     group: "Kurti",                     mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "116",   stallNumber: 116,  brand: "Etallica", category: "Fabrics",
