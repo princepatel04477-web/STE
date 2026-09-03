@@ -54,6 +54,10 @@ scripts/*.generated.gs
 # is no .vercelignore.
 /exhibitor_logos_raw/
 /exhibitor_logos_pdf/
+/STE_LOGOS/
+/exhibitor_logos_images/
+/final_extra_things_photos.pdf
+/scratch/
 
 # Allotment exports. Generated from the data in src/data, never read back.
 /STE_Stall_Allotments*.xlsx

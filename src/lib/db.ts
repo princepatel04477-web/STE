@@ -112,7 +112,8 @@ const defaultProducts = [
   { id: 'tv-screen', name: '32" Plasma Smart TV', category: 'Display & AV', description: '32" Plasma screen display with floor stand', rate_inr: 3500, unit: 'per-day', icon_name: 'tv', is_active: 1 },
   { id: 'display-rack', name: 'Garment Stand / Display Rack', category: 'Display & AV', description: 'Fabric hangers / Garment display rack', rate_inr: 900, unit: 'per-day', icon_name: 'layers', is_active: 1 },
   { id: 'pedestal-fan', name: 'Pedestal Fan', category: 'Electrical & Lighting', description: 'High power pedestal fan', rate_inr: 1500, unit: 'per-day', icon_name: 'zap', is_active: 1 },
-  { id: 'mannequin', name: 'Mannequin', category: 'Display & AV', description: 'Full-body garment display mannequin', rate_inr: 1500, unit: 'per-day', icon_name: 'shirt', is_active: 1 }
+  { id: 'mannequin', name: 'Mannequin', category: 'Display & AV', description: 'Full-body garment display mannequin', rate_inr: 1500, unit: 'per-day', icon_name: 'shirt', is_active: 1 },
+  { id: 'receptionist', name: 'Receptionist', category: 'Display & AV', description: 'Professional stall receptionist / hostess', rate_inr: 1000, unit: 'per-day', icon_name: 'user', is_active: 1 }
 ];
 
 function readData(): Schema {

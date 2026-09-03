@@ -98,6 +98,60 @@ export const PRODUCT_IMAGES_MAP: Record<string, ProductImageData> = {
     image: '/images/extras/glass-shelf.jpg',
     disclaimer: DISCLAIMER_TEXT
   },
+  'wooden-table': {
+    id: 'wooden-table',
+    name: 'Wooden Table with cover',
+    image: '/images/extras/wooden-table.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'counter-without-lock': {
+    id: 'counter-without-lock',
+    name: 'Display Glass Counter Showcase (Without Lock)',
+    image: '/images/extras/counter-without-lock.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'counter-with-lock': {
+    id: 'counter-with-lock',
+    name: 'Display Glass Counter Showcase (With Lock)',
+    image: '/images/extras/counter-with-lock.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'tall-showcase-without-lock': {
+    id: 'tall-showcase-without-lock',
+    name: 'Tall Showcase (Without Lock)',
+    image: '/images/extras/tall-showcase-without-lock.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'tall-showcase-with-lock': {
+    id: 'tall-showcase-with-lock',
+    name: 'Tall Showcase (With Lock)',
+    image: '/images/extras/tall-showcase-with-lock.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'apple-chair': {
+    id: 'apple-chair',
+    name: 'Apple Chair',
+    image: '/images/extras/apple-chair.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'receptionist': {
+    id: 'receptionist',
+    name: 'Receptionist / Hostess',
+    image: '/images/extras/receptionist.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'mannequin': {
+    id: 'mannequin',
+    name: 'Mannequin',
+    image: '/images/extras/mannequin.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'garment-stand-double': {
+    id: 'garment-stand-double',
+    name: 'Garment Stand (Double Rod)',
+    image: '/images/extras/garment-stand-double.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
   'wooden-shelf': {
     id: 'wooden-shelf',
     name: 'Wooden Shelf',
@@ -106,7 +160,7 @@ export const PRODUCT_IMAGES_MAP: Record<string, ProductImageData> = {
   },
   'garment-stand': {
     id: 'garment-stand',
-    name: 'Garment Stand',
+    name: 'Garment Stand (Single Rod)',
     image: '/images/extras/garment-stand.jpg',
     disclaimer: DISCLAIMER_TEXT
   },

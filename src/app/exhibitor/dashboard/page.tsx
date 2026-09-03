@@ -2090,7 +2090,7 @@ export default function ExhibitorDashboardPage() {
 
             <div className="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
               <a
-                href="https://eventmanagement.isavgo.com/ste2026-registration"
+                href="https://eventmanagement.isavgo.com/ste2026-registration/exhibitor/login"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-400"
