@@ -47,3 +47,13 @@ scripts/*.generated.gs
 .env*
 ~$*
 *.csv
+
+# Exhibitor artwork pulled down from Drive to work on locally. Nothing in the
+# app reads it and the raw .cdr set alone is 25MB, so it stays out of the repo
+# and out of the deployment upload - vercel falls back to this file when there
+# is no .vercelignore.
+/exhibitor_logos_raw/
+/exhibitor_logos_pdf/
+
+# Allotment exports. Generated from the data in src/data, never read back.
+/STE_Stall_Allotments*.xlsx

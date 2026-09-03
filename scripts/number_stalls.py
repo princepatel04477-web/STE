@@ -2,9 +2,43 @@
 """
 STE 2026 - stall numbering generator.
 
-Reads the approved floor plan (Final-Layout-STE-2026.svg), reconstructs the
-underlying cell grid from the drawing's fills and border lines, recovers every
-stall as an exact rectangle, then assigns stall numbers 1..153.
+Reads the approved floor plan (Final-Layout-STE-2026.xls, sheet
+"STE - Proposed Layout 3.9.2026"), recovers every stall as an exact rectangle,
+carries the numbers already on the exhibitors' slips across unchanged, and
+numbers whatever the new plan added from 153 up.
+
+THE DRAWING IS A SPREADSHEET
+The organisers draw the floor in Excel on a grid of one cell per metre, so a
+merged block of 18 rows by 3 columns labelled "18M x 3M" is a stall and its
+span is its real size. That is exact to the metre, so the geometry here is
+read straight off the merge list rather than traced back out of a PDF export.
+GRID_X / GRID_Y put a cell back into the printed plan's own coordinate space,
+so every rectangle the app already hit-tests against stays where it was.
+
+NUMBERS DO NOT MOVE
+A stall number is on a signed allotment slip, so it belongs to the exhibitor
+rather than to the position. LOCKED_NUMBERS pins each number to the cell it
+occupies in this layout: a stall the organisers slid up its column keeps its
+number, and a number that has come off the floor is retired rather than
+reissued. Only a bay no number claims takes a new one, counting on from 153 -
+153 being free because 152 and 153 were thrown together under the lower
+number. The walk order below is what hands new numbers out; it no longer
+re-cuts the old ones.
+
+WHAT THE 3 SEP 2026 LAYOUT CHANGED
+  - The food court was shrunk. The floor it gave back holds 20 new bays in the
+    south-west, numbered 153-172.
+  - The north hall columns were re-stacked: 53, 56, 59, 62, 65, 68 and 71 moved
+    up to the north wall and 54, 57, 60, 63, 66, 69 and 72 dropped into the
+    middle, with the four 9M columns (74/75/76, 78/79/80, 83/84/85, 88/89/90)
+    re-stacked the same way. Every one of them keeps its number.
+  - 111 came off the floor: its 18M x 3M block is drawn parked outside the hall
+    wall and its floor is now 3M x 3M bays. Nobody had drawn it, so it is
+    retired and left as a gap rather than reissued.
+  - 39, the 42M x 6M anchor, is now drawn cut into 15 bays carrying their own
+    1-28 numbering and their brands. It stays one stall on one number: the cut
+    is the holder's own sub-letting, recorded as subStalls, and it is kept out
+    of the draw, the unit count and the occupancy figures.
 
 The floor is walked once, west to east:
   1. North wall strip   - the 6M x 3M run along the top wall, west -> east.
@@ -13,62 +47,181 @@ The floor is walked once, west to east:
   3. South hall columns - columns west -> east; inside a column, from the
      central cross-aisle end back toward the south wall.
 
-Numbers are then handed out saree frontage first, so it holds one unbroken run
-(1-29: the north wall strip, then the eight big perimeter blocks), with the
-rest of the floor following from 30 in the same walk order.
-
-Each stall also carries the draw pool it belongs to. The saree pool is
-stalls 1-108 less 27, 28 and 29 - 105 stalls, sized to the saree list exactly.
-Those three are the big perimeter blocks kept back for K.K. Garments, Geeta Tex
-and Mohilya, who booked those sizes but are not saree brands.
-
 Outputs:
   src/data/stallMap2026.ts                         - typed master stall list
-  public/assets/Final-Layout-STE-2026-numbered.svg - the plan with numbers on it
+  public/assets/Final-Layout-STE-2026-numbered.svg - the plan, drawn and numbered
+
+The plan is drawn here rather than annotated onto an export, because the
+layout only exists as a spreadsheet now. A stall's badge and its rectangle are
+the same rectangle, so the two cannot drift apart.
+
+The allotment (src/data/stallAllotment2026.ts) is NOT rewritten by default. It
+carries live draw results and hand-seated rows, and re-running the seeded draw
+over a floor that has changed shape would move brands off numbers already on
+their slips. Pass --allotment to rebuild it deliberately.
 
 Run:  python scripts/number_stalls.py
 """
 from __future__ import annotations
 
 import re
-from bisect import bisect_right
+import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import xlrd
+
 ROOT = Path(__file__).resolve().parent.parent
-SRC_SVG = ROOT / "Final-Layout-STE-2026.svg"
+SRC_XLS = ROOT / "Final-Layout-STE-2026.xls"
+SRC_SHEET = "STE - Proposed Layout 3.9.2026"
 OUT_TS = ROOT / "src" / "data" / "stallMap2026.ts"
 OUT_SVG = ROOT / "public" / "assets" / "Final-Layout-STE-2026-numbered.svg"
 SHEET = ROOT / "STE_data_sheet.xlsx"
 OUT_ALLOT = ROOT / "src" / "data" / "stallAllotment2026.ts"
 
-# The drawing is a PDF export at 0.75 scale; 1 metre = 5.638 user units.
-PDF_SCALE = 0.75
+# The printed plan's coordinate space, kept from the PDF export the first
+# numbering was cut from so the app's own overlay constants still hold:
+# 1 metre = 5.638 user units in an 841.92 x 595.32 viewBox.
 UNITS_PER_M = 5.638
-# Top edge of the central 6M cross-aisle: the north/south hall divider.
-CROSS_AISLE_Y = 317.4
-# Stalls above this y are the north wall strip, not a hall column.
-NORTH_STRIP_Y = 70.0
+VIEW_W, VIEW_H = 841.92007, 595.32
 
-# Fill colour -> stall size, straight off the drawing's own legend.
-SIZE_BY_COLOUR = {
-    "#eaf1dd": (6, 42),   # 42M x 6M
-    "#fcd5b4": (6, 30),   # 30M x 6M
-    "#c5d9f1": (3, 36),   # 36M x 3M
-    "#e6b9b8": (3, 30),   # 30M x 3M
-    "#ffff99": (3, 24),   # 24M x 3M
-    "#66ffff": (3, 18),   # 18M x 3M
-    "#00ff99": (3, 12),   # 12M x 3M
-    "#b2a1c7": (3, 9),    # 9M x 3M
-    "#ff99ff": None,      # 6M x 3M - runs both ways, so accept either
-    "#ff3399": (3, 3),    # 3M x 3M
-    # The south-west 18M x 3M below the food court. It is drawn in the legend's
-    # cyan rather than the hall cyan, and the legend's own tally of 25 leaves it
-    # out, but the source workbook carries it as a stall cell like any other
-    # (sheet "STE - Proposed Layout", r84 c28), so it is counted here.
-    "#00ffff": (18, 3),
+# One spreadsheet cell is one metre. These put a cell back on the printed
+# plan - a least-squares fit of the previous layout's 152 stalls onto the
+# coordinates the export gave them, good to a third of a unit (about 6cm on
+# the floor), so nothing the app already draws shifts.
+GRID_X = (5.63974, 18.1471)   # x = col * 5.63974 + 18.1471
+GRID_Y = (5.63200, 30.6141)   # y = row * 5.63200 + 30.6141
+
+# Where the halls start and stop, in grid rows. Between them lies the central
+# 6M cross-aisle, rows 51 to 57.
+STRIP_END_ROW = 9        # rows above this are the north wall strip
+CROSS_AISLE_ROW = 55     # rows from here down are the south hall
+
+# The legend box sits in the middle of the south hall and lists sizes with
+# their counts, so its swatches read as stalls unless they are cut out first.
+LEGEND_BOX = (60, 91, 55, 84)   # rows [60, 91), columns [55, 84)
+
+# Blocks the organisers have dragged off the floor and left beside the
+# drawing. They are not stalls any more; see RETIRED_NUMBERS.
+PARKED_CELLS = {(85, 141)}      # the 18M x 3M that was 111
+
+# Stall size -> the fill the printed plan uses for it, off the drawing's own
+# legend. The workbook's palette is not the print's, so the plan is drawn from
+# the size rather than from the cell's own colour.
+COLOUR_BY_SIZE = {
+    "42M x 6M": "#eaf1dd",
+    "30M x 6M": "#fcd5b4",
+    "36M x 3M": "#c5d9f1",
+    "30M x 3M": "#e6b9b8",
+    "24M x 3M": "#ffff99",
+    "18M x 3M": "#66ffff",
+    "12M x 3M": "#00ff99",
+    "9M x 3M": "#b2a1c7",
+    "6M x 3M": "#ff99ff",
+    "3M x 3M": "#ff3399",
 }
-LEGEND_SWATCH_M = (11, 3)  # the colour keys in the legend box, not stalls
+
+# The 42M x 6M anchor. The drawing no longer labels it with its size - it is
+# covered by the 15 bays its holder has sub-let - so the block itself is named
+# here, and read_layout() lifts the bays out of those cells.
+ANCHOR_CELL = (9, 37, 42, 6)    # row, column, rows, columns
+
+# --------------------------------------------------------------------------
+# The numbering, pinned
+# --------------------------------------------------------------------------
+# Every number that is on an allotment slip, against the cell it sits on in
+# THIS layout. A stall that moved is still the same stall, so it is listed at
+# the cell it moved to and keeps its number; see the module docstring for what
+# moved on 3 Sep 2026.
+#
+# Editing this table renumbers the floor, so edit it only when the organisers
+# have actually re-let a bay - never to tidy up a gap.
+LOCKED_NUMBERS = {
+    (  3,   4):   1, (  3,  10):   2, (  3,  16):   3, (  3,  22):   4, (  3,  28):   5,
+    (  3,  34):   6, (  3,  40):   7, (  3,  49):   8, (  3,  55):   9, (  3,  61):  10,
+    (  3,  67):  11, (  3,  73):  12, (  3,  79):  13, (  3,  85):  14, (  3,  94):  15,
+    (  3, 100):  16, (  3, 106):  17, (  3, 112):  18, (  3, 118):  19, (  3, 124):  20,
+    (  3, 130):  21, ( 21,   4):  22, ( 21,  10):  23, ( 21,  13):  24, ( 21,  19):  25,
+    ( 21,  22):  26, ( 15, 118):  27, ( 21, 121):  28, ( 21, 127):  29, (  9,   4):  30,
+    (  9,  10):  31, (  9,  13):  32, (  9,  19):  33, (  9,  22):  34, ( 27,  28):  35,
+    (  9,  28):  36, ( 27,  31):  37, (  9,  31):  38, (  9,  37):  39,
+    ( 21,  46):  40, (  9,  46):  41,
+    (  9,  49):  42, ( 33,  55):  43, ( 21,  55):  44, (  9,  55):  45, ( 33,  58):  46,
+    ( 21,  58):  47, (  9,  58):  48, ( 33,  64):  49, ( 21,  64):  50, (  9,  64):  51,
+    ( 33,  67):  52, (  9,  67):  53, ( 27,  67):  54, ( 33,  73):  55, (  9,  73):  56,
+    ( 27,  73):  57, ( 33,  76):  58, (  9,  76):  59, ( 27,  76):  60, ( 33,  82):  61,
+    (  9,  82):  62, ( 27,  82):  63, ( 33,  85):  64, (  9,  85):  65, ( 27,  85):  66,
+    ( 33,  91):  67, (  9,  91):  68, ( 27,  91):  69, ( 33,  94):  70, (  9,  94):  71,
+    ( 27,  94):  72, ( 33, 100):  73, ( 18, 100):  74, (  9, 100):  75, ( 27, 100):  76,
+    ( 33, 103):  77, ( 18, 103):  78, (  9, 103):  79, ( 27, 103):  80, ( 42, 109):  81,
+    ( 33, 109):  82, ( 18, 109):  83, (  9, 109):  84, ( 27, 109):  85, ( 42, 112):  86,
+    ( 33, 112):  87, ( 18, 112):  88, (  9, 112):  89, ( 27, 112):  90, (  9, 118):  91,
+    ( 18, 121):  92, ( 15, 121):  93, ( 12, 121):  94, (  9, 121):  95, ( 18, 127):  96,
+    ( 15, 127):  97, ( 12, 127):  98, (  9, 127):  99, ( 27, 130): 100, ( 24, 130): 101,
+    ( 21, 130): 102, ( 18, 130): 103, ( 15, 130): 104, ( 12, 130): 105, (  9, 130): 106,
+    ( 57,  28): 107, ( 63,  28): 108, ( 69,  28): 109, ( 75,  28): 110, ( 57,  34): 112,
+    ( 57,  37): 113, ( 57,  43): 114, ( 57,  98): 115, ( 75,  98): 116, ( 81,  98): 117,
+    ( 57, 101): 118, ( 75, 101): 119, ( 81, 101): 120, ( 57, 107): 121, ( 75, 107): 122,
+    ( 81, 107): 123, ( 87, 107): 124, ( 57, 110): 125, ( 75, 110): 126, ( 81, 110): 127,
+    ( 87, 110): 128, ( 57, 116): 129, ( 69, 116): 130, ( 78, 116): 131, ( 57, 119): 132,
+    ( 69, 119): 133, ( 78, 119): 134, ( 57, 125): 135, ( 69, 125): 136, ( 81, 125): 137,
+    ( 87, 125): 138, ( 57, 128): 139, ( 69, 128): 140, ( 81, 128): 141, ( 87, 128): 142,
+    ( 57, 134): 143, ( 60, 134): 144, ( 63, 134): 145, ( 66, 134): 146, ( 69, 134): 147,
+    ( 72, 134): 148, ( 75, 134): 149, ( 78, 134): 150, ( 81, 134): 151, ( 84, 134): 152,
+    ( 75,  43): 153, ( 57,  25): 157,
+    ( 69,  25): 158, ( 75,  25): 159, ( 78,  25): 160, ( 81,  25): 161, ( 87,  25): 162,
+    ( 81,  28): 163, ( 87,  28): 164, ( 87,  31): 165, ( 81,  34): 166, ( 87,  34): 167,
+    ( 81,  37): 168, ( 87,  37): 169, ( 87,  40): 170, ( 87,  43): 172,
+}
+
+# Numbers that have come off the floor. They are never handed out again: an
+# exhibitor's old number has to keep meaning nothing rather than quietly mean
+# somebody else's stall.
+RETIRED_NUMBERS = {
+    111,   # 18M x 3M, south hall. Drawn parked outside the hall wall on the
+           # 3 Sep 2026 layout and its floor cut into 3M x 3M bays. It had not
+           # been drawn for, so retiring it moves nobody.
+    #
+    # The organisers' second pass at the 3 Sep layout took the four westernmost
+    # south-hall bays back off the floor, leaving that corner to the premium
+    # lounge. All four were bays the same day's first pass had added, so none
+    # had ever been offered, let alone drawn for.
+    154,   # 9M x 3M, was column 19
+    155,   # 3M x 3M, was column 19
+    156,   # 3M x 3M, was column 22
+    # 171's 3M x 3M square was swallowed by the 9M x 3M bay that now runs from
+    # row 75 to row 84 in column 43. That bay is numbered 153 - the number the
+    # same pass freed up, and one no exhibitor had ever held.
+    171,
+}
+
+# Where a bay the plan has added starts counting. 153 is free because the
+# organisers threw 152 and 153 together into one 3m x 6m bay under the lower
+# number (organisers, 1 Sep 2026).
+FIRST_NEW_NUMBER = 153
+
+# Numbers printed on the drawing the floor was first numbered from. They are
+# carried so an exhibitor holding an old plan can still find their stall.
+LEGACY_NUMBERS = {
+    1: "111", 2: "112", 22: "109", 23: "108", 24: "107", 25: "106",
+    26: "105", 27: "103", 28: "106", 29: "105", 39: "101", 40: "102",
+}
+
+# The whole stalls that are hand-allotted, so the plan can grey them out and
+# DRAWABLE_STALLS_2026 can leave them alone. This is deliberately narrower
+# than RESERVED, which allot() reads: RESERVED also seats brands on bays that
+# do go into the draw (and on half of one), and marking those on the map would
+# take them off the floor.
+MAP_RESERVED = {
+    27: "K.K. Garments",                          # 36M x 3M
+    39: "SARAOGI SUPER SALES PRIVATE LIMITED",    # 42M x 6M, the largest stall
+    40: "Murtidhara Sarees / Shyamraj",           # 30M x 6M
+}
+
+# The bays the saree pool needed cut in half. Locked rather than re-derived:
+# the halves are on slips as 91A / 91B and 107A / 107B, and re-sizing the pool
+# against a floor that has changed shape could cut a different pair.
+LOCKED_SPLIT_BAYS = [91, 107]
 
 # The saree frontage: the big perimeter runs plus the north wall strip. These
 # take the opening block of numbers so the section reads as one run on signage.
@@ -231,16 +384,13 @@ WITHDRAWN = {
 #                   off anyone's slip, and they were the last pair on the
 #                   floor, so nothing renumbers behind them.
 #
-#                   The merge is in the drawing, not here: a stall is marked
-#                   off by the black border lines around it and sized by the
-#                   colour it is painted, so the line between the two is
-#                   deleted from Final-Layout-STE-2026.svg and the bay is
-#                   repainted in the legend's 6M x 3M pink. read_shapes() and
-#                   classify() then read one 3m x 6m, 200 sqft bay where there
-#                   were two 3m x 3m ones, and the floor comes back 152 stalls
-#                   rather than 153. Repainting is not cosmetic: classify()
-#                   throws away a region whose measurements do not match the
-#                   size its colour declares.
+#                   The merge is in the drawing, not here: the organisers draw
+#                   the two squares as one merged block on the layout sheet,
+#                   6 rows by 3 columns labelled "6M x 3M", so read_layout()
+#                   reads one 3m x 6m, 200 sqft bay where there were two
+#                   3m x 3m ones. The label has to agree with the block's own
+#                   span, so a bay merged without relabelling stops the run
+#                   rather than coming back the wrong size.
 #
 #
 # A firm listed here is skipped when the sheet is read, so a row the organisers
@@ -328,207 +478,204 @@ SHEET_SIZE_BY_SQM = {
     252: (2600, "42m x 6m", ("3m x 78m",)),
 }
 
-RECT_RE = re.compile(r"M(-?[\d.]+) (-?[\d.]+)H(-?[\d.]+)V(-?[\d.]+)H(-?[\d.]+)Z")
-PATH_RE = re.compile(r"<path([^>]*)/>")
-TEXT_RE = re.compile(r"<text([^>]*)>(.*?)</text>", re.S)
-TSPAN_RE = re.compile(r'<tspan y="([-\d.]+)" x="([^"]*)"[^>]*>(.*?)</tspan>', re.S)
+SIZE_TEXT = re.compile(r"(\d+)\s*M\s*[xX]\s*(\d+)\s*M", re.I)
+# A sub-let bay inside the anchor block: "1 & 2 Pagriwala", "7 Miu-Miu".
+SUB_LABEL = re.compile(r"^(\d+(?:\s*&\s*\d+)*)\s+(.*\S)$")
 
 
 # --------------------------------------------------------------------------
 # 1. Read the drawing
 # --------------------------------------------------------------------------
-def read_shapes(body):
-    """Split every rectangle in the drawing into colour fills and border lines.
-
-    Border lines carry no fill attribute, so they render black by default -
-    that is what marks one stall off from the next."""
-    fills, walls = [], []
-    for m in PATH_RE.finditer(body):
-        attrs = m.group(1)
-        d = re.search(r'd="([^"]*)"', attrs)
-        if not d:
-            continue
-        colour_attr = re.search(r'fill="(#[0-9a-fA-F]{6})"', attrs)
-        colour = colour_attr.group(1) if colour_attr else "#000000"
-        for r in RECT_RE.finditer(d.group(1)):
-            x1, y1, x2, y2, _ = (float(v) for v in r.groups())
-            box = (
-                colour,
-                min(x1, x2) * PDF_SCALE, min(y1, y2) * PDF_SCALE,
-                max(x1, x2) * PDF_SCALE, max(y1, y2) * PDF_SCALE,
-            )
-            (walls if colour == "#000000" else fills).append(box)
-    return fills, walls
+def cell_text(sheet, row, col):
+    value = sheet.cell_value(row, col)
+    if isinstance(value, float) and value == int(value):
+        value = int(value)
+    return " ".join(str(value).split())
 
 
-def snap(values, tol=0.2):
-    out = []
-    for v in sorted(values):
-        if not out or v - out[-1] > tol:
-            out.append(v)
-    return out
+def region_text(sheet, rlo, rhi, clo, chi):
+    """A merged block's label.
+
+    Excel keeps it on the top-left cell, but a block drawn by merging over an
+    older one can carry its label further in, so the whole block is read."""
+    for row in range(rlo, rhi):
+        for col in range(clo, chi):
+            text = cell_text(sheet, row, col)
+            if text:
+                return text
+    return ""
 
 
-def recover_stalls(fills, walls):
-    """Rebuild the spreadsheet grid, then flood-fill it into stall rectangles.
-
-    Neighbouring stalls of the same size share a fill colour, so colour alone
-    would merge them; the black border cells are what keep them apart."""
-    edges_x = snap([v for s in fills + walls for v in (s[1], s[3])])
-    edges_y = snap([v for s in fills + walls for v in (s[2], s[4])])
-    n_cols, n_rows = len(edges_x) - 1, len(edges_y) - 1
-
-    def span(edges, lo, hi):
-        return (
-            max(0, bisect_right(edges, lo + 0.2) - 1),
-            min(len(edges) - 2, bisect_right(edges, hi - 0.2) - 1),
-        )
-
-    grid = [[None] * n_cols for _ in range(n_rows)]
-    for colour, x1, y1, x2, y2 in fills:
-        if colour == "#ffffff":
-            continue
-        c1, c2 = span(edges_x, x1, x2)
-        r1, r2 = span(edges_y, y1, y2)
-        for r in range(r1, r2 + 1):
-            for c in range(c1, c2 + 1):
-                grid[r][c] = colour
-    for _, x1, y1, x2, y2 in walls:
-        c1, c2 = span(edges_x, x1, x2)
-        r1, r2 = span(edges_y, y1, y2)
-        for r in range(r1, r2 + 1):
-            for c in range(c1, c2 + 1):
-                grid[r][c] = "WALL"
-
-    seen = [[False] * n_cols for _ in range(n_rows)]
-    stalls = []
-    for r0 in range(n_rows):
-        for c0 in range(n_cols):
-            colour = grid[r0][c0]
-            if seen[r0][c0] or colour in (None, "WALL"):
-                continue
-            stack, cells = [(r0, c0)], []
-            seen[r0][c0] = True
-            while stack:
-                r, c = stack.pop()
-                cells.append((r, c))
-                for dr, dc in ((0, 1), (0, -1), (1, 0), (-1, 0)):
-                    nr, nc = r + dr, c + dc
-                    if (0 <= nr < n_rows and 0 <= nc < n_cols
-                            and not seen[nr][nc] and grid[nr][nc] == colour):
-                        seen[nr][nc] = True
-                        stack.append((nr, nc))
-            c1, c2 = min(c for _, c in cells), max(c for _, c in cells) + 1
-            r1, r2 = min(r for r, _ in cells), max(r for r, _ in cells) + 1
-            x, y = edges_x[c1], edges_y[r1]
-            stall = classify(colour, x, y, edges_x[c2] - x, edges_y[r2] - y)
-            if stall:
-                stalls.append(stall)
-    return stalls
+def to_plan(row, col, rows, cols):
+    """A grid block's rectangle in the printed plan's own coordinate space."""
+    ax, bx = GRID_X
+    ay, by = GRID_Y
+    return {"x": round(col * ax + bx, 2), "y": round(row * ay + by, 2),
+            "w": round(cols * ax, 2), "h": round(rows * ay, 2)}
 
 
-def classify(colour, x, y, w, h):
-    """Keep the region only if it is a stall of a size the legend declares."""
-    if colour not in SIZE_BY_COLOUR or w < 2 or h < 2:
-        return None
-    w_m, h_m = round(w / UNITS_PER_M), round(h / UNITS_PER_M)
-    if (w_m, h_m) == LEGEND_SWATCH_M:
-        return None
-    expected = SIZE_BY_COLOUR[colour]
-    if expected is None:                       # 6M x 3M, either orientation
-        if sorted((w_m, h_m)) != [3, 6]:
-            return None
-    elif (w_m, h_m) != expected and (h_m, w_m) != expected:
-        return None
-    long_m, short_m = max(w_m, h_m), min(w_m, h_m)
-    area = w_m * h_m
+def describe(rows, cols):
+    """The size fields a stall carries, from its footprint in metres."""
+    area = rows * cols
     sqft, sheet_size, aliases = SHEET_SIZE_BY_SQM[area]
-    return {
-        "x": round(x, 2), "y": round(y, 2), "w": round(w, 2), "h": round(h, 2),
-        "widthM": w_m, "depthM": h_m,
-        "size": "%dM x %dM" % (long_m, short_m),
-        "areaSqm": area,
-        "areaSqft": sqft,
-        "sheetSize": sheet_size,
-        "sheetAliases": list(aliases),
-        "colour": colour,
-    }
+    return {"widthM": cols, "depthM": rows,
+            "size": "%dM x %dM" % (max(rows, cols), min(rows, cols)),
+            "areaSqm": area, "areaSqft": sqft,
+            "sheetSize": sheet_size, "sheetAliases": list(aliases)}
 
 
-def read_legacy_numbers(body):
-    """The handful of numbers already printed on the drawing (101, 105, 111...)."""
-    found = []
-    for m in TEXT_RE.finditer(body):
-        tr = re.search(r'transform="matrix\(([^)]*)\)"', m.group(1))
-        a, b, c, d, e, f = (float(v) for v in re.split(r"[ ,]+", tr.group(1).strip()))
-        for t in TSPAN_RE.finditer(m.group(2)):
-            ty = float(t.group(1))
-            xs = [float(v) for v in t.group(2).split()]
-            txt = t.group(3).strip()
-            if not re.fullmatch(r"1\d\d", txt) or len(xs) != len(txt):
-                continue
-            pts = [(a * x + c * ty + e, b * x + d * ty + f) for x in xs]
-            cx = (min(p[0] for p in pts) + max(p[0] for p in pts)) / 2
-            cy = (min(p[1] for p in pts) + max(p[1] for p in pts)) / 2
-            found.append((txt, cx, cy))
-    return found
+def in_legend(row, col):
+    top, bottom, left, right = LEGEND_BOX
+    return top <= row < bottom and left <= col < right
 
+
+def in_anchor(row, col):
+    top, left, rows, cols = ANCHOR_CELL
+    return top <= row < top + rows and left <= col < left + cols
+
+
+def read_layout():
+    """Split every merged block on the layout sheet into stalls and the rest.
+
+    One cell is one metre, so a block's span is its real size. A block whose
+    label names a size is a stall, and that label has to agree with the span:
+    a drawing that says one thing and measures another is a mistake worth
+    stopping for, not one to round away."""
+    book = xlrd.open_workbook(SRC_XLS, formatting_info=True)
+    sheet = book.sheet_by_name(SRC_SHEET)
+    stalls, features = [], []
+    for rlo, rhi, clo, chi in sheet.merged_cells:
+        rows, cols = rhi - rlo, chi - clo
+        label = region_text(sheet, rlo, rhi, clo, chi)
+        size = SIZE_TEXT.search(label)
+        if size and not in_legend(rlo, clo) and (rlo, clo) not in PARKED_CELLS:
+            printed = sorted((int(size.group(1)), int(size.group(2))))
+            if printed != sorted((rows, cols)):
+                raise SystemExit(
+                    "the block at row %d column %d measures %dM x %dM on the "
+                    "grid but is labelled %r"
+                    % (rlo, clo, rows, cols, label))
+            stalls.append({"row": rlo, "col": clo, **describe(rows, cols),
+                           **to_plan(rlo, clo, rows, cols)})
+            continue
+        if in_anchor(rlo, clo):
+            # The anchor block's own cells - read_anchor() draws these as the
+            # sub-let bays they are, so they are not loose furniture.
+            continue
+        if (rlo, clo) in PARKED_CELLS:
+            # A block the organisers have dragged off the floor and left lying
+            # beside the drawing. It is not part of the hall, and drawing it
+            # would put an unnumbered stall on the plan.
+            continue
+        index = book.xf_list[sheet.cell_xf_index(rlo, clo)]
+        colour = book.colour_map.get(index.background.pattern_colour_index)
+        features.append({"row": rlo, "col": clo, "label": label,
+                         "fill": "#%02x%02x%02x" % colour if colour else None,
+                         **to_plan(rlo, clo, rows, cols)})
+    stalls.append(read_anchor(sheet))
+    return stalls, features
+
+
+def read_anchor(sheet):
+    """The 42M x 6M block, and the bays its holder has sub-let inside it.
+
+    The drawing no longer labels the block with its own size - the sub-let
+    bays cover it - so the block is named by ANCHOR_CELL and the bays are read
+    out of the cells it spans. They are recorded, drawn and searchable, but
+    they are not lettable units: the block is one stall on one number, already
+    hand-allotted whole, and letting its parts out here would put 15 stalls
+    into the draw that the organisers have not offered."""
+    row, col, rows, cols = ANCHOR_CELL
+    subs = []
+    for rlo, rhi, clo, chi in sheet.merged_cells:
+        if not (row <= rlo < row + rows and col <= clo < col + cols):
+            continue
+        parts = SUB_LABEL.match(region_text(sheet, rlo, rhi, clo, chi))
+        if not parts:
+            continue
+        subs.append({"row": rlo, "col": clo,
+                     "units": re.sub(r"\s*&\s*", " & ", parts.group(1)),
+                     "brand": parts.group(2),
+                     "size": "%dM x %dM" % (max(rhi - rlo, chi - clo),
+                                            min(rhi - rlo, chi - clo)),
+                     **to_plan(rlo, clo, rhi - rlo, chi - clo)})
+    # Down each column in turn from the cross-aisle end back, which is the
+    # order the block's own 1-28 numbering runs in.
+    subs.sort(key=lambda s: (s["col"], -s["row"]))
+    return {"row": row, "col": col, "subStalls": subs,
+            **describe(rows, cols), **to_plan(row, col, rows, cols)}
 
 # --------------------------------------------------------------------------
 # 2. Assign the numbers
 # --------------------------------------------------------------------------
-def assign_numbers(stalls):
-    strip = sorted((s for s in stalls if s["y"] < NORTH_STRIP_Y),
-                   key=lambda s: s["x"])
-    north = [s for s in stalls if NORTH_STRIP_Y <= s["y"] < CROSS_AISLE_Y]
-    south = [s for s in stalls if s["y"] >= CROSS_AISLE_Y]
+def walk_order(stalls):
+    """The floor walked once, west to east.
+
+    This is the order a bay the plan has added takes its number in. It no
+    longer re-cuts the numbers that are already out."""
+    strip = sorted((s for s in stalls if s["row"] < STRIP_END_ROW),
+                   key=lambda s: s["col"])
+    north = [s for s in stalls if STRIP_END_ROW <= s["row"] < CROSS_AISLE_ROW]
+    south = [s for s in stalls if s["row"] >= CROSS_AISLE_ROW]
 
     def by_column(group, from_cross_aisle_upward):
         """Columns west to east; inside a column, start at the cross-aisle end."""
         columns = defaultdict(list)
         for s in group:
-            columns[round(s["x"], 1)].append(s)
+            columns[s["col"]].append(s)
         ordered = []
-        for x in sorted(columns):
+        for col in sorted(columns):
             ordered.extend(sorted(
-                columns[x],
-                key=lambda s: -s["y"] if from_cross_aisle_upward else s["y"]))
+                columns[col],
+                key=lambda s: -s["row"] if from_cross_aisle_upward else s["row"]))
         return ordered
 
-    walk = (
-        [("North Wall Strip", s) for s in strip]
-        + [("North Hall", s) for s in by_column(north, True)]
-        + [("South Hall", s) for s in by_column(south, False)]
-    )
-    for zone, s in walk:
-        s["zone"] = zone
-        # Frontage flag, used only to decide who gets the opening numbers.
-        s["frontage"] = (
-            zone == "North Wall Strip" or s["size"] in SAREE_SIZES
-        )
-        # The end the number is printed at - the stall's frontage on the aisle.
-        s["frontEnd"] = "centre" if zone == "North Wall Strip" else (
-            "south" if zone == "North Hall" else "north")
-
-    # The saree frontage takes the opening block of numbers so it reads as one
-    # run on signage; the rest of the floor follows in the same walk order.
-    ordered = ([s for _, s in walk if s["frontage"]]
-               + [s for _, s in walk if not s["frontage"]])
-    for i, s in enumerate(ordered, start=1):
-        s["stallNumber"] = i
-        if i in RESERVED:
-            s["reservedFor"] = RESERVED[i]
-        del s["frontage"]
-    return ordered
+    # frontEnd is the end the number is printed at: the stall's frontage on
+    # the aisle it is entered from.
+    for s in strip:
+        s["zone"], s["frontEnd"] = "North Wall Strip", "centre"
+    for s in north:
+        s["zone"], s["frontEnd"] = "North Hall", "south"
+    for s in south:
+        s["zone"], s["frontEnd"] = "South Hall", "north"
+    return strip + by_column(north, True) + by_column(south, False)
 
 
-def attach_legacy(stalls, legacy):
-    for label, cx, cy in legacy:
-        for s in stalls:
-            if s["x"] <= cx <= s["x"] + s["w"] and s["y"] <= cy <= s["y"] + s["h"]:
-                s["legacyNumber"] = label
-                break
+def carry_numbers(stalls):
+    """Put back the number that is already on the slip, then number the rest.
 
+    LOCKED_NUMBERS pins a number to the cell it occupies in this layout, so a
+    stall the organisers slid up its column keeps it. A bay the table does not
+    claim is one the plan has added, and takes the next number no stall on
+    this floor has ever held."""
+    walk = walk_order(stalls)
+    for s in walk:
+        s["stallNumber"] = LOCKED_NUMBERS.get((s["row"], s["col"]))
+
+    taken = {s["stallNumber"] for s in walk if s["stallNumber"]}
+    reissued = taken & RETIRED_NUMBERS
+    if reissued:
+        raise SystemExit("retired numbers are back on the floor: %s"
+                         % sorted(reissued))
+    nxt = max([FIRST_NEW_NUMBER - 1, *taken, *RETIRED_NUMBERS]) + 1
+    for s in walk:
+        if s["stallNumber"] is None:
+            s["stallNumber"] = nxt
+            nxt += 1
+
+    numbers = [s["stallNumber"] for s in walk]
+    if len(numbers) != len(set(numbers)):
+        raise SystemExit("LOCKED_NUMBERS seats two stalls on one number")
+
+    for s in walk:
+        number = s["stallNumber"]
+        if number in LEGACY_NUMBERS:
+            s["legacyNumber"] = LEGACY_NUMBERS[number]
+        if number in MAP_RESERVED:
+            s["reservedFor"] = MAP_RESERVED[number]
+        for i, sub in enumerate(s.get("subStalls", []), start=1):
+            sub["id"] = "%d-%d" % (number, i)
+    return sorted(walk, key=lambda s: s["stallNumber"])
 
 def split_halves(stalls, bay_numbers):
     """Cut the named 200 sqft bays into two 100 sqft modules, 4A and 4B.
@@ -766,37 +913,100 @@ def trade_runs(allotments):
 # --------------------------------------------------------------------------
 # 4. Write the outputs
 # --------------------------------------------------------------------------
-def write_numbered_svg(source, stalls):
-    badges = ['<g id="stall-numbers" font-family="Arial, Helvetica, sans-serif">']
+def xml_escape(text):
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
-    def badge(cx, cy, label):
-        bw, bh = 4.2 + 3.6 * len(label), 9.0
-        badges.append(
+
+def draw_plan(stalls, features):
+    """Draw the plan, then put the numbers on it.
+
+    The layout is a spreadsheet now, so the plan is drawn from the same grid
+    the numbers are cut from rather than annotated onto an export. A stall's
+    badge and its rectangle come out of one rectangle, so the drawing and the
+    numbering cannot drift apart."""
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %s %s"'
+           ' width="%s" height="%s"'
+           ' font-family="Arial, Helvetica, sans-serif">'
+           % (VIEW_W, VIEW_H, VIEW_W, VIEW_H),
+           '<rect width="%s" height="%s" fill="#ffffff"/>' % (VIEW_W, VIEW_H)]
+
+    def rect(box, fill, stroke=None):
+        edge = ' stroke="%s" stroke-width="0.6"' % stroke if stroke else ""
+        out.append('<rect x="%.2f" y="%.2f" width="%.2f" height="%.2f"'
+                   ' fill="%s"%s/>'
+                   % (box["x"], box["y"], box["w"], box["h"], fill, edge))
+
+    def label(box, text, cap, colour="#1f2937", weight="normal", at=0.5):
+        """Centre a label in its box, turned on its side if the box is tall.
+
+        A label that will not fit legibly is left off rather than shrunk to a
+        smear: the plan is read at arm's length off a printed sheet."""
+        if not text:
+            return
+        turn = box["h"] > box["w"] * 1.6
+        across, down = (box["h"], box["w"]) if turn else (box["w"], box["h"])
+        size = min(cap, down * 0.62, across * 1.7 / len(text))
+        if size < 2.3:
+            return
+        # `at` slides the label down its box to clear the number badge; a
+        # turned box is narrow, so there is nowhere to slide it to.
+        cx = box["x"] + box["w"] / 2
+        cy = box["y"] + box["h"] * (0.5 if turn else at)
+        spin = ' transform="rotate(-90 %.2f %.2f)"' % (cx, cy) if turn else ""
+        out.append('<text x="%.2f" y="%.2f" font-size="%.2f" font-weight="%s"'
+                   ' text-anchor="middle" fill="%s"%s>%s</text>'
+                   % (cx, cy + size * 0.35, size, weight, colour, spin,
+                      xml_escape(text)))
+
+    # The hall itself: walls, aisles, entrances, the offices and the legend.
+    for f in features:
+        if f["fill"] and f["fill"] != "#ffffff":
+            rect(f, f["fill"])
+        label(f, f["label"], 7.5, weight="bold")
+
+    for s in stalls:
+        rect(s, COLOUR_BY_SIZE[s["size"]], "#000000")
+        if "subStalls" not in s:
+            # The north wall strip carries its badge in the middle, so its
+            # size sits high in the bay rather than under the number.
+            label(s, s["size"], 5.4,
+                  at=0.24 if s["frontEnd"] == "centre" else 0.5)
+    # The anchor block's sub-let bays, drawn over the block they sit in.
+    for s in stalls:
+        for sub in s.get("subStalls", []):
+            rect(sub, COLOUR_BY_SIZE[sub["size"]], "#000000")
+            label(sub, "%s %s" % (sub["units"], sub["brand"]), 4.6)
+
+    out.append('<g id="stall-numbers">')
+
+    def badge(cx, cy, text):
+        bw, bh = 4.2 + 3.6 * len(text), 9.0
+        out.append(
             '<rect x="%.2f" y="%.2f" width="%.2f" height="%.2f" rx="2"'
             ' fill="#ffffff" stroke="#c00000" stroke-width="0.7"/>'
             '<text x="%.2f" y="%.2f" font-size="6.6" font-weight="bold"'
             ' text-anchor="middle" fill="#c00000">%s</text>'
-            % (cx - bw / 2, cy - bh / 2, bw, bh, cx, cy + 2.4, label)
-        )
+            % (cx - bw / 2, cy - bh / 2, bw, bh, cx, cy + 2.4, text))
 
     for s in stalls:
         if "halves" in s:
             # A 200 sqft bay: label both 100 sqft modules and rule the split.
-            for h in s["halves"]:
-                badge(h["x"] + h["w"] / 2, h["y"] + h["h"] / 2, h["id"])
+            for half in s["halves"]:
+                badge(half["x"] + half["w"] / 2, half["y"] + half["h"] / 2,
+                      half["id"])
             a, b = s["halves"]
             if a["y"] == b["y"]:                    # bay runs east-west
                 x = max(a["x"], b["x"])
-                badges.append('<line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"'
-                              ' stroke="#c00000" stroke-width="0.5"'
-                              ' stroke-dasharray="2 1.6"/>'
-                              % (x, s["y"], x, s["y"] + s["h"]))
+                out.append('<line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"'
+                           ' stroke="#c00000" stroke-width="0.5"'
+                           ' stroke-dasharray="2 1.6"/>'
+                           % (x, s["y"], x, s["y"] + s["h"]))
             else:
                 y = max(a["y"], b["y"])
-                badges.append('<line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"'
-                              ' stroke="#c00000" stroke-width="0.5"'
-                              ' stroke-dasharray="2 1.6"/>'
-                              % (s["x"], y, s["x"] + s["w"], y))
+                out.append('<line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"'
+                           ' stroke="#c00000" stroke-width="0.5"'
+                           ' stroke-dasharray="2 1.6"/>'
+                           % (s["x"], y, s["x"] + s["w"], y))
             continue
         inset = 7.5
         if s["frontEnd"] == "south":
@@ -804,12 +1014,14 @@ def write_numbered_svg(source, stalls):
         elif s["frontEnd"] == "north":
             cy = s["y"] + inset
         else:
-            cy = s["y"] + s["h"] / 2
+            # The strip is only 3M deep, so the badge sits low in the bay and
+            # its size label rides above rather than under it.
+            cy = s["y"] + s["h"] * 0.68
         badge(s["x"] + s["w"] / 2, cy, str(s["stallNumber"]))
-    badges.append("</g>")
+    out.append("</g>")
+    out.append("</svg>")
     OUT_SVG.parent.mkdir(parents=True, exist_ok=True)
-    OUT_SVG.write_text(source.replace("</svg>", "\n".join(badges) + "\n</svg>"),
-                       encoding="utf-8")
+    OUT_SVG.write_text("\n".join(out) + "\n", encoding="utf-8")
 
 
 def write_typescript(stalls):
@@ -820,7 +1032,7 @@ def write_typescript(stalls):
             "  { stallNumber: %-4s size: %-12s sheetSize: %-12s areaSqm: %-5s"
             " areaSqft: %-6s zone: %-21s widthM: %2d,"
             " depthM: %2d, x: %7.2f, y: %6.2f, w: %6.2f, h: %6.2f,"
-            " legacyNumber: %s%s%s%s },"
+            " legacyNumber: %s%s%s%s%s },"
             % ("%d," % s["stallNumber"], '"%s",' % s["size"],
                '"%s",' % s["sheetSize"], "%d," % s["areaSqm"],
                "%d," % s["areaSqft"], '"%s",' % s["zone"],
@@ -835,22 +1047,42 @@ def write_typescript(stalls):
                    '{ id: "%s", x: %.2f, y: %.2f, w: %.2f, h: %.2f }'
                    % (h["id"], h["x"], h["y"], h["w"], h["h"])
                    for h in s["halves"]))
-               if "halves" in s else "")
+               if "halves" in s else "",
+               (",\n    subStalls: [\n%s,\n    ]" % ",\n".join(
+                   '      { id: "%s", units: "%s", brand: "%s", size: "%s",'
+                   ' x: %.2f, y: %.2f, w: %.2f, h: %.2f }'
+                   % (b["id"], b["units"], b["brand"], b["size"],
+                      b["x"], b["y"], b["w"], b["h"])
+                   for b in s["subStalls"]))
+               if s.get("subStalls") else "")
         )
     totals = Counter(s["size"] for s in stalls)
     ordered_totals = sorted(totals.items(), key=lambda kv: -kv[1])
     breakdown = "\n".join(" *   %-10s %3d" % (k, v) for k, v in ordered_totals)
     counts = "\n".join('  "%s": %d,' % (k, v) for k, v in ordered_totals)
+    highest = max(s["stallNumber"] for s in stalls)
+    retired = sorted(RETIRED_NUMBERS)
+    retired_note = ((", less %s - retired off the floor and never reissued"
+                     % ", ".join(str(n) for n in retired)) if retired else "")
     nl = "\n"
     OUT_TS.write_text(
         "/**\n"
-        " * STE 2026 master stall map - generated from Final-Layout-STE-2026.svg.\n"
+        " * STE 2026 master stall map - generated from the layout sheet\n"
+        " * \"%s\" in Final-Layout-STE-2026.xls.\n"
         " *\n"
         " * Do not hand-edit. Regenerate with:  python scripts/number_stalls.py\n"
         " *\n"
         " * %d stalls, %d sqm:\n%s\n"
         " *\n"
-        " * x/y/w/h are the stall's rectangle in the floor-plan SVG's own\n"
+        " * Numbers run 1-%d%s.\n"
+        " *\n"
+        " * A number belongs to the exhibitor holding it, not to a position on\n"
+        " * the floor: a stall the organisers move keeps its number, a number\n"
+        " * that comes off the floor is retired rather than reissued, and a bay\n"
+        " * the plan adds is numbered from the end. See LOCKED_NUMBERS in the\n"
+        " * generator for what is pinned where.\n"
+        " *\n"
+        " * x/y/w/h are the stall's rectangle in the floor plan's own\n"
         " * coordinate space (1 metre = %s units), so they can be used to draw\n"
         " * or hit-test the plan directly.\n"
         " */\n\n"
@@ -859,13 +1091,32 @@ def write_typescript(stalls):
         "export interface StallHalf {\n"
         "  /** The bay number with an A or B suffix, e.g. \"91A\". */\n"
         "  id: string;\n"
+        "  /** The part's own size. Defaults to 3M x 3M, the half of a 200 sqft bay. */\n"
+        "  size?: string;\n"
+        "  x: number;\n"
+        "  y: number;\n"
+        "  w: number;\n"
+        "  h: number;\n"
+        "}\n\n"
+        "/**\n"
+        " * A bay the stall's holder has sub-let inside it. Recorded and drawn,\n"
+        " * but never a lettable unit: the stall is let whole, on one number.\n"
+        " */\n"
+        "export interface SubStall {\n"
+        "  /** The stall number with the bay's position, e.g. \"39-1\". */\n"
+        "  id: string;\n"
+        "  /** The block's own numbering for this bay, e.g. \"1 & 2\". */\n"
+        "  units: string;\n"
+        "  brand: string;\n"
+        "  size: string;\n"
         "  x: number;\n"
         "  y: number;\n"
         "  w: number;\n"
         "  h: number;\n"
         "}\n\n"
         "export interface Stall2026 {\n"
-        "  /** 1..%d, walked west to east: north wall strip, north hall, south hall. */\n"
+        "  /** 1..%d, less any retired. Walked west to east: north wall strip,\n"
+        "   *  north hall, south hall. */\n"
         "  stallNumber: number;\n"
         "  /** As written on the floor plan, e.g. \"18M x 3M\". */\n"
         "  size: string;\n"
@@ -889,6 +1140,8 @@ def write_typescript(stalls):
         "  reservedFor?: string;\n"
         "  /** Set only on the bays the saree pool needed split, e.g. 91A / 91B. */\n"
         "  halves?: StallHalf[];\n"
+        "  /** Bays the holder has sub-let inside this stall. Not lettable. */\n"
+        "  subStalls?: SubStall[];\n"
         "}\n\n"
         "export const STALL_MAP_2026: Stall2026[] = [\n%s\n];\n\n"
         "export const TOTAL_STALLS_2026 = STALL_MAP_2026.length;\n\n"
@@ -939,8 +1192,8 @@ def write_typescript(stalls):
         "    (s) => s.sheetSize === wanted || s.sheetAliases?.includes(wanted)\n"
         "  );\n"
         "}\n"
-        % (len(stalls), sum(s["areaSqm"] for s in stalls), breakdown,
-           UNITS_PER_M, len(stalls), nl.join(rows), counts),
+        % (SRC_SHEET, len(stalls), sum(s["areaSqm"] for s in stalls), breakdown,
+           highest, retired_note, UNITS_PER_M, highest, nl.join(rows), counts),
         encoding="utf-8")
 
 
@@ -1017,35 +1270,55 @@ def json_str(value):
 
 
 def main():
-    source = SRC_SVG.read_text(encoding="utf-8")
-    body = source[source.find("</defs>"):]
-    fills, walls = read_shapes(body)
-    stalls = assign_numbers(recover_stalls(fills, walls))
-    attach_legacy(stalls, read_legacy_numbers(body))
+    stalls, features = read_layout()
+    stalls = carry_numbers(stalls)
+    split_halves(stalls, LOCKED_SPLIT_BAYS)
 
-    exhibitors = read_exhibitors()
-    saree = [e for e in exhibitors if e["isSaree"]]
-    pool_end, split_bays = size_pool_and_splits(stalls, saree)
-    # Only now, so a late booking cannot move the pool end or the split bays.
-    exhibitors += LATE_ENTRANTS
-    saree += [e for e in LATE_ENTRANTS if e["isSaree"]]
-    split_halves(stalls, split_bays)
-    allotments, unplaced = allot(stalls, exhibitors, pool_end, split_bays)
-
-    write_numbered_svg(source, stalls)
+    draw_plan(stalls, features)
     write_typescript(stalls)
-    write_allotment(allotments, pool_end, split_bays, exhibitors)
+
+    numbers = sorted(s["stallNumber"] for s in stalls)
+    gaps = [n for n in range(1, numbers[-1]) if n not in set(numbers)]
+    if gaps != sorted(RETIRED_NUMBERS):
+        raise SystemExit("the numbering has gaps nobody retired: %s"
+                         % sorted(set(gaps) - RETIRED_NUMBERS))
 
     print("%d stalls, %d sqm" % (len(stalls), sum(s["areaSqm"] for s in stalls)))
     for size, n in sorted(Counter(s["size"] for s in stalls).items(),
                           key=lambda kv: -kv[1]):
         print("  %-10s %3d" % (size, n))
+    print("numbered 1-%d, retired %s"
+          % (numbers[-1], sorted(RETIRED_NUMBERS) or "none"))
+    print("bays split  %s" % (sorted(LOCKED_SPLIT_BAYS) or "none"))
+    for path in (OUT_TS, OUT_SVG):
+        print("wrote %s" % path.relative_to(ROOT))
+
+    if "--allotment" not in sys.argv[1:]:
+        print("\n%s left alone: it carries live draw results and hand-seated\n"
+              "rows, and rebuilding it over a floor that has changed shape "
+              "would move\nbrands off numbers already on their slips. Pass "
+              "--allotment to rebuild it." % OUT_ALLOT.relative_to(ROOT))
+        return
+
+    exhibitors = read_exhibitors()
+    saree = [e for e in exhibitors if e["isSaree"]]
+    pool_end, split_bays = size_pool_and_splits(stalls, saree)
+    if sorted(split_bays) != sorted(LOCKED_SPLIT_BAYS):
+        raise SystemExit(
+            "the saree pool now wants bays %s cut, not %s. Those halves are "
+            "out as 91A/91B and 107A/107B, so settle it with the organisers "
+            "before rebuilding." % (sorted(split_bays), sorted(LOCKED_SPLIT_BAYS)))
+    # Only now, so a late booking cannot move the pool end or the split bays.
+    exhibitors += LATE_ENTRANTS
+    saree += [e for e in LATE_ENTRANTS if e["isSaree"]]
+    allotments, unplaced = allot(stalls, exhibitors, pool_end, split_bays)
+    write_allotment(allotments, pool_end, split_bays, exhibitors)
+
     print("\n%d exhibitors: %d saree, %d general"
           % (len(exhibitors), len(saree), len(exhibitors) - len(saree)))
     print("saree pool  stalls 1-%d less %s  (%d stalls)"
           % (pool_end, sorted(SAREE_POOL_EXCLUDES),
              pool_end - len(SAREE_POOL_EXCLUDES)))
-    print("bays split  %s" % (sorted(split_bays) or "none"))
     print("allotted    %d" % len(allotments))
     print("")
     print("size        brands  trades  runs")
@@ -1056,8 +1329,7 @@ def main():
         print("UNPLACED    %d" % len(unplaced))
         for e in unplaced:
             print("   %-40s %s" % (e["brand"], e["sheetSize"]))
-    for path in (OUT_TS, OUT_ALLOT, OUT_SVG):
-        print("wrote %s" % path.relative_to(ROOT))
+    print("wrote %s" % OUT_ALLOT.relative_to(ROOT))
 
 
 if __name__ == "__main__":
