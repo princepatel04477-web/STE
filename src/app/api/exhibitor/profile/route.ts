@@ -15,9 +15,9 @@ import { checkGstin, normalizeGstin, verifyGstinWithPortal } from '@/lib/gstin';
 // already saved, which the portal then reports as a failed save.
 export const maxDuration = 30;
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import db, { saveRemotePassword } from '@/lib/db';
-import { isRegisteredExhibitor } from '@/data/registeredExhibitors';
+import { findExhibitor, isRegisteredExhibitor, canonicalMobile } from '@/data/registeredExhibitors';
 import { createSessionToken, isAdminMobile } from '@/lib/auth';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
@@ -9,30 +9,57 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { mobile, new_password } = body;
 
-    const rawInput = String(mobile).trim();
+    const rawInput = String(mobile ?? '').trim();
     if (!rawInput || !new_password) {
       return NextResponse.json(
-        { error: 'User ID / Mobile number and new password are required.' },
+        { error: 'User ID / Mobile number / Brand Name and new password are required.' },
         { status: 400 }
       );
     }
 
-    let cleanMobile = rawInput;
-    if (/^[0-9+\-\s()]+$/.test(rawInput)) {
-      cleanMobile = rawInput.replace(/\D/g, '').slice(-10);
-      if (cleanMobile.length < 10) {
-        return NextResponse.json(
-          { error: 'Please enter a valid 10-digit mobile number or User ID.' },
-          { status: 400 }
-        );
+    // Resolve exhibitor by mobile, alias, User ID, or Brand Name
+    const exhibitor = findExhibitor(rawInput);
+    let cleanMobile = exhibitor?.mobile || '';
+
+    if (!cleanMobile) {
+      if (/^[0-9+\-\s()]+$/.test(rawInput)) {
+        const digits = rawInput.replace(/\D/g, '').slice(-10);
+        if (digits.length === 10) {
+          cleanMobile = digits;
+        }
+      } else {
+        cleanMobile = rawInput.toUpperCase();
       }
-    } else {
-      cleanMobile = rawInput.toUpperCase();
     }
 
-    // Verify mobile / user ID is on the master sheet - an alias counts as the
-    // exhibitor's own number, the same test login applies.
-    if (!isRegisteredExhibitor(cleanMobile)) {
+    if (!cleanMobile) {
+      return NextResponse.json(
+        { error: 'Please enter a valid 10-digit mobile number, User ID, or Brand Name.' },
+        { status: 400 }
+      );
+    }
+
+    // Always fold to canonical mobile
+    cleanMobile = canonicalMobile(cleanMobile);
+
+    // Whitelist check
+    let isAllowed = isRegisteredExhibitor(cleanMobile);
+    if (!isAllowed && isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbEx } = await supabaseAdmin
+          .from('exhibitors')
+          .select('mobile')
+          .eq('mobile', cleanMobile)
+          .maybeSingle();
+        if (sbEx?.mobile) {
+          isAllowed = true;
+        }
+      } catch (sbErr) {
+        console.warn('[Reset] Supabase check error:', sbErr);
+      }
+    }
+
+    if (!isAllowed) {
       return NextResponse.json(
         { error: 'User ID / Mobile number not found in registered exhibitor list. Please check your credentials.' },
         { status: 403 }
@@ -48,8 +75,10 @@ export async function POST(request: Request) {
     }
 
     // Update custom_password in local DB memory & remote persistent store
-    db.prepare('UPDATE exhibitors SET custom_password = ? WHERE mobile = ?').run(cleanPass, cleanMobile);
-    await saveRemotePassword(cleanMobile, cleanPass);
+    try {
+      db.prepare('UPDATE exhibitors SET custom_password = ? WHERE mobile = ?').run(cleanPass, cleanMobile);
+      await saveRemotePassword(cleanMobile, cleanPass);
+    } catch {}
 
     if (isSupabaseConfigured && supabaseAdmin) {
       try {
@@ -72,15 +101,18 @@ export async function POST(request: Request) {
     const response = NextResponse.json({
       success: true,
       mobile: cleanMobile,
+      token,
       isAdmin,
       redirectUrl: isAdmin ? '/admin/exhibitors' : '/exhibitor/dashboard',
       message: 'Password updated successfully! Logging you in...'
     });
 
+    const isHttps = request.url.startsWith('https:');
+
     // Set HTTP-only session cookie
     response.cookies.set('exhibitor_session', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' && isHttps,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7 // 7 days
@@ -89,7 +121,7 @@ export async function POST(request: Request) {
     // Set HTTP-only custom password backup cookie
     response.cookies.set(`ste_custom_pass_${cleanMobile}`, cleanPass, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' && isHttps,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 365 // 1 year

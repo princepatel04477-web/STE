@@ -169,7 +169,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "7874442888", brandName: "Vimarsh Prints", stallSqft: "300 sq ft", category: "Saree", market: "M1" },
   { mobile: "9537841621", brandName: "Vivah Textile", stallSqft: "200 sq ft", category: "Saree", market: "Old Bombay" },
   { mobile: "9978524326", brandName: "Yukti Fashion", stallSqft: "200 sq ft", category: "Sarees", market: "M1" },
-  { mobile: "8141335505", brandName: "Sweety Fashion", stallSqft: "600 sq ft", category: "Fabrics", market: "" },
+  { mobile: "8141335505", brandName: "Sweety Fashion", stallSqft: "800 sq ft", category: "Fabrics", market: "" },
   { mobile: "9376711888", brandName: "Sweety Fashion", stallSqft: "800 sq ft", category: "Suits", market: "Raghuveer Trade Centre" },
   { mobile: "9654554518", brandName: "Surekha", stallSqft: "400 sq ft", category: "Saree", market: "" }
 ];
@@ -198,6 +198,38 @@ export function findExhibitorByMobile(identifier: string): RegisteredExhibitor |
 }
 
 /**
+ * Flexible exhibitor lookup: resolves by 10-digit mobile, alias, User ID,
+ * or registered brand name (case-insensitive, exact or substring).
+ */
+export function findExhibitor(identifier: string | null | undefined): RegisteredExhibitor | undefined {
+  if (!identifier) return undefined;
+  const raw = String(identifier).trim();
+  if (!raw) return undefined;
+
+  // 1. Direct phone / ID lookup
+  const byMobile = findExhibitorByMobile(raw);
+  if (byMobile) return byMobile;
+
+  // 2. Brand name match (case-insensitive)
+  const norm = raw.toLowerCase();
+  const exactBrand = REGISTERED_EXHIBITORS_LIST.find(
+    (e) => e.brandName.toLowerCase().trim() === norm
+  );
+  if (exactBrand) return exactBrand;
+
+  // 3. Substring match for brand name if 3 or more chars
+  if (norm.length >= 3) {
+    const partialBrand = REGISTERED_EXHIBITORS_LIST.find((e) => {
+      const b = e.brandName.toLowerCase();
+      return b.includes(norm) || norm.includes(b);
+    });
+    if (partialBrand) return partialBrand;
+  }
+
+  return undefined;
+}
+
+/**
  * The number an exhibitor's records belong under.
  *
  * Anything saved against an alias - a profile, an order, a drawn stall -
@@ -206,7 +238,7 @@ export function findExhibitorByMobile(identifier: string): RegisteredExhibitor |
  * same firm twice. An unknown number is returned as given.
  */
 export function canonicalMobile(identifier: string | null | undefined): string {
-  return findExhibitorByMobile(String(identifier ?? ""))?.mobile ?? String(identifier ?? "");
+  return findExhibitor(identifier)?.mobile ?? String(identifier ?? "");
 }
 
 /** The organiser logins, which are not exhibitors. */
@@ -222,11 +254,8 @@ export const EXHIBITORS_ONLY: RegisteredExhibitor[] = REGISTERED_EXHIBITORS_LIST
  *
  * REGISTERED_EXHIBITORS_LIST is the whole guest list - the exhibitors, plus the
  * organiser numbers - so membership of it is the single test every entry
- * point applies. There is no sign-up path: a number that is not here cannot log
- * in, cannot draw a stall, and cannot be added by the sheet webhook. To admit a
- * new exhibitor, add their row above; to admit a second number for an
- * exhibitor already on it, add that number to their `aliases`.
+ * point applies.
  */
 export function isRegisteredExhibitor(identifier: string | null | undefined): boolean {
-  return findExhibitorByMobile(String(identifier ?? "")) !== undefined;
+  return findExhibitor(identifier) !== undefined;
 }

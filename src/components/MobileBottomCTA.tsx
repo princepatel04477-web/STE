@@ -37,12 +37,10 @@ export default function MobileBottomCTA() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleWhatsAppClick = () => {
-    const message = language === "en"
-      ? "Namaste! I want to know more about STE 2026 stall booking."
-      : "नमस्ते! मैं STE 2026 स्टॉल बुकिंग के बारे में अधिक जानना चाहता हूँ।";
-    window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
-  };
+  const whatsappMessage = language === "en"
+    ? "Namaste! I want to know more about STE 2026 stall booking."
+    : "नमस्ते! मैं STE 2026 स्टॉल बुकिंग के बारे में अधिक जानना चाहता हूँ।";
+  const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
   const handleBookClick = () => {
     const el = document.getElementById("packages");
@@ -73,16 +71,17 @@ export default function MobileBottomCTA() {
 
           <div className="h-[72px] flex items-center justify-stretch">
             {/* WhatsApp CTA */}
-            <button
-              onClick={handleWhatsAppClick}
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 h-full bg-[#25D366] text-white flex items-center justify-center gap-2 font-sans font-bold text-sm tracking-wide active:brightness-95 transition-all border-r border-white/20 wa-pulse tap-feedback"
-              type="button"
             >
               <MessageSquare className="w-5 h-5 fill-white text-white" />
               <span>
                 <Translate en="📲 WhatsApp Us" hi="📲 व्हाट्सएप पर बात करें" />
               </span>
-            </button>
+            </a>
 
             {/* Exhibitor's Portal CTA */}
             <a

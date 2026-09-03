@@ -29,17 +29,40 @@ export default function CinematicPreloader() {
   // Starts true so server and first client render agree (no hydration mismatch).
   // The effect below dismisses it within a frame for repeat/reduced-motion visits.
   const [show, setShow] = useState(true);
+  const [isDismissing, setIsDismissing] = useState(false);
+  const [forceUnmounted, setForceUnmounted] = useState(false);
   const skipRef = useRef<HTMLButtonElement | null>(null);
   const doneRef = useRef(false);
 
   const dismiss = useCallback(() => {
     if (doneRef.current) return;
     doneRef.current = true;
+    setIsDismissing(true);
     announceIntroDone();
     setShow(false);
+
+    // Hard failsafe: remove from DOM after exit duration even if rAF stalls
+    setTimeout(() => {
+      setForceUnmounted(true);
+    }, 400);
   }, []);
 
   useEffect(() => {
+    // Never animate or trap users if backgrounded (e.g. app switch from WhatsApp)
+    if (document.hidden) {
+      dismiss();
+      setForceUnmounted(true);
+      return;
+    }
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        dismiss();
+        setForceUnmounted(true);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
     const seen = (() => {
       try {
         return sessionStorage.getItem(SEEN_KEY) === "true";
@@ -54,6 +77,7 @@ export default function CinematicPreloader() {
     // to stop.
     if (seen || reduced) {
       dismiss();
+      setForceUnmounted(true);
       return;
     }
 
@@ -62,11 +86,19 @@ export default function CinematicPreloader() {
     const timer = setTimeout(dismiss, MAX_MS);
     const onReady = () => requestAnimationFrame(dismiss);
 
+    // Absolute hard ceiling: preloader overlay MUST never remain in DOM longer than 1500ms
+    const hardFailsafe = setTimeout(() => {
+      dismiss();
+      setForceUnmounted(true);
+    }, 1500);
+
     if (document.readyState === "complete") onReady();
     else window.addEventListener("load", onReady, { once: true });
 
     return () => {
       clearTimeout(timer);
+      clearTimeout(hardFailsafe);
+      document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("load", onReady);
     };
   }, [dismiss]);
@@ -81,6 +113,8 @@ export default function CinematicPreloader() {
     return () => window.removeEventListener("keydown", onKey);
   }, [show, dismiss]);
 
+  if (forceUnmounted) return null;
+
   return (
     <AnimatePresence>
       {show && (
@@ -90,7 +124,9 @@ export default function CinematicPreloader() {
         <motion.div
           key="preloader"
           id="cinematic-preloader"
-          className="fixed top-0 left-0 w-full h-[100svh] z-preloader bg-[#050505] flex flex-col justify-center items-center select-none"
+          className={`fixed top-0 left-0 w-full h-[100svh] z-preloader bg-[#050505] flex flex-col justify-center items-center select-none ${
+            isDismissing ? "pointer-events-none opacity-0 transition-opacity duration-300" : "pointer-events-auto"
+          }`}
           role="status"
           aria-live="polite"
           initial={{ clipPath: "inset(0 0% 0 0)", opacity: 1 }}

@@ -84,11 +84,12 @@ export default function EstimateBuilder() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const whatsAppExtrasUrl = `https://wa.me/919950787787?text=${encodeURIComponent(
+    `Namaste! I would like to request exhibitor extras for STE 2026:\n\n${generateSerializedSummary()}`
+  )}`;
+
   const handleWhatsAppRequest = () => {
-    const text = encodeURIComponent(
-      `Namaste! I would like to request exhibitor extras for STE 2026:\n\n${generateSerializedSummary()}`
-    );
-    window.open(`https://wa.me/919950787787?text=${text}`, "_blank");
+    window.location.href = whatsAppExtrasUrl;
   };
 
   const handleDirectSubmit = async (e: React.FormEvent) => {
@@ -442,14 +443,15 @@ export default function EstimateBuilder() {
                 </div>
 
                 <div className="space-y-3">
-                  <button
-                    type="button"
-                    onClick={handleWhatsAppRequest}
+                  <a
+                    href={whatsAppExtrasUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-full py-3 px-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all"
                   >
                     <MessageSquare className="w-4 h-4" />
                     <span>Send via WhatsApp (+91 99507 87787)</span>
-                  </button>
+                  </a>
 
                   <div className="relative flex items-center py-2">
                     <div className="flex-grow border-t border-slate-200" />

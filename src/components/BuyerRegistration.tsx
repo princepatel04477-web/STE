@@ -122,10 +122,11 @@ export default function BuyerRegistration() {
     }, 1200);
   };
 
+  const buyerWhatsAppText = `Hello STE 2026, I have registered as a B2B Buyer.\n\nBusiness: ${businessName}\nType: ${buyerType}\nCity: ${city}\nInterests: ${selectedCategories.join(", ")}`;
+  const buyerWhatsAppUrl = `https://wa.me/${PHONE_WA}?text=${encodeURIComponent(buyerWhatsAppText)}`;
+
   const handleWhatsAppRedirect = () => {
-    const text = `Hello STE 2026, I have registered as a B2B Buyer.\n\nBusiness: ${businessName}\nType: ${buyerType}\nCity: ${city}\nInterests: ${selectedCategories.join(", ")}`;
-    const url = `https://wa.me/${PHONE_WA}?text=${encodeURIComponent(text)}`;
-    window.open(url, "_blank");
+    window.location.href = buyerWhatsAppUrl;
   };
 
   return (
@@ -508,12 +509,14 @@ export default function BuyerRegistration() {
 
                 {/* CTA buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md justify-center">
-                  <button
-                    onClick={handleWhatsAppRedirect}
+                  <a
+                    href={buyerWhatsAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-full sm:w-auto px-8 py-3.5 bg-gold-gradient rounded-full text-expo-midnight font-sans font-bold text-xs tracking-[2px] uppercase shadow-lg hover:shadow-expo-glow transition-all flex items-center justify-center gap-1.5 btn-shimmer gold-border-pulse"
                   >
                     <MessageSquare className="w-4 h-4 stroke-[2.5]" /> <Translate en="Send Verification via WhatsApp" hi="व्हाट्सएप के माध्यम से सत्यापन भेजें" />
-                  </button>
+                  </a>
                   <button
                     onClick={() => {
                       setSuccess(false);

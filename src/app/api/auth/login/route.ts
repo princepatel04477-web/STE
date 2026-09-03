@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import db, { fetchRemotePasswords } from '@/lib/db';
 import { createSessionToken, validatePassword, isAdminMobile } from '@/lib/auth';
-import { isRegisteredExhibitor } from '@/data/registeredExhibitors';
+import { findExhibitor, isRegisteredExhibitor, canonicalMobile } from '@/data/registeredExhibitors';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function POST(request: Request) {
@@ -10,45 +10,73 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { mobile, password } = body;
 
-    const rawInput = String(mobile).trim();
+    const rawInput = String(mobile ?? '').trim();
     if (!rawInput || !password) {
       return NextResponse.json(
-        { error: 'User ID / Mobile number and password are required.' },
+        { error: 'User ID / Mobile number / Brand Name and password are required.' },
         { status: 400 }
       );
     }
 
-    let cleanMobile = rawInput;
-    if (/^[0-9+\-\s()]+$/.test(rawInput)) {
-      cleanMobile = rawInput.replace(/\D/g, '').slice(-10);
-      if (cleanMobile.length < 10) {
-        return NextResponse.json(
-          { error: 'Please enter a valid 10-digit mobile number or User ID.' },
-          { status: 400 }
-        );
+    // Resolve exhibitor by mobile, alias, User ID, or Brand Name
+    const exhibitor = findExhibitor(rawInput);
+    let cleanMobile = exhibitor?.mobile || '';
+
+    if (!cleanMobile) {
+      if (/^[0-9+\-\s()]+$/.test(rawInput)) {
+        const digits = rawInput.replace(/\D/g, '').slice(-10);
+        if (digits.length === 10) {
+          cleanMobile = digits;
+        }
+      } else {
+        cleanMobile = rawInput.toUpperCase();
       }
-    } else {
-      cleanMobile = rawInput.toUpperCase();
     }
 
-    // The portal is closed: only the numbers on the master sheet get in. This
-    // runs before any profile is touched, so an unknown number cannot register
-    // itself simply by trying to log in.
-    if (!isRegisteredExhibitor(cleanMobile)) {
+    if (!cleanMobile) {
       return NextResponse.json(
-        { error: 'This number is not on the STE 2026 exhibitor list. Please contact the organisers.' },
+        { error: 'Please enter a valid 10-digit mobile number, User ID, or Brand Name.' },
+        { status: 400 }
+      );
+    }
+
+    // Always fold to canonical mobile so alias logins share the master row
+    cleanMobile = canonicalMobile(cleanMobile);
+
+    // Whitelist check: Static master list first, then Supabase cloud database fallback
+    let isAllowed = isRegisteredExhibitor(cleanMobile);
+    if (!isAllowed && isSupabaseConfigured && supabaseAdmin) {
+      try {
+        const { data: sbEx } = await supabaseAdmin
+          .from('exhibitors')
+          .select('mobile')
+          .eq('mobile', cleanMobile)
+          .maybeSingle();
+        if (sbEx?.mobile) {
+          isAllowed = true;
+        }
+      } catch (sbErr) {
+        console.warn('[Login] Supabase exhibitor check error:', sbErr);
+      }
+    }
+
+    if (!isAllowed) {
+      return NextResponse.json(
+        { error: 'This number or brand is not on the STE 2026 exhibitor list. If you are a confirmed exhibitor, please contact the organisers at +91 91061 39666.' },
         { status: 403 }
       );
     }
 
-    // Ensure exhibitor profile exists
-    const existing = db
-      .prepare('SELECT * FROM exhibitors WHERE mobile = ?')
-      .get(cleanMobile) as any;
+    // Ensure exhibitor profile exists in local fallback store
+    try {
+      const existing = db
+        .prepare('SELECT * FROM exhibitors WHERE mobile = ?')
+        .get(cleanMobile) as any;
 
-    if (!existing) {
-      db.prepare('INSERT INTO exhibitors (mobile) VALUES (?)').run(cleanMobile);
-    }
+      if (!existing) {
+        db.prepare('INSERT INTO exhibitors (mobile) VALUES (?)').run(cleanMobile);
+      }
+    } catch {}
 
     // Retrieve custom password from Supabase, local memory, backup cookie, or remote persistent store
     const cookieStore = await cookies();
@@ -70,16 +98,18 @@ export async function POST(request: Request) {
       } catch {}
     }
 
-    const customPass = supabaseCustomPass || existing?.custom_password || cookiePass || remotePass;
+    const localExisting = db
+      .prepare('SELECT custom_password FROM exhibitors WHERE mobile = ?')
+      .get(cleanMobile) as any;
+
+    const customPass = supabaseCustomPass || localExisting?.custom_password || cookiePass || remotePass;
     const inputPass = String(password).trim();
     const isValidPassword = validatePassword(inputPass, customPass, cleanMobile);
 
     if (!isValidPassword) {
       return NextResponse.json(
         {
-          error: customPass
-            ? 'Invalid password. Please enter your custom password.'
-            : 'Invalid password. Please enter your custom password or default password (ste@2026).'
+          error: 'Invalid password. You can use the default password "ste@2026", your registered mobile number, or click "Create / Reset Password".'
         },
         { status: 401 }
       );
@@ -87,21 +117,22 @@ export async function POST(request: Request) {
 
     // Create session JWT token
     const token = await createSessionToken(cleanMobile);
-
     const isAdmin = isAdminMobile(cleanMobile);
 
     const response = NextResponse.json({
       success: true,
       mobile: cleanMobile,
+      token,
       isAdmin,
       redirectUrl: isAdmin ? '/admin/exhibitors' : '/exhibitor/dashboard',
       message: 'Login successful'
     });
 
-    // Set HTTP-only cookie
+    // Set HTTP-only cookie (secure over https in production)
+    const isHttps = request.url.startsWith('https:');
     response.cookies.set('exhibitor_session', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' && isHttps,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7 // 7 days

@@ -41,6 +41,12 @@ export default function FinalCTA() {
   const [resetCaptcha, setResetCaptcha] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [inView, setInView] = useState(false);
+  const [step3Attempted, setStep3Attempted] = useState(false);
+
+  const stallDimensionRef = useRef<HTMLSelectElement | null>(null);
+  const primaryCategoryRef = useRef<HTMLSelectElement | null>(null);
+  const cityRef = useRef<HTMLInputElement | null>(null);
+  const captchaRef = useRef<HTMLDivElement | null>(null);
 
   const triggerCaptchaReset = () => {
     setResetCaptcha((prev) => !prev);
@@ -193,16 +199,36 @@ export default function FinalCTA() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setStep3Attempted(true);
     
-    if (!isStep1Valid() || !isStep2Valid() || !isStep3Valid()) {
+    if (!isStep1Valid()) {
+      setCurrentStep(1);
+      return;
+    }
+    if (!isStep2Valid()) {
+      setCurrentStep(2);
+      return;
+    }
+    if (!isStep3Valid()) {
+      if (!formData.stallDimension) {
+        stallDimensionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        stallDimensionRef.current?.focus();
+      } else if (!formData.primaryCategory) {
+        primaryCategoryRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        primaryCategoryRef.current?.focus();
+      } else if (!formData.city.trim()) {
+        cityRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        cityRef.current?.focus();
+      } else if (!isVerified) {
+        captchaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       return;
     }
 
     setShowModal(true);
   };
 
-  const handleWhatsAppRedirect = () => {
-    const textMessage = `*STE 2026 Stall Booking Inquiry*
+  const bookingSummaryText = `*STE 2026 Stall Booking Inquiry*
 ---------------------------------------
 *Company:* ${formData.companyName}
 *Contact Person:* ${formData.contactPerson}
@@ -215,10 +241,12 @@ export default function FinalCTA() {
 *Category:* ${formData.primaryCategory}
 *Stall Dimension:* ${formData.stallDimension} sq meters
 *Turnover:* ${formData.turnover}
-    *Message:* ${formData.message || "N/A"}`;
+*Message:* ${formData.message || "N/A"}`;
 
-    const encoded = encodeURIComponent(textMessage);
-    window.open(`https://wa.me/${SUPPORT_WA}?text=${encoded}`, "_blank");
+  const whatsAppBookingUrl = `https://wa.me/${SUPPORT_WA}?text=${encodeURIComponent(bookingSummaryText)}`;
+
+  const handleWhatsAppRedirect = () => {
+    window.location.href = whatsAppBookingUrl;
   };
 
   const slideVariants = {
@@ -644,10 +672,15 @@ export default function FinalCTA() {
                             <Translate en="Preferred Stall Area *" hi="पसंदीदा स्टॉल क्षेत्र *" />
                           </label>
                           <select
+                            ref={stallDimensionRef}
                             required
                             value={formData.stallDimension}
                             onChange={(e) => setFormData({ ...formData, stallDimension: e.target.value })}
-                            className="w-full bg-[#0c0c0c] border border-white/10 focus:border-expo-gold focus:outline-none focus:ring-1 focus:ring-expo-gold/20 rounded-sm px-4 py-3.5 text-base text-white transition-colors duration-300 appearance-none cursor-pointer"
+                            className={`w-full bg-[#0c0c0c] border ${
+                              step3Attempted && !formData.stallDimension
+                                ? "border-red-500/80 ring-1 ring-red-500/30"
+                                : "border-white/10 focus:border-expo-gold focus:ring-expo-gold/20"
+                            } focus:outline-none focus:ring-1 rounded-sm px-4 py-3.5 text-base text-white transition-colors duration-300 appearance-none cursor-pointer`}
                           >
                             <option value="" disabled className="text-white/20">{language === "en" ? "Select Preferred Stall Area" : "पसंदीदा स्टॉल क्षेत्र चुनें"}</option>
                             <option value="9">{language === "en" ? "9 Sqm Standard Stall" : "9 वर्ग मीटर मानक स्टॉल"}</option>
@@ -655,6 +688,11 @@ export default function FinalCTA() {
                             <option value="27">{language === "en" ? "27 Sqm Premium Space" : "27 वर्ग मीटर प्रीमियम स्थान"}</option>
                             <option value="36">{language === "en" ? "36 Sqm+ Custom Pavilion" : "36+ वर्ग मीटर कस्टम पवेलियन"}</option>
                           </select>
+                          {step3Attempted && !formData.stallDimension && (
+                            <span className="text-[11px] text-red-400 font-sans">
+                              <Translate en="Please select your preferred stall area *" hi="कृपया अपना पसंदीदा स्टॉल क्षेत्र चुनें *" />
+                            </span>
+                          )}
                         </div>
 
                         {/* Category Interested In */}
@@ -663,10 +701,15 @@ export default function FinalCTA() {
                             <Translate en="Category Interested In *" hi="रुचि की श्रेणी *" />
                           </label>
                           <select
+                            ref={primaryCategoryRef}
                             required
                             value={formData.primaryCategory}
                             onChange={(e) => setFormData({ ...formData, primaryCategory: e.target.value })}
-                            className="w-full bg-[#0c0c0c] border border-white/10 focus:border-expo-gold focus:outline-none focus:ring-1 focus:ring-expo-gold/20 rounded-sm px-4 py-3.5 text-base text-white transition-colors duration-300 appearance-none cursor-pointer"
+                            className={`w-full bg-[#0c0c0c] border ${
+                              step3Attempted && !formData.primaryCategory
+                                ? "border-red-500/80 ring-1 ring-red-500/30"
+                                : "border-white/10 focus:border-expo-gold focus:ring-expo-gold/20"
+                            } focus:outline-none focus:ring-1 rounded-sm px-4 py-3.5 text-base text-white transition-colors duration-300 appearance-none cursor-pointer`}
                           >
                             <option value="" disabled className="text-white/20">{language === "en" ? "Select Category" : "श्रेणी चुनें"}</option>
                             <option value="Sarees">{language === "en" ? "Sarees" : "साड़ी"}</option>
@@ -678,6 +721,11 @@ export default function FinalCTA() {
                             <option value="Mens Ethnic Wear">{language === "en" ? "Sherwani & Men's Ethnic Wear" : "शेरवानी और पुरुषों के एथनिक वियर"}</option>
                             <option value="Value Added Fabrics">{language === "en" ? "Value Added Fabrics / Embroideries" : "मूल्य वर्धित कपड़े / कढ़ाई"}</option>
                           </select>
+                          {step3Attempted && !formData.primaryCategory && (
+                            <span className="text-[11px] text-red-400 font-sans">
+                              <Translate en="Please select your category *" hi="कृपया अपनी श्रेणी चुनें *" />
+                            </span>
+                          )}
                         </div>
 
                         {/* City */}
@@ -686,21 +734,37 @@ export default function FinalCTA() {
                             <Translate en="City *" hi="शहर *" />
                           </label>
                           <input
+                            ref={cityRef}
                             type="text"
                             required
                             value={formData.city}
                             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                            className="w-full bg-white/[0.02] border border-white/10 focus:border-expo-gold focus:outline-none rounded-sm px-4 py-3.5 text-base text-white placeholder-white/20 transition-all duration-300 focus:ring-1 focus:ring-expo-gold/20"
+                            className={`w-full bg-white/[0.02] border ${
+                              step3Attempted && !formData.city.trim()
+                                ? "border-red-500/80 ring-1 ring-red-500/30"
+                                : "border-white/10 focus:border-expo-gold focus:ring-expo-gold/20"
+                            } focus:outline-none rounded-sm px-4 py-3.5 text-base text-white placeholder-white/20 transition-all duration-300 focus:ring-1`}
                             placeholder={language === "en" ? "e.g. Surat, Mumbai" : "जैसे: सूरत, मुंबई"}
                           />
+                          {step3Attempted && !formData.city.trim() && (
+                            <span className="text-[11px] text-red-400 font-sans">
+                              <Translate en="Please enter your city *" hi="कृपया अपना शहर दर्ज करें *" />
+                            </span>
+                          )}
                         </div>
 
                         {/* Dynamic LoomGate CAPTCHA */}
-                        <div className="flex flex-col gap-2 w-full">
+                        <div ref={captchaRef} className="flex flex-col gap-2 w-full">
                           <LoomGateVerification
                             onVerify={(val) => setIsVerified(val)}
                             resetTrigger={resetCaptcha}
                           />
+                          {step3Attempted && !isVerified && (
+                            <span className="text-[11px] text-red-400 font-sans flex items-center gap-1.5">
+                              <span className="text-xs">⚠️</span>
+                              <Translate en="Please complete security verification above *" hi="कृपया ऊपर दिया गया सुरक्षा सत्यापन पूरा करें *" />
+                            </span>
+                          )}
                         </div>
 
                         {/* Elegant Confirmation Panel */}
@@ -747,6 +811,19 @@ export default function FinalCTA() {
                   </motion.div>
                 </AnimatePresence>
               </motion.div>
+
+              {/* Validation Warning Alert for Step 3 */}
+              {currentStep === 3 && step3Attempted && !isStep3Valid() && (
+                <div className="p-3 bg-red-500/10 border border-red-500/40 rounded-sm text-red-300 text-xs font-sans flex items-center gap-2 mt-2">
+                  <span className="text-base">⚠️</span>
+                  <span>
+                    <Translate
+                      en="Please complete all required fields highlighted in red above to continue."
+                      hi="आगे बढ़ने के लिए कृपया ऊपर लाल रंग में हाइलाइट किए गए सभी आवश्यक फ़ील्ड भरें।"
+                    />
+                  </span>
+                </div>
+              )}
 
               {/* Step Navigation Controls */}
               <div className="flex gap-4 mt-2">
@@ -804,7 +881,6 @@ export default function FinalCTA() {
              <div className="absolute top-4 right-4 cursor-pointer text-expo-warm/60 hover:text-white transition-colors duration-300"
                   onClick={() => {
                     setShowModal(false);
-                    triggerCaptchaReset();
                   }}>
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -877,20 +953,18 @@ export default function FinalCTA() {
             </div>
 
             <div className="flex flex-col w-full gap-3">
-              <button
-                onClick={() => {
-                  handleWhatsAppRedirect();
-                  setShowModal(false);
-                  triggerCaptchaReset();
-                }}
+              <a
+                href={whatsAppBookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full py-4 bg-gold-gradient rounded-sm text-expo-midnight font-sans font-bold text-xs tracking-[3px] uppercase shadow-lg hover:shadow-expo-glow transition-all duration-500 flex items-center justify-center gap-2 btn-shimmer gold-border-pulse"
               >
                 <Translate en="📲 Complete on WhatsApp" hi="📲 व्हाट्सएप पर पूरा करें" />
-              </button>
+              </a>
               <button
+                type="button"
                 onClick={() => {
                   setShowModal(false);
-                  triggerCaptchaReset();
                 }}
                 className="w-full py-3.5 bg-transparent border border-white/10 hover:border-white/30 rounded-sm text-white/70 hover:text-white font-sans text-xs tracking-[2px] uppercase transition-all duration-300 badge-tap active:scale-95"
               >

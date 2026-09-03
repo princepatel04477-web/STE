@@ -105,7 +105,7 @@ export default function ExhibitionExperience() {
         <OptimizedVideoBg
           src="/assets/video/exhibition.mp4"
           className="w-full h-full filter brightness-[0.35] contrast-[1.05]"
-          fallbackImage="/f_kidswear.jpeg"
+          fallbackImage="/assets/images/f_kidswear.webp"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-[#050505] z-10" />
         <div className="noise-overlay z-20" />
