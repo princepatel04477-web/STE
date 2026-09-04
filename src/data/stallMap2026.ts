@@ -118,7 +118,16 @@ export const STALL_MAP_2026: Stall2026[] = [
   { stallNumber: 25,  size: "30M x 3M",  sheetSize: "3m x 30m",  areaSqm: 90,   areaSqft: 1000,  zone: "North Hall",         widthM:  3, depthM: 30, x:  125.30, y: 148.89, w:  16.92, h: 168.96, legacyNumber: "106" },
   { stallNumber: 26,  size: "30M x 3M",  sheetSize: "3m x 30m",  areaSqm: 90,   areaSqft: 1000,  zone: "North Hall",         widthM:  3, depthM: 30, x:  142.22, y: 148.89, w:  16.92, h: 168.96, legacyNumber: "105" },
   { stallNumber: 27,  size: "36M x 3M",  sheetSize: "3m x 36m",  areaSqm: 108,  areaSqft: 1200,  zone: "North Hall",         widthM:  3, depthM: 36, x:  683.64, y: 115.09, w:  16.92, h: 202.75, legacyNumber: "103", reservedFor: "K.K. Garments" },
-  { stallNumber: 28,  size: "30M x 3M",  sheetSize: "3m x 30m",  areaSqm: 90,   areaSqft: 1000,  zone: "North Hall",         widthM:  3, depthM: 30, x:  700.56, y: 148.89, w:  16.92, h: 168.96, legacyNumber: "106" },
+  { stallNumber: 28,  size: "30M x 3M",  sheetSize: "3m x 30m",  areaSqm: 90,   areaSqft: 1000,  zone: "North Hall",         widthM:  3, depthM: 30, x:  700.56, y: 148.89, w:  16.92, h: 168.96, legacyNumber: "106", halves: [
+    { id: "28A", size: "3M x 3M", x: 700.56, y: 300.95, w: 16.92, h: 16.90 },
+    { id: "28B", size: "9M x 3M", x: 700.56, y: 250.26, w: 16.92, h: 50.69 },
+    { id: "28C", size: "3M x 3M", x: 700.56, y: 233.37, w: 16.92, h: 16.90 },
+    { id: "28D", size: "3M x 3M", x: 700.56, y: 216.47, w: 16.92, h: 16.90 },
+    { id: "28E", size: "3M x 3M", x: 700.56, y: 199.57, w: 16.92, h: 16.90 },
+    { id: "28F", size: "3M x 3M", x: 700.56, y: 182.68, w: 16.92, h: 16.90 },
+    { id: "28G", size: "3M x 3M", x: 700.56, y: 165.78, w: 16.92, h: 16.90 },
+    { id: "28H", size: "3M x 3M", x: 700.56, y: 148.89, w: 16.92, h: 16.90 },
+  ] },
   { stallNumber: 29,  size: "30M x 3M",  sheetSize: "3m x 30m",  areaSqm: 90,   areaSqft: 1000,  zone: "North Hall",         widthM:  3, depthM: 30, x:  734.39, y: 148.89, w:  16.92, h: 168.96, legacyNumber: "105" },
   { stallNumber: 30,  size: "12M x 3M",  sheetSize: "3m x 12m",  areaSqm: 36,   areaSqft: 400,   zone: "North Hall",         widthM:  3, depthM: 12, x:   40.71, y:  81.30, w:  16.92, h:  67.58, legacyNumber: undefined },
   { stallNumber: 31,  size: "12M x 3M",  sheetSize: "3m x 12m",  areaSqm: 36,   areaSqft: 400,   zone: "North Hall",         widthM:  3, depthM: 12, x:   74.54, y:  81.30, w:  16.92, h:  67.58, legacyNumber: undefined },
@@ -242,7 +251,10 @@ export const STALL_MAP_2026: Stall2026[] = [
   { stallNumber: 133, size: "9M x 3M",   sheetSize: "3m x 9m",   areaSqm: 27,   areaSqft: 300,   zone: "South Hall",         widthM:  3, depthM:  9, x:  689.28, y: 419.22, w:  16.92, h:  50.69, legacyNumber: undefined },
   { stallNumber: 134, size: "9M x 3M",   sheetSize: "3m x 9m",   areaSqm: 27,   areaSqft: 300,   zone: "South Hall",         widthM:  3, depthM:  9, x:  689.28, y: 469.91, w:  16.92, h:  50.69, legacyNumber: undefined },
   { stallNumber: 135, size: "12M x 3M",  sheetSize: "3m x 12m",  areaSqm: 36,   areaSqft: 400,   zone: "South Hall",         widthM:  3, depthM: 12, x:  723.11, y: 351.64, w:  16.92, h:  67.58, legacyNumber: undefined },
-  { stallNumber: 136, size: "12M x 3M",  sheetSize: "3m x 12m",  areaSqm: 36,   areaSqft: 400,   zone: "South Hall",         widthM:  3, depthM: 12, x:  723.11, y: 419.22, w:  16.92, h:  67.58, legacyNumber: undefined },
+  { stallNumber: 136, size: "12M x 3M",  sheetSize: "3m x 12m",  areaSqm: 36,   areaSqft: 400,   zone: "South Hall",         widthM:  3, depthM: 12, x:  723.11, y: 419.22, w:  16.92, h:  67.58, legacyNumber: undefined, halves: [
+    { id: "136A", size: "6M x 3M", x: 723.11, y: 419.22, w: 16.92, h: 33.79 },
+    { id: "136B", size: "6M x 3M", x: 723.11, y: 453.01, w: 16.92, h: 33.79 },
+  ] },
   { stallNumber: 137, size: "6M x 3M",   sheetSize: "3m x 6m",   areaSqm: 18,   areaSqft: 200,   zone: "South Hall",         widthM:  3, depthM:  6, x:  723.11, y: 486.81, w:  16.92, h:  33.79, legacyNumber: undefined },
   { stallNumber: 138, size: "3M x 3M",   sheetSize: "3m x 3m",   areaSqm: 9,    areaSqft: 100,   zone: "South Hall",         widthM:  3, depthM:  3, x:  723.11, y: 520.60, w:  16.92, h:  16.90, legacyNumber: undefined },
   { stallNumber: 139, size: "12M x 3M",  sheetSize: "3m x 12m",  areaSqm: 36,   areaSqft: 400,   zone: "South Hall",         widthM:  3, depthM: 12, x:  740.03, y: 351.64, w:  16.92, h:  67.58, legacyNumber: undefined },
@@ -311,11 +323,20 @@ export const STALL_UNITS_2026: {
   areaSqft: number;
 }[] = STALL_MAP_2026.flatMap((s) =>
   s.halves
-    ? s.halves.map((h) => ({
-        id: h.id,
-        stallNumber: s.stallNumber,
-        areaSqft: 100,
-      }))
+    ? s.halves.map((h) => {
+        let sqft = 100;
+        if (h.size) {
+          const match = h.size.match(/^(\d+)M\s*x\s*(\d+)M$/i);
+          if (match) {
+            sqft = Math.round((parseInt(match[1], 10) * parseInt(match[2], 10)) / 0.09);
+          }
+        }
+        return {
+          id: h.id,
+          stallNumber: s.stallNumber,
+          areaSqft: sqft,
+        };
+      })
     : [{ id: String(s.stallNumber), stallNumber: s.stallNumber,
          areaSqft: s.areaSqft }]
 );

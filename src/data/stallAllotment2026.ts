@@ -224,6 +224,32 @@
  *        so 141 belongs to the saree 200 block and the draw - not the
  *        organisers - decides who ends up in the south hall. A rerun of
  *        scripts/number_stalls.py must not send them back to 100 sqft.
+ *   136A Shakambari Lace House, downsized to 200 sqft on the north half of bay 136
+ *        (organisers, 5 Sep 2026). Held so their downsized stall is locked.
+ *   136B Raghav Creation, moved off bay 152 onto the south half of bay 136 (200 sqft)
+ *        (organisers, 5 Sep 2026). Held so their move is locked.
+ *   28A..28H Eight-way split of bay 28 along its lobby-facing frontage (organisers, 5 Sep 2026):
+ *        28A: YKDK (100 sqft, placeholder, held)
+ *        28B: Ruby (300 sqft, moved off bay 88, held)
+ *        28C: Vaishnavi Sarees (100 sqft, placeholder, held)
+ *        28D: Shivay (100 sqft, placeholder, held)
+ *        28E: Sonia (100 sqft, placeholder, held)
+ *        28F: Shubh Laxmi (100 sqft, placeholder, held)
+ *        28G: Mercury (100 sqft, placeholder, held)
+ *        28H: Om Ganesh (100 sqft, placeholder, held)
+ *        Mohilya (9722771233) removed from bay 28 with registered sqft (1000) intact.
+ *   61   Libaas Fashion (AK TRENDZ), upsized to 600 sqft and moved off bay 132 onto 61
+ *        (organisers, 5 Sep 2026). Held so their move & upsize is locked.
+ *   62   Triveni (600 sqft placeholder, organisers, 5 Sep 2026). Replaces stale
+ *        Nidhivan / Yogayaa row whose real live stall is 53.
+ *   88, 132, 152 stand empty / vacated. Ruby moved 88 -> 28B; Libaas Fashion moved
+ *        132 -> 61; Raghav Creation moved 152 -> 136B. Clearing 88 also fixes the
+ *        stale Swarnpari Design entry.
+ *
+ *   Durability note: unlike standard single-unit held rows, the split into multiple units
+ *   for bays 136 and 28 is outside number_stalls.py's standard 2-piece saree generator logic.
+ *   If scripts/number_stalls.py --allotment is ever rerun, these split units and the hand-edited
+ *   SVG must be reapplied by hand.
  */
 
 export type AllotmentPool = "Saree" | "General";
@@ -300,8 +326,22 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Lehenga",                   mobile: "",            sheetSize: "3m x 30m",  areaSqft: 1000,  pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "27",    stallNumber: 27,   brand: "K.K. Garments", category: "Fabric/Garment",
     group: "Dress Material & Fabrics",  mobile: "",            sheetSize: "3m x 36m",  areaSqft: 1200,  pool: "General",  zone: "North Hall",         held: true },
-  { unitId: "28",    stallNumber: 28,   brand: "Mohilya", category: "Kurties",
-    group: "Kurti",                     mobile: "9722771233",  sheetSize: "3m x 30m",  areaSqft: 1000,  pool: "General",  zone: "North Hall",         held: false },
+  { unitId: "28A",   stallNumber: 28,   brand: "YKDK", category: "Kurties",
+    group: "Kurti",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "28B",   stallNumber: 28,   brand: "Ruby", category: "Saree",
+    group: "Saree",                     mobile: "9829085935",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "28C",   stallNumber: 28,   brand: "Vaishnavi Sarees", category: "Kurties",
+    group: "Kurti",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "28D",   stallNumber: 28,   brand: "Shivay", category: "Kurties",
+    group: "Kurti",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "28E",   stallNumber: 28,   brand: "Sonia", category: "Kurties",
+    group: "Kurti",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "28F",   stallNumber: 28,   brand: "Shubh Laxmi", category: "Kurties",
+    group: "Kurti",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "28G",   stallNumber: 28,   brand: "Mercury", category: "Kurties",
+    group: "Kurti",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "28H",   stallNumber: 28,   brand: "Om Ganesh", category: "Kurties",
+    group: "Kurti",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
   { unitId: "29",    stallNumber: 29,   brand: "Geeta Tex (Ambika)", category: "Suit",
     group: "Suits",                     mobile: "",            sheetSize: "3m x 30m",  areaSqft: 1000,  pool: "General",  zone: "North Hall",         held: false },
   { unitId: "30",    stallNumber: 30,   brand: "Sukhdev Textile", category: "Sarees",
@@ -366,8 +406,10 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "60",    stallNumber: 60,   brand: "Jyotsna", category: "Saree",
     group: "Saree",                     mobile: "9898866093",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: true },
-  { unitId: "62",    stallNumber: 62,   brand: "Nidhivan / Yogayaa", category: "Sarees",
-    group: "Saree",                     mobile: "7052577725",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
+  { unitId: "61",    stallNumber: 61,   brand: "Libaas Fashion (AK TRENDZ)", category: "Kurti",
+    group: "Kurti",                     mobile: "9374739383",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "62",    stallNumber: 62,   brand: "Triveni", category: "Sarees",
+    group: "Saree",                     mobile: "",            sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "North Hall",         held: false },
   { unitId: "63",    stallNumber: 63,   brand: "Tithi Designer", category: "Saree",
     group: "Saree",                     mobile: "9662399969",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "64",    stallNumber: 64,   brand: "Nishcay Sarees / Naisha Synthetics", category: "Saree",
@@ -414,12 +456,10 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "85",    stallNumber: 85,   brand: "Khatu Shyam", category: "Lehanga Choli",
     group: "Lehenga",                   mobile: "9825550213",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "86",    stallNumber: 86,   brand: "Ruby", category: "Saree",
-    group: "Saree",                     mobile: "9829085935",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "Saree",    zone: "North Hall",         held: false },
+  { unitId: "86",    stallNumber: 86,   brand: "", category: "",
+    group: "Saree",                     mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "87",    stallNumber: 87,   brand: "Satish Dresses", category: "Uniform Saree",
     group: "Saree",                     mobile: "9825122634",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "88",    stallNumber: 88,   brand: "Swarnpari Design", category: "Sarees",
-    group: "Saree",                     mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "89",    stallNumber: 89,   brand: "Vimarsh Prints", category: "Saree",
     group: "Saree",                     mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "90",    stallNumber: 90,   brand: "Nirvana Designer", category: "Lehenga",
@@ -504,16 +544,16 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Kurti",                     mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "131",   stallNumber: 131,  brand: "Kuhu Creation (Kesari Creation)", category: "Kurti",
     group: "Kurti",                     mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "132",   stallNumber: 132,  brand: "Libaas Fashion (AK TRENDZ)", category: "Kurti",
-    group: "Kurti",                     mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "133",   stallNumber: 133,  brand: "Poonam Designer", category: "Kurties",
     group: "Kurti",                     mobile: "9377062128",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "134",   stallNumber: 134,  brand: "Israni Entertainment", category: "Entertainment",
     group: "Men's Wear",                mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "135",   stallNumber: 135,  brand: "Alok Suit", category: "Suit",
     group: "Suits",                     mobile: "",            sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "136",   stallNumber: 136,  brand: "Shakambari Lace House", category: "Lace Materials",
-    group: "Dress Material & Fabrics",  mobile: "9982170219",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
+  { unitId: "136A",  stallNumber: 136,  brand: "Shakambari Lace House", category: "Lace Materials",
+    group: "Dress Material & Fabrics",  mobile: "9982170219",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
+  { unitId: "136B",  stallNumber: 136,  brand: "Raghav Creation", category: "Fabrics",
+    group: "Dress Material & Fabrics",  mobile: "9830944345",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "137",   stallNumber: 137,  brand: "Garden Vareli", category: "Sarees / Dress Material",
     group: "Saree",                     mobile: "6357238663",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "138",   stallNumber: 138,  brand: "Bhagvad Fabrics", category: "Fabrics",
@@ -542,17 +582,14 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Home & Other",              mobile: "9824131004",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "151",   stallNumber: 151,  brand: "Dream Delta", category: "Books",
     group: "Home & Other",              mobile: "8200203732",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: true },
-  { unitId: "152",   stallNumber: 152,  brand: "Raghav Creation", category: "Fabrics",
-    group: "Dress Material & Fabrics",  mobile: "9830944345",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
 ];
 
 /** Stalls the saree brands drew from. */
 export const SAREE_POOL_STALLS: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107];
 
-/** Bays cut into lettable parts: the 200 sqft bays 91 and 107, halved to
- *  cover the saree pool's 100 sqft demand. Bay 100 is left whole - the
- *  organisers want the 800 sqft anchor let as one stall, not in parts. */
-export const SPLIT_BAYS_2026: number[] = [91, 107];
+/** Bays cut into lettable parts: the 200 sqft bays 91, 107, 136, and 1000 sqft bay 28.
+ *  Bay 100 is left whole - the organisers want the 800 sqft anchor let as one stall, not in parts. */
+export const SPLIT_BAYS_2026: number[] = [91, 107, 136, 28];
 
 export function findAllotmentByMobile(mobile: string) {
   const key = mobile.replace(/\D/g, "").slice(-10);

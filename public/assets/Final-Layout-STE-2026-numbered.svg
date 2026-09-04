@@ -149,9 +149,30 @@
 <rect x="683.64" y="115.09" width="16.92" height="202.75" fill="#c5d9f1" class="stall-rect"/>
 <text x="692.10" y="120.29" class="size-lbl" text-anchor="middle" transform="rotate(-90 692.10 119.09)">36M x 3M</text>
 <text x="692.10" y="216.51" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 692.10 214.97)">KK GROUP</text>
-<rect x="700.56" y="148.89" width="16.92" height="168.96" fill="#e6b9b8" class="stall-rect"/>
-<text x="709.02" y="154.09" class="size-lbl" text-anchor="middle" transform="rotate(-90 709.02 152.89)">30M x 3M</text>
-<text x="709.02" y="233.41" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 709.02 231.87)">Mohilya</text>
+<rect x="700.56" y="300.95" width="16.92" height="16.90" fill="#ff3399" class="stall-rect"/>
+<text x="709.02" y="305.00" class="size-lbl" text-anchor="middle" transform="rotate(-90 709.02 304.00)">3M x 3M</text>
+<text x="709.02" y="312.00" font-size="2.7" class="brand-lbl" text-anchor="middle">YKDK</text>
+<rect x="700.56" y="250.26" width="16.92" height="50.69" fill="#ffff99" class="stall-rect"/>
+<text x="709.02" y="255.46" class="size-lbl" text-anchor="middle" transform="rotate(-90 709.02 254.26)">9M x 3M</text>
+<text x="709.02" y="278.00" font-size="3.5" class="brand-lbl" text-anchor="middle" transform="rotate(-90 709.02 276.00)">Ruby</text>
+<rect x="700.56" y="233.37" width="16.92" height="16.90" fill="#ff3399" class="stall-rect"/>
+<text x="709.02" y="237.00" class="size-lbl" text-anchor="middle" transform="rotate(-90 709.02 236.00)">3M x 3M</text>
+<text x="709.02" y="244.50" font-size="2.0" class="brand-lbl" text-anchor="middle">Vaishnavi Sarees</text>
+<rect x="700.56" y="216.47" width="16.92" height="16.90" fill="#ff3399" class="stall-rect"/>
+<text x="709.02" y="220.00" class="size-lbl" text-anchor="middle" transform="rotate(-90 709.02 219.00)">3M x 3M</text>
+<text x="709.02" y="227.50" font-size="2.7" class="brand-lbl" text-anchor="middle">Shivay</text>
+<rect x="700.56" y="199.57" width="16.92" height="16.90" fill="#ff3399" class="stall-rect"/>
+<text x="709.02" y="203.00" class="size-lbl" text-anchor="middle" transform="rotate(-90 709.02 202.00)">3M x 3M</text>
+<text x="709.02" y="210.50" font-size="2.7" class="brand-lbl" text-anchor="middle">Sonia</text>
+<rect x="700.56" y="182.68" width="16.92" height="16.90" fill="#ff3399" class="stall-rect"/>
+<text x="709.02" y="186.00" class="size-lbl" text-anchor="middle" transform="rotate(-90 709.02 185.00)">3M x 3M</text>
+<text x="709.02" y="193.50" font-size="2.0" class="brand-lbl" text-anchor="middle">Shubh Laxmi</text>
+<rect x="700.56" y="165.78" width="16.92" height="16.90" fill="#ff3399" class="stall-rect"/>
+<text x="709.02" y="169.00" class="size-lbl" text-anchor="middle" transform="rotate(-90 709.02 168.00)">3M x 3M</text>
+<text x="709.02" y="176.50" font-size="2.5" class="brand-lbl" text-anchor="middle">Mercury</text>
+<rect x="700.56" y="148.89" width="16.92" height="16.90" fill="#ff3399" class="stall-rect"/>
+<text x="709.02" y="152.50" class="size-lbl" text-anchor="middle" transform="rotate(-90 709.02 151.50)">3M x 3M</text>
+<text x="709.02" y="159.50" font-size="2.2" class="brand-lbl" text-anchor="middle">Om Ganesh</text>
 <rect x="734.39" y="148.89" width="16.92" height="168.96" fill="#e6b9b8" class="stall-rect"/>
 <text x="742.85" y="154.09" class="size-lbl" text-anchor="middle" transform="rotate(-90 742.85 152.89)">30M x 3M</text>
 <text x="742.85" y="233.41" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 742.85 231.87)">Geeta Tex (Ambika)</text>
@@ -322,10 +343,10 @@
 <text x="455.23" y="199.30" font-size="3.5" class="brand-lbl" text-anchor="middle" transform="rotate(-90 455.23 198.07)">Jyotsana</text>
 <rect x="480.61" y="216.47" width="16.92" height="101.38" fill="#66ffff" class="stall-rect"/>
 <text x="489.07" y="221.67" class="size-lbl" text-anchor="middle" transform="rotate(-90 489.07 220.47)">18M x 3M</text>
-<text x="489.07" y="266.66" class="vacant-lbl" text-anchor="middle" transform="rotate(-90 489.07 265.66)">(Vacant)</text>
+<text x="489.07" y="266.66" font-size="3.5" class="brand-lbl" text-anchor="middle" transform="rotate(-90 489.07 265.66)">Libaas Fashion (AK TRENDZ)</text>
 <rect x="480.61" y="81.30" width="16.92" height="101.38" fill="#66ffff" class="stall-rect"/>
 <text x="489.07" y="86.50" class="size-lbl" text-anchor="middle" transform="rotate(-90 489.07 85.30)">18M x 3M</text>
-<text x="489.07" y="131.49" class="vacant-lbl" text-anchor="middle" transform="rotate(-90 489.07 130.49)">(Vacant)</text>
+<text x="489.07" y="131.49" font-size="3.5" class="brand-lbl" text-anchor="middle" transform="rotate(-90 489.07 130.49)">Triveni</text>
 <rect x="480.61" y="182.68" width="16.92" height="33.79" fill="#ff99ff" class="stall-rect"/>
 <text x="489.07" y="187.88" class="size-lbl" text-anchor="middle" transform="rotate(-90 489.07 186.68)">6M x 3M</text>
 <text x="489.07" y="198.91" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 489.07 198.07)">Laxmi Crea…</text>
@@ -412,7 +433,7 @@
 <text x="658.26" y="241.16" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 658.26 240.31)">MAHADEV NX( RUDRA STUD…</text>
 <rect x="649.80" y="131.99" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="658.26" y="137.19" class="size-lbl" text-anchor="middle" transform="rotate(-90 658.26 135.99)">9M x 3M</text>
-<text x="658.26" y="157.06" font-size="3.5" class="brand-lbl" text-anchor="middle" transform="rotate(-90 658.26 155.84)">Ruby saree house</text>
+<text x="658.26" y="157.06" class="vacant-lbl" text-anchor="middle" transform="rotate(-90 658.26 155.84)">(Vacant)</text>
 <rect x="649.80" y="81.30" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="658.26" y="86.50" class="size-lbl" text-anchor="middle" transform="rotate(-90 658.26 85.30)">9M x 3M</text>
 <text x="655.26" y="106.13" font-size="2.8" class="brand-lbl" text-anchor="middle" transform="rotate(-90 655.26 105.15)">Swarnpari Designer</text>
@@ -553,7 +574,7 @@
 <text x="680.82" y="498.07" font-size="3.7" class="brand-lbl" text-anchor="middle" transform="rotate(-90 680.82 496.75)">Poonam Design…</text>
 <rect x="689.28" y="351.64" width="16.92" height="67.58" fill="#00ff99" class="stall-rect"/>
 <text x="697.74" y="416.42" class="size-lbl" text-anchor="middle" transform="rotate(-90 697.74 415.22)">12M x 3M</text>
-<text x="697.74" y="388.06" font-size="3.2" class="brand-lbl" text-anchor="middle" transform="rotate(-90 697.74 386.93)">Libaas Fashion (AK TRENDZ)</text>
+<text x="697.74" y="388.06" class="vacant-lbl" text-anchor="middle" transform="rotate(-90 697.74 386.93)">(Vacant)</text>
 <rect x="689.28" y="419.22" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="697.74" y="467.11" class="size-lbl" text-anchor="middle" transform="rotate(-90 697.74 465.91)">9M x 3M</text>
 <text x="697.74" y="447.61" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 697.74 446.07)">J B Designer</text>
@@ -565,9 +586,12 @@
 <text x="731.57" y="416.42" class="size-lbl" text-anchor="middle" transform="rotate(-90 731.57 415.22)">12M x 3M</text>
 <text x="728.57" y="388.19" font-size="3.6" class="brand-lbl" text-anchor="middle" transform="rotate(-90 728.57 386.93)">Alok Suit</text>
 <text x="734.57" y="388.19" font-size="3.6" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 734.57 386.93)">JAIMALA</text>
-<rect x="723.11" y="419.22" width="16.92" height="67.58" fill="#00ff99" class="stall-rect"/>
-<text x="731.57" y="484.00" class="size-lbl" text-anchor="middle" transform="rotate(-90 731.57 482.80)">12M x 3M</text>
-<text x="731.57" y="455.91" font-size="4.0" class="brand-lbl" text-anchor="middle" transform="rotate(-90 731.57 454.51)">Shakambari Lace House</text>
+<rect x="723.11" y="419.22" width="16.92" height="33.79" fill="#ff99ff" class="stall-rect"/>
+<text x="731.57" y="450.21" class="size-lbl" text-anchor="middle" transform="rotate(-90 731.57 449.01)">6M x 3M</text>
+<text x="731.57" y="438.50" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 731.57 437.50)">Shakambari Lace House</text>
+<rect x="723.11" y="453.01" width="16.92" height="33.79" fill="#ff99ff" class="stall-rect"/>
+<text x="731.57" y="484.00" class="size-lbl" text-anchor="middle" transform="rotate(-90 731.57 482.80)">6M x 3M</text>
+<text x="731.57" y="472.00" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 731.57 471.00)">Raghav Creation</text>
 <rect x="723.11" y="486.81" width="16.92" height="33.79" fill="#ff99ff" class="stall-rect"/>
 <text x="731.57" y="517.80" class="size-lbl" text-anchor="middle" transform="rotate(-90 731.57 516.60)">6M x 3M</text>
 <text x="731.57" y="506.05" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 731.57 505.21)">Garden Var…</text>
@@ -614,8 +638,7 @@
 <text x="782.33" y="498.61" font-size="1.8" class="brand-lbl-2" text-anchor="middle">&quot;Your buyer i…</text>
 <rect x="773.87" y="503.70" width="16.92" height="33.79" fill="#ff99ff" class="stall-rect"/>
 <text x="782.33" y="534.69" class="size-lbl" text-anchor="middle" transform="rotate(-90 782.33 533.49)">6M x 3M</text>
-<text x="779.33" y="522.80" font-size="2.0" class="brand-lbl" text-anchor="middle" transform="rotate(-90 779.33 522.10)">Raghav Creat…</text>
-<text x="785.33" y="522.80" font-size="2.0" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 785.33 522.10)">Specialist i…</text>
+<text x="782.33" y="522.80" class="vacant-lbl" text-anchor="middle" transform="rotate(-90 782.33 522.10)">(Vacant)</text>
 <rect x="260.66" y="453.01" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="269.12" y="500.90" class="size-lbl" text-anchor="middle" transform="rotate(-90 269.12 499.70)">9M x 3M</text>
 <text x="269.12" y="480.86" class="vacant-lbl" text-anchor="middle" transform="rotate(-90 269.12 479.86)">(Vacant)</text>
@@ -713,7 +736,14 @@
 <rect x="128.96" y="309.85" width="9.60" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="133.76" y="314.35" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">25</text>
 <rect x="145.88" y="309.85" width="9.60" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="150.68" y="314.35" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">26</text>
 <rect x="687.30" y="309.84" width="9.60" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="692.10" y="314.34" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">27</text>
-<rect x="704.22" y="309.85" width="9.60" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="709.02" y="314.35" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">28</text>
+<rect x="704.02" y="301.95" width="10.00" height="4.50" rx="1.2" fill="#ffffff" stroke="#b91c1c" stroke-width="0.6"/><text x="709.02" y="305.20" font-size="3.0" font-weight="800" text-anchor="middle" fill="#b91c1c">28A</text>
+<rect x="704.02" y="252.00" width="10.00" height="4.50" rx="1.2" fill="#ffffff" stroke="#b91c1c" stroke-width="0.6"/><text x="709.02" y="255.25" font-size="3.0" font-weight="800" text-anchor="middle" fill="#b91c1c">28B</text>
+<rect x="704.02" y="234.37" width="10.00" height="4.50" rx="1.2" fill="#ffffff" stroke="#b91c1c" stroke-width="0.6"/><text x="709.02" y="237.62" font-size="3.0" font-weight="800" text-anchor="middle" fill="#b91c1c">28C</text>
+<rect x="704.02" y="217.47" width="10.00" height="4.50" rx="1.2" fill="#ffffff" stroke="#b91c1c" stroke-width="0.6"/><text x="709.02" y="220.72" font-size="3.0" font-weight="800" text-anchor="middle" fill="#b91c1c">28D</text>
+<rect x="704.02" y="200.57" width="10.00" height="4.50" rx="1.2" fill="#ffffff" stroke="#b91c1c" stroke-width="0.6"/><text x="709.02" y="203.82" font-size="3.0" font-weight="800" text-anchor="middle" fill="#b91c1c">28E</text>
+<rect x="704.02" y="183.68" width="10.00" height="4.50" rx="1.2" fill="#ffffff" stroke="#b91c1c" stroke-width="0.6"/><text x="709.02" y="186.93" font-size="3.0" font-weight="800" text-anchor="middle" fill="#b91c1c">28F</text>
+<rect x="704.02" y="166.78" width="10.00" height="4.50" rx="1.2" fill="#ffffff" stroke="#b91c1c" stroke-width="0.6"/><text x="709.02" y="170.03" font-size="3.0" font-weight="800" text-anchor="middle" fill="#b91c1c">28G</text>
+<rect x="704.02" y="149.89" width="10.00" height="4.50" rx="1.2" fill="#ffffff" stroke="#b91c1c" stroke-width="0.6"/><text x="709.02" y="153.14" font-size="3.0" font-weight="800" text-anchor="middle" fill="#b91c1c">28H</text>
 <rect x="738.05" y="309.85" width="9.60" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="742.85" y="314.35" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">29</text>
 <rect x="44.37" y="140.88" width="9.60" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="49.17" y="145.38" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">30</text>
 <rect x="78.20" y="140.88" width="9.60" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="83.00" y="145.38" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">31</text>
@@ -822,7 +852,8 @@
 <rect x="691.64" y="421.22" width="12.20" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="697.74" y="425.72" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">133</text>
 <rect x="691.64" y="471.91" width="12.20" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="697.74" y="476.41" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">134</text>
 <rect x="725.47" y="353.64" width="12.20" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="731.57" y="358.14" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">135</text>
-<rect x="725.47" y="421.22" width="12.20" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="731.57" y="425.72" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">136</text>
+<rect x="725.47" y="421.22" width="12.20" height="5.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="731.57" y="425.00" font-size="3.5" font-weight="800" text-anchor="middle" fill="#b91c1c">136A</text>
+<rect x="725.47" y="455.01" width="12.20" height="5.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="731.57" y="458.80" font-size="3.5" font-weight="800" text-anchor="middle" fill="#b91c1c">136B</text>
 <rect x="725.47" y="488.81" width="12.20" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="731.57" y="493.31" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">137</text>
 <rect x="726.57" y="521.90" width="10.00" height="5.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="731.57" y="525.59" font-size="3.5" font-weight="800" text-anchor="middle" fill="#b91c1c">138</text>
 <rect x="742.39" y="353.64" width="12.20" height="6.00" rx="1.5" fill="#ffffff" stroke="#b91c1c" stroke-width="0.75"/><text x="748.49" y="358.14" font-size="4.4" font-weight="800" text-anchor="middle" fill="#b91c1c">139</text>

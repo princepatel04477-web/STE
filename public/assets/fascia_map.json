@@ -544,13 +544,6 @@
     ],
     "source": "supabase"
   },
-  "152": {
-    "fascia_names": [
-      "Raghav Creation",
-      "Specialist in brasso fabrics"
-    ],
-    "source": "supabase"
-  },
   "98": {
     "fascia_names": [
       "LAXMIPRIYA",
@@ -568,12 +561,6 @@
     "fascia_names": [
       "Reyansh Creation",
       "Raj Synthetics"
-    ],
-    "source": "supabase"
-  },
-  "88": {
-    "fascia_names": [
-      "Ruby saree house pvt ltd"
     ],
     "source": "supabase"
   },
@@ -645,12 +632,6 @@
   "65": {
     "fascia_names": [
       "Satvachan sarees"
-    ],
-    "source": "supabase"
-  },
-  "136": {
-    "fascia_names": [
-      "Shakambari Lace House"
     ],
     "source": "supabase"
   },
@@ -883,15 +864,69 @@
     ],
     "source": "supabase"
   },
-  "28": {
+  "28A": {
     "fascia_names": [
-      "Mohilya"
+      "YKDK"
     ],
-    "source": "static_plan_fallback"
+    "source": "held_override"
+  },
+  "28B": {
+    "fascia_names": [
+      "Ruby"
+    ],
+    "source": "held_override"
+  },
+  "28C": {
+    "fascia_names": [
+      "Vaishnavi Sarees"
+    ],
+    "source": "held_override"
+  },
+  "28D": {
+    "fascia_names": [
+      "Shivay"
+    ],
+    "source": "held_override"
+  },
+  "28E": {
+    "fascia_names": [
+      "Sonia"
+    ],
+    "source": "held_override"
+  },
+  "28F": {
+    "fascia_names": [
+      "Shubh Laxmi"
+    ],
+    "source": "held_override"
+  },
+  "28G": {
+    "fascia_names": [
+      "Mercury"
+    ],
+    "source": "held_override"
+  },
+  "28H": {
+    "fascia_names": [
+      "Om Ganesh"
+    ],
+    "source": "held_override"
   },
   "30": {
     "fascia_names": [
       "Sukhdev Textile"
+    ],
+    "source": "static_plan_fallback"
+  },
+  "61": {
+    "fascia_names": [
+      "Libaas Fashion (AK TRENDZ)"
+    ],
+    "source": "held_override"
+  },
+  "62": {
+    "fascia_names": [
+      "Triveni"
     ],
     "source": "static_plan_fallback"
   },
@@ -907,10 +942,16 @@
     ],
     "source": "held_override"
   },
-  "132": {
+  "136A": {
     "fascia_names": [
-      "Libaas Fashion (AK TRENDZ)"
+      "Shakambari Lace House"
     ],
-    "source": "static_plan_fallback"
+    "source": "held_override"
+  },
+  "136B": {
+    "fascia_names": [
+      "Raghav Creation"
+    ],
+    "source": "held_override"
   }
 }
