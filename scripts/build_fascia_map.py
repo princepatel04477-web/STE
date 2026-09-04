@@ -31,10 +31,11 @@ import openpyxl
 sys.stdout.reconfigure(encoding="utf-8")
 
 ROOT = Path(r"C:\Users\rebel\OneDrive\Documents\Projects\STE-feature-clean-code-assets")
-SCRATCH = Path(
-    r"C:\Users\rebel\AppData\Local\Temp\claude\C--Users-rebel-OneDrive-Documents-Projects-STE-feature-clean-code-assets"
-    r"\99dc5d3c-51be-4ebc-857b-db0d8b71cc10\scratchpad"
-)
+# A session-scoped temp path here would rot the moment that session ends -
+# this one already had, pointing at a scratchpad no session could still
+# reach. /scratch is the repo's own gitignored working directory instead, so
+# a fresh exhibitors_fascia.json dropped there survives across sessions.
+SCRATCH = ROOT / "scratch"
 
 
 def clean_names(raw):

@@ -103,7 +103,8 @@
 <text x="480.61" y="59.31" font-size="3.3" class="brand-lbl" text-anchor="middle">Sitaram Creation</text>
 <rect x="497.52" y="47.51" width="33.84" height="16.90" fill="#ff99ff" class="stall-rect"/>
 <text x="529.86" y="51.71" class="size-lbl" text-anchor="end">6M x 3M</text>
-<text x="514.44" y="59.31" font-size="2.9" class="brand-lbl" text-anchor="middle">Charchita Designer</text>
+<text x="514.44" y="57.01" font-size="3.2" class="brand-lbl" text-anchor="middle">SANKALP</text>
+<text x="514.44" y="61.31" font-size="3.2" class="brand-lbl-2" text-anchor="middle">JHAM FASHION</text>
 <rect x="548.28" y="47.51" width="33.84" height="16.90" fill="#ff99ff" class="stall-rect"/>
 <text x="580.62" y="51.71" class="size-lbl" text-anchor="end">6M x 3M</text>
 <text x="565.20" y="59.31" font-size="3.1" class="brand-lbl" text-anchor="middle">Tikza fashion hub</text>
@@ -133,7 +134,8 @@
 <text x="52.17" y="233.13" font-size="3.6" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 52.17 231.87)">Bansi Group (Shirting:Fabrics:Uniform Sarees)</text>
 <rect x="74.54" y="148.89" width="16.92" height="168.96" fill="#e6b9b8" class="stall-rect"/>
 <text x="83.00" y="154.09" class="size-lbl" text-anchor="middle" transform="rotate(-90 83.00 152.89)">30M x 3M</text>
-<text x="83.00" y="232.87" class="vacant-lbl" text-anchor="middle" transform="rotate(-90 83.00 231.87)">(Vacant)</text>
+<text x="80.00" y="233.13" font-size="3.6" class="brand-lbl" text-anchor="middle" transform="rotate(-90 80.00 231.87)">Shiv Tex</text>
+<text x="86.00" y="233.13" font-size="3.6" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 86.00 231.87)">SHIV TEX CREATION</text>
 <rect x="91.46" y="148.89" width="16.92" height="168.96" fill="#e6b9b8" class="stall-rect"/>
 <text x="99.92" y="154.09" class="size-lbl" text-anchor="middle" transform="rotate(-90 99.92 152.89)">30M x 3M</text>
 <text x="96.92" y="233.13" font-size="3.6" class="brand-lbl" text-anchor="middle" transform="rotate(-90 96.92 231.87)">Indian Women</text>
@@ -155,7 +157,7 @@
 <text x="742.85" y="233.41" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 742.85 231.87)">Geeta Tex (Ambika)</text>
 <rect x="40.71" y="81.30" width="16.92" height="67.58" fill="#00ff99" class="stall-rect"/>
 <text x="49.17" y="86.50" class="size-lbl" text-anchor="middle" transform="rotate(-90 49.17 85.30)">12M x 3M</text>
-<text x="49.17" y="115.13" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 49.17 113.59)">SANKALP</text>
+<text x="49.17" y="115.13" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 49.17 113.59)">Sukhdev Textile</text>
 <rect x="74.54" y="81.30" width="16.92" height="67.58" fill="#00ff99" class="stall-rect"/>
 <text x="83.00" y="86.50" class="size-lbl" text-anchor="middle" transform="rotate(-90 83.00 85.30)">12M x 3M</text>
 <text x="83.00" y="115.13" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 83.00 113.59)">AABHAR VASTRAM</text>
@@ -254,7 +256,7 @@
 <text x="289.04" y="114.85" font-size="3.6" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 289.04 113.59)">Shreesant sarees</text>
 <rect x="294.49" y="81.30" width="16.92" height="67.58" fill="#00ff99" class="stall-rect"/>
 <text x="302.95" y="86.50" class="size-lbl" text-anchor="middle" transform="rotate(-90 302.95 85.30)">12M x 3M</text>
-<text x="302.95" y="114.59" class="vacant-lbl" text-anchor="middle" transform="rotate(-90 302.95 113.59)">(Vacant)</text>
+<text x="302.95" y="115.13" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 302.95 113.59)">Sristi Sarees</text>
 <rect x="328.33" y="216.47" width="16.92" height="101.38" fill="#66ffff" class="stall-rect"/>
 <text x="336.79" y="221.67" class="size-lbl" text-anchor="middle" transform="rotate(-90 336.79 220.47)">18M x 3M</text>
 <text x="333.79" y="266.92" font-size="3.6" class="brand-lbl" text-anchor="middle" transform="rotate(-90 333.79 265.66)">Earth Fabrics</text>
@@ -339,10 +341,11 @@
 <text x="508.98" y="198.77" font-size="2.0" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 508.98 198.07)">Shringar Cre…</text>
 <rect x="531.36" y="216.47" width="16.92" height="101.38" fill="#66ffff" class="stall-rect"/>
 <text x="539.82" y="221.67" class="size-lbl" text-anchor="middle" transform="rotate(-90 539.82 220.47)">18M x 3M</text>
-<text x="539.82" y="267.20" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 539.82 265.66)">Sarv Kala (V.D)</text>
+<text x="539.82" y="267.20" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 539.82 265.66)">Sarv kala sarees</text>
 <rect x="531.36" y="81.30" width="16.92" height="101.38" fill="#66ffff" class="stall-rect"/>
 <text x="539.82" y="86.50" class="size-lbl" text-anchor="middle" transform="rotate(-90 539.82 85.30)">18M x 3M</text>
-<text x="539.82" y="132.03" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 539.82 130.49)">Kala Shree</text>
+<text x="536.82" y="131.75" font-size="3.6" class="brand-lbl" text-anchor="middle" transform="rotate(-90 536.82 130.49)">Kala Shree fabrics pvt</text>
+<text x="542.82" y="131.75" font-size="3.6" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 542.82 130.49)">Sun Stuti sarees</text>
 <rect x="531.36" y="182.68" width="16.92" height="33.79" fill="#ff99ff" class="stall-rect"/>
 <text x="539.82" y="187.88" class="size-lbl" text-anchor="middle" transform="rotate(-90 539.82 186.68)">6M x 3M</text>
 <text x="539.82" y="198.91" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 539.82 198.07)">Univastra…</text>
@@ -379,10 +382,12 @@
 <text x="610.50" y="156.65" font-size="2.3" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 610.50 155.84)">Janani Dreams Texfab L…</text>
 <rect x="599.04" y="81.30" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="607.50" y="86.50" class="size-lbl" text-anchor="middle" transform="rotate(-90 607.50 85.30)">9M x 3M</text>
-<text x="607.50" y="106.55" font-size="4.0" class="brand-lbl" text-anchor="middle" transform="rotate(-90 607.50 105.15)">Vimarsh Prints</text>
+<text x="604.50" y="106.41" font-size="3.6" class="brand-lbl" text-anchor="middle" transform="rotate(-90 604.50 105.15)">Vimarsh Prints</text>
+<text x="610.50" y="106.41" font-size="3.6" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 610.50 105.15)">Vimarsh Studio</text>
 <rect x="599.04" y="182.68" width="16.92" height="33.79" fill="#ff99ff" class="stall-rect"/>
 <text x="607.50" y="187.88" class="size-lbl" text-anchor="middle" transform="rotate(-90 607.50 186.68)">6M x 3M</text>
-<text x="607.50" y="198.91" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 607.50 198.07)">Shrithik d…</text>
+<text x="604.50" y="198.77" font-size="2.0" class="brand-lbl" text-anchor="middle" transform="rotate(-90 604.50 198.07)">SHRITHIK DES…</text>
+<text x="610.50" y="198.77" font-size="2.0" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 610.50 198.07)">E-3225-E3226…</text>
 <rect x="632.88" y="267.16" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="641.34" y="272.36" class="size-lbl" text-anchor="middle" transform="rotate(-90 641.34 271.16)">9M x 3M</text>
 <text x="641.34" y="292.55" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 641.34 291.00)">KESHRAG</text>
@@ -407,7 +412,7 @@
 <text x="658.26" y="241.16" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 658.26 240.31)">MAHADEV NX( RUDRA STUD…</text>
 <rect x="649.80" y="131.99" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="658.26" y="137.19" class="size-lbl" text-anchor="middle" transform="rotate(-90 658.26 135.99)">9M x 3M</text>
-<text x="658.26" y="157.38" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 658.26 155.84)">Ruby</text>
+<text x="658.26" y="157.06" font-size="3.5" class="brand-lbl" text-anchor="middle" transform="rotate(-90 658.26 155.84)">Ruby saree house</text>
 <rect x="649.80" y="81.30" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="658.26" y="86.50" class="size-lbl" text-anchor="middle" transform="rotate(-90 658.26 85.30)">9M x 3M</text>
 <text x="655.26" y="106.13" font-size="2.8" class="brand-lbl" text-anchor="middle" transform="rotate(-90 655.26 105.15)">Swarnpari Designer</text>
@@ -453,8 +458,8 @@
 <text x="759.77" y="157.69" font-size="2.7" class="brand-lbl" text-anchor="middle">TALREJA</text>
 <text x="759.77" y="160.69" font-size="2.7" class="brand-lbl-2" text-anchor="middle">SAREE</text>
 <rect x="751.31" y="131.99" width="16.92" height="16.90" fill="#ff3399" class="stall-rect"/>
-<text x="759.77" y="140.79" font-size="2.7" class="brand-lbl" text-anchor="middle">Siyaram</text>
-<text x="759.77" y="143.79" font-size="2.7" class="brand-lbl-2" text-anchor="middle">Fabrics</text>
+<text x="759.77" y="140.79" font-size="1.8" class="brand-lbl" text-anchor="middle">Siyaram Fabri…</text>
+<text x="759.77" y="143.79" font-size="1.8" class="brand-lbl-2" text-anchor="middle">Aadhya creati…</text>
 <rect x="751.31" y="115.09" width="16.92" height="16.90" fill="#ff3399" class="stall-rect"/>
 <text x="759.77" y="123.89" font-size="2.7" class="brand-lbl" text-anchor="middle">Sahil</text>
 <text x="759.77" y="126.89" font-size="2.7" class="brand-lbl-2" text-anchor="middle">Creation</text>
@@ -477,7 +482,8 @@
 <text x="184.52" y="438.45" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 184.52 437.62)">Glorry Cre…</text>
 <rect x="176.06" y="453.01" width="16.92" height="33.79" fill="#ff99ff" class="stall-rect"/>
 <text x="184.52" y="484.00" class="size-lbl" text-anchor="middle" transform="rotate(-90 184.52 482.80)">6M x 3M</text>
-<text x="184.52" y="472.24" font-size="2.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 184.52 471.40)">Dream Home…</text>
+<text x="181.52" y="472.10" font-size="2.0" class="brand-lbl" text-anchor="middle" transform="rotate(-90 181.52 471.40)">Dream Home F…</text>
+<text x="187.52" y="472.10" font-size="2.0" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 187.52 471.40)">BedlineHome</text>
 <rect x="209.90" y="351.64" width="16.92" height="135.17" fill="#ffff99" class="stall-rect"/>
 <text x="218.36" y="484.01" class="size-lbl" text-anchor="middle" transform="rotate(-90 218.36 482.81)">24M x 3M</text>
 <text x="218.36" y="422.26" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 218.36 420.72)">Sweety Fashion</text>
@@ -537,7 +543,7 @@
 <text x="646.98" y="532.40" font-size="2.4" class="brand-lbl-2" text-anchor="middle">Fashion C K</text>
 <rect x="672.36" y="351.64" width="16.92" height="67.58" fill="#00ff99" class="stall-rect"/>
 <text x="680.82" y="416.42" class="size-lbl" text-anchor="middle" transform="rotate(-90 680.82 415.22)">12M x 3M</text>
-<text x="680.82" y="388.47" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 680.82 386.93)">Dharm Art (S)</text>
+<text x="680.82" y="388.47" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 680.82 386.93)">Dharm Art</text>
 <rect x="672.36" y="419.22" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="680.82" y="467.11" class="size-lbl" text-anchor="middle" transform="rotate(-90 680.82 465.91)">9M x 3M</text>
 <text x="677.82" y="446.77" font-size="2.0" class="brand-lbl" text-anchor="middle" transform="rotate(-90 677.82 446.07)">Kuhoo Creation (Kesari Crea…</text>
@@ -553,7 +559,8 @@
 <text x="697.74" y="447.61" font-size="4.4" class="brand-lbl" text-anchor="middle" transform="rotate(-90 697.74 446.07)">J B Designer</text>
 <rect x="689.28" y="469.91" width="16.92" height="50.69" fill="#b2a1c7" class="stall-rect"/>
 <text x="697.74" y="517.80" class="size-lbl" text-anchor="middle" transform="rotate(-90 697.74 516.60)">9M x 3M</text>
-<text x="697.74" y="497.74" font-size="2.8" class="brand-lbl" text-anchor="middle" transform="rotate(-90 697.74 496.75)">Israni Entertainment</text>
+<text x="694.74" y="497.45" font-size="2.0" class="brand-lbl" text-anchor="middle" transform="rotate(-90 694.74 496.75)">Israni Digi Life</text>
+<text x="700.74" y="497.45" font-size="2.0" class="brand-lbl-2" text-anchor="middle" transform="rotate(-90 700.74 496.75)">Israni Digi Life (An Israni…</text>
 <rect x="723.11" y="351.64" width="16.92" height="67.58" fill="#00ff99" class="stall-rect"/>
 <text x="731.57" y="416.42" class="size-lbl" text-anchor="middle" transform="rotate(-90 731.57 415.22)">12M x 3M</text>
 <text x="728.57" y="388.19" font-size="3.6" class="brand-lbl" text-anchor="middle" transform="rotate(-90 728.57 386.93)">Alok Suit</text>
