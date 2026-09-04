@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
-import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
+import { supabaseAdmin, isSupabaseConfigured, upsertExhibitorRow } from '@/lib/supabase';
 import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import {
@@ -63,6 +63,14 @@ export async function GET(request: Request) {
             stall_allocated_at: sbExhibitor.stall_allocated_at ?? exhibitor?.stall_allocated_at
           };
 
+          // Each of these has its own column since migration
+          // 20260904000027. The payload below is read afterwards only to
+          // answer for a row the backfill did not reach.
+          if (sbExhibitor.exhibitor_name) extractedExhibitorName = sbExhibitor.exhibitor_name;
+          if (sbExhibitor.company_description) extractedCompanyDesc = sbExhibitor.company_description;
+          if (sbExhibitor.gstin) extractedGstin = sbExhibitor.gstin;
+          if (sbExhibitor.profile_pic_url) extractedProfilePicUrl = sbExhibitor.profile_pic_url;
+
           if (sbExhibitor.fascia_names_json) {
             const parsed = typeof sbExhibitor.fascia_names_json === 'string'
               ? JSON.parse(sbExhibitor.fascia_names_json)
@@ -74,10 +82,10 @@ export async function GET(request: Request) {
               if (Array.isArray(parsed.fascia_names)) {
                 extractedFasciaNames = parsed.fascia_names.map((n: any) => String(n || ''));
               }
-              if (parsed.exhibitor_name) extractedExhibitorName = parsed.exhibitor_name;
-              if (parsed.profile_pic_url) extractedProfilePicUrl = parsed.profile_pic_url;
-              if (parsed.company_description) extractedCompanyDesc = parsed.company_description;
-              if (parsed.gstin) extractedGstin = parsed.gstin;
+              if (parsed.exhibitor_name && !extractedExhibitorName) extractedExhibitorName = parsed.exhibitor_name;
+              if (parsed.profile_pic_url && !extractedProfilePicUrl) extractedProfilePicUrl = parsed.profile_pic_url;
+              if (parsed.company_description && !extractedCompanyDesc) extractedCompanyDesc = parsed.company_description;
+              if (parsed.gstin && !extractedGstin) extractedGstin = parsed.gstin;
             }
           }
         }
@@ -180,7 +188,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -255,28 +263,41 @@ export async function POST(request: Request) {
     let driveFolderUrl = existing?.drive_folder_url || null;
 
     if (isSupabaseConfigured && supabaseAdmin) {
-      try {
-        const { data: sbEx } = await supabaseAdmin
-          .from('exhibitors')
-          .select('fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url')
-          .eq('mobile', session.mobile)
-          .maybeSingle();
+      // supabase-js resolves a failed query rather than throwing it, so the
+      // error has to be read off the result. Carrying on past one would take
+      // the empty /tmp values below as the truth and blank the exhibitor's
+      // artwork and Drive links on the write that follows. Refuse instead:
+      // the portal retries, and nothing is lost by a save that did not happen.
+      const { data: sbEx, error: sbReadErr } = await supabaseAdmin
+        .from('exhibitors')
+        .select('fascia_names_json, logo_file_url, cdr_file_url, drive_file_url, drive_folder_id, drive_folder_url')
+        .eq('mobile', session.mobile)
+        .maybeSingle();
 
-        if (sbEx?.fascia_names_json) {
+      if (sbReadErr) {
+        console.error('[Profile POST] Could not read the current profile:', sbReadErr.message);
+        return NextResponse.json(
+          { error: 'Could not reach the database, so nothing was changed. Please try again in a moment.' },
+          { status: 503 }
+        );
+      }
+
+      if (sbEx?.fascia_names_json) {
+        try {
           const parsed = typeof sbEx.fascia_names_json === 'string' ? JSON.parse(sbEx.fascia_names_json) : sbEx.fascia_names_json;
           if (parsed && typeof parsed === 'object' && parsed.profile_pic_url) {
             profilePicUrl = parsed.profile_pic_url;
           }
+        } catch (err) {
+          console.warn('[Profile POST] Unreadable stored profile payload:', err);
         }
-
-        logoFileUrl = sbEx?.logo_file_url ?? logoFileUrl;
-        cdrFileUrl = sbEx?.cdr_file_url ?? cdrFileUrl;
-        driveFileUrl = sbEx?.drive_file_url ?? driveFileUrl;
-        driveFolderId = sbEx?.drive_folder_id ?? driveFolderId;
-        driveFolderUrl = sbEx?.drive_folder_url ?? driveFolderUrl;
-      } catch (err) {
-        console.warn('[Profile POST] Could not read cloud artwork links:', err);
       }
+
+      logoFileUrl = sbEx?.logo_file_url ?? logoFileUrl;
+      cdrFileUrl = sbEx?.cdr_file_url ?? cdrFileUrl;
+      driveFileUrl = sbEx?.drive_file_url ?? driveFileUrl;
+      driveFolderId = sbEx?.drive_folder_id ?? driveFolderId;
+      driveFolderUrl = sbEx?.drive_folder_url ?? driveFolderUrl;
     }
 
     const structuredProfilePayload = {
@@ -302,20 +323,29 @@ export async function POST(request: Request) {
     // Direct cloud sync to Supabase Database
     if (isSupabaseConfigured && supabaseAdmin) {
       try {
-        const { error: sbErr } = await supabaseAdmin
-          .from('exhibitors')
-          .upsert({
+        const sbErr = await upsertExhibitorRow({
             mobile: session.mobile,
             brand_name: cleanBrand,
             stall_sqft: cleanSqft,
             fascia_names_json: structuredProfilePayload,
+            // The same four values also go in their own columns. They used to
+            // live only inside the payload above, which made that one JSONB
+            // field the single copy of every exhibitor's name, description,
+            // GSTIN and photo - and any writer that rebuilt it without one of
+            // them erased it. Columns are per-field, so a partial write can no
+            // longer take the rest with it, and a reader can ask for just the
+            // field it wants. Needs migration 20260904000027.
+            exhibitor_name: cleanExhibitorName,
+            company_description: cleanCompanyDesc,
+            gstin: cleanGstin,
+            profile_pic_url: profilePicUrl,
             logo_file_url: logoFileUrl,
             cdr_file_url: cdrFileUrl,
             drive_file_url: driveFileUrl,
             drive_folder_id: driveFolderId,
             drive_folder_url: driveFolderUrl,
             updated_at: new Date().toISOString()
-          }, { onConflict: 'mobile' });
+        });
 
         if (sbErr) {
           console.error('[SupabaseDB] Profile upsert error:', sbErr.message);

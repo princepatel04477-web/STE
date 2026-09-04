@@ -277,6 +277,8 @@ export default function ExhibitorDashboardPage() {
 
   // General Loading & Auth check
   const [initialLoading, setInitialLoading] = useState(true);
+  /** A load that did not complete. Nothing is saved while this is true. */
+  const [loadFailed, setLoadFailed] = useState(false);
   const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   // Submission confirmation shown over the page, so the result is impossible to
@@ -406,6 +408,7 @@ export default function ExhibitorDashboardPage() {
   };
 
   const fetchInitialData = async () => {
+    let loadedCleanly = false;
     try {
       // 1. Fetch Profile
       const profRes = await fetch('/api/exhibitor/profile');
@@ -413,6 +416,15 @@ export default function ExhibitorDashboardPage() {
         router.push('/exhibitor/login');
         return;
       }
+
+      // Anything other than a profile - a 503 from a database that could not
+      // be read, a 500 - must stop the load here. Carrying on would seed the
+      // form with blanks and then let autosave write those blanks over
+      // everything the exhibitor had already saved.
+      if (!profRes.ok) {
+        throw new Error(`The profile could not be loaded (${profRes.status}).`);
+      }
+
       const profData = await profRes.json();
 
       setMobile(profData.mobile || '');
@@ -460,6 +472,9 @@ export default function ExhibitorDashboardPage() {
 
       // 2. Fetch Extras Catalog & existing order
       const catRes = await fetch('/api/exhibitor/extras');
+      if (!catRes.ok) {
+        throw new Error(`Your requirements could not be loaded (${catRes.status}).`);
+      }
       const catData = await catRes.json();
 
       if (catData.products) {
@@ -493,13 +508,23 @@ export default function ExhibitorDashboardPage() {
         profData.mobile || '',
         profData.updated_at ? new Date(profData.updated_at).getTime() : 0
       );
+      loadedCleanly = true;
     } catch (err) {
       console.error('Failed to load exhibitor dashboard data:', err);
+      setLoadFailed(true);
     } finally {
       setInitialLoading(false);
-      setTimeout(() => {
-        isInitializedRef.current = true;
-      }, 600);
+
+      // Autosave is armed only by a load that worked. Arming it after a failed
+      // one pointed it at a form holding nothing, and the first keystroke -
+      // or React re-running the effect - then saved those blanks over the
+      // exhibitor's name, description, GSTIN and extras order. A failed load
+      // now leaves the portal read-only until it is reloaded.
+      if (loadedCleanly) {
+        setTimeout(() => {
+          isInitializedRef.current = true;
+        }, 600);
+      }
     }
   };
 
@@ -1240,6 +1265,28 @@ export default function ExhibitorDashboardPage() {
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 lg:px-8 pt-4 sm:pt-8 pb-36 sm:pb-32 space-y-6 sm:space-y-8">
+
+        {/* The portal could not read what is already saved. Nothing is written
+            back while this is showing, so an exhibitor cannot type into a form
+            that looks empty only because the load failed. */}
+        {loadFailed && (
+          <div className="p-4 rounded-2xl bg-red-50 border-2 border-red-400 text-red-950 text-sm font-semibold flex items-start gap-3 shadow-xs">
+            <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+            <div className="space-y-2">
+              <p>
+                We could not load your saved details just now, so this form is not
+                showing them and nothing you type here will be saved.
+              </p>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="px-3.5 py-2 rounded-xl bg-red-600 text-white text-xs font-bold hover:bg-red-700 transition-colors"
+              >
+                Reload the portal
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Work recovered from a visit that could not reach the server */}
         {restoredDraftNotice && (

@@ -1,3 +1,5 @@
+import { EXTRA_PRODUCTS } from '@/lib/db';
+
 export interface SyncPayload {
   mobile: string;
   exhibitor_name?: string;
@@ -37,6 +39,26 @@ function attemptSignal(): AbortSignal | undefined {
   } catch {
     return undefined;
   }
+}
+
+/** A sheet-safe column name for a product id: 'sofa-double' -> 'sofa_double'. */
+function productColumnKey(id: string): string {
+  return id.replace(/-/g, '_');
+}
+
+/** A zeroed column for every catalog product, filled in from this order. */
+function productColumns(itemMap: Record<string, number>): Record<string, number> {
+  const columns: Record<string, number> = {};
+  for (const product of EXTRA_PRODUCTS) {
+    columns[productColumnKey(product.id)] = itemMap[product.id] || 0;
+  }
+  // Anything ordered that is no longer in the catalog still gets a column,
+  // rather than vanishing from the sheet.
+  for (const [id, quantity] of Object.entries(itemMap)) {
+    const key = productColumnKey(id);
+    if (!(key in columns)) columns[key] = quantity;
+  }
+  return columns;
 }
 
 export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean> {
@@ -88,19 +110,11 @@ export async function syncToGoogleSheets(payload: SyncPayload): Promise<boolean>
       fascia_name_4: fascia4,
       fascia_names_summary: fasciaAll,
       rental_days: payload.rental_days || 2,
-      // Dedicated product column quantities
-      sofa_2seater: itemMap['sofa-2seater'] || 0,
-      sofa_single: itemMap['sofa-single'] || 0,
-      exhibition_chair: itemMap['exhibition-chair'] || 0,
-      glass_table: itemMap['glass-table'] || 0,
-      reception_counter: itemMap['reception-counter'] || 0,
-      female_model: itemMap['female-model'] || 0,
-      male_model: itemMap['male-model'] || 0,
-      spot_light: itemMap['spot-light'] || 0,
-      power_socket: itemMap['power-socket'] || 0,
-      tv_screen: itemMap['tv-screen'] || 0,
-      display_rack: itemMap['display-rack'] || 0,
-      brochure_stand: itemMap['brochure-stand'] || 0,
+      // One column per product in the catalog, keyed by its id. These used to
+      // be a hand-written list whose ids had drifted from the catalog's, so
+      // thirteen of the eighteen products reported zero however many were
+      // ordered. Generated now, so a new product cannot be missed.
+      ...productColumns(itemMap),
       // Summary & Notes
       items_summary: formattedItemsSummary,
       special_notes: payload.special_notes || '',

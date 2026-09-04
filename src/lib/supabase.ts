@@ -44,4 +44,61 @@ export const supabaseAdmin = isSupabaseConfigured
     })
   : null;
 
+/**
+ * Columns added by migration 20260904000027, which gave the profile fields a
+ * home of their own instead of leaving them inside fascia_names_json.
+ *
+ * A deployment can reach production before its migration is applied, and
+ * PostgREST refuses a whole write that names a column the schema does not have
+ * (PGRST204). That would take out every profile save until the migration ran,
+ * so upsertExhibitorRow drops these and tries once more rather than failing.
+ */
+const PROFILE_COLUMNS = [
+  'exhibitor_name',
+  'company_description',
+  'gstin',
+  'profile_pic_url',
+] as const;
+
+/** True for the error PostgREST raises when a column is not in the schema. */
+function isUnknownColumnError(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  // PGRST204 from PostgREST, 42703 ("undefined column") from Postgres itself.
+  if (error.code === 'PGRST204' || error.code === '42703') return true;
+  const message = error.message || '';
+  return PROFILE_COLUMNS.some((column) => message.includes(`'${column}' column`));
+}
+
+/**
+ * Writes an exhibitor row, surviving a schema that predates the profile
+ * columns. Returns the error PostgREST gave, or null when the row was saved.
+ */
+export async function upsertExhibitorRow(
+  row: Record<string, unknown>
+): Promise<{ message: string } | null> {
+  if (!supabaseAdmin) return { message: 'Supabase is not configured.' };
+
+  const { error } = await supabaseAdmin
+    .from('exhibitors')
+    .upsert(row, { onConflict: 'mobile' });
+
+  if (!error) return null;
+  if (!isUnknownColumnError(error)) return { message: error.message };
+
+  console.warn(
+    '[Supabase] The exhibitor profile columns are missing - apply migration ' +
+    '20260904000027. Saving without them for now; the values still go into ' +
+    'fascia_names_json.'
+  );
+
+  const fallback = { ...row };
+  for (const column of PROFILE_COLUMNS) delete fallback[column];
+
+  const { error: retryError } = await supabaseAdmin
+    .from('exhibitors')
+    .upsert(fallback, { onConflict: 'mobile' });
+
+  return retryError ? { message: retryError.message } : null;
+}
+
 export default supabaseAdmin;

@@ -61,3 +61,7 @@ scripts/*.generated.gs
 
 # Allotment exports. Generated from the data in src/data, never read back.
 /STE_Stall_Allotments*.xlsx
+
+# Python bytecode from the layout scripts.
+__pycache__/
+*.pyc

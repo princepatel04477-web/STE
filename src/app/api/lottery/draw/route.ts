@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}));
     let mobile = normalizeExhibitorId(body.mobile);
 
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     if (!mobile && session?.mobile) {
       mobile = normalizeExhibitorId(session.mobile);
     }

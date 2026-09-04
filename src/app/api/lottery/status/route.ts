@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     // so the two can never disagree about who is being seated: a phone still
     // carrying an earlier session used to be shown that firm's stall while the
     // draw ran for the number actually typed in.
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     const mobile =
       normalizeExhibitorId(queryMobile) ||
       (session?.mobile ? normalizeExhibitorId(session.mobile) : '');

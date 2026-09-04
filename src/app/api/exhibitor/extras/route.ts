@@ -10,9 +10,9 @@ import { checkGstin, normalizeGstin, verifyGstinWithPortal } from '@/lib/gstin';
 // already saved, which the portal then reports as a failed save.
 export const maxDuration = 30;
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -26,24 +26,33 @@ export async function GET() {
       .get(session.mobile) as { items_json: string | any; special_notes: string; rental_days?: number; updated_at: string } | undefined;
 
     if (isSupabaseConfigured && supabaseAdmin) {
-      try {
-        const { data: sbOrder } = await supabaseAdmin
-          .from('exhibitor_orders')
-          .select('*')
-          .eq('mobile', session.mobile)
-          .maybeSingle();
+      // A read that failed must never reach the portal as an empty basket.
+      // The local store is a /tmp cache that a cold instance starts empty, so
+      // falling back to it would show an exhibitor no extras - and the
+      // dashboard would then autosave that empty basket straight over the
+      // order they had already placed. Say so instead and let it retry.
+      const { data: sbOrder, error: sbReadErr } = await supabaseAdmin
+        .from('exhibitor_orders')
+        .select('*')
+        .eq('mobile', session.mobile)
+        .maybeSingle();
 
-        if (sbOrder) {
-          order = {
-            ...order,
-            items_json: sbOrder.items_json,
-            special_notes: sbOrder.special_notes ?? order?.special_notes ?? '',
-            rental_days: sbOrder.rental_days ?? order?.rental_days ?? 2,
-            updated_at: sbOrder.updated_at || order?.updated_at || null
-          };
-        }
-      } catch (err) {
-        console.warn('[Extras GET] Supabase fetch fallback to local:', err);
+      if (sbReadErr) {
+        console.error('[Extras GET] Could not read the order:', sbReadErr.message);
+        return NextResponse.json(
+          { error: 'Could not load your requirements. Please try again in a moment.' },
+          { status: 503 }
+        );
+      }
+
+      if (sbOrder) {
+        order = {
+          ...order,
+          items_json: sbOrder.items_json,
+          special_notes: sbOrder.special_notes ?? order?.special_notes ?? '',
+          rental_days: sbOrder.rental_days ?? order?.rental_days ?? 2,
+          updated_at: sbOrder.updated_at || order?.updated_at || null
+        };
       }
     }
 
@@ -80,9 +89,11 @@ async function lookupStoredExhibitorName(mobile: string): Promise<string> {
     try {
       const { data: sbProfile } = await supabaseAdmin
         .from('exhibitors')
-        .select('fascia_names_json')
+        .select('exhibitor_name, fascia_names_json')
         .eq('mobile', mobile)
         .maybeSingle();
+
+      if (sbProfile?.exhibitor_name) return String(sbProfile.exhibitor_name).trim();
 
       const rawPayload = sbProfile?.fascia_names_json;
       if (rawPayload) {
@@ -112,9 +123,11 @@ async function lookupStoredGstin(mobile: string): Promise<string> {
     try {
       const { data: sbProfile } = await supabaseAdmin
         .from('exhibitors')
-        .select('fascia_names_json')
+        .select('gstin, fascia_names_json')
         .eq('mobile', mobile)
         .maybeSingle();
+
+      if (sbProfile?.gstin) return normalizeGstin(sbProfile.gstin);
 
       const rawPayload = sbProfile?.fascia_names_json;
       if (rawPayload) {
@@ -137,7 +150,7 @@ async function lookupStoredGstin(mobile: string): Promise<string> {
 
 export async function POST(request: Request) {
   try {
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

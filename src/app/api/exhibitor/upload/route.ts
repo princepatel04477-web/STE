@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAuthenticatedExhibitor } from '@/lib/auth';
 import db, { updateExhibitorFiles } from '@/lib/db';
-import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
+import { supabaseAdmin, isSupabaseConfigured, upsertExhibitorRow } from '@/lib/supabase';
 import { syncExhibitorRowToSheets } from '@/lib/googleSheets';
 import { findExhibitorByMobile } from '@/data/registeredExhibitors';
 import {
@@ -49,7 +49,7 @@ function validateFile(file: File): string | null {
  */
 export async function POST(request: Request) {
   try {
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     if (!session) {
       return NextResponse.json(
         { error: 'Unauthorized. Please login to your exhibitor portal.' },
@@ -194,6 +194,11 @@ export async function POST(request: Request) {
 
     let currentExhibitorName = existingExhibitor?.exhibitor_name || '';
     let currentCompanyDesc = existingExhibitor?.company_description || '';
+    // The GSTIN and the portrait belong to the profile, not to this upload.
+    // They are carried through untouched - rebuilding the stored payload
+    // without them is what erased a GSTIN on every logo upload.
+    let currentGstin = existingExhibitor?.gstin || '';
+    let currentProfilePicUrl = profilePicUrl;
     let currentFasciaNames = [brandName, '', '', ''];
     let currentSqft = existingExhibitor?.stall_sqft || reg?.stallSqft || '200 sq ft';
 
@@ -210,6 +215,8 @@ export async function POST(request: Request) {
           }
           if (parsed.exhibitor_name && !currentExhibitorName) currentExhibitorName = parsed.exhibitor_name;
           if (parsed.company_description && !currentCompanyDesc) currentCompanyDesc = parsed.company_description;
+          if (parsed.gstin && !currentGstin) currentGstin = parsed.gstin;
+          if (parsed.profile_pic_url && !currentProfilePicUrl) currentProfilePicUrl = parsed.profile_pic_url;
         }
       } catch {}
     }
@@ -217,14 +224,37 @@ export async function POST(request: Request) {
     // Direct cloud sync to Supabase Database
     if (isSupabaseConfigured && supabaseAdmin) {
       try {
-        // Fetch latest remote record to prevent overwriting concurrent edits
-        const { data: sbCurrent } = await supabaseAdmin
+        // The row as it stands. This write rebuilds the whole profile payload,
+        // so a read that failed must not be taken for an exhibitor who has no
+        // profile: the defaults above would then be written over their real
+        // name, description, GSTIN and fascia names. supabase-js returns a
+        // failed query rather than throwing it, so the error is read off the
+        // result and the write abandoned. The files themselves are already
+        // safe in storage and in the ledger by this point.
+        const { data: sbCurrent, error: sbReadErr } = await supabaseAdmin
           .from('exhibitors')
           .select('*')
           .eq('mobile', session.mobile)
           .maybeSingle();
 
+        if (sbReadErr) {
+          console.error('[SupabaseDB] Could not read the profile before linking:', sbReadErr.message);
+          return NextResponse.json(
+            {
+              error:
+                'Your files were uploaded, but the database could not be reached to ' +
+                'link them to your profile. Please try the upload again in a moment.'
+            },
+            { status: 503 }
+          );
+        }
+
         if (sbCurrent) {
+          if (sbCurrent.exhibitor_name) currentExhibitorName = sbCurrent.exhibitor_name;
+          if (sbCurrent.company_description) currentCompanyDesc = sbCurrent.company_description;
+          if (sbCurrent.gstin) currentGstin = sbCurrent.gstin;
+          if (sbCurrent.profile_pic_url && !newestProfilePic) currentProfilePicUrl = sbCurrent.profile_pic_url;
+
           if (sbCurrent.fascia_names_json) {
             const parsed = typeof sbCurrent.fascia_names_json === 'string'
               ? JSON.parse(sbCurrent.fascia_names_json)
@@ -237,6 +267,10 @@ export async function POST(request: Request) {
               }
               if (parsed.exhibitor_name) currentExhibitorName = parsed.exhibitor_name;
               if (parsed.company_description) currentCompanyDesc = parsed.company_description;
+              if (parsed.gstin) currentGstin = parsed.gstin;
+              // Only a portrait sent in this very request replaces the one on
+              // record; a logo upload leaves it exactly as it was.
+              if (parsed.profile_pic_url && !newestProfilePic) currentProfilePicUrl = parsed.profile_pic_url;
             }
           }
           if (sbCurrent.brand_name) brandName = sbCurrent.brand_name;
@@ -247,23 +281,26 @@ export async function POST(request: Request) {
           fascia_names: currentFasciaNames,
           exhibitor_name: currentExhibitorName,
           company_description: currentCompanyDesc,
-          profile_pic_url: profilePicUrl || null
+          gstin: currentGstin,
+          profile_pic_url: currentProfilePicUrl || null
         };
 
-        const { error: sbUpdateErr } = await supabaseAdmin
-          .from('exhibitors')
-          .upsert({
+        const sbUpdateErr = await upsertExhibitorRow({
             mobile: session.mobile,
             brand_name: brandName,
             stall_sqft: currentSqft,
             fascia_names_json: structuredProfilePayload,
+            exhibitor_name: currentExhibitorName,
+            company_description: currentCompanyDesc,
+            gstin: currentGstin,
+            profile_pic_url: currentProfilePicUrl || null,
             logo_file_url: logoUrl || sbCurrent?.logo_file_url || null,
             cdr_file_url: cdrUrl || sbCurrent?.cdr_file_url || null,
             drive_file_url: driveFileUrl || sbCurrent?.drive_file_url || null,
             drive_folder_id: driveFolderId || sbCurrent?.drive_folder_id || null,
             drive_folder_url: driveFolderUrl || sbCurrent?.drive_folder_url || null,
             updated_at: new Date().toISOString()
-          }, { onConflict: 'mobile' });
+        });
 
         if (sbUpdateErr) {
           console.error('[SupabaseDB] Upload update error:', sbUpdateErr);
@@ -286,8 +323,9 @@ export async function POST(request: Request) {
     try {
       await syncExhibitorRowToSheets(session.mobile, {
         exhibitor_name: currentExhibitorName,
-        profile_pic_url: profilePicUrl || '',
+        profile_pic_url: currentProfilePicUrl || '',
         company_description: currentCompanyDesc,
+        gstin: currentGstin,
         brand_name: brandName,
         stall_sqft: currentSqft,
         fascia_names: currentFasciaNames,
@@ -356,9 +394,9 @@ export async function POST(request: Request) {
 }
 
 /** The exhibitor's current brand files, so the dashboard can list them. */
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -382,7 +420,7 @@ export async function GET() {
  */
 export async function DELETE(request: Request) {
   try {
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

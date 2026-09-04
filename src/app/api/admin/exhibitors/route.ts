@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
+import db, { EXTRA_PRODUCTS } from '@/lib/db';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import {
   REGISTERED_EXHIBITORS_LIST,
@@ -189,21 +189,18 @@ export async function GET() {
       };
     });
 
-    // Item-wise totals catalog initialize
-    const itemTotals: Record<string, { id: string; name: string; quantity: number; unit: string }> = {
-      'sofa-2seater': { id: 'sofa-2seater', name: 'VIP 2-Seater Leather Sofa', quantity: 0, unit: 'pcs' },
-      'sofa-single': { id: 'sofa-single', name: 'Single Seater Armchair', quantity: 0, unit: 'pcs' },
-      'exhibition-chair': { id: 'exhibition-chair', name: 'Standard Visitor Chair', quantity: 0, unit: 'pcs' },
-      'glass-table': { id: 'glass-table', name: 'Round Glass Meeting Table', quantity: 0, unit: 'pcs' },
-      'reception-counter': { id: 'reception-counter', name: 'Lockable Counter Table', quantity: 0, unit: 'pcs' },
-      'female-model': { id: 'female-model', name: 'Promotional Female Model / Hostess', quantity: 0, unit: 'person/day' },
-      'male-model': { id: 'male-model', name: 'Promotional Male Model / Host', quantity: 0, unit: 'person/day' },
-      'spot-light': { id: 'spot-light', name: 'LED Yellow/White Spotlight (50W)', quantity: 0, unit: 'pcs' },
-      'power-socket': { id: 'power-socket', name: '5A / 15A Power Socket Connection', quantity: 0, unit: 'point' },
-      'tv-screen': { id: 'tv-screen', name: '55" 4K Smart TV with Floor Stand', quantity: 0, unit: 'pcs' },
-      'display-rack': { id: 'display-rack', name: 'Fabric Hangers / Garment Display Rack', quantity: 0, unit: 'pcs' },
-      'brochure-stand': { id: 'brochure-stand', name: 'Acrylic Catalogue / Brochure Stand', quantity: 0, unit: 'pcs' }
-    };
+    // Item-wise totals, one line per product in the catalog.
+    //
+    // This used to be a hand-written list of ids, and it had drifted: only
+    // five of the eighteen ids it named still existed, so the console reported
+    // zero for desk tables, chairs, shelves, mannequins, receptionists and the
+    // rest however many had been ordered. Built from the catalog now, under
+    // the catalog's own names, so the totals and the order forms cannot
+    // disagree about what a product is called.
+    const itemTotals: Record<string, { id: string; name: string; quantity: number; unit: string }> =
+      Object.fromEntries(
+        EXTRA_PRODUCTS.map((p) => [p.id, { id: p.id, name: p.name, quantity: 0, unit: p.unit }])
+      );
 
     /**
      * Has this exhibitor actually filled the portal in?
@@ -286,9 +283,19 @@ export async function GET() {
         try {
           items = typeof order.items_json === 'string' ? JSON.parse(order.items_json) : order.items_json;
           items.forEach(item => {
-            if (itemTotals[item.id]) {
-              itemTotals[item.id].quantity += (Number(item.quantity) || 0);
+            if (!item?.id) return;
+            // An order placed against a product since withdrawn is still an
+            // order the organiser has to supply, so it gets its own line
+            // rather than being dropped from the totals.
+            if (!itemTotals[item.id]) {
+              itemTotals[item.id] = {
+                id: item.id,
+                name: item.name || item.id,
+                quantity: 0,
+                unit: item.unit || 'pcs'
+              };
             }
+            itemTotals[item.id].quantity += (Number(item.quantity) || 0);
           });
         } catch {
           items = [];

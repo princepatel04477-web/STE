@@ -7,7 +7,7 @@ import { allNumbersFor, clearStallAllocation } from '@/lib/stallAssignment';
 
 export async function POST(request: Request) {
   try {
-    const session = await getAuthenticatedExhibitor();
+    const session = await getAuthenticatedExhibitor(request);
     const body = await request.json().catch(() => ({}));
     const { mobile, resetAll } = body;
 

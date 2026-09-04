@@ -95,7 +95,16 @@ interface Schema {
   lottery_allocations: Array<LotteryAllocationRecord>;
 }
 
-const defaultProducts = [
+/**
+ * The extras catalog, and the only place its ids are written down.
+ *
+ * Two other places used to keep their own hand-typed list of ids - the sheet's
+ * per-product columns and the admin console's item totals - and both had
+ * drifted: thirteen of the eighteen products were counted as zero because the
+ * id they were looked up by did not exist. Anything that needs to enumerate
+ * the catalog reads this.
+ */
+export const EXTRA_PRODUCTS = [
   { id: 'desk-table', name: 'Desk Table', category: 'Furniture & Seating', description: '1m × 0.5m × 0.75m desk table', rate_inr: 600, unit: 'per-day', icon_name: 'table', is_active: 1 },
   { id: 'glass-round-table', name: 'Glass Round Table', category: 'Furniture & Seating', description: '1m dia × 0.75m glass table', rate_inr: 1400, unit: 'per-day', icon_name: 'table', is_active: 1 },
   { id: 'white-chair', name: 'White Chair', category: 'Furniture & Seating', description: 'Standard white seating chair', rate_inr: 700, unit: 'per-day', icon_name: 'chair', is_active: 1 },
@@ -126,7 +135,7 @@ function readData(): Schema {
         created_at: new Date().toISOString()
       })),
       exhibitors: [],
-      extra_products: defaultProducts,
+      extra_products: EXTRA_PRODUCTS,
       exhibitor_orders: [],
       lottery_allocations: []
     };
@@ -148,7 +157,7 @@ function readData(): Schema {
       parsed.lottery_allocations = [];
     }
     // Always update extra_products rates to match STE_EXTRAS.xlsx
-    parsed.extra_products = defaultProducts;
+    parsed.extra_products = EXTRA_PRODUCTS;
     return parsed;
   } catch {
     return {
@@ -159,7 +168,7 @@ function readData(): Schema {
         created_at: new Date().toISOString()
       })),
       exhibitors: [],
-      extra_products: defaultProducts,
+      extra_products: EXTRA_PRODUCTS,
       exhibitor_orders: [],
       lottery_allocations: []
     };
@@ -193,19 +202,18 @@ export const db = {
           const target = String(args[0]);
           return data.allowed_exhibitors.find(e => e.mobile === target);
         }
-        if (q.includes('select * from exhibitors where mobile = ?') || q.includes('select mobile, brand_name, stall_sqft')) {
+        // Matched on the table, not on the column list. Listing the exact
+        // SELECTs meant a caller that added a column silently fell through to
+        // undefined: the profile save and the upload both read their existing
+        // row this way and always got nothing back, so every save looked like
+        // a first-time insert and no local value was ever carried forward.
+        // The whole record is returned either way - the caller reads the
+        // fields it named.
+        if (q.includes('from exhibitors where mobile = ?')) {
           const target = String(args[0]);
           return data.exhibitors.find(e => e.mobile === target);
         }
-        if (q.includes('select id from exhibitors where mobile = ?')) {
-          const target = String(args[0]);
-          return data.exhibitors.find(e => e.mobile === target);
-        }
-        if (q.includes('select items_json, special_notes') || q.includes('select * from exhibitor_orders where mobile = ?')) {
-          const target = String(args[0]);
-          return data.exhibitor_orders.find(o => o.mobile === target);
-        }
-        if (q.includes('select id from exhibitor_orders where mobile = ?')) {
+        if (q.includes('from exhibitor_orders where mobile = ?')) {
           const target = String(args[0]);
           return data.exhibitor_orders.find(o => o.mobile === target);
         }
