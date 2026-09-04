@@ -297,13 +297,28 @@ SHEET_SIZE_ALIASES = {"3m x 60m": "30m x 6m", "3m x 78m": "42m x 6m"}
 # 107B rather than 103 keeps the trade runs whole: it is the last 100 sqft unit
 # before the south hall fabrics run, where 103 sits in the middle of the north
 # hall saree squares.
+#
+# 30/14/101 are one chain, closed on itself (organisers, 3 Sep 2026, bay
+# numbers corrected 4 Sep 2026 - see supabase/migrations/20260904000025 and
+# 20260904000026): SANKALP move up off their drawn 200 sqft bay 14 onto the
+# 400 sqft bay 30, which the live draw had left standing free (Abhaar Vastram
+# drew 31, Bharti Sarees drew 44). Charchita Designer move onto the 14
+# SANKALP vacate, a resize from the 100 sqft bay 101 they had actually drawn.
+# Hariom Trendz, not on the sheet at all (see LATE_ENTRANTS), take the 101
+# Charchita vacate. The chain was first drafted against bays 18 and 92, which
+# turned out to already be real, unrelated live draws (Shiv Vardhaan on 18
+# since 31 Aug 2026, Saaj Creations on 92 since 27 Aug) - neither was ever
+# free, so neither is touched by this chain at all.
 RESERVED = {
     "27": "K.K. Garments",                    # 36M x 3M
+    "30": "SANKALP",                          # 12M x 3M, moved up from bay 14
     "39": "SARAOGI SUPER SALES PRIVATE LIMITED",  # 42M x 6M, the largest stall
     "40": "Murtidhara Sarees / Shyamraj",     # 30M x 6M
     "43": "Earth Fabrics",                    # 18M x 3M, swapped with 46
     "46": "Bahubali",                         # 18M x 3M, swapped with 43
+    "14": "Charchita Designer",               # 6M x 3M, the bay SANKALP vacate
     "100": "Anaya Designer",                  # 24M x 3M, booked after the sheet
+    "101": "Hariom Trendz",                   # 3M x 3M, booked after the sheet
     "107B": "Jagadamba Creation",             # half a 6M x 3M, the free one
     "137": "Garden Vareli",                   # 6M x 3M, booked after the sheet
     "152": "Raghav Creation",                 # 6M x 3M, the merged 152+153
@@ -415,6 +430,9 @@ LATE_ENTRANTS = [
     {"brand": "Raghav Creation", "category": "Fabrics",
      "sheetSize": "3m x 6m", "areaSqft": 200, "mobile": "9830944345",
      "isSaree": False, "group": "Dress Material & Fabrics"},
+    {"brand": "Hariom Trendz", "category": "Saree",
+     "sheetSize": "3m x 3m", "areaSqft": 100, "mobile": "9586746162",
+     "isSaree": True, "group": "Saree"},
 ]
 
 LATE_ENTRANT_BRANDS = {e["brand"] for e in LATE_ENTRANTS}
@@ -917,13 +935,36 @@ def xml_escape(text):
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def draw_plan(stalls, features):
-    """Draw the plan, then put the numbers on it.
+def read_allotment_brands():
+    """Who is on each unit, read back off src/data/stallAllotment2026.ts.
+
+    The plan is drawn from the layout, but the name in a bay comes from the
+    allotment, so the drawing reads that file rather than being handed the
+    rows: a stall changing hands must show on the printed plan without the
+    floor having to be renumbered. A unit nobody holds simply has no name.
+
+    Keyed by unit id rather than stall number, so a bay that was cut carries
+    a name in each half - 91A and 91B are two firms."""
+    if not OUT_ALLOT.exists():
+        return {}
+    text = OUT_ALLOT.read_text(encoding="utf-8")
+    return {unit: brand for unit, brand in
+            re.findall(r'unitId:\s*"([^"]+)"[^\n]*?brand:\s*"([^"]*)"', text)}
+
+
+def draw_plan(stalls, features, brands=None):
+    """Draw the plan, then put the names and the numbers on it.
 
     The layout is a spreadsheet now, so the plan is drawn from the same grid
     the numbers are cut from rather than annotated onto an export. A stall's
     badge and its rectangle come out of one rectangle, so the drawing and the
-    numbering cannot drift apart."""
+    numbering cannot drift apart.
+
+    `brands` is the allotment read back in, so a bay carries the name of the
+    firm on it. A name that will not fit legibly is left off rather than
+    smeared - see name_label - so the smallest squares carry their number
+    alone, the way they always have."""
+    brands = brands or {}
     out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %s %s"'
            ' width="%s" height="%s"'
            ' font-family="Arial, Helvetica, sans-serif">'
@@ -958,19 +999,116 @@ def draw_plan(stalls, features):
                    % (cx, cy + size * 0.35, size, weight, colour, spin,
                       xml_escape(text)))
 
+    def wrap(text, lines):
+        """Break a name over `lines` lines on word boundaries, or None."""
+        if lines == 1:
+            return [text]
+        words = text.split()
+        if len(words) < lines:
+            return None
+        target = -(-len(text) // lines)
+        out_lines, cur = [], ""
+        for word in words:
+            if cur and len(cur) + 1 + len(word) > target \
+                    and len(out_lines) < lines - 1:
+                out_lines.append(cur)
+                cur = word
+            else:
+                cur = "%s %s" % (cur, word) if cur else word
+        out_lines.append(cur)
+        return out_lines if len(out_lines) == lines else None
+
+    def name_label(box, text, cap, span, colour="#111827"):
+        """Write the firm's name into the clear run of the bay it was given.
+
+        `span` is the (lo, hi) run along the bay's own length that the size
+        label and the number badge have already been placed clear of - the
+        name is centred in that run rather than at a fraction of the whole
+        bay, so it cannot land on either. A run too short to hold the name at
+        2.3pt gets none: the plan is read at arm's length off a printed
+        sheet, and a name smeared to fit is worse than the number alone,
+        which never lies about who is where."""
+        if not text:
+            return
+        lo, hi = span
+        run = hi - lo
+        if run < 6:
+            return
+        turn = box["h"] > box["w"] * 1.6
+        down = box["w"] if turn else box["h"]
+        best = None
+        for n in (1, 2, 3):
+            rows = wrap(text, n)
+            if not rows:
+                continue
+            size = min(cap,
+                       run * 1.7 / max(len(r) for r in rows),
+                       down * 0.55 / (n * 1.15))
+            if best is None or size > best[0]:
+                best = (size, rows)
+        if best is None or best[0] < 2.3:
+            return
+        size, rows = best
+        cx = box["x"] + box["w"] / 2
+        cy = (lo + hi) / 2
+        spin = ' transform="rotate(-90 %.2f %.2f)"' % (cx, cy) if turn else ""
+        top = cy - (len(rows) - 1) * size * 1.15 / 2 + size * 0.35
+        for i, row in enumerate(rows):
+            out.append('<text x="%.2f" y="%.2f" font-size="%.2f"'
+                       ' font-weight="bold" text-anchor="middle" fill="%s"%s>'
+                       '%s</text>'
+                       % (cx, top + i * size * 1.15, size, colour, spin,
+                          xml_escape(row)))
+
+    def size_font_for(box, text, cap):
+        """The font size `label` would pick for `text` in this box."""
+        turn = box["h"] > box["w"] * 1.6
+        across, down = (box["h"], box["w"]) if turn else (box["w"], box["h"])
+        return min(cap, down * 0.62, across * 1.7 / len(text))
+
     # The hall itself: walls, aisles, entrances, the offices and the legend.
     for f in features:
         if f["fill"] and f["fill"] != "#ffffff":
             rect(f, f["fill"])
         label(f, f["label"], 7.5, weight="bold")
 
+    BADGE_INSET, BADGE_HALF, GAP = 7.5, 4.5, 2.0
+
     for s in stalls:
         rect(s, COLOUR_BY_SIZE[s["size"]], "#000000")
-        if "subStalls" not in s:
-            # The north wall strip carries its badge in the middle, so its
-            # size sits high in the bay rather than under the number.
+        if "subStalls" in s:
+            # The anchor block is drawn as the bays its holder sub-lets, and
+            # those carry the names; the block's own would be painted over.
+            continue
+        turn = s["h"] > s["w"] * 1.6
+        if "halves" in s or not turn:
+            # A split bay's own size label spans both halves, so it keeps the
+            # plain centred placement; a wall-strip bay is too shallow for
+            # anything beyond its size and number to have clear room at all.
             label(s, s["size"], 5.4,
                   at=0.24 if s["frontEnd"] == "centre" else 0.5)
+            continue
+        # A single-badge bay: pin the size label right beside the badge,
+        # against the wall it fronts, so the rest of the bay's length is one
+        # clear run left over for the name - the two can never collide,
+        # because each is placed from what the other has already claimed.
+        size_font = size_font_for(s, s["size"], 5.4)
+        size_half = len(s["size"]) * size_font / 1.7 / 2
+        if s["frontEnd"] == "south":
+            badge_cy = s["y"] + s["h"] - BADGE_INSET
+            size_cy = badge_cy - BADGE_HALF - GAP - size_half
+            name_span = (s["y"], size_cy - size_half - GAP)
+        else:
+            badge_cy = s["y"] + BADGE_INSET
+            size_cy = badge_cy + BADGE_HALF + GAP + size_half
+            name_span = (size_cy + size_half + GAP, s["y"] + s["h"])
+        cx = s["x"] + s["w"] / 2
+        out.append('<text x="%.2f" y="%.2f" font-size="%.2f"'
+                   ' text-anchor="middle" fill="#1f2937"'
+                   ' transform="rotate(-90 %.2f %.2f)">%s</text>'
+                   % (cx, size_cy + size_font * 0.35, size_font, cx, size_cy,
+                      xml_escape(s["size"])))
+        name_label(s, brands.get(str(s["stallNumber"])), 5.0, name_span)
     # The anchor block's sub-let bays, drawn over the block they sit in.
     for s in stalls:
         for sub in s.get("subStalls", []):
@@ -1274,7 +1412,7 @@ def main():
     stalls = carry_numbers(stalls)
     split_halves(stalls, LOCKED_SPLIT_BAYS)
 
-    draw_plan(stalls, features)
+    draw_plan(stalls, features, read_allotment_brands())
     write_typescript(stalls)
 
     numbers = sorted(s["stallNumber"] for s in stalls)
@@ -1313,6 +1451,9 @@ def main():
     saree += [e for e in LATE_ENTRANTS if e["isSaree"]]
     allotments, unplaced = allot(stalls, exhibitors, pool_end, split_bays)
     write_allotment(allotments, pool_end, split_bays, exhibitors)
+    # The plan was drawn against the allotment as it stood; a rebuild has just
+    # moved firms, so draw it again rather than leave the names a run behind.
+    draw_plan(stalls, features, read_allotment_brands())
 
     print("\n%d exhibitors: %d saree, %d general"
           % (len(exhibitors), len(saree), len(exhibitors) - len(saree)))

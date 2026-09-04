@@ -1,0 +1,896 @@
+{
+  "1": {
+    "fascia_names": [
+      "Tithi Designer"
+    ],
+    "source": "supabase"
+  },
+  "2": {
+    "fascia_names": [
+      "Chandwani Silk Mills"
+    ],
+    "source": "supabase"
+  },
+  "3": {
+    "fascia_names": [
+      "Shreeji Designer / Khushi Fashion"
+    ],
+    "source": "supabase"
+  },
+  "4": {
+    "fascia_names": [
+      "Vani Designer"
+    ],
+    "source": "supabase"
+  },
+  "5": {
+    "fascia_names": [
+      "Omkar Creation",
+      "Shivrudra Designer"
+    ],
+    "source": "supabase"
+  },
+  "6": {
+    "fascia_names": [
+      "Nirvana (Kiran)"
+    ],
+    "source": "supabase"
+  },
+  "7": {
+    "fascia_names": [
+      "Vivah Textiles Pvt Ltd"
+    ],
+    "source": "supabase"
+  },
+  "8": {
+    "fascia_names": [
+      "Nidhi Creations"
+    ],
+    "source": "supabase"
+  },
+  "9": {
+    "fascia_names": [
+      "KOKILA GROUP",
+      "KOKILA SILK WEAVES"
+    ],
+    "source": "supabase"
+  },
+  "11": {
+    "fascia_names": [
+      "Mahadev Silk Mills"
+    ],
+    "source": "supabase"
+  },
+  "12": {
+    "fascia_names": [
+      "Vihanaa Prints",
+      "Amritwani prints"
+    ],
+    "source": "supabase"
+  },
+  "13": {
+    "fascia_names": [
+      "Sitaram Creation Pvt Ltd"
+    ],
+    "source": "supabase"
+  },
+  "15": {
+    "fascia_names": [
+      "Tikza fashion hub"
+    ],
+    "source": "supabase"
+  },
+  "16": {
+    "fascia_names": [
+      "Aalingan Art",
+      "Nidhanam"
+    ],
+    "source": "supabase"
+  },
+  "17": {
+    "fascia_names": [
+      "Gauri Ganesh",
+      "SHIVSHAKTI"
+    ],
+    "source": "supabase"
+  },
+  "18": {
+    "fascia_names": [
+      "Shiv Vardhan Sarees"
+    ],
+    "source": "supabase"
+  },
+  "21": {
+    "fascia_names": [
+      "Amyraa Trends / Pagaria Fashion"
+    ],
+    "source": "supabase"
+  },
+  "22": {
+    "fascia_names": [
+      "Bansi Uniform Sarees And Suits",
+      "Bansi Group (Shirting:Fabrics:Uniform Sarees)"
+    ],
+    "source": "supabase"
+  },
+  "24": {
+    "fascia_names": [
+      "Indian Women",
+      "Shankar suman"
+    ],
+    "source": "supabase"
+  },
+  "25": {
+    "fascia_names": [
+      "Abhivadan Fashion"
+    ],
+    "source": "supabase"
+  },
+  "26": {
+    "fascia_names": [
+      "Sur Shyam/Girraj"
+    ],
+    "source": "supabase"
+  },
+  "27": {
+    "fascia_names": [
+      "KK GROUP"
+    ],
+    "source": "supabase"
+  },
+  "29": {
+    "fascia_names": [
+      "Geeta Tex (Ambika)"
+    ],
+    "source": "supabase"
+  },
+  "31": {
+    "fascia_names": [
+      "AABHAR VASTRAM"
+    ],
+    "source": "supabase"
+  },
+  "32": {
+    "fascia_names": [
+      "Shubh Saachi"
+    ],
+    "source": "supabase"
+  },
+  "33": {
+    "fascia_names": [
+      "Pikasho"
+    ],
+    "source": "supabase"
+  },
+  "34": {
+    "fascia_names": [
+      "Jindal Saree Centre Private Limited, Delhi",
+      "Jindal Saree Centre P Ltd, Delhi"
+    ],
+    "source": "supabase"
+  },
+  "35": {
+    "fascia_names": [
+      "Suparshva Silk",
+      "Samprati creation"
+    ],
+    "source": "supabase"
+  },
+  "36": {
+    "fascia_names": [
+      "Mahadev Group"
+    ],
+    "source": "supabase"
+  },
+  "37": {
+    "fascia_names": [
+      "Sambhav Saree & silk",
+      "Samita saree"
+    ],
+    "source": "supabase"
+  },
+  "38": {
+    "fascia_names": [
+      "KODAS & COMPANY"
+    ],
+    "source": "supabase"
+  },
+  "39": {
+    "fascia_names": [
+      "Saraogi Super Sales Private Limited"
+    ],
+    "source": "supabase"
+  },
+  "40": {
+    "fascia_names": [
+      "Shyamraj Lehengas & More",
+      "Shyamraj kids"
+    ],
+    "source": "supabase"
+  },
+  "41": {
+    "fascia_names": [
+      "Swamee creation pvt ltd.",
+      "Shreesant sarees"
+    ],
+    "source": "supabase"
+  },
+  "43": {
+    "fascia_names": [
+      "Earth Fabrics",
+      "Vasudha"
+    ],
+    "source": "supabase"
+  },
+  "44": {
+    "fascia_names": [
+      "Bharti prints",
+      "Samriddhi faishon"
+    ],
+    "source": "supabase"
+  },
+  "45": {
+    "fascia_names": [
+      "Surekha Whole Sale India"
+    ],
+    "source": "supabase"
+  },
+  "46": {
+    "fascia_names": [
+      "Bahubali",
+      "Gomteshwar"
+    ],
+    "source": "supabase"
+  },
+  "47": {
+    "fascia_names": [
+      "SAMTA SAREES",
+      "FALGUNI SAREES"
+    ],
+    "source": "supabase"
+  },
+  "48": {
+    "fascia_names": [
+      "Prabhuji"
+    ],
+    "source": "supabase"
+  },
+  "49": {
+    "fascia_names": [
+      "Shree Laxmi Textiles",
+      "Laxmi group"
+    ],
+    "source": "supabase"
+  },
+  "50": {
+    "fascia_names": [
+      "Gauri Putra"
+    ],
+    "source": "supabase"
+  },
+  "51": {
+    "fascia_names": [
+      "Todi Creations"
+    ],
+    "source": "supabase"
+  },
+  "52": {
+    "fascia_names": [
+      "AKASHLEELA"
+    ],
+    "source": "supabase"
+  },
+  "53": {
+    "fascia_names": [
+      "Nidhivan",
+      "Yogyaa Sarees"
+    ],
+    "source": "supabase"
+  },
+  "54": {
+    "fascia_names": [
+      "Mangal Jyoti Sarees",
+      "Jeenkripa Sarees"
+    ],
+    "source": "supabase"
+  },
+  "55": {
+    "fascia_names": [
+      "Heirlooms Designer",
+      "BAPA SITARAM WEAVING PVT LTD"
+    ],
+    "source": "supabase"
+  },
+  "56": {
+    "fascia_names": [
+      "Kayaan Prints pvt ltd"
+    ],
+    "source": "supabase"
+  },
+  "57": {
+    "fascia_names": [
+      "Radhya Designer"
+    ],
+    "source": "supabase"
+  },
+  "58": {
+    "fascia_names": [
+      "Krishnam Art"
+    ],
+    "source": "supabase"
+  },
+  "59": {
+    "fascia_names": [
+      "Kesari Nandan Sarees Pvt Ltd",
+      "Gauri Ganesh Premium Collection"
+    ],
+    "source": "supabase"
+  },
+  "60": {
+    "fascia_names": [
+      "Jyotsana"
+    ],
+    "source": "supabase"
+  },
+  "63": {
+    "fascia_names": [
+      "Laxmi Creation"
+    ],
+    "source": "supabase"
+  },
+  "65": {
+    "fascia_names": [
+      "Satvachan sarees"
+    ],
+    "source": "supabase"
+  },
+  "66": {
+    "fascia_names": [
+      "Shalini Fashions",
+      "Shringar Creations"
+    ],
+    "source": "supabase"
+  },
+  "67": {
+    "fascia_names": [
+      "Sarv Kala (V.D)"
+    ],
+    "source": "supabase"
+  },
+  "68": {
+    "fascia_names": [
+      "Kala Shree"
+    ],
+    "source": "supabase"
+  },
+  "69": {
+    "fascia_names": [
+      "Univastra Fashion"
+    ],
+    "source": "supabase"
+  },
+  "70": {
+    "fascia_names": [
+      "APPLE LIFESTYLE INDUSTRIES LTD",
+      "APPLE LIFESTYLE"
+    ],
+    "source": "supabase"
+  },
+  "71": {
+    "fascia_names": [
+      "Rachit Group"
+    ],
+    "source": "supabase"
+  },
+  "72": {
+    "fascia_names": [
+      "Yukti Fashion"
+    ],
+    "source": "supabase"
+  },
+  "73": {
+    "fascia_names": [
+      "R.RUDRA CREATION LLP"
+    ],
+    "source": "supabase"
+  },
+  "74": {
+    "fascia_names": [
+      "SATISH SILK MILLS",
+      "RUSHABH FABRICS"
+    ],
+    "source": "supabase"
+  },
+  "75": {
+    "fascia_names": [
+      "Mintu Fashion"
+    ],
+    "source": "supabase"
+  },
+  "76": {
+    "fascia_names": [
+      "Shangar Tex"
+    ],
+    "source": "supabase"
+  },
+  "77": {
+    "fascia_names": [
+      "Hanumanta Creation",
+      "HANUMANTA SAREE"
+    ],
+    "source": "supabase"
+  },
+  "78": {
+    "fascia_names": [
+      "Janani Designer World",
+      "Janani Dreams Texfab Ltd"
+    ],
+    "source": "supabase"
+  },
+  "79": {
+    "fascia_names": [
+      "Vimarsh Prints"
+    ],
+    "source": "supabase"
+  },
+  "80": {
+    "fascia_names": [
+      "Shrithik designer"
+    ],
+    "source": "supabase"
+  },
+  "81": {
+    "fascia_names": [
+      "KESHRAG PVT.LTD",
+      "KESHRAG PVT LTD"
+    ],
+    "source": "supabase"
+  },
+  "82": {
+    "fascia_names": [
+      "Anjali Creation"
+    ],
+    "source": "supabase"
+  },
+  "83": {
+    "fascia_names": [
+      "Kairadhya saree"
+    ],
+    "source": "supabase"
+  },
+  "84": {
+    "fascia_names": [
+      "P.G. Sarees"
+    ],
+    "source": "supabase"
+  },
+  "85": {
+    "fascia_names": [
+      "Nirvana Designer",
+      "Nirvana Ethnics"
+    ],
+    "source": "supabase"
+  },
+  "87": {
+    "fascia_names": [
+      "MAHADEV NX( RUDRA STUDIO )"
+    ],
+    "source": "supabase"
+  },
+  "88": {
+    "fascia_names": [
+      "Ruby"
+    ],
+    "source": "supabase"
+  },
+  "89": {
+    "fascia_names": [
+      "Swarnpari Designer",
+      "Shiv Ambey  Designer"
+    ],
+    "source": "supabase"
+  },
+  "90": {
+    "fascia_names": [
+      "Khatu Shayam designer"
+    ],
+    "source": "supabase"
+  },
+  "91B": {
+    "fascia_names": [
+      "Veemoo Fashions"
+    ],
+    "source": "supabase"
+  },
+  "92": {
+    "fascia_names": [
+      "Saaj Creations"
+    ],
+    "source": "supabase"
+  },
+  "93": {
+    "fascia_names": [
+      "Shankh Designer"
+    ],
+    "source": "supabase"
+  },
+  "94": {
+    "fascia_names": [
+      "Reyansh Creation",
+      "Raj Synthetics"
+    ],
+    "source": "supabase"
+  },
+  "95": {
+    "fascia_names": [
+      "Shreya Silk Sarees"
+    ],
+    "source": "supabase"
+  },
+  "96": {
+    "fascia_names": [
+      "Dhanlaxmi Silk Mills",
+      "Bhagvandas&co"
+    ],
+    "source": "supabase"
+  },
+  "97": {
+    "fascia_names": [
+      "Alokraj Fashion"
+    ],
+    "source": "supabase"
+  },
+  "98": {
+    "fascia_names": [
+      "LAXMIPRIYA",
+      "RAGHAV FASHION"
+    ],
+    "source": "supabase"
+  },
+  "99": {
+    "fascia_names": [
+      "Amipara Silk Mills",
+      "M.K. Textiles"
+    ],
+    "source": "supabase"
+  },
+  "100": {
+    "fascia_names": [
+      "Anaya Designer"
+    ],
+    "source": "supabase"
+  },
+  "102": {
+    "fascia_names": [
+      "TALREJA SAREE"
+    ],
+    "source": "supabase"
+  },
+  "104": {
+    "fascia_names": [
+      "Sahil Creation"
+    ],
+    "source": "supabase"
+  },
+  "105": {
+    "fascia_names": [
+      "Ganga Creation",
+      "Ganga sarees"
+    ],
+    "source": "supabase"
+  },
+  "106": {
+    "fascia_names": [
+      "KANAK PRIYA SAREES",
+      "KANIKA FASHION"
+    ],
+    "source": "supabase"
+  },
+  "107A": {
+    "fascia_names": [
+      "AMAYA FABRICS PVT.LTD. SURAT",
+      "ALLOL GROUP"
+    ],
+    "source": "supabase"
+  },
+  "107B": {
+    "fascia_names": [
+      "Jagdamba Creation"
+    ],
+    "source": "supabase"
+  },
+  "108": {
+    "fascia_names": [
+      "Nirham Club Wear"
+    ],
+    "source": "supabase"
+  },
+  "109": {
+    "fascia_names": [
+      "Glorry Creation"
+    ],
+    "source": "supabase"
+  },
+  "112": {
+    "fascia_names": [
+      "Sweety Fashion Pvt. Ltd."
+    ],
+    "source": "supabase"
+  },
+  "113": {
+    "fascia_names": [
+      "Ethnico by Laxmi",
+      "LAXMI FABRIC"
+    ],
+    "source": "supabase"
+  },
+  "115": {
+    "fascia_names": [
+      "Ramsha (Gouri Impex)"
+    ],
+    "source": "supabase"
+  },
+  "116": {
+    "fascia_names": [
+      "Samarth Creation",
+      "Dhanishka Creation"
+    ],
+    "source": "supabase"
+  },
+  "117": {
+    "fascia_names": [
+      "Vaani nx",
+      "Mmanthan fab"
+    ],
+    "source": "supabase"
+  },
+  "118": {
+    "fascia_names": [
+      "MITTOO By Khantil Group",
+      "WOOGLEE By Khantil Group"
+    ],
+    "source": "supabase"
+  },
+  "120": {
+    "fascia_names": [
+      "Shayam Fabrics"
+    ],
+    "source": "supabase"
+  },
+  "121": {
+    "fascia_names": [
+      "Radhey Group"
+    ],
+    "source": "supabase"
+  },
+  "122": {
+    "fascia_names": [
+      "ETALICA SILK MILLS"
+    ],
+    "source": "supabase"
+  },
+  "123": {
+    "fascia_names": [
+      "Shaurya Silk Mills"
+    ],
+    "source": "supabase"
+  },
+  "124": {
+    "fascia_names": [
+      "Narmada Weavetech Pvt Ltd",
+      "NARMADA TEXTILES"
+    ],
+    "source": "supabase"
+  },
+  "125": {
+    "fascia_names": [
+      "Siddharth Fashion , Sheetal Fashion",
+      "YUG MANTRA Design By Siddharth Fashion"
+    ],
+    "source": "supabase"
+  },
+  "126": {
+    "fascia_names": [
+      "Vighanharata Creatives",
+      "SEEMAYA"
+    ],
+    "source": "supabase"
+  },
+  "127": {
+    "fascia_names": [
+      "NBD MARKET HUB PRIVATE LIMITED"
+    ],
+    "source": "supabase"
+  },
+  "128": {
+    "fascia_names": [
+      "Shiv Fashion C K"
+    ],
+    "source": "supabase"
+  },
+  "129": {
+    "fascia_names": [
+      "Dharm Art (S)"
+    ],
+    "source": "supabase"
+  },
+  "130": {
+    "fascia_names": [
+      "Kuhoo Creation (Kesari Creation)",
+      "Kuhoo"
+    ],
+    "source": "supabase"
+  },
+  "131": {
+    "fascia_names": [
+      "Poonam Designer"
+    ],
+    "source": "supabase"
+  },
+  "133": {
+    "fascia_names": [
+      "J B Designer"
+    ],
+    "source": "supabase"
+  },
+  "134": {
+    "fascia_names": [
+      "Israni Entertainment"
+    ],
+    "source": "supabase"
+  },
+  "135": {
+    "fascia_names": [
+      "Alok Suit",
+      "JAIMALA"
+    ],
+    "source": "supabase"
+  },
+  "136": {
+    "fascia_names": [
+      "Shakambari Lace House"
+    ],
+    "source": "supabase"
+  },
+  "137": {
+    "fascia_names": [
+      "Garden Vareli"
+    ],
+    "source": "supabase"
+  },
+  "138": {
+    "fascia_names": [
+      "NS Fashion"
+    ],
+    "source": "supabase"
+  },
+  "140": {
+    "fascia_names": [
+      "Pearly Pink"
+    ],
+    "source": "supabase"
+  },
+  "141": {
+    "fascia_names": [
+      "SAHVIKA"
+    ],
+    "source": "supabase"
+  },
+  "142": {
+    "fascia_names": [
+      "Aashirwad Creation  (Aahira)"
+    ],
+    "source": "supabase"
+  },
+  "143": {
+    "fascia_names": [
+      "BHAGVAD FABRIC",
+      "BHAGVAD GROUP"
+    ],
+    "source": "supabase"
+  },
+  "144": {
+    "fascia_names": [
+      "KUNJ BIHARI CREATION"
+    ],
+    "source": "supabase"
+  },
+  "145": {
+    "fascia_names": [
+      "Mojasia Texo Fab"
+    ],
+    "source": "supabase"
+  },
+  "146": {
+    "fascia_names": [
+      "Vikram Fabrics"
+    ],
+    "source": "supabase"
+  },
+  "147": {
+    "fascia_names": [
+      "Mahadev Fabrics"
+    ],
+    "source": "supabase"
+  },
+  "148": {
+    "fascia_names": [
+      "Ashirwad Textiles"
+    ],
+    "source": "supabase"
+  },
+  "149": {
+    "fascia_names": [
+      "Dev Mata Creation"
+    ],
+    "source": "supabase"
+  },
+  "150": {
+    "fascia_names": [
+      "Abhilasha Enterprises"
+    ],
+    "source": "supabase"
+  },
+  "151": {
+    "fascia_names": [
+      "|\"खरीददार बाबूजी कुछ गड़बड़ तो नही?!\" & \"pending से paid तक\"|   |\"ખરીદનાર વેપારી જુઠ્ઠો છે!?\"  &\"Pending થી Paid સુધી\"|",
+      "\"Your buyer is lying?!\" & \"from pending  to paid\""
+    ],
+    "source": "supabase"
+  },
+  "152": {
+    "fascia_names": [
+      "Raghav Creation",
+      "Specialist in brasso fabrics"
+    ],
+    "source": "supabase"
+  },
+  "14": {
+    "fascia_names": [
+      "Charchita Designer"
+    ],
+    "source": "held_override"
+  },
+  "28": {
+    "fascia_names": [
+      "Mohilya"
+    ],
+    "source": "static_plan_fallback"
+  },
+  "30": {
+    "fascia_names": [
+      "SANKALP"
+    ],
+    "source": "held_override"
+  },
+  "64": {
+    "fascia_names": [
+      "Nishcay Sarees / Naisha Synthetics"
+    ],
+    "source": "static_plan_fallback"
+  },
+  "101": {
+    "fascia_names": [
+      "Hariom Trendz"
+    ],
+    "source": "held_override"
+  },
+  "103": {
+    "fascia_names": [
+      "Siyaram Fabrics"
+    ],
+    "source": "held_override"
+  },
+  "110": {
+    "fascia_names": [
+      "Dream Home Fab"
+    ],
+    "source": "static_plan_fallback"
+  },
+  "132": {
+    "fascia_names": [
+      "Libaas Fashion (AK TRENDZ)"
+    ],
+    "source": "static_plan_fallback"
+  }
+}
