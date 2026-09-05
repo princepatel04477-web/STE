@@ -278,6 +278,16 @@ export async function GET() {
         fasciaNames = [brandName, '', '', ''];
       }
 
+      // A profile opened programmatically (rather than filled in by the
+      // exhibitor) can carry fascia_names_json as `[]` rather than null -
+      // truthy, so the branch above runs and parses it, but every slot comes
+      // back empty. That must still read as "no fascia name typed yet", not
+      // as a blank row: the sheet should never show less than the brand name
+      // the organisers already know this stall by.
+      if (!fasciaNames.some((n) => n && n.trim())) {
+        fasciaNames = [brandName, '', '', ''];
+      }
+
       let items: Array<{ id: string; name: string; quantity: number; unit: string }> = [];
       if (order && order.items_json) {
         try {
