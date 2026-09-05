@@ -72,7 +72,6 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9998675623", brandName: "Jagadamba Creation", stallSqft: "100 sq ft", category: "Fabrics", market: "" },
   { mobile: "9586921213", brandName: "Janani Designer World / Janani Dreams Texfab Ltd", stallSqft: "300 sq ft", category: "Saree / Lengha", market: "M4" },
   { mobile: "9999991375", brandName: "Jindal Saree Center", stallSqft: "400 sq ft", category: "Sarees", market: "" },
-  { mobile: "9414141810", brandName: "JMJ Creations", stallSqft: "200 sq ft", category: "Dress Material , Kids Wear  Fabrics", market: "" },
   { mobile: "9586621717", brandName: "K.K. Garments", stallSqft: "1200 sq ft", category: "Fabric/Garment", market: "Hojiwala Sachin" },
   { mobile: "9426923797", brandName: "Kairadhya", stallSqft: "300 sq ft", category: "Sarees", market: "Raghukul", aliases: ["9327665182"] },
   { mobile: "9374954037", brandName: "Kala Shree", stallSqft: "600 sq ft", category: "Saree", market: "Ekta Textile Market" },
@@ -171,7 +170,21 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9537841621", brandName: "Vivah Textile", stallSqft: "200 sq ft", category: "Saree", market: "Old Bombay" },
   { mobile: "9978524326", brandName: "Yukti Fashion", stallSqft: "200 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9376711888", brandName: "Sweety Fashion", stallSqft: "800 sq ft", category: "Suits", market: "Raghuveer Trade Centre", aliases: ["8141335505"] },
-  { mobile: "9654554518", brandName: "Surekha", stallSqft: "400 sq ft", category: "Saree", market: "" }
+  { mobile: "9654554518", brandName: "Surekha", stallSqft: "400 sq ft", category: "Saree", market: "" },
+  { mobile: "9310797518", brandName: "Pagriwala", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "9999478191", brandName: "Taani / Turkish Boy", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "8750204126", brandName: "Rich Rang", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "8017437639", brandName: "Miu-Miu / I Laila / Little Girls / Laila Gold", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "8130017615", brandName: "Softcore Infotech", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "9216586012", brandName: "Metal Bird / Eureca / Nyasia", stallSqft: "200 sq ft", category: "", market: "", aliases: ["9871342511"] },
+  { mobile: "7456833341", brandName: "Signature Club", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "9839425959", brandName: "Mr.Ethnic", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "7678947481", brandName: "Happy Boy / 5G Jeans", stallSqft: "200 sq ft", category: "", market: "", aliases: ["9999059128"] },
+  { mobile: "9582312435", brandName: "Ketely", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "7021115281", brandName: "Zylo", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "7874954427", brandName: "RKF Studio (Men's Ethnic)", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "9883009021", brandName: "24 Street", stallSqft: "200 sq ft", category: "", market: "", aliases: ["8017311157"] },
+  { mobile: "9007387489", brandName: "Wow Lotus", stallSqft: "200 sq ft", category: "", market: "", aliases: ["8420440876"] }
 ];
 
 /** Every number one exhibitor answers to: the sheet's, plus any alias. */
