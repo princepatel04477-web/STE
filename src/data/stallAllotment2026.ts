@@ -202,9 +202,10 @@
  *        made two profiles: the firm signed in on the number and set a
  *        password there, and the ID's own row sat beside it holding the brand
  *        name, so the admin console had the firm twice and neither row was
- *        whole. The number is on this row so the hold on 39 - the 2600 sqft
- *        anchor, the largest stall on the floor - is found by mobile rather
- *        than by brand name alone.
+ *        whole. The number is on this row so the hold on 39 - the anchor,
+ *        the largest stall on the floor, booked at 2800 sqft (organisers,
+ *        5 Sep 2026; was 2600) - is found by mobile rather than by brand
+ *        name alone.
  *   38   Apple lifestyle answer on 9825398582, not the 9099140404 the sheet
  *        carries (organisers, 29 Aug 2026). The old number has been given up
  *        and may be reassigned, so it is retired rather than kept as an
@@ -363,7 +364,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "38",    stallNumber: 38,   brand: "Apple lifestyle", category: "Sarees",
     group: "Saree",                     mobile: "9825398582",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "39",    stallNumber: 39,   brand: "SARAOGI SUPER SALES PRIVATE LIMITED", category: "Sarees",
-    group: "Saree",                     mobile: "9810550285",  sheetSize: "42m x 6m",  areaSqft: 2600,  pool: "Saree",    zone: "North Hall",         held: true },
+    group: "Saree",                     mobile: "9810550285",  sheetSize: "42m x 6m",  areaSqft: 2800,  pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "40",    stallNumber: 40,   brand: "Murtidhara Sarees / Shyamraj", category: "Lehenga",
     group: "Lehenga",                   mobile: "",            sheetSize: "30m x 6m",  areaSqft: 2000,  pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "41",    stallNumber: 41,   brand: "Sristi Sarees", category: "Sarees",
