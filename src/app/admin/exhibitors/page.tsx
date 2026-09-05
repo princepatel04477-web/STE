@@ -353,7 +353,7 @@ export default function AdminExhibitorsPage() {
         ex.stall_sqft,
         ex.stall_number || 'Not Drawn',
         ex.stall_hall || '',
-        fasciaStr || ex.brand_name,
+        fasciaStr,
         ex.gstin || (ex.gstin_missing ? 'MISSING' : ''),
         extrasStr,
         ex.drive_folder_url || ex.drive_file_url || '',

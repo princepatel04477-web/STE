@@ -274,19 +274,10 @@ export async function GET() {
             if (parsed.gstin && !exhibitorGstin) exhibitorGstin = parsed.gstin;
           }
         } catch {}
-      } else {
-        fasciaNames = [brandName, '', '', ''];
       }
-
-      // A profile opened programmatically (rather than filled in by the
-      // exhibitor) can carry fascia_names_json as `[]` rather than null -
-      // truthy, so the branch above runs and parses it, but every slot comes
-      // back empty. That must still read as "no fascia name typed yet", not
-      // as a blank row: the sheet should never show less than the brand name
-      // the organisers already know this stall by.
-      if (!fasciaNames.some((n) => n && n.trim())) {
-        fasciaNames = [brandName, '', '', ''];
-      }
+      // No fallback to brandName: this column reports what the exhibitor
+      // actually typed as their fascia/header name, so it stays blank until
+      // they have - a blank cell here is the honest answer, not a bug.
 
       let items: Array<{ id: string; name: string; quantity: number; unit: string }> = [];
       if (order && order.items_json) {
