@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import db, { LotteryAllocationRecord } from '@/lib/db';
-import { MASTER_STALL_INVENTORY, STALL_CATEGORY_LADDER, normalizeSqftCategory } from '@/data/stallInventory';
+import { STALL_CATEGORY_LADDER, normalizeSqftCategory } from '@/data/stallInventory';
+import { ALLOTMENTS_2026 } from '@/data/stallAllotment2026';
+import { OCCUPANCY_2026 } from '@/lib/stallOccupancy';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase';
 import { getAuthenticatedExhibitor, isAdminMobile } from '@/lib/auth';
 
@@ -32,10 +34,22 @@ export async function GET(request: Request) {
       }
     }
     
-    // Category Breakdown Stats
+    // Category Breakdown Stats - built from the real approved layout
+    // (stallAllotment2026), not the synthetic placeholder inventory the old
+    // demo lottery used: that inventory's own stall count (166) had drifted
+    // well behind the real, current floor (180 units, 175 seated), which is
+    // what made "Available Stalls" go negative on the admin console - it was
+    // subtracting a live count from a stale one.
+    //
+    // "Corner" has no equivalent in the real layout's own data (it was a
+    // property the synthetic inventory computed from a fabricated block
+    // shape), so it is reported here as the real large-format stalls -
+    // areaSqft >= 600 - the same threshold stall-allocation's own
+    // isCornerEligible rule uses to decide who gets offered an L-shape.
+    const CORNER_THRESHOLD_SQFT = 600;
     const categoryStats = STALL_CATEGORY_LADDER.map((cat) => {
-      const totalInInventory = MASTER_STALL_INVENTORY.filter((s) => s.categorySqft === cat).length;
-      const cornerInInventory = MASTER_STALL_INVENTORY.filter((s) => s.categorySqft === cat && s.isCorner).length;
+      const inCategory = ALLOTMENTS_2026.filter((a) => normalizeSqftCategory(a.areaSqft) === cat);
+      const cornerInCategory = inCategory.filter((a) => a.areaSqft >= CORNER_THRESHOLD_SQFT);
 
       // Match on the stall actually allotted, so an upgraded exhibitor is counted
       // against the category they were physically given.
@@ -45,10 +59,10 @@ export async function GET(request: Request) {
 
       return {
         category: `${cat} sq ft`,
-        totalStalls: totalInInventory,
-        cornerStalls: cornerInInventory,
+        totalStalls: inCategory.length,
+        cornerStalls: cornerInCategory.length,
         allocatedCount: allocatedInCat.length,
-        availableCount: Math.max(0, totalInInventory - allocatedInCat.length),
+        availableCount: Math.max(0, inCategory.length - allocatedInCat.length),
         cornerAllocated: allocatedInCat.filter((a) => a.is_corner === 1).length
       };
     });
@@ -94,9 +108,13 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
-      totalCapacity: MASTER_STALL_INVENTORY.length,
-      totalAllocated: allocations.length,
-      totalRemaining: MASTER_STALL_INVENTORY.length - allocations.length,
+      // Same source and the same figures as the "Approved Floor Plan"
+      // panel further down this page (stallOccupancy.ts) - the two used to
+      // disagree because this block alone read the old synthetic inventory.
+      totalCapacity: OCCUPANCY_2026.totalUnits,
+      totalAllocated: OCCUPANCY_2026.allotted,
+      totalRemaining: OCCUPANCY_2026.free,
+      cornerStallsTotal: ALLOTMENTS_2026.filter((a) => a.areaSqft >= CORNER_THRESHOLD_SQFT).length,
       categoryStats,
       allocations
     });
