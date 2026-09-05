@@ -38,9 +38,13 @@
  *        (already on the floor, previously mobile-less) and that unit 145's
  *        sheet row (Aakashdip) was carrying YKDK's mobile (7728088199) by
  *        mistake - moved here; Aakashdip's own mobile is still unknown.
+ *   15   Divine Silk Mills trades as "Tikza fashion hub" now - same firm,
+ *        same mobile (9909789088), already correctly seated here by this
+ *        pass (matched on the new name). PENDING-5 removed - it was a
+ *        stale duplicate of this same row under the old name, not a
+ *        second exhibitor.
  *
  * STILL UNRESOLVED - left exactly as they were, not touched by this pass:
- *   PENDING-5   Divine Silk Mills   - still absent from the new roster.
  *   79          Geeta Readymade / King's Man, a HAND-CONFIRMED (held: true)
  *               assignment, is entirely absent from the new roster with no
  *               replacement named for the unit. Kept as-is rather than
@@ -424,8 +428,6 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "7285010000",  sheetSize: "3m x 6m",   areaSqft: 400,   pool: "Saree",    zone: "South Hall",         held: false },
   { unitId: "168",     stallNumber: 168,  brand: "Kushagra", category: "",
     group: "General",                   mobile: "9151060725",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
-  { unitId: "PENDING-5", stallNumber: 5,    brand: "Divine Silk Mills", category: "Sarees",
-    group: "Saree",                     mobile: "9909789088",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
 ];
 
 /** Stalls the saree brands drew from (unchanged by this pass). */
