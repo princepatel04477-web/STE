@@ -433,8 +433,20 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
 /** Stalls the saree brands drew from (unchanged by this pass). */
 export const SAREE_POOL_STALLS: number[] = [1, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68, 69, 70, 71, 73, 74, 75, 76, 77, 78, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 102, 112, 113, 114, 115, 116, 117, 118, 119, 121, 122, 123, 126, 127, 166, 167];
 
-/** The only 200 sqft bays cut into A/B halves (unchanged by this pass). */
-export const SPLIT_BAYS_2026: number[] = [91, 107];
+/**
+ * Every bay stallOccupancy.ts must expand into its own lettered halves
+ * rather than count as one unit keyed by its bare stall number: 91 and 107
+ * from the original layout, plus the eight synthetic 9001-9008 container
+ * keys the 5 Sep 2026 layout introduced for a lettered pair/solo that no
+ * longer shares its numeral with a real bare stall (136A, 139A, 166A,
+ * 163A, 143A/143B, 161A, 92A, 102A - see stallMap2026.ts's own header).
+ * Leaving the 9000s out of this list was the bug behind /admin/lottery
+ * showing them as still-free: every one of those halves already has a
+ * real exhibitor on stallAllotment2026.ts, but nothing has ever been
+ * allotted against the literal id "9001", so the occupancy join found no
+ * match and reported the whole container empty.
+ */
+export const SPLIT_BAYS_2026: number[] = [91, 107, 9001, 9002, 9003, 9004, 9005, 9006, 9007, 9008];
 
 export function findAllotmentByMobile(mobile: string) {
   const key = mobile.replace(/\D/g, "").slice(-10);
