@@ -1585,13 +1585,6 @@ export default function ExhibitorDashboardPage() {
                   {brandName || 'Registered Exhibitor'}
                 </h3>
               </div>
-              {category && (
-                <div className="mt-3">
-                  <span className="inline-block px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-200 text-slate-800">
-                    Category: {category}
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Allotted Stall Number Card */}
