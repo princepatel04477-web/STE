@@ -17,8 +17,14 @@ import {
  * The drawing itself is served as a static SVG rather than bundled, so the
  * exhibitor sees the real plan - the same one printed for the hall - with an
  * invisible hit layer on top for picking out a stall.
+ *
+ * Served with a one-year immutable cache header, so the filename has to
+ * change whenever the drawing's content does (bump the "-v2" suffix) - a
+ * redeploy alone leaves every browser that already loaded the old name
+ * showing it for up to a year. See commit b6d1a5a for the same fix applied
+ * to the extras catalog photos.
  */
-const PLAN_SRC = '/assets/Final-Layout-STE-2026-numbered.svg';
+const PLAN_SRC = '/assets/Final-Layout-STE-2026-numbered-v2.svg';
 
 /** The plan's own coordinate space, so the overlay lines up with the drawing. */
 const VIEW_W = 841.92007;

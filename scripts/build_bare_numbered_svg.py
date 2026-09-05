@@ -184,3 +184,9 @@ svg_content = "\n".join(out) + "\n"
 out_svg_path = ROOT / "public" / "assets" / "Final-Layout-STE-2026-numbered.svg"
 out_svg_path.write_text(svg_content, encoding="utf-8")
 print(f"wrote {out_svg_path}")
+print(
+    "REMINDER: this asset is served with a one-year immutable cache header "
+    "(see FloorPlan2026.tsx). Copy this file to a NEW -v<n> filename and "
+    "bump PLAN_SRC there too, or every browser that already loaded the old "
+    "name keeps showing it for up to a year regardless of this redeploy."
+)
