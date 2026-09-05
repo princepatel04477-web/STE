@@ -194,7 +194,11 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9352924452", brandName: "Shubh laxmi", stallSqft: "100 sq ft", category: "", market: "" },
   { mobile: "6376473726", brandName: "Mercury Fashion", stallSqft: "100 sq ft", category: "", market: "" },
   { mobile: "9829084015", brandName: "Om Ganesh Fashion", stallSqft: "100 sq ft", category: "", market: "" },
-  { mobile: "7728088199", brandName: "Aakashdip", stallSqft: "300 sq ft", category: "", market: "" },
+  // Aakashdip (stall 145) had no real mobile of its own - the sheet's row
+  // for it carried YKDK's number (7728088199) by mistake, per the
+  // organisers (6 Sep 2026). Removed until a real number is collected;
+  // stallAllotment2026.ts keeps their stall-145 row with mobile blank.
+  { mobile: "7728088199", brandName: "YKDK", stallSqft: "100 sq ft", category: "Kurties", market: "" },
   { mobile: "9151060725", brandName: "Kushagra", stallSqft: "200 sq ft", category: "", market: "" },
 ];
 

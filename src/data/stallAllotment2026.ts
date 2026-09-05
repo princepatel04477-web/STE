@@ -25,22 +25,31 @@
  *     brand-new to the roster; their category/group is inferred from the
  *     brand name (no category column in the source sheet), not sourced.
  *
+ * RESOLVED 6 Sep 2026 (organiser confirmation, not from the sheet):
+ *   50   SSS / Saraogi Super Sales - the sheet's own row for unit 50 (brand
+ *        "SSS") had no mobile; the organisers confirmed 9810550285 (Saraogi's
+ *        known number) belongs here, not on unit 39 (Miu-Miu, which keeps
+ *        its own prior mobile untouched). PENDING-39 removed - this is the
+ *        same firm, now on a real unit.
+ *   104  YKDK - the sheet lists YKDK against unit 102 with no mobile, but
+ *        102 already has a different, mobile-bearing claimant (Nandani
+ *        Regent) elsewhere in the same sheet - a duplicate stall number in
+ *        the organisers' own file. They confirmed YKDK's real unit is 104
+ *        (already on the floor, previously mobile-less) and that unit 145's
+ *        sheet row (Aakashdip) was carrying YKDK's mobile (7728088199) by
+ *        mistake - moved here; Aakashdip's own mobile is still unknown.
+ *
  * STILL UNRESOLVED - left exactly as they were, not touched by this pass:
  *   PENDING-5   Divine Silk Mills   - still absent from the new roster.
- *   PENDING-39  Saraogi Super Sales - still absent from the new roster BY
- *               NAME, but the roster gives stall 39 (Miu-Miu, 100 sqft) the
- *               mobile 9810550285 - Saraogi's own known mobile, and the one
- *               unit 50 (SSS) held until this pass, where the roster now
- *               leaves it blank. That mobile was NOT written onto Miu-Miu
- *               here (unit 39 below keeps its prior mobile) because writing
- *               it to production would silently reassign Saraogi's existing
- *               portal identity to a different exhibitor. Needs an explicit
- *               answer from the organisers before either row's mobile
- *               changes.
  *   79          Geeta Readymade / King's Man, a HAND-CONFIRMED (held: true)
  *               assignment, is entirely absent from the new roster with no
  *               replacement named for the unit. Kept as-is rather than
  *               deleting a confirmed exhibitor over an unexplained omission.
+ *   145         Aakashdip - real mobile still unknown since 7728088199
+ *               turned out to be YKDK's (see above). No portal access until
+ *               a number is collected.
+ *   136A        Jai Shree Krishna - no mobile anywhere in the source sheet.
+ *               No portal access until a number is collected.
  *
  * 175 exhibitors on 166 stalls.
  */
@@ -161,8 +170,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "General",                   mobile: "9883009021",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "North Hall",         held: true },
   { unitId: "49",      stallNumber: 49,   brand: "Wow Lotus", category: "",
     group: "General",                   mobile: "9007387489",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "North Hall",         held: true },
-  { unitId: "50",      stallNumber: 50,   brand: "SSS", category: "",
-    group: "General",                   mobile: "",            sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "50",      stallNumber: 50,   brand: "SSS", category: "Sarees",
+    group: "Saree",                     mobile: "9810550285",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "51",      stallNumber: 51,   brand: "Murtidhara Sarees / Shyamraj", category: "Lehenga",
     group: "Lehenga",                   mobile: "9016588151",  sheetSize: "30m x 6m",  areaSqft: 2000,  pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "52",      stallNumber: 52,   brand: "Swamee", category: "Saree",
@@ -272,7 +281,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "103",     stallNumber: 103,  brand: "K.K. Garments", category: "Fabric/Garment",
     group: "Dress Material & Fabrics",  mobile: "9586621717",  sheetSize: "3m x 36m",  areaSqft: 1200,  pool: "General",  zone: "North Hall",         held: true },
   { unitId: "104",     stallNumber: 104,  brand: "YKDK", category: "Kurties",
-    group: "Kurti",                     mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
+    group: "Kurti",                     mobile: "7728088199",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "North Hall",         held: true },
   { unitId: "105",     stallNumber: 105,  brand: "Ruby", category: "Saree",
     group: "Saree",                     mobile: "9829085935",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "North Hall",         held: true },
   { unitId: "106",     stallNumber: 106,  brand: "Vaishnavi Sarees", category: "Kurties",
@@ -362,7 +371,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "144",     stallNumber: 144,  brand: "J B Designer", category: "Kurti",
     group: "Kurti",                     mobile: "9545612026",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "145",     stallNumber: 145,  brand: "Aakashdip", category: "",
-    group: "General",                   mobile: "7728088199",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: true },
+    group: "General",                   mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "146",     stallNumber: 146,  brand: "Dharam Art (S)", category: "Dress Matterial, Kurtie",
     group: "Kurti",                     mobile: "9879360089",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "147",     stallNumber: 147,  brand: "Kuhu Creation (Kesari Creation)", category: "Kurti",
@@ -415,8 +424,6 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "7285010000",  sheetSize: "3m x 6m",   areaSqft: 400,   pool: "Saree",    zone: "South Hall",         held: false },
   { unitId: "168",     stallNumber: 168,  brand: "Kushagra", category: "",
     group: "General",                   mobile: "9151060725",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
-  { unitId: "PENDING-39", stallNumber: 39,   brand: "SARAOGI SUPER SALES PRIVATE LIMITED", category: "Sarees",
-    group: "Saree",                     mobile: "9810550285",  sheetSize: "42m x 6m",  areaSqft: 2800,  pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "PENDING-5", stallNumber: 5,    brand: "Divine Silk Mills", category: "Sarees",
     group: "Saree",                     mobile: "9909789088",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
 ];
