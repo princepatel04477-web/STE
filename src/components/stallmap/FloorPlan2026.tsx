@@ -24,7 +24,7 @@ import {
  * showing it for up to a year. See commit b6d1a5a for the same fix applied
  * to the extras catalog photos.
  */
-const PLAN_SRC = '/assets/Final-Layout-STE-2026-numbered-v2.svg';
+const PLAN_SRC = '/assets/Final-Layout-STE-2026-numbered-v3.svg';
 
 /** The plan's own coordinate space, so the overlay lines up with the drawing. */
 const VIEW_W = 841.92007;

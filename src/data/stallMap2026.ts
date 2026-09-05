@@ -42,6 +42,21 @@
  * x/y/w/h are the stall's rectangle in the floor plan's own
  * coordinate space (1 metre = 5.638 units), so they can be used to draw
  * or hit-test the plan directly.
+ *
+ * WIDENED 6 Sep 2026: stall 32's merged cell in the raw drawing only spans
+ * 18 rows (rows 33-51), but its own printed label already reads "24M x 3M" -
+ * the 6 rows directly above it (27-33, same columns) are blank/unlabeled in
+ * the sheet, which is Samprati Creation's 200 sqft folded into Suparshva's
+ * stall (see stallAllotment2026.ts) without the merged cell ever being
+ * extended to cover it. Widened here to match the label and neighbouring
+ * stall 35's identical row-27 start, so the two draw at the same height
+ * instead of stall 32 looking short next to it.
+ *
+ * NOTE for future edits: scripts/build_final_svg.py's parse_stall_map()
+ * finds each entry with a regex that expects them back-to-back with no
+ * comment lines in between - a comment inserted directly above one entry
+ * merges it into its neighbour's match and silently drops it from every
+ * regeneration. Put entry-specific notes here in the header instead.
  */
 
 export type StallZone = "North Wall Strip" | "North Hall" | "South Hall";
@@ -137,7 +152,7 @@ export const STALL_MAP_2026: Stall2026[] = [
   { stallNumber: 29, size: "12M x 3M", sheetSize: "3m x 12m", areaSqm: 36, areaSqft: 400, zone: "North Hall", widthM: 3, depthM: 12, x: 125.3, y: 81.3, w: 16.92, h: 67.58 },
   { stallNumber: 30, size: "12M x 3M", sheetSize: "3m x 12m", areaSqm: 36, areaSqft: 400, zone: "North Hall", widthM: 3, depthM: 12, x: 142.22, y: 81.3, w: 16.92, h: 67.58 },
   { stallNumber: 31, size: "30M x 3M", sheetSize: "3m x 30m", areaSqm: 90, areaSqft: 1000, zone: "North Hall", widthM: 3, depthM: 30, x: 142.22, y: 148.89, w: 16.92, h: 168.96 },
-  { stallNumber: 32, size: "18M x 3M", sheetSize: "3m x 18m", areaSqm: 54, areaSqft: 600, zone: "North Hall", widthM: 3, depthM: 18, x: 176.06, y: 216.47, w: 16.92, h: 101.38 },
+  { stallNumber: 32, size: "24M x 3M", sheetSize: "3m x 24m", areaSqm: 72, areaSqft: 800, zone: "North Hall", widthM: 3, depthM: 24, x: 176.06, y: 182.68, w: 16.92, h: 135.17 },
   { stallNumber: 33, size: "18M x 3M", sheetSize: "3m x 18m", areaSqm: 54, areaSqft: 600, zone: "North Hall", widthM: 3, depthM: 18, x: 176.06, y: 81.3, w: 16.92, h: 101.38 },
   { stallNumber: 34, size: "18M x 3M", sheetSize: "3m x 18m", areaSqm: 54, areaSqft: 600, zone: "North Hall", widthM: 3, depthM: 18, x: 192.98, y: 81.3, w: 16.92, h: 101.38 },
   { stallNumber: 35, size: "24M x 3M", sheetSize: "3m x 24m", areaSqm: 72, areaSqft: 800, zone: "North Hall", widthM: 3, depthM: 24, x: 192.98, y: 182.68, w: 16.92, h: 135.17 },
