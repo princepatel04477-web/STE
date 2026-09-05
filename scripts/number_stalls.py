@@ -1132,19 +1132,22 @@ def draw_plan(stalls, features, brands=None):
             for half in s["halves"]:
                 badge(half["x"] + half["w"] / 2, half["y"] + half["h"] / 2,
                       half["id"])
-            a, b = s["halves"]
-            if a["y"] == b["y"]:                    # bay runs east-west
-                x = max(a["x"], b["x"])
-                out.append('<line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"'
-                           ' stroke="#c00000" stroke-width="0.5"'
-                           ' stroke-dasharray="2 1.6"/>'
-                           % (x, s["y"], x, s["y"] + s["h"]))
-            else:
-                y = max(a["y"], b["y"])
-                out.append('<line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"'
-                           ' stroke="#c00000" stroke-width="0.5"'
-                           ' stroke-dasharray="2 1.6"/>'
-                           % (s["x"], y, s["x"] + s["w"], y))
+            # A bay with a single lettered bonus unit (no equal second half to
+            # rule against) just gets its badge above - nothing to split.
+            if len(s["halves"]) == 2:
+                a, b = s["halves"]
+                if a["y"] == b["y"]:                    # bay runs east-west
+                    x = max(a["x"], b["x"])
+                    out.append('<line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"'
+                               ' stroke="#c00000" stroke-width="0.5"'
+                               ' stroke-dasharray="2 1.6"/>'
+                               % (x, s["y"], x, s["y"] + s["h"]))
+                else:
+                    y = max(a["y"], b["y"])
+                    out.append('<line x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"'
+                               ' stroke="#c00000" stroke-width="0.5"'
+                               ' stroke-dasharray="2 1.6"/>'
+                               % (s["x"], y, s["x"] + s["w"], y))
             continue
         inset = 7.5
         if s["frontEnd"] == "south":

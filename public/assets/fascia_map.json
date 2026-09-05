@@ -126,7 +126,7 @@
     "fascia_names": [
       "Chandwani Silk Mills"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "149": {
     "fascia_names": [
@@ -151,7 +151,7 @@
     "fascia_names": [
       "Tikza fashion hub"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "151": {
     "fascia_names": [
@@ -162,10 +162,9 @@
   },
   "110": {
     "fascia_names": [
-      "Dream Home Fab",
-      "BedlineHome"
+      "Mercury Fashion"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "43": {
     "fascia_names": [
@@ -202,9 +201,9 @@
   },
   "137": {
     "fascia_names": [
-      "Garden Vareli"
+      "SAHVIKA"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "17": {
     "fascia_names": [
@@ -215,9 +214,9 @@
   },
   "50": {
     "fascia_names": [
-      "Gauri Putra"
+      "SSS"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "29": {
     "fascia_names": [
@@ -286,10 +285,9 @@
   },
   "34": {
     "fascia_names": [
-      "Jindal Saree Centre Private Limited, Delhi",
-      "Jindal Saree Centre P Ltd, Delhi"
+      "Kodas"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "27": {
     "fascia_names": [
@@ -433,16 +431,15 @@
   },
   "145": {
     "fascia_names": [
-      "Mojasia Texo Fab"
+      "Aakashdip"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "40": {
     "fascia_names": [
-      "Shyamraj Lehengas & More",
-      "Shyamraj kids"
+      "Rajnish Computer"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "124": {
     "fascia_names": [
@@ -455,7 +452,7 @@
     "fascia_names": [
       "Nidhi Creations"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "53": {
     "fascia_names": [
@@ -466,9 +463,9 @@
   },
   "108": {
     "fascia_names": [
-      "Nirham Club Wear"
+      "Soniya creation"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "6": {
     "fascia_names": [
@@ -478,10 +475,9 @@
   },
   "85": {
     "fascia_names": [
-      "Nirvana Designer",
-      "Nirvana Ethnics"
+      "Satish Silk Mills"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "138": {
     "fascia_names": [
@@ -612,9 +608,9 @@
   },
   "39": {
     "fascia_names": [
-      "Saraogi Super Sales Private Limited"
+      "Miu-Miu"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "67": {
     "fascia_names": [
@@ -631,9 +627,9 @@
   },
   "65": {
     "fascia_names": [
-      "Satvachan sarees"
+      "Nidhivan / Yogayaa"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "66": {
     "fascia_names": [
@@ -656,9 +652,9 @@
   },
   "123": {
     "fascia_names": [
-      "Shaurya Silk Mills"
+      "Talreja Saree"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "120": {
     "fascia_names": [
@@ -681,9 +677,9 @@
   },
   "18": {
     "fascia_names": [
-      "Shiv Vardhan Sarees"
+      "Shiv Vardhaan"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "49": {
     "fascia_names": [
@@ -752,9 +748,9 @@
   },
   "26": {
     "fascia_names": [
-      "Sur Shyam/Girraj"
+      "Subh Saachi/Shiv Ganges"
     ],
-    "source": "supabase"
+    "source": "roster_update_5sep"
   },
   "41": {
     "fascia_names": [
@@ -932,26 +928,68 @@
   },
   "64": {
     "fascia_names": [
-      "Nishcay Sarees / Naisha Synthetics"
+      "Mangal Jyoti Sarees"
     ],
-    "source": "static_plan_fallback"
+    "source": "roster_update_5sep"
   },
   "101": {
     "fascia_names": [
-      "Hariom Trendz"
+      "Swarnpari Design"
     ],
-    "source": "held_override"
+    "source": "roster_update_5sep"
   },
   "136A": {
     "fascia_names": [
-      "Shakambari Lace House"
+      "Jai Shree Krishna"
     ],
-    "source": "held_override"
+    "source": "roster_update_5sep"
   },
   "136B": {
     "fascia_names": [
       "Raghav Creation"
     ],
     "source": "held_override"
+  },
+  "102A": {
+    "fascia_names": [
+      "Veemoo Fashions"
+    ],
+    "source": "roster_update_5sep"
+  },
+  "107": {
+    "fascia_names": [
+      "Shivaay Cotoure"
+    ],
+    "source": "roster_update_5sep"
+  },
+  "111": {
+    "fascia_names": [
+      "Om Ganesh Fashion"
+    ],
+    "source": "roster_update_5sep"
+  },
+  "152": {
+    "fascia_names": [
+      "RADHEY GROUP"
+    ],
+    "source": "roster_update_5sep"
+  },
+  "161A": {
+    "fascia_names": [
+      "SANKALP"
+    ],
+    "source": "roster_update_5sep"
+  },
+  "19": {
+    "fascia_names": [
+      "Durga Textiles / Durga Silk Mills"
+    ],
+    "source": "roster_update_5sep"
+  },
+  "92A": {
+    "fascia_names": [
+      "Prabhukripa Synthetics"
+    ],
+    "source": "roster_update_5sep"
   }
 }

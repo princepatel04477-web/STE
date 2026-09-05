@@ -175,7 +175,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9999478191", brandName: "Taani / Turkish Boy", stallSqft: "200 sq ft", category: "", market: "" },
   { mobile: "8750204126", brandName: "Rich Rang", stallSqft: "200 sq ft", category: "", market: "" },
   { mobile: "8017437639", brandName: "Miu-Miu / I Laila / Little Girls / Laila Gold", stallSqft: "100 sq ft", category: "", market: "" },
-  { mobile: "8130017615", brandName: "Softcore Infotech", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "8130017615", brandName: "Rajnish Computer", stallSqft: "100 sq ft", category: "", market: "" },
   { mobile: "9216586012", brandName: "Metal Bird / Eureca / Nyasia", stallSqft: "200 sq ft", category: "", market: "", aliases: ["9871342511"] },
   { mobile: "7456833341", brandName: "Signature Club", stallSqft: "200 sq ft", category: "", market: "" },
   { mobile: "9839425959", brandName: "Mr.Ethnic", stallSqft: "200 sq ft", category: "", market: "" },
@@ -184,7 +184,18 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "7021115281", brandName: "Zylo", stallSqft: "200 sq ft", category: "", market: "" },
   { mobile: "7874954427", brandName: "RKF Studio (Men's Ethnic)", stallSqft: "200 sq ft", category: "", market: "" },
   { mobile: "9883009021", brandName: "24 Street", stallSqft: "200 sq ft", category: "", market: "", aliases: ["8017311157"] },
-  { mobile: "9007387489", brandName: "Wow Lotus", stallSqft: "200 sq ft", category: "", market: "", aliases: ["8420440876"] }
+  { mobile: "9007387489", brandName: "Wow Lotus", stallSqft: "200 sq ft", category: "", market: "", aliases: ["8420440876"] },
+  // Added from ste_final_stall_numbers.xlsx (5 Sep 2026 final roster) - brands
+  // with no prior profile or registeredExhibitors row at all.
+  { mobile: "9374555439", brandName: "Prabhukripa Synthetics", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "9983545202", brandName: "Vaishnavi Sarees", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "8882750260", brandName: "Shivaay Cotoure", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "8003772130", brandName: "Soniya creation", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "9352924452", brandName: "Shubh laxmi", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "6376473726", brandName: "Mercury Fashion", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "9829084015", brandName: "Om Ganesh Fashion", stallSqft: "100 sq ft", category: "", market: "" },
+  { mobile: "7728088199", brandName: "Aakashdip", stallSqft: "300 sq ft", category: "", market: "" },
+  { mobile: "9151060725", brandName: "Kushagra", stallSqft: "200 sq ft", category: "", market: "" },
 ];
 
 /** Every number one exhibitor answers to: the sheet's, plus any alias. */
