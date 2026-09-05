@@ -143,7 +143,13 @@ export const PRODUCT_IMAGES_MAP: Record<string, ProductImageData> = {
   'mannequin': {
     id: 'mannequin',
     name: 'Mannequin',
-    image: '/images/extras/v2/mannequin.jpg',
+    image: '/images/extras/v2/mannequin-v2.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'rack': {
+    id: 'rack',
+    name: 'Rack',
+    image: '/images/extras/v2/rack.jpg',
     disclaimer: DISCLAIMER_TEXT
   },
   'garment-stand-double': {
