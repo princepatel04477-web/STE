@@ -51,7 +51,8 @@ import {
   Edit3,
   Loader2,
   MoreVertical,
-  Search
+  Search,
+  Lock
 } from 'lucide-react';
 
 const STRICT_CUTOFF_DATE = '5th September 2026, 12:00 PM';
@@ -245,6 +246,8 @@ export default function ExhibitorDashboardPage() {
   const [extrasSuccessMsg, setExtrasSuccessMsg] = useState('');
   const [lastSubmittedAt, setLastSubmittedAt] = useState<string | null>(null);
   const [showBillModal, setShowBillModal] = useState(false);
+  /** Set by the organiser to freeze this section — no adding, editing, or submitting. */
+  const [requirementsLocked, setRequirementsLocked] = useState(false);
 
   // Mobile navigation, search & UI State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -481,6 +484,8 @@ export default function ExhibitorDashboardPage() {
         setProducts(catData.products);
       }
 
+      setRequirementsLocked(Boolean(catData.requirementsLocked));
+
       if (catData.existingOrder) {
         const qMap: Record<string, number> = {};
         const dMap: Record<string, number> = {};
@@ -623,7 +628,7 @@ export default function ExhibitorDashboardPage() {
     // once there are extras on it, so hold it back rather than flashing a save
     // error at someone still filling the form in.
     const extrasPayload =
-      exhibitorName.trim() && !(gstinRequired && !gstinIsComplete)
+      exhibitorName.trim() && !(gstinRequired && !gstinIsComplete) && !requirementsLocked
         ? buildExtrasPayload()
         : null;
 
@@ -692,6 +697,7 @@ export default function ExhibitorDashboardPage() {
     quantities,
     itemDays,
     specialNotes,
+    requirementsLocked,
     initialLoading
   ]);
 
@@ -973,6 +979,7 @@ export default function ExhibitorDashboardPage() {
   };
 
   const updateQuantity = (id: string, delta: number) => {
+    if (requirementsLocked) return;
     setQuantities((prev) => {
       const current = prev[id] || 0;
       const updated = Math.max(0, current + delta);
@@ -981,6 +988,7 @@ export default function ExhibitorDashboardPage() {
   };
 
   const updateItemDays = (id: string, days: number) => {
+    if (requirementsLocked) return;
     setItemDays((prev) => ({
       ...prev,
       [id]: Math.max(1, Math.min(30, days))
@@ -988,6 +996,7 @@ export default function ExhibitorDashboardPage() {
   };
 
   const handleSaveExtras = async () => {
+    if (requirementsLocked) return;
     setHasAttemptedSubmit(true);
     setExtrasSuccessMsg('');
 
@@ -2184,6 +2193,23 @@ export default function ExhibitorDashboardPage() {
             </div>
           </div>
 
+          {requirementsLocked && (
+            <div className="mb-6 p-4 rounded-2xl bg-slate-100 border-2 border-slate-300 text-slate-800 flex items-start gap-3 shadow-xs">
+              <Lock className="w-5 h-5 text-slate-500 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-900">This section has been locked by the organiser</h3>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  Your extras and special requirements are shown below as read-only and cannot be changed. Contact
+                  the organiser if you need something updated.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <fieldset
+            disabled={requirementsLocked}
+            className={`border-0 p-0 m-0 min-w-0 ${requirementsLocked ? 'opacity-60' : ''}`}
+          >
           {/* Search Bar & Sticky Category Filter */}
           <div className="space-y-3 mb-6">
             <div className="relative">
@@ -2552,13 +2578,15 @@ export default function ExhibitorDashboardPage() {
 
             <button
               onClick={handleSaveExtras}
-              disabled={extrasSaving}
+              disabled={extrasSaving || requirementsLocked}
+              title={requirementsLocked ? 'Your requirements have been locked by the organiser.' : undefined}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs uppercase tracking-wider shadow-md shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
-              <span>{extrasSaving ? 'Submitting...' : 'Submit Extra Requirements'}</span>
+              <span>{extrasSaving ? 'Submitting...' : requirementsLocked ? 'Requirements Locked' : 'Submit Extra Requirements'}</span>
             </button>
           </div>
+          </fieldset>
         </section>
 
         {/* Section 5: Live Order Summary */}
@@ -2791,11 +2819,12 @@ export default function ExhibitorDashboardPage() {
 
             <button
               onClick={handleSaveExtras}
-              disabled={extrasSaving}
+              disabled={extrasSaving || requirementsLocked}
+              title={requirementsLocked ? 'Your requirements have been locked by the organiser.' : undefined}
               className="w-full sm:w-auto flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider shadow-md shadow-amber-500/20 transition-all transform active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>{extrasSaving ? 'Submitting...' : 'Submit All Requirements'}</span>
+              <span>{extrasSaving ? 'Submitting...' : requirementsLocked ? 'Requirements Locked' : 'Submit All Requirements'}</span>
             </button>
           </div>
         </div>

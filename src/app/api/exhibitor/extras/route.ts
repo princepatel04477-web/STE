@@ -65,8 +65,11 @@ export async function GET(request: Request) {
       }
     }
 
+    const requirementsLocked = await lookupRequirementsLocked(session.mobile);
+
     return NextResponse.json({
       products,
+      requirementsLocked,
       existingOrder: {
         items,
         special_notes: order?.special_notes || '',
@@ -115,6 +118,33 @@ async function lookupStoredExhibitorName(mobile: string): Promise<string> {
 }
 
 /**
+ * Whether the organiser has frozen this exhibitor's requirements section.
+ * Checked on both the read (so the portal can render read-only) and the
+ * write (so a locked exhibitor can't push a change through directly).
+ */
+async function lookupRequirementsLocked(mobile: string): Promise<boolean> {
+  if (isSupabaseConfigured && supabaseAdmin) {
+    try {
+      const { data: sbProfile } = await supabaseAdmin
+        .from('exhibitors')
+        .select('requirements_locked')
+        .eq('mobile', mobile)
+        .maybeSingle();
+
+      if (sbProfile) return Boolean(sbProfile.requirements_locked);
+    } catch (err) {
+      console.warn('[Extras] Requirements-lock lookup fell back to local store:', err);
+    }
+  }
+
+  const local = db
+    .prepare('SELECT requirements_locked FROM exhibitors WHERE mobile = ?')
+    .get(mobile) as { requirements_locked?: boolean } | undefined;
+
+  return Boolean(local?.requirements_locked);
+}
+
+/**
  * The GSTIN already stored against this exhibitor. Supabase keeps it inside
  * the structured fascia payload; the local store keeps it in its own column.
  */
@@ -153,6 +183,13 @@ export async function POST(request: Request) {
     const session = await getAuthenticatedExhibitor(request);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (await lookupRequirementsLocked(session.mobile)) {
+      return NextResponse.json(
+        { error: 'Your requirements have been locked by the organiser. Contact them if you need changes.' },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();

@@ -84,6 +84,8 @@ export interface ExhibitorRecord {
   stall_zone?: string;
   stall_dimensions?: string;
   stall_allocated_at?: string;
+  /** Set by the organiser to freeze this exhibitor's Additional Requirements & Extras section. */
+  requirements_locked?: boolean;
   updated_at: string;
 }
 
@@ -605,6 +607,62 @@ export function updateExhibitorFiles(
     return true;
   } catch (err) {
     console.error('Failed to update exhibitor files in db:', err);
+    return false;
+  }
+}
+
+export function setExhibitorRequirementsLock(mobile: string, locked: boolean): boolean {
+  try {
+    const data = readData();
+    let ex = data.exhibitors.find(e => e.mobile === mobile);
+    if (!ex) {
+      ex = {
+        id: data.exhibitors.length + 1,
+        mobile,
+        brand_name: '',
+        stall_sqft: '',
+        exhibitor_name: '',
+        company_description: '',
+        updated_at: new Date().toISOString()
+      };
+      data.exhibitors.push(ex);
+    }
+    ex.requirements_locked = locked;
+    ex.updated_at = new Date().toISOString();
+
+    saveData(data);
+    return true;
+  } catch (err) {
+    console.error('Failed to update exhibitor requirements lock in db:', err);
+    return false;
+  }
+}
+
+export function setAllExhibitorsRequirementsLock(mobiles: string[], locked: boolean): boolean {
+  try {
+    const data = readData();
+    mobiles.forEach((mobile) => {
+      let ex = data.exhibitors.find(e => e.mobile === mobile);
+      if (!ex) {
+        ex = {
+          id: data.exhibitors.length + 1,
+          mobile,
+          brand_name: '',
+          stall_sqft: '',
+          exhibitor_name: '',
+          company_description: '',
+          updated_at: new Date().toISOString()
+        };
+        data.exhibitors.push(ex);
+      }
+      ex.requirements_locked = locked;
+      ex.updated_at = new Date().toISOString();
+    });
+
+    saveData(data);
+    return true;
+  } catch (err) {
+    console.error('Failed to bulk-update exhibitor requirements lock in db:', err);
     return false;
   }
 }

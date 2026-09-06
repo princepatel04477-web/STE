@@ -427,7 +427,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "167",     stallNumber: 167,  brand: "Univastra Sarees", category: "Sarees (200)",
     group: "Saree",                     mobile: "7285010000",  sheetSize: "3m x 6m",   areaSqft: 400,   pool: "Saree",    zone: "South Hall",         held: false },
   { unitId: "168",     stallNumber: 168,  brand: "Kushagra", category: "",
-    group: "General",                   mobile: "9151060725",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
+    group: "General",                   mobile: "9151060275",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
 ];
 
 /** Stalls the saree brands drew from (unchanged by this pass). */

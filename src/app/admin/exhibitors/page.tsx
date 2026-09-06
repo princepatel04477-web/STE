@@ -42,7 +42,9 @@ import {
   Crown,
   Users,
   Wrench,
-  Check
+  Check,
+  Lock,
+  Unlock
 } from 'lucide-react';
 import BillModal from '@/components/extras/BillModal';
 import ExhibitorDetailModal, { ExhibitorDetailData } from '@/components/admin/ExhibitorDetailModal';
@@ -92,6 +94,8 @@ interface ExhibitorRecord {
   portal_filled?: boolean;
   /** One of the two organiser logins, not an exhibitor. */
   is_organiser?: boolean;
+  /** Set by the organiser to freeze this exhibitor's Additional Requirements & Extras section. */
+  requirements_locked?: boolean;
   last_updated: string;
 }
 
@@ -142,6 +146,10 @@ export default function AdminExhibitorsPage() {
   const [selectedExhibitorForBill, setSelectedExhibitorForBill] = useState<ExhibitorRecord | null>(null);
   const [selectedExhibitorForDetail, setSelectedExhibitorForDetail] = useState<ExhibitorRecord | null>(null);
 
+  // Requirements lock state
+  const [lockingMobile, setLockingMobile] = useState<string | null>(null);
+  const [bulkLocking, setBulkLocking] = useState(false);
+
   // Table horizontal scrolling ref
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
   const topScrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -185,6 +193,58 @@ export default function AdminExhibitorsPage() {
       console.error('Failed to load admin exhibitors:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Freeze/unfreeze one exhibitor's Additional Requirements & Extras section.
+  const toggleRequirementsLock = async (mobile: string, locked: boolean) => {
+    setLockingMobile(mobile);
+    try {
+      const res = await fetch('/api/admin/exhibitors/lock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mobile, locked })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Failed to update lock state.');
+        return;
+      }
+      setExhibitors((prev) =>
+        prev.map((ex) => (ex.mobile === mobile ? { ...ex, requirements_locked: locked } : ex))
+      );
+    } catch (err) {
+      console.error('Failed to toggle requirements lock:', err);
+      alert('Failed to reach the server. Please try again.');
+    } finally {
+      setLockingMobile(null);
+    }
+  };
+
+  // Lock All / Unlock All — every exhibitor's requirements section at once.
+  const bulkSetRequirementsLock = async (locked: boolean) => {
+    const verb = locked ? 'lock' : 'unlock';
+    if (!window.confirm(`${locked ? 'Lock' : 'Unlock'} the Additional Requirements & Extras section for every exhibitor?`)) {
+      return;
+    }
+    setBulkLocking(true);
+    try {
+      const res = await fetch('/api/admin/exhibitors/lock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ all: true, locked })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || `Failed to ${verb} all exhibitors.`);
+        return;
+      }
+      setExhibitors((prev) => prev.map((ex) => ({ ...ex, requirements_locked: locked })));
+    } catch (err) {
+      console.error(`Failed to ${verb} all exhibitors:`, err);
+      alert('Failed to reach the server. Please try again.');
+    } finally {
+      setBulkLocking(false);
     }
   };
 
@@ -484,6 +544,26 @@ export default function AdminExhibitorsPage() {
             >
               <Download className="w-4 h-4" />
               <span>Export Excel ({filteredExhibitors.length})</span>
+            </button>
+
+            <button
+              onClick={() => bulkSetRequirementsLock(true)}
+              disabled={bulkLocking}
+              title="Lock the Additional Requirements & Extras section for every exhibitor"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 border border-rose-300 text-xs font-bold text-rose-900 transition-all shadow-2xs disabled:opacity-50"
+            >
+              <Lock className="w-4 h-4" />
+              <span>Lock All</span>
+            </button>
+
+            <button
+              onClick={() => bulkSetRequirementsLock(false)}
+              disabled={bulkLocking}
+              title="Unlock the Additional Requirements & Extras section for every exhibitor"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-xs font-bold text-emerald-900 transition-all shadow-2xs disabled:opacity-50"
+            >
+              <Unlock className="w-4 h-4" />
+              <span>Unlock All</span>
             </button>
           </div>
         </div>
@@ -898,9 +978,12 @@ export default function AdminExhibitorsPage() {
                                 )}
                               </div>
                               <div className="truncate max-w-[160px]">
-                                <span className="font-extrabold text-slate-900 block text-xs truncate">
+                                <span className="font-extrabold text-slate-900 block text-xs truncate flex items-center gap-1">
                                   {ex.exhibitor_name || (
                                     <span className="text-amber-800 italic font-semibold">Not registered yet</span>
+                                  )}
+                                  {ex.requirements_locked && (
+                                    <Lock className="w-3 h-3 text-rose-600 shrink-0" aria-label="Requirements locked" />
                                   )}
                                 </span>
                                 {ex.profile_pic_url ? (
@@ -1087,6 +1170,32 @@ export default function AdminExhibitorsPage() {
                               >
                                 <FileText className="w-3.5 h-3.5 text-amber-800" />
                                 <span>Tax Bill</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleRequirementsLock(ex.mobile, !ex.requirements_locked);
+                                }}
+                                disabled={lockingMobile === ex.mobile}
+                                className={`px-2.5 py-1.5 rounded-lg border font-bold text-[11px] transition-all flex items-center gap-1 shadow-2xs disabled:opacity-50 ${
+                                  ex.requirements_locked
+                                    ? 'bg-rose-100 hover:bg-rose-200 text-rose-900 border-rose-300'
+                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                                }`}
+                                title={
+                                  ex.requirements_locked
+                                    ? 'Unlock their requirements section'
+                                    : 'Lock their requirements section'
+                                }
+                              >
+                                {ex.requirements_locked ? (
+                                  <Lock className="w-3.5 h-3.5 text-rose-700" />
+                                ) : (
+                                  <Unlock className="w-3.5 h-3.5 text-slate-500" />
+                                )}
+                                <span>{ex.requirements_locked ? 'Locked' : 'Unlocked'}</span>
                               </button>
                             </div>
                           </td>

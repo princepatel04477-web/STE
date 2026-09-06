@@ -199,7 +199,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   // organisers (6 Sep 2026). Removed until a real number is collected;
   // stallAllotment2026.ts keeps their stall-145 row with mobile blank.
   { mobile: "7728088199", brandName: "YKDK", stallSqft: "100 sq ft", category: "Kurties", market: "" },
-  { mobile: "9151060725", brandName: "Kushagra", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "9151060275", brandName: "Kushagra", stallSqft: "200 sq ft", category: "", market: "" },
 ];
 
 /** Every number one exhibitor answers to: the sheet's, plus any alias. */

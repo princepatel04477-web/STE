@@ -332,6 +332,7 @@ export async function GET() {
         drive_file_url: dbEx?.drive_file_url || null,
         drive_folder_url: dbEx?.drive_folder_url || null,
         rental_days: order?.rental_days ?? 2,
+        requirements_locked: Boolean(dbEx?.requirements_locked),
         last_updated: order?.order_updated || dbEx?.updated_at || new Date().toISOString()
       };
 
