@@ -42,7 +42,7 @@ export const EXTRAS_RATES: ExtraItem[] = [
   { id: "plasma-32",         code: "DP 26", name: "32\" Plasma Screen with Stand", spec: "32-inch display with floor stand", rateInr: 3500, rateUsd: 27, basis: "per-day", category: "display-av", image: getProductImage("plasma-32") },
   { id: "garment-stand",     code: "DP 27", name: "Garment Stand (Single Rod)", spec: "4.5'w × 5.5'ht", rateInr: 900,  rateUsd: 7,  basis: "per-day", category: "display-av", image: getProductImage("garment-stand") },
   { id: "garment-stand-double", code: "DP 27A", name: "Garment Stand (Double Rod)", spec: "4.5'w × 5.5'ht", rateInr: 900, rateUsd: 7, basis: "per-day", category: "display-av", image: getProductImage("garment-stand-double") },
-  { id: "mannequin",         code: "DP 28", name: "Mannequin",                 spec: "Full-body garment display mannequin", rateInr: 1500, rateUsd: 16, basis: "per-day", category: "display-av", image: getProductImage("mannequin") },
+  { id: "mannequin",         code: "DP 28", name: "Mannequin",                 spec: "Full-body garment display mannequin (₹1,500 for 2 days)", rateInr: 750, rateUsd: 8, basis: "per-day", category: "display-av", image: getProductImage("mannequin") },
   { id: "receptionist",      code: "DP 29", name: "Receptionist",              spec: "Professional stall receptionist / hostess (per day)", rateInr: 1000, rateUsd: 12, basis: "per-day", category: "display-av", image: getProductImage("receptionist") },
   { id: "rack",              code: "DP 30", name: "Rack",                      spec: "5-tier aluminium display rack", rateInr: 1500, rateUsd: 16, basis: "per-day", category: "display-av", image: getProductImage("rack") },
 ];

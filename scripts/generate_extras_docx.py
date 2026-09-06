@@ -108,8 +108,9 @@ def create_extras_document(output_path):
         ("DP 26", "32\" Plasma Screen with Stand", "32-inch display with floor stand", "₹3,500", "$27", "Per day", "Display & AV"),
         ("DP 27", "Garment Stand (Single Rod)", "4.5'w × 5.5'ht", "₹900", "$7", "Per day", "Display & AV"),
         ("DP 27A", "Garment Stand (Double Rod)", "4.5'w × 5.5'ht", "₹900", "$7", "Per day", "Display & AV"),
-        ("DP 28", "Mannequin", "Full-body garment display mannequin", "₹1,500", "$16", "Per day", "Display & AV"),
+        ("DP 28", "Mannequin", "Full-body garment display mannequin (₹1,500 for 2 days)", "₹750", "$8", "Per day", "Display & AV"),
         ("DP 29", "Receptionist", "Professional stall receptionist / hostess", "₹1,000", "$12", "Per day", "Display & AV"),
+        ("DP 30", "Rack", "5-tier aluminium display rack", "₹1,500", "$16", "Per day", "Display & AV"),
     ]
 
     table = doc.add_table(rows=len(items_data) + 1, cols=7)

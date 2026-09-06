@@ -75,7 +75,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9586621717", brandName: "K.K. Garments", stallSqft: "1200 sq ft", category: "Fabric/Garment", market: "Hojiwala Sachin" },
   { mobile: "9426923797", brandName: "Kairadhya", stallSqft: "300 sq ft", category: "Sarees", market: "Raghukul", aliases: ["9327665182"] },
   { mobile: "9374954037", brandName: "Kala Shree", stallSqft: "600 sq ft", category: "Saree", market: "Ekta Textile Market" },
-  { mobile: "9825129301", brandName: "Kama Print N Pack (NBD)", stallSqft: "200 sq ft", category: "Pack", market: "" },
+  { mobile: "9825129301", brandName: "NBD MARKET HUB PRIVATE LIMITED", stallSqft: "200 sq ft", category: "Pack", market: "" },
   { mobile: "9537886611", brandName: "Kanak Priya Art", stallSqft: "100 sq ft", category: "Sarees", market: "M2" },
   { mobile: "9909313004", brandName: "Kayaan Prints", stallSqft: "600 sq ft", category: "Sarees", market: "Raghukul" },
   { mobile: "9825127946", brandName: "Kesari Nandan", stallSqft: "600 sq ft", category: "Sarees", market: "M1" },
@@ -95,7 +95,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "7574971032", brandName: "Mangal Jyoti", stallSqft: "200 sq ft", category: "Sarees", market: "Raghukul" },
   { mobile: "9913165411", brandName: "Mintu Fashion", stallSqft: "300 sq ft", category: "Sarees", market: "M2" },
   { mobile: "9925633987", brandName: "Mittoo Suits (Khantil E Com)", stallSqft: "600 sq ft", category: "Kurties/Suit", market: "Katargam GIDC" },
-  { mobile: "9722771233", brandName: "Mohilya", stallSqft: "1000 sq ft", category: "Kurties", market: "Globale" },
+  { mobile: "9722771233", brandName: "Mohilya", stallSqft: "600 sq ft", category: "Kurties", market: "Globale" },
   { mobile: "7878536330", brandName: "Mojasia Texo Fab", stallSqft: "100 sq ft", category: "Fabrics", market: "Raghukul" },
   { mobile: "9016588151", brandName: "Murtidhara Sarees / Shyamraj", stallSqft: "2000 sq ft", category: "Lehenga", market: "Raghukul" },
   { mobile: "9924222001", brandName: "Nandani Regent", stallSqft: "100 sq ft", category: "Sarees", market: "Regent" },
@@ -158,6 +158,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9099448676", brandName: "Swarnpari Design", stallSqft: "300 sq ft", category: "Sarees", market: "M2" },
   { mobile: "9377404494", brandName: "Talreeja Sarees", stallSqft: "100 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9662399969", brandName: "Tithi Designer", stallSqft: "200 sq ft", category: "Saree", market: "M1", aliases: ["8511573752"] },
+  { mobile: "9712720963", brandName: "Triveni Sarees", stallSqft: "400 sq ft", category: "Sarees", market: "" },
   { mobile: "8141014006", brandName: "Todi Creation", stallSqft: "400 sq ft", category: "Lehanga", market: "M1" },
   { mobile: "7285010000", brandName: "Univastra Sarees", stallSqft: "200 sq ft", category: "Sarees (200)", market: "M1" },
   { mobile: "9328539215", brandName: "Vani Designer", stallSqft: "200 sq ft", category: "Sarees", market: "M2" },
@@ -199,7 +200,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   // organisers (6 Sep 2026). Removed until a real number is collected;
   // stallAllotment2026.ts keeps their stall-145 row with mobile blank.
   { mobile: "7728088199", brandName: "YKDK", stallSqft: "100 sq ft", category: "Kurties", market: "" },
-  { mobile: "9151060275", brandName: "Kushagra", stallSqft: "200 sq ft", category: "", market: "" },
+  { mobile: "9151060275", brandName: "Kushagra", stallSqft: "200 sq ft", category: "", market: "", aliases: ["9151060725"] },
 ];
 
 /** Every number one exhibitor answers to: the sheet's, plus any alias. */

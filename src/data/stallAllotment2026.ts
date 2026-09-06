@@ -55,7 +55,7 @@
  *   136A        Jai Shree Krishna - no mobile anywhere in the source sheet.
  *               No portal access until a number is collected.
  *
- * 175 exhibitors on 166 stalls.
+ * 176 exhibitors on 167 stalls (22 hand-allotted to Triveni Sarees post-pass).
  */
 
 export type AllotmentPool = "Saree" | "General";
@@ -120,6 +120,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "9824150667",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
   { unitId: "21",      stallNumber: 21,   brand: "Amyraa Trends / Pagaria Fashion", category: "Saree",
     group: "Saree",                     mobile: "9265618713",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "North Wall Strip",   held: false },
+  { unitId: "22",      stallNumber: 22,   brand: "Triveni Sarees", category: "Sarees",
+    group: "Saree",                     mobile: "9712720963",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "North Hall",         held: true },
   { unitId: "23",      stallNumber: 23,   brand: "Bansi Sarees", category: "Uniform Saree",
     group: "Saree",                     mobile: "9377609280",  sheetSize: "3m x 30m",  areaSqft: 1000,  pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "24",      stallNumber: 24,   brand: "Shiv Tex", category: "Sarees",
@@ -361,7 +363,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "139A",    stallNumber: 139,  brand: "Alok Suit", category: "Suit",
     group: "Suits",                     mobile: "8469000011",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "140",     stallNumber: 140,  brand: "Mohilya", category: "",
-    group: "General",                   mobile: "9722771233",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: true },
+    group: "General",                   mobile: "9722771233",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "141",     stallNumber: 141,  brand: "Raghav Creation", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "9830944345",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "142",     stallNumber: 142,  brand: "Garden Vareli", category: "Sarees / Dress Material",
@@ -382,7 +384,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Kurti",                     mobile: "9925557740",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "148",     stallNumber: 148,  brand: "Poonam Designer", category: "Kurties",
     group: "Kurti",                     mobile: "9377062128",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "149",     stallNumber: 149,  brand: "Kama Print N Pack (NBD)", category: "Pack",
+  { unitId: "149",     stallNumber: 149,  brand: "NBD MARKET HUB PRIVATE LIMITED", category: "Pack",
     group: "Home & Other",              mobile: "9825129301",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "150",     stallNumber: 150,  brand: "Vighnakarta / Seemaya", category: "Other",
     group: "Home & Other",              mobile: "7573975665",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
@@ -427,7 +429,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "167",     stallNumber: 167,  brand: "Univastra Sarees", category: "Sarees (200)",
     group: "Saree",                     mobile: "7285010000",  sheetSize: "3m x 6m",   areaSqft: 400,   pool: "Saree",    zone: "South Hall",         held: false },
   { unitId: "168",     stallNumber: 168,  brand: "Kushagra", category: "",
-    group: "General",                   mobile: "9151060275",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: true },
+    group: "General",                   mobile: "9151060275",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
 ];
 
 /** Stalls the saree brands drew from (unchanged by this pass). */

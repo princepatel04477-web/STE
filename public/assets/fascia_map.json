@@ -991,5 +991,11 @@
       "Prabhukripa Synthetics"
     ],
     "source": "roster_update_5sep"
+  },
+  "168": {
+    "fascia_names": [
+      "Kushagra Premium Fabrics"
+    ],
+    "source": "supabase"
   }
 }
