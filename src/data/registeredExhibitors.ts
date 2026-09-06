@@ -59,6 +59,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "6357238663", brandName: "Garden Vareli", stallSqft: "200 sq ft", category: "Sarees / Dress Material", market: "" },
   { mobile: "9601700354", brandName: "Gauri Ganesh", stallSqft: "200 sq ft", category: "Sarees", market: "429 A M2" },
   { mobile: "9586899777", brandName: "Gauri Putra", stallSqft: "400 sq ft", category: "Lehanga", market: "M1" },
+  { mobile: "9503522336", brandName: "Geeta Readymade / Kingsman", stallSqft: "200 sq ft", category: "", market: "" },
   { mobile: "9879688431", brandName: "Geeta Tex (Ambika)", stallSqft: "1000 sq ft", category: "Suit", market: "Kuberji Houses" },
   { mobile: "9638338014", brandName: "Glorry Creation", stallSqft: "200 sq ft", category: "Kurtis", market: "Surana 101" },
   { mobile: "9909648249", brandName: "Hanumanta Lehanga", stallSqft: "600 sq ft", category: "Lehanga", market: "De Ventura" },

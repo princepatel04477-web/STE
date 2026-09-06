@@ -45,15 +45,18 @@
  *        second exhibitor.
  *
  * STILL UNRESOLVED - left exactly as they were, not touched by this pass:
- *   79          Geeta Readymade / King's Man, a HAND-CONFIRMED (held: true)
- *               assignment, is entirely absent from the new roster with no
- *               replacement named for the unit. Kept as-is rather than
- *               deleting a confirmed exhibitor over an unexplained omission.
  *   145         Aakashdip - real mobile still unknown since 7728088199
  *               turned out to be YKDK's (see above). No portal access until
  *               a number is collected.
  *   136A        Jai Shree Krishna - no mobile anywhere in the source sheet.
  *               No portal access until a number is collected.
+ *
+ * RESOLVED 6 Sep 2026 (organiser confirmation, not from the sheet):
+ *   79   Geeta Readymade / Kingsman, a HAND-CONFIRMED (held: true) assignment
+ *        entirely absent from the new roster with no replacement named for
+ *        the unit - brand spelling fixed ("Geeta Readumade / King,s Man" was
+ *        a transcription typo) and mobile 9503522336 added, closing the gap
+ *        this pass left open.
  *
  * 176 exhibitors on 167 stalls (22 hand-allotted to Triveni Sarees post-pass).
  */
@@ -232,8 +235,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Saree",                     mobile: "9099941185",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "78",      stallNumber: 78,   brand: "Kala Shree", category: "Saree",
     group: "Saree",                     mobile: "9374954037",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
-  { unitId: "79",      stallNumber: 79,   brand: "Geeta Readumade / King,s Man", category: "",
-    group: "General",                   mobile: "",            sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "North Hall",         held: true },
+  { unitId: "79",      stallNumber: 79,   brand: "Geeta Readymade / Kingsman", category: "",
+    group: "General",                   mobile: "9503522336",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "North Hall",         held: true },
   { unitId: "80",      stallNumber: 80,   brand: "Sarv Kala (V.D)", category: "Sarees",
     group: "Saree",                     mobile: "9978655007",  sheetSize: "3m x 18m",  areaSqft: 600,   pool: "Saree",    zone: "North Hall",         held: false },
   { unitId: "81",      stallNumber: 81,   brand: "Apple lifestyle", category: "Sarees",
