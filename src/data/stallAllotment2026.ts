@@ -36,8 +36,8 @@
  *        Regent) elsewhere in the same sheet - a duplicate stall number in
  *        the organisers' own file. They confirmed YKDK's real unit is 104
  *        (already on the floor, previously mobile-less) and that unit 145's
- *        sheet row (Aakashdip) was carrying YKDK's mobile (7728088199) by
- *        mistake - moved here; Aakashdip's own mobile is still unknown.
+ *        sheet row (Aakshvik, formerly Aakashdip) was carrying YKDK's mobile (7728088199) by
+ *        mistake - moved here; unit 145 mobile confirmed as 9773042440.
  *   15   Divine Silk Mills trades as "Tikza fashion hub" now - same firm,
  *        same mobile (9909789088), already correctly seated here by this
  *        pass (matched on the new name). PENDING-5 removed - it was a
@@ -45,9 +45,6 @@
  *        second exhibitor.
  *
  * STILL UNRESOLVED - left exactly as they were, not touched by this pass:
- *   145         Aakashdip - real mobile still unknown since 7728088199
- *               turned out to be YKDK's (see above). No portal access until
- *               a number is collected.
  *   136A        Jai Shree Krishna - no mobile anywhere in the source sheet.
  *               No portal access until a number is collected.
  *
@@ -379,8 +376,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Home & Other",              mobile: "9824131004",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "144",     stallNumber: 144,  brand: "J B Designer", category: "Kurti",
     group: "Kurti",                     mobile: "9545612026",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
-  { unitId: "145",     stallNumber: 145,  brand: "Aakashdip", category: "",
-    group: "General",                   mobile: "",            sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: true },
+  { unitId: "145",     stallNumber: 145,  brand: "Aakshvik", category: "",
+    group: "General",                   mobile: "9773042440",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "146",     stallNumber: 146,  brand: "Dharam Art (S)", category: "Dress Matterial, Kurtie",
     group: "Kurti",                     mobile: "9879360089",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "147",     stallNumber: 147,  brand: "Kuhu Creation (Kesari Creation)", category: "Kurti",
