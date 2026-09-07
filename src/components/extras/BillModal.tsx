@@ -531,15 +531,21 @@ export default function BillModal({
                 </div>
 
                 {/* UPI QR Code Box */}
-                <div className="flex items-center gap-2.5 bg-white p-1.5 rounded-lg border border-amber-300 shadow-2xs shrink-0 self-center">
+                <a
+                  href={`upi://pay?pa=MSSURATTEXTILEEXHIBITION.eazypay@icici&pn=M/S.SURAT%20TEXTILE%20EXHIBITION%20&tr=EZYS8238090480&cu=INR&mc=5691${grandTotal > 0 ? `&am=${grandTotal}` : ""}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 bg-white p-2 rounded-lg border border-amber-300 shadow-2xs shrink-0 self-center hover:border-amber-500 hover:shadow-sm transition-all text-slate-950 no-underline group cursor-pointer"
+                  title="Scan with scanner or tap to pay via UPI (GPay, PhonePe, Paytm)"
+                >
                   <img
                     src="/upi_qr.png"
                     alt="Surat Textile Exhibition UPI QR Code"
-                    className="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded"
+                    className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded transition-transform group-hover:scale-105"
                   />
                   <div className="text-left font-sans pr-1">
-                    <span className="text-[9.5px] font-black text-slate-950 block uppercase tracking-tight leading-tight">
-                      Scan to Pay via UPI
+                    <span className="text-[10px] font-black text-slate-950 block uppercase tracking-tight leading-tight group-hover:text-amber-800">
+                      Scan or Tap to Pay
                     </span>
                     <span className="text-[8.5px] font-bold text-amber-800 block leading-tight mt-0.5">
                       GPay • PhonePe • Paytm
@@ -548,7 +554,7 @@ export default function BillModal({
                       A/C: Surat Textile Exhibition
                     </span>
                   </div>
-                </div>
+                </a>
               </div>
             </div>
 
