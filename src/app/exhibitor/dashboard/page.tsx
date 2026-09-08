@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getStallPackageBySqft, STALL_PACKAGES, StallPackage } from '@/data/stallPackages';
-import { getProductImage, DISCLAIMER_TEXT } from '@/data/productImages';
+import { getProductImage, getProductImageData, DISCLAIMER_TEXT, FALLBACK_EXTRA_IMAGE } from '@/data/productImages';
 import BillModal from '@/components/extras/BillModal';
 import { checkGstin, isValidGstin, normalizeGstin } from '@/lib/gstin';
 import {
@@ -52,7 +52,9 @@ import {
   Loader2,
   MoreVertical,
   Search,
-  Lock
+  Lock,
+  Maximize2,
+  Eye
 } from 'lucide-react';
 
 const STRICT_CUTOFF_DATE = '5th September 2026, 12:00 PM';
@@ -254,6 +256,7 @@ export default function ExhibitorDashboardPage() {
   const [searchFilter, setSearchFilter] = useState('');
   const [isDisclaimerDismissed, setIsDisclaimerDismissed] = useState(false);
   const [expandedMobileCards, setExpandedMobileCards] = useState<Record<string, boolean>>({});
+  const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
 
   const toggleMobileCard = (id: string) => {
     setExpandedMobileCards((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -2312,17 +2315,25 @@ export default function ExhibitorDashboardPage() {
                   {/* --- MOBILE COMPACT VIEW (< 640px) --- */}
                   <div className="sm:hidden">
                     <div className="flex items-center gap-3">
-                      {/* Square Thumbnail */}
+                      {/* Square Thumbnail with direct Photo Lightbox Preview */}
                       <div 
-                        onClick={() => toggleMobileCard(p.id)}
-                        className="w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 shrink-0 overflow-hidden flex items-center justify-center p-1 cursor-pointer"
+                        onClick={() => setPreviewProduct(p)}
+                        className="relative w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 hover:border-amber-400 shrink-0 overflow-hidden flex items-center justify-center p-1 cursor-pointer group shadow-2xs"
+                        title="Tap to view larger photo"
                       >
                         <img
                           src={imgUrl}
                           alt={p.name}
                           className="w-full h-full object-contain"
                           loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = FALLBACK_EXTRA_IMAGE;
+                          }}
                         />
+                        <span className="absolute bottom-0 right-0 bg-slate-900/85 text-amber-300 text-[8px] px-1 py-0.5 rounded-tl font-bold flex items-center gap-0.5 pointer-events-none">
+                          <Eye className="w-2 h-2" /> View
+                        </span>
                       </div>
 
                       {/* Item Info Center */}
@@ -2382,7 +2393,28 @@ export default function ExhibitorDashboardPage() {
 
                     {/* Expandable details & Rental Days on Mobile */}
                     {isExpanded && (
-                      <div className="mt-2.5 pt-2.5 border-t border-slate-200/80 space-y-2 animate-in fade-in duration-150">
+                      <div className="mt-2.5 pt-2.5 border-t border-slate-200/80 space-y-2.5 animate-in fade-in duration-150">
+                        {/* Enlarged Photo Preview on Mobile */}
+                        <div
+                          onClick={() => setPreviewProduct(p)}
+                          className="relative w-full h-36 bg-slate-50 border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center p-2 cursor-pointer hover:border-amber-400 transition-all group"
+                          title="Tap to zoom photo"
+                        >
+                          <img
+                            src={imgUrl}
+                            alt={p.name}
+                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = FALLBACK_EXTRA_IMAGE;
+                            }}
+                          />
+                          <span className="absolute bottom-1.5 right-1.5 bg-slate-900/85 text-white text-[10px] px-2 py-0.5 rounded-md font-bold flex items-center gap-1 shadow-sm pointer-events-none">
+                            <Maximize2 className="w-3 h-3 text-amber-400" /> Tap to zoom
+                          </span>
+                        </div>
+
                         <p className="text-[11px] text-slate-600">{p.description}</p>
                         
                         {/* Rental Days Segmented Control */}
@@ -2429,14 +2461,26 @@ export default function ExhibitorDashboardPage() {
 
                   {/* --- DESKTOP GRID VIEW (sm: and above) --- */}
                   <div className="hidden sm:block">
-                    {/* Product Image */}
-                    <div className="relative w-full h-36 mb-3 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group flex items-center justify-center p-2">
+                    {/* Product Image with Click-to-Enlarge Lightbox */}
+                    <div 
+                      onClick={() => setPreviewProduct(p)}
+                      className="relative w-full h-36 mb-3 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group flex items-center justify-center p-2 cursor-pointer hover:border-amber-400 transition-all shadow-2xs"
+                      title="Click to view full photo"
+                    >
                       <img
                         src={imgUrl}
                         alt={p.name}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = FALLBACK_EXTRA_IMAGE;
+                        }}
                       />
+                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-bold pointer-events-none">
+                        <Maximize2 className="w-4 h-4 text-amber-400" />
+                        <span>Click to Enlarge Photo</span>
+                      </div>
                     </div>
 
                     <div className="flex items-start justify-between gap-2 mb-2">
@@ -2739,9 +2783,31 @@ export default function ExhibitorDashboardPage() {
                     const lineTot = (p.rate_inr || 0) * (quantities[p.id] || 0) * d;
                     return (
                       <div key={p.id} className="px-4 py-3 text-xs flex justify-between items-center text-slate-700">
-                        <div>
-                          <span className="font-bold text-slate-900">{p.name}</span>
-                          <span className="text-slate-500 ml-2">({p.category})</span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewProduct(p)}
+                            className="relative w-11 h-11 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center p-0.5 hover:border-amber-400 transition-all cursor-pointer group"
+                            title="Click to view photo"
+                          >
+                            <img
+                              src={getProductImage(p.id)}
+                              alt={p.name}
+                              className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = FALLBACK_EXTRA_IMAGE;
+                              }}
+                            />
+                            <span className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <Eye className="w-3 h-3 text-white drop-shadow" />
+                            </span>
+                          </button>
+                          <div>
+                            <span className="font-bold text-slate-900 block">{p.name}</span>
+                            <span className="text-slate-500 text-[11px]">({p.category})</span>
+                          </div>
                         </div>
                         <div className="text-right font-mono">
                           <span className="font-bold text-amber-700 block">
@@ -2880,6 +2946,117 @@ export default function ExhibitorDashboardPage() {
               >
                 Stay and keep editing
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Extra Item Photo Lightbox Modal */}
+      {previewProduct && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setPreviewProduct(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Photo preview for ${previewProduct.name}`}
+        >
+          <div 
+            className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-3.5 sm:p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/90">
+              <div className="min-w-0 pr-2">
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border inline-block ${
+                  previewProduct.category === 'Furniture & Seating'
+                    ? 'bg-blue-100 text-blue-900 border-blue-200'
+                    : previewProduct.category === 'Electrical & Lighting'
+                    ? 'bg-amber-100 text-amber-950 border-amber-300'
+                    : previewProduct.category === 'Display & AV'
+                    ? 'bg-purple-100 text-purple-900 border-purple-200'
+                    : previewProduct.category === 'Manpower & Staff'
+                    ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                    : 'bg-slate-100 text-slate-700 border-slate-200'
+                }`}>
+                  {previewProduct.category}
+                </span>
+                <h3 className="text-base sm:text-lg font-black text-slate-950 truncate mt-1 font-serif">
+                  {previewProduct.name}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewProduct(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer shrink-0 border border-slate-200"
+                aria-label="Close photo preview"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Large Image Canvas */}
+            <div className="relative w-full bg-slate-100/80 min-h-[220px] sm:min-h-[280px] max-h-[48vh] flex items-center justify-center p-4 sm:p-6 overflow-hidden select-none">
+              <img
+                src={getProductImage(previewProduct.id)}
+                alt={previewProduct.name}
+                className="max-h-[44vh] w-auto max-w-full object-contain rounded-lg drop-shadow-md"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = FALLBACK_EXTRA_IMAGE;
+                }}
+              />
+            </div>
+
+            {/* Modal Body & Direct Stepper Controls */}
+            <div className="p-4 sm:p-5 bg-white space-y-3">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                {previewProduct.description}
+              </p>
+
+              {previewProduct.rate_inr ? (
+                <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50 border border-amber-300/80 shadow-2xs">
+                  <div>
+                    <span className="text-[10px] text-amber-950 font-extrabold uppercase tracking-wider block">
+                      Rental Rate
+                    </span>
+                    <span className="text-base sm:text-lg font-mono font-black text-amber-900">
+                      ₹{previewProduct.rate_inr.toLocaleString('en-IN')}{' '}
+                      <span className="text-xs font-sans font-normal text-slate-600">/ day</span>
+                    </span>
+                    <span className="text-[9px] text-amber-800 font-bold block uppercase tracking-wide">
+                      +18% GST applicable
+                    </span>
+                  </div>
+
+                  {/* Quantity Stepper inside photo preview modal */}
+                  <div className="flex items-center gap-1.5 bg-white border border-slate-300 rounded-xl p-1 shadow-2xs">
+                    <button
+                      type="button"
+                      onClick={() => updateQuantity(previewProduct.id, -1)}
+                      disabled={(quantities[previewProduct.id] || 0) <= 0}
+                      className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center font-bold text-sm disabled:opacity-30 border border-slate-200 active:scale-95 cursor-pointer"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="w-8 text-center text-sm font-mono font-black text-slate-900">
+                      {quantities[previewProduct.id] || 0}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuantity(previewProduct.id, 1)}
+                      className="w-8 h-8 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center font-extrabold text-sm shadow-2xs active:scale-95 cursor-pointer"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+
+              <p className="text-[10px] text-slate-500 italic text-center font-sans">
+                {DISCLAIMER_TEXT}
+              </p>
             </div>
           </div>
         </div>

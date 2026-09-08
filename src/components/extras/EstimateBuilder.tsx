@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Plus, Minus, Calculator, Send, Copy, Check, MessageSquare, Sparkles, X, FileText, Printer } from "lucide-react";
 import { EXTRAS_RATES, GST_RATE, formatInr, ExtraCategory, CATEGORY_LABELS } from "@/data/extras-rates";
+import { FALLBACK_EXTRA_IMAGE } from "@/data/productImages";
 import BillModal from "./BillModal";
 import { STE_COMPANY_DETAILS } from "@/data/company-details";
 
@@ -206,15 +207,33 @@ export default function EstimateBuilder() {
                       }`}
                     >
                       <div>
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h4 className="font-bold text-slate-950 text-sm leading-snug">{item.name}</h4>
-                          <span className="text-xs font-mono font-black text-amber-800 shrink-0">
-                            {formatInr(item.rateInr)} / day
-                          </span>
+                        <div className="flex items-start gap-3 mb-2">
+                          {item.image && (
+                            <div className="relative w-14 h-14 rounded-lg bg-slate-50 border border-slate-200 shrink-0 overflow-hidden flex items-center justify-center p-1 shadow-2xs">
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-full h-full object-contain"
+                                loading="lazy"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = FALLBACK_EXTRA_IMAGE;
+                                }}
+                              />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-1 mb-0.5">
+                              <h4 className="font-bold text-slate-950 text-sm leading-snug">{item.name}</h4>
+                              <span className="text-xs font-mono font-black text-amber-800 shrink-0">
+                                {formatInr(item.rateInr)}/d
+                              </span>
+                            </div>
+                            {item.spec && (
+                              <p className="text-[11px] font-mono text-slate-500 line-clamp-2">{item.spec}</p>
+                            )}
+                          </div>
                         </div>
-                        {item.spec && (
-                          <p className="text-[11px] font-mono text-slate-500 mb-3">{item.spec}</p>
-                        )}
                       </div>
 
                       <div className="flex items-center justify-between pt-3 border-t border-slate-200 mt-2">

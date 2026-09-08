@@ -215,7 +215,13 @@ export const PRODUCT_IMAGES_MAP: Record<string, ProductImageData> = {
   'pedestal-fan': {
     id: 'pedestal-fan',
     name: 'Pedestal Fan',
-    image: '/images/extras/v2/pedestrian-fan.jpg',
+    image: '/images/extras/v2/pedestal-fan.jpg',
+    disclaimer: DISCLAIMER_TEXT
+  },
+  'pedestrian-fan': {
+    id: 'pedestrian-fan',
+    name: 'Pedestal Fan',
+    image: '/images/extras/v2/pedestal-fan.jpg',
     disclaimer: DISCLAIMER_TEXT
   },
   'female-model': {
@@ -232,6 +238,131 @@ export const PRODUCT_IMAGES_MAP: Record<string, ProductImageData> = {
   }
 };
 
+export const FALLBACK_EXTRA_IMAGE = '/images/extras/v2/desk-table.jpg';
+
+/**
+ * Common code and naming aliases used in booking spreadsheets, legacy order payloads, and brochures.
+ */
+export const PRODUCT_ALIASES: Record<string, string> = {
+  // DP item codes
+  'dp-01': 'desk-table',
+  'dp-02': 'wooden-table',
+  'dp-03': 'glass-round-table',
+  'dp-04': 'white-chair',
+  'dp-05': 'cushioned-chair',
+  'dp-06': 'apple-chair',
+  'dp-08': 'sofa-single',
+  'dp-09': 'sofa-double',
+  'dp-10': 'sofa-three',
+  'dp-11': 'glass-centre-table',
+  'dp-12': 'counter-without-lock',
+  'dp-13': 'counter-with-lock',
+  'dp-14': 'tall-showcase-without-lock',
+  'dp-14a': 'tall-showcase-with-lock',
+  'dp-15': 'brochure-rack',
+  'dp-20': 'pedestal-fan',
+  'dp-21': 'glass-shelf',
+  'dp-22': 'wooden-shelf',
+  'dp-24': 'plug-point',
+  'dp-25': 'metal-halide',
+  'dp-26': 'plasma-32',
+  'dp-27': 'garment-stand',
+  'dp-27a': 'garment-stand-double',
+  'dp-28': 'mannequin',
+  'dp-29': 'receptionist',
+  'dp-30': 'rack',
+
+  // Common descriptive and legacy aliases
+  'system-table': 'desk-table',
+  'systemtable': 'desk-table',
+  'woodentable': 'wooden-table',
+  'round-table': 'glass-round-table',
+  'glassroundtable': 'glass-round-table',
+  'visitor-chair': 'white-chair',
+  'exhibition-chair': 'white-chair',
+  'stake-chair': 'cushioned-chair',
+  'cushion-chair': 'cushioned-chair',
+  'applechair': 'apple-chair',
+  'sofa-1-seater': 'sofa-single',
+  'sofa-1seater': 'sofa-single',
+  'sofa-2-seater': 'sofa-double',
+  'sofa-2seater': 'sofa-double',
+  'sofa-3-seater': 'sofa-three',
+  'sofa-3seater': 'sofa-three',
+  'rectangle-tipoi': 'glass-centre-table',
+  'tipoi': 'glass-centre-table',
+  'centre-table': 'glass-centre-table',
+  'counter': 'counter-without-lock',
+  'glass-counter': 'counter-without-lock',
+  'tall-showcase': 'tall-showcase-without-lock',
+  'showcase': 'tall-showcase-without-lock',
+  'brochure': 'brochure-rack',
+  'brochure-stand': 'brochure-rack',
+  'pedestrian-fan': 'pedestal-fan',
+  'pedestalfan': 'pedestal-fan',
+  'pedestrianfan': 'pedestal-fan',
+  'fan': 'pedestal-fan',
+  'light': 'spot-light',
+  'spotlight': 'spot-light',
+  'metalhalide': 'metal-halide',
+  'socket': 'power-socket',
+  'power-socket-connection': 'power-socket',
+  'plug': 'plug-point',
+  'plasma': 'plasma-32',
+  'tv': 'plasma-32',
+  'smart-tv': 'plasma-32',
+  'tv-screen': 'plasma-32',
+  '32-plasma': 'plasma-32',
+  'single-rod': 'garment-stand',
+  'double-rod': 'garment-stand-double',
+  'mannequin-v2': 'mannequin',
+  'hostess': 'receptionist',
+  'model': 'receptionist',
+  'display-rack': 'rack',
+};
+
+/**
+ * Resolve product image URL with normalization and fallback for any ID, code, or alias.
+ */
 export function getProductImage(productId: string): string {
-  return PRODUCT_IMAGES_MAP[productId]?.image || '/images/extras/v2/desk-table.jpg';
+  if (!productId) return FALLBACK_EXTRA_IMAGE;
+  
+  const raw = String(productId).trim();
+  if (PRODUCT_IMAGES_MAP[raw]?.image) {
+    return PRODUCT_IMAGES_MAP[raw].image;
+  }
+
+  const normalized = raw.toLowerCase().replace(/\s+/g, '-').replace(/_/g, '-');
+  if (PRODUCT_IMAGES_MAP[normalized]?.image) {
+    return PRODUCT_IMAGES_MAP[normalized].image;
+  }
+
+  const aliasKey = PRODUCT_ALIASES[normalized];
+  if (aliasKey && PRODUCT_IMAGES_MAP[aliasKey]?.image) {
+    return PRODUCT_IMAGES_MAP[aliasKey].image;
+  }
+
+  // Handle stripped DP prefix like '01' or '28'
+  const strippedDp = normalized.replace(/^dp-?/, '');
+  const dpKey = `dp-${strippedDp}`;
+  if (PRODUCT_ALIASES[dpKey] && PRODUCT_IMAGES_MAP[PRODUCT_ALIASES[dpKey]]?.image) {
+    return PRODUCT_IMAGES_MAP[PRODUCT_ALIASES[dpKey]].image;
+  }
+
+  return FALLBACK_EXTRA_IMAGE;
 }
+
+export function getProductImageData(productId: string): ProductImageData {
+  const image = getProductImage(productId);
+  const normalized = String(productId || '').trim().toLowerCase().replace(/\s+/g, '-').replace(/_/g, '-');
+  const resolvedId = PRODUCT_ALIASES[normalized] || normalized;
+  const existing = PRODUCT_IMAGES_MAP[resolvedId];
+
+  return {
+    id: existing?.id || productId,
+    name: existing?.name || productId,
+    image,
+    disclaimer: DISCLAIMER_TEXT
+  };
+}
+
