@@ -454,7 +454,7 @@ export default function AdminExhibitorsPage() {
                 </span>
               </h1>
               <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
-                Exhibitor Management, Extra Amenities & Tax Invoices
+                Exhibitor Management, Extra Amenities & Proforma Bills
               </p>
             </div>
           </Link>
@@ -1166,10 +1166,10 @@ export default function AdminExhibitorsPage() {
                                   setSelectedExhibitorForBill(ex);
                                 }}
                                 className="px-2.5 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold text-[11px] transition-all flex items-center gap-1 shadow-2xs"
-                                title="Generate Official Tax Invoice / Bill"
+                                title="Generate Official Proforma Bill"
                               >
                                 <FileText className="w-3.5 h-3.5 text-amber-800" />
-                                <span>Tax Bill</span>
+                                <span>Proforma Bill</span>
                               </button>
 
                               <button

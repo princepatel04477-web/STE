@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       gstin,
       days,
       date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-      invoice_no: `STE/INV/2026/${mobile ? mobile.slice(-4) : '0001'}`,
+      invoice_no: `STE/BILL/2026/${mobile ? mobile.slice(-4) : '0001'}`,
       items,
     };
 
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     try { fs.unlinkSync(docxPath); } catch {}
 
     const cleanBrand = brand_name.replace(/[^a-zA-Z0-9]/g, '_') || 'Exhibitor';
-    const filename = `STE_Tax_Invoice_${cleanBrand}_2026.docx`;
+    const filename = `STE_Proforma_Bill_${cleanBrand}_2026.docx`;
 
     return new NextResponse(fileBuffer, {
       status: 200,

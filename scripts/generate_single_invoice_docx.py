@@ -73,7 +73,7 @@ def generate_invoice_docx(data, output_file):
     r1.font.bold = True
     r1.font.color.rgb = RGBColor(245, 158, 11) # Gold
 
-    r_title = p_h.add_run("TAX INVOICE / ESTIMATE BILL — EXTRA REQUIREMENTS\n")
+    r_title = p_h.add_run("OFFICIAL PROFORMA BILL / ESTIMATE — EXTRA REQUIREMENTS\n")
     r_title.font.name = "Arial"
     r_title.font.size = Pt(10)
     r_title.font.bold = True
@@ -109,7 +109,7 @@ def generate_invoice_docx(data, output_file):
     # The exhibitor's own GSTIN, when they have given one. The event's own GSTIN
     # is printed in the header above and is a different number.
     buyer_gstin = str(data.get("gstin", "") or "").strip()
-    invoice_no = data.get("invoice_no", f"STE/INV/2026/{mobile[-4:] if len(mobile)>=4 else '0001'}")
+    invoice_no = data.get("invoice_no", f"STE/BILL/2026/{mobile[-4:] if len(mobile)>=4 else '0001'}")
     date_str = data.get("date", "22-Aug-2026")
     days = int(data.get("days", 2))
 
@@ -123,8 +123,8 @@ def generate_invoice_docx(data, output_file):
     ).font.size = Pt(8.5)
 
     p_inv = meta_table.cell(0, 1).paragraphs[0]
-    p_inv.add_run("INVOICE DETAILS:\n").font.bold = True
-    p_inv.add_run(f"Invoice No: {invoice_no}\nDate: {date_str}\nRental Duration: {days} Days\nPlace of Supply: 24-Gujarat").font.size = Pt(8.5)
+    p_inv.add_run("BILL DETAILS:\n").font.bold = True
+    p_inv.add_run(f"Bill No: {invoice_no}\nDate: {date_str}\nRental Duration: {days} Days\nPlace of Supply: 24-Gujarat").font.size = Pt(8.5)
 
     meta_table.cell(1, 0).paragraphs[0].add_run("Exhibition: Surat Textile Exhibition 2026").font.size = Pt(8)
     meta_table.cell(1, 1).paragraphs[0].add_run("Venue: SIECC Sarsana, Surat (Sept 12-13, 2026)").font.size = Pt(8)

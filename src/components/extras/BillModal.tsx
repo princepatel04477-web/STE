@@ -54,7 +54,7 @@ export default function BillModal({
 
   if (!isOpen) return null;
 
-  const invoiceNo = `STE/INV/2026/${mobile ? mobile.slice(-4) : "0001"}`;
+  const invoiceNo = `STE/BILL/2026/${mobile ? mobile.slice(-4) : "0001"}`;
   const currentDate = new Date().toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -108,7 +108,7 @@ export default function BillModal({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `STE_Invoice_${mobile || "bill"}.docx`;
+      a.download = `STE_Proforma_Bill_${mobile || "bill"}.docx`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -211,7 +211,7 @@ export default function BillModal({
           <div className="bill-modal-no-print flex items-center justify-between px-6 py-3.5 bg-slate-900 text-white border-b border-slate-800 shrink-0">
             <div className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-amber-400" />
-              <span className="font-bold text-sm">Official Tax Invoice & Requisition Summary</span>
+              <span className="font-bold text-sm">Official Proforma Bill & Requisition Summary</span>
               <span className="text-[10px] px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 font-mono">
                 Original For Recipient
               </span>
@@ -233,7 +233,7 @@ export default function BillModal({
                 type="button"
                 onClick={handlePrint}
                 className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black flex items-center gap-1.5 transition-all shadow-sm"
-                title="Print Tax Invoice (A4 Size)"
+                title="Print Official Proforma Bill (A4 Size)"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print / Save as PDF</span>
@@ -243,14 +243,14 @@ export default function BillModal({
                 type="button"
                 onClick={onClose}
                 className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all ml-1"
-                aria-label="Close invoice modal"
+                aria-label="Close bill modal"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* Printable Tax Invoice Content (Optimized to fit on 1 A4 page) */}
+          {/* Printable Proforma Bill Content (Optimized to fit on 1 A4 page) */}
           <div id="printable-bill" className="printable-invoice-content p-5 sm:p-7 overflow-y-auto space-y-4 print:p-0 print:overflow-visible print:space-y-3 text-slate-900">
             
             {/* 1. Official Header & Company Info */}
@@ -258,7 +258,7 @@ export default function BillModal({
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div>
                   <span className="text-[9.5px] font-mono uppercase tracking-widest text-amber-800 font-black block mb-0.5">
-                    TAX INVOICE / OFFICIAL PROFORMA BILL
+                    OFFICIAL PROFORMA BILL / ESTIMATE
                   </span>
                   <h1 className="text-xl sm:text-2xl font-black text-slate-950 uppercase tracking-tight font-serif">
                     {STE_COMPANY_DETAILS.name}
@@ -282,7 +282,7 @@ export default function BillModal({
                     <span className="text-amber-800 font-black">{STE_COMPANY_DETAILS.gstin}</span>
                   </div>
                   <div className="font-mono text-slate-700 text-[11px]">
-                    <span className="text-slate-500">Invoice No: </span>
+                    <span className="text-slate-500">Bill No: </span>
                     <strong className="text-slate-950">{invoiceNo}</strong>
                   </div>
                   <div className="font-mono text-slate-700 text-[11px]">
@@ -437,7 +437,7 @@ export default function BillModal({
               <div className="space-y-2 sm:max-w-md text-[10.5px]">
                 <div className="bg-amber-50/80 border border-amber-200 rounded-lg p-2.5">
                   <span className="text-[9px] uppercase font-black text-amber-800 block">
-                    Invoice Amount in Words:
+                    Bill Amount in Words:
                   </span>
                   <p className="font-black text-slate-950 mt-0.5 font-serif text-xs">
                     {amountInWords}
@@ -562,7 +562,7 @@ export default function BillModal({
             <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-end gap-3 text-[10.5px] text-slate-600 print-avoid-break">
               <div>
                 <p className="text-[9.5px] text-slate-500 font-sans">
-                  This is a computer-generated tax invoice & billing requisition document for Surat Textile Exhibition 2026.
+                  This is a computer-generated official proforma bill & requisition document for Surat Textile Exhibition 2026.
                 </p>
               </div>
 

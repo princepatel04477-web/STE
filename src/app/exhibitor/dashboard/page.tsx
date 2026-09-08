@@ -2885,7 +2885,7 @@ export default function ExhibitorDashboardPage() {
         </div>
       )}
 
-      {/* Official Tax Invoice / Bill Modal */}
+      {/* Official Proforma Bill Modal */}
       <BillModal
         isOpen={showBillModal}
         onClose={() => setShowBillModal(false)}

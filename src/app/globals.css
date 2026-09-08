@@ -1155,7 +1155,7 @@ body {
 .btn-gpu:hover  { transform: translateZ(0) scale(1.02); }
 .btn-gpu:active { transform: translateZ(0) scale(0.97); }
 
-/* ── Print Optimization (Ensure clean 1-2 page Tax Invoice PDF print) ── */
+/* ── Print Optimization (Ensure clean 1-2 page Proforma Bill PDF print) ── */
 @media print {
   @page {
     size: A4 portrait;

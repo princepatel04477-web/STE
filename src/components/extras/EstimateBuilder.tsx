@@ -316,7 +316,7 @@ export default function EstimateBuilder() {
                 className="w-full sm:flex-1 py-3.5 px-5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider shadow-sm transition-all flex items-center justify-center gap-2"
               >
                 <FileText className="w-4 h-4" />
-                <span>Generate Official Bill / Tax Invoice</span>
+                <span>Generate Official Proforma Bill</span>
               </button>
 
               <button
@@ -379,7 +379,7 @@ export default function EstimateBuilder() {
         </div>
       </div>
 
-      {/* Official Tax Invoice / Bill Modal */}
+      {/* Official Proforma Bill Modal */}
       <BillModal
         isOpen={showBillModal}
         onClose={() => setShowBillModal(false)}
