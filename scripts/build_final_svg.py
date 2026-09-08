@@ -104,5 +104,6 @@ print("parsed %d non-stall features from final_layout.xls" % len(features))
 brands = parse_brands()
 print("parsed %d brand names from stallAllotment2026.ts" % len(brands))
 
-ns.draw_plan(stalls, features, brands)
+clean_features = [f for f in features if not (re.match(r"^A\d+\b", f["label"].strip()) or any(b in f["label"] for b in ["Aakshvik", "Veemo", "Yogya"]))]
+ns.draw_plan(stalls, clean_features, brands)
 print("wrote", OUT_SVG.relative_to(ROOT))

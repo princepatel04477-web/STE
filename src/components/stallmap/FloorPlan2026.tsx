@@ -24,7 +24,7 @@ import {
  * showing it for up to a year. See commit b6d1a5a for the same fix applied
  * to the extras catalog photos.
  */
-const PLAN_SRC = '/assets/Final-Layout-STE-2026-numbered-v3.svg';
+const PLAN_SRC = '/assets/Final-Layout-STE-2026-numbered-v4.svg';
 
 /** The plan's own coordinate space, so the overlay lines up with the drawing. */
 const VIEW_W = 841.92007;
@@ -106,6 +106,44 @@ export default function FloorPlan2026({
    *  recognised as our own tap rather than a fresh outside mark. */
   const lastTapRef = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const isDraggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
+  const hasDraggedRef = useRef(false);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    const box = scrollRef.current;
+    if (!box) return;
+    isDraggingRef.current = true;
+    hasDraggedRef.current = false;
+    dragStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      scrollLeft: box.scrollLeft,
+      scrollTop: box.scrollTop,
+    };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current) return;
+    const box = scrollRef.current;
+    if (!box) return;
+    const dx = e.clientX - dragStartRef.current.x;
+    const dy = e.clientY - dragStartRef.current.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+      hasDraggedRef.current = true;
+      if (!isDragging) setIsDragging(true);
+    }
+    box.scrollLeft = dragStartRef.current.scrollLeft - dx;
+    box.scrollTop = dragStartRef.current.scrollTop - dy;
+  };
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+    setIsDragging(false);
+  };
 
   // An outside mark has to win over whatever was last tapped here. Without
   // this, one tap on the plan pinned `picked` forever and every later press of
@@ -254,20 +292,24 @@ export default function FloorPlan2026({
 
       <div
         ref={scrollRef}
-        className={`overflow-auto overscroll-contain bg-white ${
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        className={`overflow-auto overscroll-contain bg-white select-none ${
           compact ? 'max-h-[42vh] sm:max-h-[46vh]' : 'max-h-[58vh] sm:max-h-[66vh]'
-        }`}
-        style={{ WebkitOverflowScrolling: 'touch' }}
+        } ${zoom > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
+        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y' }}
       >
         <div
-          className="relative"
+          className="relative select-none"
           style={{ width: `${zoom * 100}%`, minWidth: '100%' }}
         >
           {/* The printed plan itself. */}
           <img
             src={PLAN_SRC}
             alt="STE 2026 floor plan with every stall numbered"
-            className="block w-full h-auto select-none"
+            className="block w-full h-auto select-none pointer-events-none"
             draggable={false}
           />
 
@@ -323,6 +365,10 @@ export default function FloorPlan2026({
                   strokeWidth={strokeWidth}
                   style={{ cursor: onSelect ? 'pointer' : 'default' }}
                   onClick={() => {
+                    if (hasDraggedRef.current) {
+                      hasDraggedRef.current = false;
+                      return;
+                    }
                     lastTapRef.current = u.id;
                     setPicked(u.id);
                     setMarkedFromOutside(false);

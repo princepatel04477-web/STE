@@ -86,7 +86,7 @@ VIEW_W, VIEW_H = number_stalls.VIEW_W, number_stalls.VIEW_H
 out = []
 out.append('<?xml version="1.0" encoding="utf-8"?>')
 out.append('<svg xmlns="http://www.w3.org/2000/svg" version="1.1"'
-           f' width="{VIEW_W}" height="{VIEW_H}" viewBox="-15 -12 872 615">')
+           f' width="{VIEW_W}" height="{VIEW_H}" viewBox="0 0 {VIEW_W} {VIEW_H}">')
 out.append('<defs>')
 out.append('  <style>')
 out.append('    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }')
@@ -98,17 +98,21 @@ out.append('    .brand-lbl-2 { font-weight: 700; fill: #000000; }')
 out.append('    .vacant-lbl { font-size: 3.2px; font-style: italic; font-weight: 500; fill: #6b7280; }')
 out.append('  </style>')
 out.append('</defs>')
-out.append('<rect x="-15" y="-12" width="872" height="615" fill="#ffffff"/>')
-out.append('<text x="421" y="-2.5" font-size="7.5" font-weight="800" fill="#111827" text-anchor="middle" letter-spacing="0.5">SURAT TEXTILE EXHIBITION (STE) 2026 \u2014 MASTER APPROVED LAYOUT (FASCIA NAMES)</text>')
+out.append(f'<rect width="{VIEW_W}" height="{VIEW_H}" fill="#ffffff"/>')
+out.append(f'<text x="{VIEW_W/2:.1f}" y="16" font-size="7.5" font-weight="800" fill="#111827" text-anchor="middle" letter-spacing="0.5">SURAT TEXTILE EXHIBITION (STE) 2026 \u2014 MASTER APPROVED LAYOUT</text>')
 
 feature_labels = []
 for f in features:
+    lbl = f["label"].strip()
+    # Filter out rogue/temporary stall labels from older sheets that conflict with finalized numbered stalls
+    if re.match(r"^A\d+\b", lbl) or any(b in lbl for b in ["Aakshvik", "Veemo", "Yogya"]):
+        continue
+
     fill = f["fill"]
     if fill and fill != "#ffffff":
         out.append(f'<rect x="{f["x"]:.2f}" y="{f["y"]:.2f}" width="{f["w"]:.2f}" height="{f["h"]:.2f}" fill="{fill}" stroke="#374151" stroke-width="0.5"/>')
     elif fill == "#ffffff":
         out.append(f'<rect x="{f["x"]:.2f}" y="{f["y"]:.2f}" width="{f["w"]:.2f}" height="{f["h"]:.2f}" fill="#ffffff" stroke="#9ca3af" stroke-width="0.5"/>')
-    lbl = f["label"].strip()
     if lbl:
         cx = f["x"] + f["w"] / 2
         cy = f["y"] + f["h"] / 2
@@ -295,6 +299,12 @@ out.append('</g>')
 out.append('</svg>')
 
 svg_content = "\n".join(out) + "\n"
-out_svg_path = ROOT / "public" / "assets" / "Final-Layout-STE-2026-numbered.svg"
-out_svg_path.write_text(svg_content, encoding="utf-8")
-print(f"wrote {out_svg_path}")
+for v_name in [
+    "Final-Layout-STE-2026-numbered-v4.svg",
+    "Final-Layout-STE-2026-numbered-v3.svg",
+    "Final-Layout-STE-2026-numbered-v2.svg",
+    "Final-Layout-STE-2026-numbered.svg",
+]:
+    p = ROOT / "public" / "assets" / v_name
+    p.write_text(svg_content, encoding="utf-8")
+    print(f"wrote {p}")
