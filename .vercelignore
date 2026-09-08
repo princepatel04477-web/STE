@@ -1,0 +1,21 @@
+﻿# Large local archive files and non-web media
+*.zip
+*.mp4
+*.xlsx
+*.xls
+*.pdf
+*.jpeg
+*.jpg
+*.csv
+/STE_Stall_Logos_Organized/
+/ste_logos/
+/ste_logos_backup_original/
+/exhibitor_logos_raw/
+/exhibitor_logos_pdf/
+/exhibitor_logos_images/
+/STE_LOGOS/
+/scratch/
+/scripts/
+/.playwright-mcp/
+/.claude/
+/supabase/
