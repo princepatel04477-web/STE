@@ -325,13 +325,17 @@ export const STALL_MAP_2026: Stall2026[] = [
     halves: [
       { id: "102A", size: "3M x 3M", x: 683.64, y: 98.2, w: 16.92, h: 16.9 },
     ] },
+  { stallNumber: 9009, size: "3M x 3M", sheetSize: "3m x 3m", areaSqm: 9, areaSqft: 100, zone: "South Hall", widthM: 3, depthM: 3, x: 689.28, y: 402.33, w: 16.92, h: 16.9,
+    halves: [
+      { id: "145A", size: "3M x 3M", x: 689.28, y: 402.33, w: 16.92, h: 16.9 },
+    ] },
 ];
 
 export const TOTAL_STALLS_2026 = STALL_MAP_2026.length;
 
 export const STALL_COUNT_BY_SIZE: Record<string, number> = {
   "6M x 3M": 49,
-  "3M x 3M": 40,
+  "3M x 3M": 41,
   "18M x 3M": 26,
   "12M x 3M": 20,
   "9M x 3M": 17,

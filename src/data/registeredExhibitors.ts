@@ -200,6 +200,10 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9773042440", brandName: "Aakshvik", stallSqft: "300 sq ft", category: "", market: "" },
   { mobile: "7728088199", brandName: "YKDK", stallSqft: "100 sq ft", category: "Kurties", market: "" },
   { mobile: "9151060275", brandName: "Kushagra", stallSqft: "200 sq ft", category: "", market: "", aliases: ["9151060725"] },
+  // Jai Shree Krishna (stall 136A): mobile 9377790132 confirmed by organiser (8 Sep 2026).
+  { mobile: "9377790132", brandName: "Jai Shree Krishna", stallSqft: "100 sq ft", category: "", market: "" },
+  // Veetrag Fashion (stall 145A): mobile 9377666809 confirmed by organiser (8 Sep 2026).
+  { mobile: "9377666809", brandName: "Veetrag Fashion", stallSqft: "100 sq ft", category: "", market: "" },
 ];
 
 /** Every number one exhibitor answers to: the sheet's, plus any alias. */

@@ -43,19 +43,18 @@
  *        pass (matched on the new name). PENDING-5 removed - it was a
  *        stale duplicate of this same row under the old name, not a
  *        second exhibitor.
- *
- * STILL UNRESOLVED - left exactly as they were, not touched by this pass:
- *   136A        Jai Shree Krishna - no mobile anywhere in the source sheet.
- *               No portal access until a number is collected.
- *
- * RESOLVED 6 Sep 2026 (organiser confirmation, not from the sheet):
+ * RESOLVED 6-8 Sep 2026 (organiser confirmation, not from the sheet):
  *   79   Geeta Readymade / Kingsman, a HAND-CONFIRMED (held: true) assignment
  *        entirely absent from the new roster with no replacement named for
  *        the unit - brand spelling fixed ("Geeta Readumade / King,s Man" was
  *        a transcription typo) and mobile 9503522336 added, closing the gap
  *        this pass left open.
+ *   136A Jai Shree Krishna - mobile 9377790132 confirmed by organiser on
+ *        8 Sep 2026, granting portal access and completing all floor assignments.
+ *   145A Veetrag Fashion - allocated on split bay 145A (100 sqft) with mobile
+ *        9377666809 confirmed by organiser on 8 Sep 2026.
  *
- * 176 exhibitors on 167 stalls (22 hand-allotted to Triveni Sarees post-pass).
+ * 177 exhibitors on 168 stalls (22 hand-allotted to Triveni Sarees post-pass).
  */
 
 export type AllotmentPool = "Saree" | "General";
@@ -353,7 +352,7 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
   { unitId: "136",     stallNumber: 136,  brand: "Narmada Weavetech", category: "Fabrics",
     group: "Dress Material & Fabrics",  mobile: "9375511910",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "136A",    stallNumber: 136,  brand: "Jai Shree Krishna", category: "",
-    group: "Home & Other",              mobile: "",            sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: true },
+    group: "Home & Other",              mobile: "9377790132",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "137",     stallNumber: 137,  brand: "SAHVIKA", category: "Sarees",
     group: "Saree",                     mobile: "8980835552",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "Saree",    zone: "South Hall",         held: false },
   { unitId: "138",     stallNumber: 138,  brand: "Pearly Pink", category: "Kids Wear",
@@ -378,6 +377,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Kurti",                     mobile: "9545612026",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "145",     stallNumber: 145,  brand: "Aakshvik", category: "",
     group: "General",                   mobile: "9773042440",  sheetSize: "3m x 9m",   areaSqft: 300,   pool: "General",  zone: "South Hall",         held: true },
+  { unitId: "145A",    stallNumber: 145,  brand: "Veetrag Fashion", category: "",
+    group: "General",                   mobile: "9377666809",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "146",     stallNumber: 146,  brand: "Dharam Art (S)", category: "Dress Matterial, Kurtie",
     group: "Kurti",                     mobile: "9879360089",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "General",  zone: "South Hall",         held: false },
   { unitId: "147",     stallNumber: 147,  brand: "Kuhu Creation (Kesari Creation)", category: "Kurti",
@@ -441,14 +442,14 @@ export const SAREE_POOL_STALLS: number[] = [1, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13,
  * from the original layout, plus the eight synthetic 9001-9008 container
  * keys the 5 Sep 2026 layout introduced for a lettered pair/solo that no
  * longer shares its numeral with a real bare stall (136A, 139A, 166A,
- * 163A, 143A/143B, 161A, 92A, 102A - see stallMap2026.ts's own header).
+ * 163A, 143A/143B, 161A, 92A, 102A, 145A - see stallMap2026.ts's own header).
  * Leaving the 9000s out of this list was the bug behind /admin/lottery
  * showing them as still-free: every one of those halves already has a
  * real exhibitor on stallAllotment2026.ts, but nothing has ever been
  * allotted against the literal id "9001", so the occupancy join found no
  * match and reported the whole container empty.
  */
-export const SPLIT_BAYS_2026: number[] = [91, 107, 9001, 9002, 9003, 9004, 9005, 9006, 9007, 9008];
+export const SPLIT_BAYS_2026: number[] = [91, 107, 9001, 9002, 9003, 9004, 9005, 9006, 9007, 9008, 9009];
 
 export function findAllotmentByMobile(mobile: string) {
   const key = mobile.replace(/\D/g, "").slice(-10);
