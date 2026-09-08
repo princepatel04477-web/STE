@@ -1,12 +1,14 @@
-﻿# Large local archive files and non-web media
-*.zip
-*.mp4
-*.xlsx
-*.xls
-*.pdf
-*.jpeg
-*.jpg
-*.csv
+# Large local archive files and non-web media in root
+/*.zip
+/*.mp4
+/*.xlsx
+/*.xls
+/*.pdf
+/*.jpeg
+/*.jpg
+/*.csv
+
+# Local data, archives and script directories
 /STE_Stall_Logos_Organized/
 /ste_logos/
 /ste_logos_backup_original/
@@ -19,3 +21,7 @@
 /.playwright-mcp/
 /.claude/
 /supabase/
+
+# Ensure all static web assets in public/ are always deployed
+!public/**
+

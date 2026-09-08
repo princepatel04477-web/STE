@@ -233,5 +233,5 @@ export const PRODUCT_IMAGES_MAP: Record<string, ProductImageData> = {
 };
 
 export function getProductImage(productId: string): string {
-  return PRODUCT_IMAGES_MAP[productId]?.image || '/images/extras/v2/v2/desk-table.jpg';
+  return PRODUCT_IMAGES_MAP[productId]?.image || '/images/extras/v2/desk-table.jpg';
 }
