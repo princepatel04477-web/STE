@@ -161,7 +161,7 @@ export const REGISTERED_EXHIBITORS_LIST: RegisteredExhibitor[] = [
   { mobile: "9662399969", brandName: "Tithi Designer", stallSqft: "200 sq ft", category: "Saree", market: "M1", aliases: ["8511573752"] },
   { mobile: "9712720963", brandName: "Triveni Sarees", stallSqft: "400 sq ft", category: "Sarees", market: "" },
   { mobile: "8141014006", brandName: "Todi Creation", stallSqft: "400 sq ft", category: "Lehanga", market: "M1" },
-  { mobile: "7285010000", brandName: "Univastra Sarees", stallSqft: "200 sq ft", category: "Sarees (200)", market: "M1" },
+  { mobile: "7285010000", brandName: "Univastra Sarees", stallSqft: "400 sq ft", category: "Sarees", market: "M1" },
   { mobile: "9328539215", brandName: "Vani Designer", stallSqft: "200 sq ft", category: "Sarees", market: "M2" },
   { mobile: "9726277110", brandName: "Vaani NX", stallSqft: "200 sq ft", category: "Fabrics", market: "Ekta Textile Market" },
   { mobile: "9979907076", brandName: "Veemo Fashions", stallSqft: "100 sq ft", category: "Saree", market: "JJ A/C" },

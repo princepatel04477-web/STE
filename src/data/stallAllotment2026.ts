@@ -427,8 +427,8 @@ export const ALLOTMENTS_2026: Allotment2026[] = [
     group: "Dress Material & Fabrics",  mobile: "9998675623",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "General",  zone: "South Hall",         held: true },
   { unitId: "166A",    stallNumber: 166,  brand: "Amaya", category: "Lehanga",
     group: "Lehenga",                   mobile: "8980018801",  sheetSize: "3m x 3m",   areaSqft: 100,   pool: "Saree",    zone: "South Hall",         held: false },
-  { unitId: "167",     stallNumber: 167,  brand: "Univastra Sarees", category: "Sarees (200)",
-    group: "Saree",                     mobile: "7285010000",  sheetSize: "3m x 6m",   areaSqft: 400,   pool: "Saree",    zone: "South Hall",         held: false },
+  { unitId: "167",     stallNumber: 167,  brand: "Univastra Sarees", category: "Sarees",
+    group: "Saree",                     mobile: "7285010000",  sheetSize: "3m x 12m",  areaSqft: 400,   pool: "Saree",    zone: "South Hall",         held: false },
   { unitId: "168",     stallNumber: 168,  brand: "Kushagra", category: "",
     group: "General",                   mobile: "9151060275",  sheetSize: "3m x 6m",   areaSqft: 200,   pool: "General",  zone: "South Hall",         held: false },
 ];
