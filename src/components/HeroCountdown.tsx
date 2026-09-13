@@ -105,12 +105,15 @@ export default function HeroCountdown() {
     };
   }, []);
 
-  // Server render and pre-hydration: the event dates, not a row of zeroes.
+  // Server render and pre-hydration: if the event has passed, show coming soon
   if (!mounted) {
+    const isPast = TARGET_MS <= Date.now();
     return (
       <div className="w-full text-center py-1">
         <span className="font-serif text-base sm:text-lg tracking-[3px] text-expo-gold uppercase">
-          {language === "en" ? EVENT.dateLabelEn : EVENT.dateLabelHi}
+          {isPast
+            ? (language === "en" ? "NEXT EXHIBITION COMING SOON" : "अगली प्रदर्शनी जल्द आ रही है")
+            : (language === "en" ? EVENT.dateLabelEn : EVENT.dateLabelHi)}
         </span>
       </div>
     );
@@ -120,7 +123,7 @@ export default function HeroCountdown() {
     return (
       <div className="w-full text-center py-1">
         <span className="font-serif text-base sm:text-lg tracking-[3px] text-expo-gold uppercase animate-pulse">
-          {language === "en" ? "EVENT IN PROGRESS" : "कार्यक्रम जारी है"}
+          {language === "en" ? "NEXT EXHIBITION COMING SOON" : "अगली प्रदर्शनी जल्द आ रही है"}
         </span>
       </div>
     );

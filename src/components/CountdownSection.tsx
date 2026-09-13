@@ -5,6 +5,7 @@ import { waapi } from "animejs";
 import { useInView } from "@/hooks/useInView";
 import { FadeUp } from "@/components/animations/MobileAnimations";
 import { Translate } from "@/components/LanguageContext";
+import { EVENT } from "@/lib/event-facts";
 
 interface FlipDigitProps {
   value: number;
@@ -32,6 +33,8 @@ const FlipDigit: React.FC<FlipDigitProps> = ({ value }) => {
   );
 };
 
+const TARGET_MS = new Date(EVENT.startDate).getTime();
+
 export default function CountdownSection() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -44,15 +47,14 @@ export default function CountdownSection() {
     seconds: 0
   });
 
-  useEffect(() => {
-    setTimeout(() => {
-      setIsMounted(true);
-    }, 0);
+  const isPast = TARGET_MS <= Date.now();
+  const showComingSoon = isExpired || isPast;
 
-    const targetDate = new Date("2026-09-12T10:00:00+05:30");
+  useEffect(() => {
+    setIsMounted(true);
+
     const updateCountdown = () => {
-      const now = new Date();
-      const difference = targetDate.getTime() - now.getTime();
+      const difference = TARGET_MS - Date.now();
       
       if (difference <= 0) {
         setIsExpired(true);
@@ -78,7 +80,7 @@ export default function CountdownSection() {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               const panels = containerRef.current?.querySelectorAll(".glow-panel");
-              if (panels) {
+              if (panels && panels.length > 0) {
                 waapi.animate(Array.from(panels) as unknown as HTMLElement[], {
                   opacity: [0, 1],
                   scale: [0.95, 1],
@@ -118,7 +120,11 @@ export default function CountdownSection() {
         {/* Title */}
         <FadeUp delay={0}>
           <span className="text-xs font-bold tracking-[6px] text-expo-gold uppercase mb-4 block">
-            <Translate en="SECURE YOUR COMMERCIAL STALL" hi="अपना कमर्शियल स्टॉल सुरक्षित करें" />
+            {showComingSoon ? (
+              <Translate en="STAY TUNED FOR UPDATES" hi="अपडेट्स के लिए बने रहें" />
+            ) : (
+              <Translate en="SECURE YOUR COMMERCIAL STALL" hi="अपना कमर्शियल स्टॉल सुरक्षित करें" />
+            )}
           </span>
         </FadeUp>
         <FadeUp delay={0.08}>
@@ -128,74 +134,49 @@ export default function CountdownSection() {
               headingInView ? "in-view" : ""
             }`}
           >
-            <Translate en="The Sourcing Event" hi="सोर्सिंग इवेंट" /> <br />
-            <span className="text-metallic font-light italic">
-              <Translate en="Commences In" hi="शुरू होने में" />
-            </span>
+            {showComingSoon ? (
+              <>
+                <Translate en="Next Exhibition" hi="अगली प्रदर्शनी" /> <br />
+                <span className="text-metallic font-light italic">
+                  <Translate en="Coming Soon" hi="जल्द आ रही है" />
+                </span>
+              </>
+            ) : (
+              <>
+                <Translate en="The Sourcing Event" hi="सोर्सिंग इवेंट" /> <br />
+                <span className="text-metallic font-light italic">
+                  <Translate en="Commences In" hi="शुरू होने में" />
+                </span>
+              </>
+            )}
           </h2>
         </FadeUp>
         <FadeUp delay={0.16}>
           <p className="font-sans text-sm sm:text-base text-expo-warm/60 leading-relaxed mb-16 max-w-xl">
-            <Translate
-              en="Surat Textile Exhibition 2026 is almost fully booked. Watch the cinematic ticking clock and act fast to secure your premium exhibition stall before registration closes."
-              hi="सूरत टेक्सटाइल प्रदर्शनी 2026 के लगभग सभी स्टॉल बुक हो चुके हैं। उल्टी गिनती देखें और पंजीकरण बंद होने से पहले अपने प्रीमियम प्रदर्शनी स्टॉल को सुरक्षित करने के लिए त्वरित कार्रवाई करें।"
-            />
+            {showComingSoon ? (
+              <Translate
+                en="Surat Textile Exhibition will return with its next grand edition. Watch this space for upcoming dates, venue announcements, and stall booking details."
+                hi="सूरत टेक्सटाइल प्रदर्शनी अपने अगले भव्य संस्करण के साथ वापस आएगी। आगामी तिथियों, स्थल विवरण और स्टॉल बुकिंग घोषणाओं के लिए यहाँ बने रहें।"
+              />
+            ) : (
+              <Translate
+                en="Surat Textile Exhibition 2026 is almost fully booked. Watch the cinematic ticking clock and act fast to secure your premium exhibition stall before registration closes."
+                hi="सूरत टेक्सटाइल प्रदर्शनी 2026 के लगभग सभी स्टॉल बुक हो चुके हैं। उल्टी गिनती देखें और पंजीकरण बंद होने से पहले अपने प्रीमियम प्रदर्शनी स्टॉल को सुरक्षित करने के लिए त्वरित कार्रवाई करें।"
+              />
+            )}
           </p>
         </FadeUp>
 
         {/* Large Cinematic Countdown Grid */}
         <div className="w-full max-w-4xl flex justify-center">
-          {!isMounted ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 w-full">
-              {/* Days Fallback */}
-              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
-                <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
-                <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
-                  110
-                </span>
-                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
-                  <Translate en="Days" hi="दिन" />
-                </span>
-              </div>
-              {/* Hours Fallback */}
-              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
-                <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
-                <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
-                  12
-                </span>
-                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
-                  <Translate en="Hours" hi="घंटे" />
-                </span>
-              </div>
-              {/* Minutes Fallback */}
-              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
-                <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
-                <span className="font-serif text-5xl md:text-7xl font-extralight text-white leading-none tracking-normal drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
-                  30
-                </span>
-                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
-                  <Translate en="Minutes" hi="मिनट" />
-                </span>
-              </div>
-              {/* Seconds Fallback */}
-              <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-8 md:p-12 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.05)] card-tap">
-                <div className="absolute inset-0 bg-gold-gradient opacity-[0.02] rounded-2xl pointer-events-none" />
-                <span className="font-serif text-5xl md:text-7xl font-extralight text-expo-gold leading-none tracking-normal drop-shadow-[0_0_15px_rgba(214,160,102,0.4)]">
-                  45
-                </span>
-                <span className="text-xs uppercase tracking-[4px] text-expo-warm/50 block mt-4 font-semibold">
-                  <Translate en="Seconds" hi="सेकंड" />
-                </span>
-              </div>
-            </div>
-          ) : isExpired ? (
+          {showComingSoon ? (
             <div className="glow-panel relative border-glow-card bg-expo-midnight/40 md:backdrop-blur-sm p-12 md:p-16 flex flex-col items-center justify-center rounded-2xl shadow-[0_0_36px_rgba(214,160,102,0.15)] max-w-2xl w-full card-tap">
               <div className="absolute inset-0 bg-gold-gradient opacity-[0.05] rounded-2xl pointer-events-none" />
               <span className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-expo-gold leading-none tracking-wider uppercase animate-pulse">
-                <Translate en="EVENT IN PROGRESS" hi="इवेंट प्रगति पर है" />
+                <Translate en="NEXT EXHIBITION COMING SOON" hi="अगली प्रदर्शनी जल्द आ रही है" />
               </span>
               <span className="text-sm text-expo-warm/70 mt-4 tracking-[2px] font-sans font-semibold uppercase">
-                <Translate en="September 12-13, 2026 • SIECC, Surat" hi="सितंबर 12-13, 2026 • एसआईईसीसी, सूरत" />
+                <Translate en="Dates & Stall Bookings To Be Announced Soon" hi="तिथियों और स्टॉल बुकिंग की घोषणा जल्द की जाएगी" />
               </span>
             </div>
           ) : (
