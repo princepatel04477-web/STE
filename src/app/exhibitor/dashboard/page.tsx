@@ -321,16 +321,8 @@ export default function ExhibitorDashboardPage() {
     if (typeof profile.gstin === 'string') setGstin(profile.gstin);
     if (typeof profile.brand_name === 'string' && profile.brand_name) setBrandName(profile.brand_name);
 
-    if (typeof profile.stall_sqft === 'string' && profile.stall_sqft) {
-      const draftSqft = normalizeSqft(profile.stall_sqft);
-      if (SQFT_PRESETS.includes(draftSqft)) {
-        setSelectedSqftOption(draftSqft);
-        setCustomSqft('');
-      } else if (draftSqft) {
-        setSelectedSqftOption('Other');
-        setCustomSqft(draftSqft);
-      }
-    }
+    // stall_sqft is an allocated property determined by the server/roster,
+    // and must never be overridden by client-side cached drafts.
 
     if (Array.isArray(profile.fascia_names) && profile.fascia_names.length >= 2) {
       setFasciaNames(profile.fascia_names.map((n) => String(n || '')));

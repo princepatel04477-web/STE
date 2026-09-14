@@ -200,7 +200,7 @@ export async function POST(request: Request) {
     let currentGstin = existingExhibitor?.gstin || '';
     let currentProfilePicUrl = profilePicUrl;
     let currentFasciaNames = [brandName, '', '', ''];
-    let currentSqft = existingExhibitor?.stall_sqft || reg?.stallSqft || '200 sq ft';
+    let currentSqft = reg?.stallSqft || existingExhibitor?.stall_sqft || '200 sq ft';
 
     if (existingExhibitor?.fascia_names_json) {
       try {
@@ -274,7 +274,7 @@ export async function POST(request: Request) {
             }
           }
           if (sbCurrent.brand_name) brandName = sbCurrent.brand_name;
-          if (sbCurrent.stall_sqft) currentSqft = sbCurrent.stall_sqft;
+          if (sbCurrent.stall_sqft && !reg?.stallSqft) currentSqft = sbCurrent.stall_sqft;
         }
 
         const structuredProfilePayload = {

@@ -35,9 +35,8 @@ export async function GET(request: Request) {
     const registeredMaster = findExhibitorByMobile(mobile);
     const dbExhibitor = db.prepare('SELECT * FROM exhibitors WHERE mobile = ?').get(mobile) as any;
 
-    const brandName = dbExhibitor?.brand_name || registeredMaster?.brandName || 'STE Exhibitor';
-    const rawSqft = dbExhibitor?.stall_sqft || registeredMaster?.stallSqft || '200 sq ft';
-    const categorySqft = normalizeSqftCategory(rawSqft);
+    const brandName = registeredMaster?.brandName || dbExhibitor?.brand_name || 'STE Exhibitor';
+    let rawSqft = registeredMaster?.stallSqft || dbExhibitor?.stall_sqft || '200 sq ft';
     const market = registeredMaster?.market || '';
 
     // 2. The stall this exhibitor holds, under any of the numbers they answer
@@ -65,11 +64,14 @@ export async function GET(request: Request) {
       throw err;
     }
 
+    const finalSqft = allocation?.stall_sqft || rawSqft;
+    const categorySqft = normalizeSqftCategory(finalSqft);
+
     return NextResponse.json({
       success: true,
       mobile,
       brandName,
-      rawSqft,
+      rawSqft: finalSqft,
       categorySqft: `${categorySqft} sq ft`,
       market,
       hasDrawn: Boolean(allocation),

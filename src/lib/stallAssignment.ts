@@ -114,13 +114,17 @@ export async function recordStallAllocation(
   if (!allocation?.stall_number) return;
 
   const mobile = canonicalMobile(allocation.mobile);
-  const fields = {
+  const resolvedSqft = allocation.stall_sqft?.trim() || '';
+  const fields: Record<string, any> = {
     stall_number: allocation.stall_number,
     stall_hall: allocation.hall || '',
     stall_zone: allocation.zone || '',
     stall_dimensions: allocation.dimensions || '',
     stall_allocated_at: allocation.allocated_at || new Date().toISOString(),
   };
+  if (resolvedSqft) {
+    fields.stall_sqft = resolvedSqft;
+  }
 
   // Local store, so a dev run and the offline fallback agree with the cloud.
   try {
@@ -128,17 +132,32 @@ export async function recordStallAllocation(
       .prepare('SELECT * FROM exhibitors WHERE mobile = ?')
       .get(mobile) as Record<string, unknown> | undefined;
     if (existing) {
-      db.prepare(
-        `UPDATE exhibitors SET stall_number = ?, stall_hall = ?, stall_zone = ?,
-         stall_dimensions = ?, stall_allocated_at = ? WHERE mobile = ?`
-      ).run(
-        fields.stall_number,
-        fields.stall_hall,
-        fields.stall_zone,
-        fields.stall_dimensions,
-        fields.stall_allocated_at,
-        mobile
-      );
+      if (resolvedSqft) {
+        db.prepare(
+          `UPDATE exhibitors SET stall_number = ?, stall_hall = ?, stall_zone = ?,
+           stall_dimensions = ?, stall_allocated_at = ?, stall_sqft = ? WHERE mobile = ?`
+        ).run(
+          fields.stall_number,
+          fields.stall_hall,
+          fields.stall_zone,
+          fields.stall_dimensions,
+          fields.stall_allocated_at,
+          resolvedSqft,
+          mobile
+        );
+      } else {
+        db.prepare(
+          `UPDATE exhibitors SET stall_number = ?, stall_hall = ?, stall_zone = ?,
+           stall_dimensions = ?, stall_allocated_at = ? WHERE mobile = ?`
+        ).run(
+          fields.stall_number,
+          fields.stall_hall,
+          fields.stall_zone,
+          fields.stall_dimensions,
+          fields.stall_allocated_at,
+          mobile
+        );
+      }
     }
   } catch (err) {
     console.warn('[Stall] Local write skipped:', err);

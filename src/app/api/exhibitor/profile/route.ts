@@ -8,6 +8,7 @@ import {
   resolveAndRecordStall,
   StallLookupUnavailableError,
 } from '@/lib/stallAssignment';
+import { findOnPlan } from '@/lib/drawEngine2026';
 import { checkGstin, normalizeGstin, verifyGstinWithPortal } from '@/lib/gstin';
 
 // The write touches Supabase and then the Google Sheet; the platform default is
@@ -94,14 +95,54 @@ export async function GET(request: Request) {
       }
     }
 
+    // The stall they were allotted travels with the profile, so the dashboard
+    // shows a stall number without asking the draw table itself.
+    let stall = null;
+    let stallFallback: Record<string, string> | null = null;
+    try {
+      stall = await resolveAndRecordStall(session.mobile);
+    } catch (err) {
+      if (!(err instanceof StallLookupUnavailableError)) throw err;
+      console.warn('[Profile GET] Allotment read failed; using the profile copy.');
+      stallFallback = {
+        stall_number: exhibitor?.stall_number || '',
+        stall_hall: exhibitor?.stall_hall || '',
+        stall_zone: exhibitor?.stall_zone || '',
+        stall_dimensions: exhibitor?.stall_dimensions || '',
+        stall_allocated_at: exhibitor?.stall_allocated_at || '',
+      };
+    }
+
     const reg = findExhibitorByMobile(session.mobile);
+    const plan = findOnPlan(session.mobile, exhibitor?.brand_name || reg?.brandName);
+
     const brand_name = (exhibitor?.brand_name && exhibitor.brand_name.trim() !== '')
       ? exhibitor.brand_name
-      : (reg?.brandName || 'Registered Exhibitor');
+      : (reg?.brandName || plan?.brand || 'Registered Exhibitor');
 
-    const stall_sqft = (exhibitor?.stall_sqft && exhibitor.stall_sqft.trim() !== '')
-      ? exhibitor.stall_sqft
-      : (reg?.stallSqft || '200 sq ft');
+    // Authoritative stall size:
+    // 1. Specific unit geometry on the floor plan (ALLOTMENTS_2026)
+    // 2. Lucky draw / allocation record (lottery_allocations)
+    // 3. Master registration list (REGISTERED_EXHIBITORS_LIST)
+    // 4. Stored exhibitor profile stall_sqft
+    // 5. Default 200 sq ft
+    const stall_sqft = (plan?.areaSqft ? `${plan.areaSqft} sq ft` : '')
+      || (stall?.stall_sqft && stall.stall_sqft.trim() !== '' ? stall.stall_sqft.trim() : '')
+      || (reg?.stallSqft && reg.stallSqft.trim() !== '' ? reg.stallSqft.trim() : '')
+      || (exhibitor?.stall_sqft && exhibitor.stall_sqft.trim() !== '' ? exhibitor.stall_sqft.trim() : '')
+      || '200 sq ft';
+
+    // Keep stored DB row aligned with the authoritative stall size
+    if (exhibitor && exhibitor.stall_sqft !== stall_sqft) {
+      try {
+        db.prepare('UPDATE exhibitors SET stall_sqft = ? WHERE mobile = ?').run(stall_sqft, session.mobile);
+        if (isSupabaseConfigured && supabaseAdmin) {
+          void supabaseAdmin.from('exhibitors').update({ stall_sqft }).eq('mobile', session.mobile);
+        }
+      } catch (err) {
+        console.warn('[Profile GET] Note on syncing stall_sqft:', err);
+      }
+    }
 
     let fascia_names = ['', ''];
     if (extractedFasciaNames.length > 0 && extractedFasciaNames.some(n => n.trim() !== '')) {
@@ -130,29 +171,6 @@ export async function GET(request: Request) {
       } catch {}
     } else {
       fascia_names = [brand_name, ''];
-    }
-
-    // The stall they were allotted travels with the profile, so the dashboard
-    // shows a stall number without asking the draw table itself.
-    //
-    // If the draw table cannot be read, the copy already written onto this
-    // profile answers instead. Nothing here offers a draw, so an out-of-date
-    // stall number is the worst this can show - where the portal does offer
-    // one, /api/lottery/status refuses rather than guesses.
-    let stall = null;
-    let stallFallback: Record<string, string> | null = null;
-    try {
-      stall = await resolveAndRecordStall(session.mobile);
-    } catch (err) {
-      if (!(err instanceof StallLookupUnavailableError)) throw err;
-      console.warn('[Profile GET] Allotment read failed; using the profile copy.');
-      stallFallback = {
-        stall_number: exhibitor?.stall_number || '',
-        stall_hall: exhibitor?.stall_hall || '',
-        stall_zone: exhibitor?.stall_zone || '',
-        stall_dimensions: exhibitor?.stall_dimensions || '',
-        stall_allocated_at: exhibitor?.stall_allocated_at || '',
-      };
     }
 
     return NextResponse.json({
@@ -197,13 +215,15 @@ export async function POST(request: Request) {
     const { brand_name, stall_sqft, fascia_names, exhibitor_name, company_description, gstin } = body;
 
     const reg = findExhibitorByMobile(session.mobile);
+    const plan = findOnPlan(session.mobile, typeof brand_name === 'string' ? brand_name : undefined);
     const cleanBrand = (typeof brand_name === 'string' && brand_name.trim())
       ? brand_name.trim()
-      : (reg?.brandName || 'Registered Exhibitor');
+      : (reg?.brandName || plan?.brand || 'Registered Exhibitor');
 
-    const cleanSqft = (typeof stall_sqft === 'string' && stall_sqft.trim())
-      ? stall_sqft.trim()
-      : (reg?.stallSqft || '200 sq ft');
+    // Authoritative stall sqft cannot be overridden by client drafts or forms
+    const cleanSqft = (plan?.areaSqft ? `${plan.areaSqft} sq ft` : '')
+      || (reg?.stallSqft && reg.stallSqft.trim() !== '' ? reg.stallSqft.trim() : '')
+      || (typeof stall_sqft === 'string' && stall_sqft.trim() ? stall_sqft.trim() : '200 sq ft');
 
     const cleanExhibitorName = typeof exhibitor_name === 'string' ? exhibitor_name.trim() : '';
     const cleanCompanyDesc = typeof company_description === 'string' ? company_description.trim().slice(0, 400) : '';
