@@ -10,6 +10,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { STE_COMPANY_DETAILS, numberToWordsINR } from "@/data/company-details";
+import { findExtraRateItem } from "@/data/extras-rates";
 
 export interface InvoiceItem {
   id: string;
@@ -61,7 +62,21 @@ export default function BillModal({
     year: "numeric",
   });
 
-  const subtotal = items.reduce((sum, item) => {
+  // Resolve authoritative rate and item code for every line item
+  const resolvedItems = items.map((item) => {
+    const master = findExtraRateItem(item.id, item.name);
+    const rate = item.rateInr || item.rate_inr || master?.rateInr || 0;
+    const code = (item.code && item.code !== "DP") ? item.code : (master?.code || item.code || "DP");
+    const spec = item.spec || master?.spec || "";
+    return {
+      ...item,
+      code,
+      rateInr: rate,
+      spec,
+    };
+  });
+
+  const subtotal = resolvedItems.reduce((sum, item) => {
     const rate = item.rateInr || item.rate_inr || 0;
     const itemDayCount = item.days || 2;
     return sum + rate * item.quantity * itemDayCount;
@@ -86,7 +101,7 @@ export default function BillModal({
         stall_sqft: stallSqft,
         fascia_names: fasciaNames || [],
         gstin,
-        items: items.map((i) => ({
+        items: resolvedItems.map((i) => ({
           code: i.code || "DP",
           name: i.name,
           spec: i.spec || "",
@@ -377,14 +392,14 @@ export default function BillModal({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {items.length === 0 ? (
+                  {resolvedItems.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-4 text-center text-slate-400 italic">
                         No extra items selected
                       </td>
                     </tr>
                   ) : (
-                    items.map((item, idx) => {
+                    resolvedItems.map((item, idx) => {
                       const rate = item.rateInr || item.rate_inr || 0;
                       const itemDays = item.days || 2;
                       const lineTotal = rate * item.quantity * itemDays;

@@ -48,7 +48,7 @@ import {
 } from 'lucide-react';
 import BillModal from '@/components/extras/BillModal';
 import ExhibitorDetailModal, { ExhibitorDetailData } from '@/components/admin/ExhibitorDetailModal';
-import { EXTRAS_RATES } from '@/data/extras-rates';
+import { EXTRAS_RATES, findExtraRateItem } from '@/data/extras-rates';
 
 interface ExhibitorItem {
   id: string;
@@ -1304,13 +1304,14 @@ export default function AdminExhibitorsPage() {
           stallSqft={selectedExhibitorForBill.stall_sqft || '200 sq ft'}
           fasciaNames={selectedExhibitorForBill.fascia_names}
           items={selectedExhibitorForBill.items.map((it) => {
-            const master = EXTRAS_RATES.find((m) => m.id === it.id || m.name.toLowerCase() === it.name.toLowerCase());
+            const master = findExtraRateItem(it.id, it.name);
+            const rate = (it as any).rate_inr || (it as any).rateInr || master?.rateInr || 0;
             return {
               id: it.id,
-              code: master?.code || 'DP',
-              name: it.name,
+              code: master?.code || (it as any).code || 'DP',
+              name: it.name || master?.name || '',
               spec: master?.spec || null,
-              rateInr: master?.rateInr || 600,
+              rateInr: rate,
               quantity: it.quantity,
               days: it.days || 2,
             };

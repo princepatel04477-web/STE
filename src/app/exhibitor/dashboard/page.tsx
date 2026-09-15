@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { getStallPackageBySqft, STALL_PACKAGES, StallPackage } from '@/data/stallPackages';
 import { getProductImage, getProductImageData, DISCLAIMER_TEXT, FALLBACK_EXTRA_IMAGE } from '@/data/productImages';
 import BillModal from '@/components/extras/BillModal';
+import { findExtraRateItem } from '@/data/extras-rates';
 import { checkGstin, isValidGstin, normalizeGstin } from '@/lib/gstin';
 import {
   Building2,
@@ -3065,13 +3066,18 @@ export default function ExhibitorDashboardPage() {
         gstin={gstinIsComplete ? gstin : ''}
         items={products
           .filter((p) => (quantities[p.id] || 0) > 0)
-          .map((p) => ({
-            id: p.id,
-            name: p.name,
-            rateInr: p.rate_inr || 0,
-            quantity: quantities[p.id],
-            days: itemDays[p.id] || 2,
-          }))}
+          .map((p) => {
+            const master = findExtraRateItem(p.id, p.name);
+            return {
+              id: p.id,
+              code: master?.code,
+              name: p.name,
+              spec: master?.spec || p.description,
+              rateInr: p.rate_inr || master?.rateInr || 0,
+              quantity: quantities[p.id],
+              days: itemDays[p.id] || 2,
+            };
+          })}
       />
     </div>
   );

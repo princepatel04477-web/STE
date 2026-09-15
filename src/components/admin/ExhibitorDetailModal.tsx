@@ -24,7 +24,7 @@ import {
   Printer,
   Info
 } from 'lucide-react';
-import { EXTRAS_RATES } from '@/data/extras-rates';
+import { EXTRAS_RATES, findExtraRateItem } from '@/data/extras-rates';
 
 export interface ExhibitorDetailItem {
   id: string;
@@ -90,15 +90,13 @@ export default function ExhibitorDetailModal({
 
   // Calculate items cost preview
   const itemsWithRates = exhibitor.items.map((it) => {
-    const master = EXTRAS_RATES.find(
-      (m) => m.id === it.id || m.name.toLowerCase() === it.name.toLowerCase()
-    );
-    const rate = master?.rateInr || 600;
+    const master = findExtraRateItem(it.id, it.name);
+    const rate = (it as any).rate_inr || (it as any).rateInr || master?.rateInr || 0;
     const days = it.days || exhibitor.rental_days || 2;
     const total = rate * it.quantity * days;
     return {
       ...it,
-      code: master?.code || 'DP',
+      code: master?.code || (it as any).code || 'DP',
       rate,
       days,
       total

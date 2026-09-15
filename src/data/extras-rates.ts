@@ -53,5 +53,67 @@ export const CATEGORY_LABELS: Record<ExtraCategory, string> = {
   electrical: "Electrical & Utilities",
 };
 
+export const EXTRA_RATE_ALIASES: Record<string, string> = {
+  "tv-screen": "plasma-32",
+  "tv": "plasma-32",
+  "smart-tv": "plasma-32",
+  "32-plasma": "plasma-32",
+  "plasma": "plasma-32",
+  "spot-light": "metal-halide",
+  "spotlight": "metal-halide",
+  "light": "metal-halide",
+  "power-socket": "plug-point",
+  "power-socket-connection": "plug-point",
+  "socket": "plug-point",
+  "display-rack": "garment-stand",
+  "single-rod": "garment-stand",
+  "double-rod": "garment-stand-double",
+  "pedestrian-fan": "pedestal-fan",
+  "brochure-stand": "brochure-rack",
+};
+
+/**
+ * Resolve an ExtraItem from EXTRAS_RATES given an ID or Name.
+ * Handles aliases such as tv-screen -> plasma-32, spot-light -> metal-halide, etc.
+ */
+export function findExtraRateItem(id?: string, name?: string): ExtraItem | undefined {
+  const normId = (id || "").toLowerCase().trim();
+  const normName = (name || "").toLowerCase().trim();
+
+  // 1. Direct ID match
+  let found = EXTRAS_RATES.find((item) => item.id.toLowerCase() === normId);
+  if (found) return found;
+
+  // 2. Alias ID match
+  const mappedId = EXTRA_RATE_ALIASES[normId];
+  if (mappedId) {
+    found = EXTRAS_RATES.find((item) => item.id.toLowerCase() === mappedId.toLowerCase());
+    if (found) return found;
+  }
+
+  // 3. Exact Name match
+  if (normName) {
+    found = EXTRAS_RATES.find((item) => item.name.toLowerCase() === normName);
+    if (found) return found;
+  }
+
+  // 4. Fuzzy / Substring matches
+  if (normId.includes("tv") || normId.includes("plasma") || normName.includes("tv") || normName.includes("plasma")) {
+    return EXTRAS_RATES.find((item) => item.id === "plasma-32");
+  }
+  if (normId.includes("spot") || normName.includes("spot")) {
+    return EXTRAS_RATES.find((item) => item.id === "metal-halide");
+  }
+  if (normId.includes("socket") || normName.includes("socket") || normName.includes("plug")) {
+    return EXTRAS_RATES.find((item) => item.id === "plug-point");
+  }
+  if (normId.includes("double") && (normId.includes("garment") || normName.includes("double"))) {
+    return EXTRAS_RATES.find((item) => item.id === "garment-stand-double");
+  }
+
+  return undefined;
+}
+
 export const formatInr = (n: number) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
+
