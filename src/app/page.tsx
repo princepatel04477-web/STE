@@ -21,6 +21,8 @@ const BuyerRegistration = nextDynamic(() => import("@/components/BuyerRegistrati
 const FinalCTA = nextDynamic(() => import("@/components/FinalCTA"));
 const Footer = nextDynamic(() => import("@/components/Footer"));
 const StallPackages = nextDynamic(() => import("@/components/StallPackages"));
+const ExhibitionVideoGallery = nextDynamic(() => import("@/components/ExhibitionVideoGallery"));
+const ExhibitionReelsShowcase = nextDynamic(() => import("@/components/ExhibitionReelsShowcase"));
 
 /**
  * Server component. The page used to be one client component whose initial
@@ -44,6 +46,10 @@ export default function Home() {
         <div id="home">
           <CinematicHero />
         </div>
+
+        <LazySection id="exhibition-reels" minHeight="500px">
+          <ExhibitionReelsShowcase />
+        </LazySection>
 
         <LazySection minHeight="200px">
           <PremiumTransitions mode="gold-tunnel" />
@@ -71,6 +77,10 @@ export default function Home() {
 
         <LazySection id="exhibition-experience" minHeight="700px">
           <ExhibitionExperience />
+        </LazySection>
+
+        <LazySection id="exhibition-videos" minHeight="500px">
+          <ExhibitionVideoGallery />
         </LazySection>
 
         <LazySection id="packages" minHeight="600px">
