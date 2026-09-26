@@ -1,0 +1,36 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "surat-expo",
+	"account_id": "0e1accef8ef38c95615ccc2127999037",
+	"compatibility_date": "2026-09-19",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"services": [
+		{
+			// Self-reference service binding, the service name must match the worker name
+			// see https://opennext.js.org/cloudflare/caching
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "surat-expo"
+		}
+	],
+	"images": {
+		// Enable image optimization
+		// see https://opennext.js.org/cloudflare/howtos/image
+		"binding": "IMAGES"
+	},
+	"vars": {
+		"NEXTJS_ENV": "production",
+		"NEXT_PUBLIC_SITE_URL": "https://www.stesurat.com",
+		"NEXT_PUBLIC_SUPABASE_URL": "https://naqscetimzjuhtzthqur.supabase.co",
+		"NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hcXNjZXRpbXpqdWh0enRocXVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2Mzk1MzEsImV4cCI6MjEwMzIxNTUzMX0.HShdMhZ3scoBIFwz4fPvMpu5fkEKhD_2_rL0eZAMr_g",
+		"GOOGLE_DRIVE_PARENT_FOLDER_ID": "1_6t-lfH0ha4BF1MxP2nsry6zmjmUFFcm"
+	},
+	"workers_dev": true
+}

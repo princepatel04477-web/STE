@@ -73,8 +73,17 @@ scripts/*.generated.gs
 /Manequinn.jpeg
 /Rack_image.jpeg
 /Lottery-System.mp4
+/public/assets/video/reels/
 /.playwright-mcp/
 
 # Python bytecode from the layout scripts.
 __pycache__/
 *.pyc
+
+# OpenNext
+.open-next
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example

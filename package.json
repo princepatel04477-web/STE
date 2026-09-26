@@ -3,14 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build": "next build --webpack",
     "dev": "next dev",
-    "build": "next build",
     "start": "next start",
     "db:migrate": "tsx scripts/migrate-to-supabase.ts",
     "sync:sheets": "tsx scripts/sync-sheets-to-db.ts",
     "drive:check": "tsx scripts/drive-sync.ts check",
     "drive:retry": "tsx scripts/drive-sync.ts retry",
-    "drive:setup": "tsx scripts/drive-setup.ts"
+    "drive:setup": "tsx scripts/drive-setup.ts",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -43,6 +47,7 @@
     "three": "^0.184.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -52,7 +57,8 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.23.12",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.135.0"
   },
   "browserslist": [
     "chrome >= 111",

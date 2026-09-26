@@ -62,16 +62,22 @@ export default function Footer() {
           <StaggerChild className="col-span-1 md:col-span-1 flex flex-col items-start">
             <Image 
               src="/assets/logo_STE.webp" 
-              alt="STE Logo" 
+              alt="Surat Textile Exhibition Logo" 
               width={100} 
               height={85} 
               sizes="100px"
-              className="mb-6 h-auto object-contain opacity-90" 
+              className="mb-3 h-auto object-contain opacity-95" 
             />
+            <h3 className="font-display text-lg font-bold tracking-wider text-expo-gold leading-tight mb-1">
+              <Translate en="Surat Textile Exhibition" hi="सूरत टेक्सटाइल एग्जीबिशन" />
+            </h3>
+            <span className="text-[11px] tracking-[0.2em] uppercase text-expo-warm/60 font-sans font-semibold mb-3">
+              STE 2026
+            </span>
             <p className="text-xs text-expo-warm/50 font-sans leading-relaxed mb-6">
               <Translate 
-                en="The official digital identity of India's largest textile sourcing ecosystem. A hyper-premium B2B exhibition showcase." 
-                hi="भारत के सबसे बड़े कपड़ा सोर्सिंग इकोसिस्टम की आधिकारिक डिजिटल पहचान। एक हाइपर-प्रीमियम B2B प्रदर्शनी शोकेस।" 
+                en="The official digital identity of Surat Textile Exhibition (STE 2026) — India's largest textile sourcing ecosystem. A hyper-premium B2B exhibition showcase." 
+                hi="सूरत टेक्सटाइल एग्जीबिशन (STE 2026) की आधिकारिक डिजिटल पहचान — भारत का सबसे बड़ा कपड़ा सोर्सिंग इकोसिस्टम। एक हाइपर-प्रीमियम B2B प्रदर्शनी शोकेस।" 
               />
             </p>
             {/* Social Icons with Glow Effects */}
@@ -189,9 +195,13 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="footer-bottom opacity-0 flex flex-col md:flex-row items-center justify-between text-xs font-sans tracking-widest uppercase gap-4 text-expo-warm/60">
-          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-            <p className="text-expo-copper/70 font-semibold">
-              © 2026 AKAS Events. All Rights Reserved.
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+            <p className="text-expo-copper/80 font-semibold">
+              © 2026 Surat Textile Exhibition (STE). All Rights Reserved.
+            </p>
+            <span className="hidden sm:inline text-white/20">•</span>
+            <p className="text-expo-warm/50 text-[11px] normal-case tracking-normal">
+              Organized by {EVENT.organizerName}
             </p>
             <span className="hidden sm:inline text-white/20">•</span>
             <p className="text-amber-400/90 font-medium tracking-wider">
