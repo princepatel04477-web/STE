@@ -263,8 +263,8 @@ export default function CinematicHero() {
         >
           <span className="text-xs font-bold tracking-[3px] md:tracking-[6px] text-expo-gold uppercase mb-6 bg-expo-gold/5 border border-expo-gold/15 px-3.5 py-1.5 md:px-5 md:py-2.5 rounded-full md:backdrop-blur-sm glow-soft animate-pulse">
             <Translate
-              en={`${EVENT.dateLabelEn} • ${EVENT.venueShortEn}`}
-              hi={`${EVENT.dateLabelHi} • ${EVENT.venueShortHi}`}
+              en="New Exhibition Coming Soon"
+              hi="नई प्रदर्शनी जल्द आ रही है"
             />
           </span>
         </div>
