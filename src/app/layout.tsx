@@ -28,15 +28,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Surat Textile Exhibition 2026 (STE) | India's Premier B2B Sourcing Machine",
-    template: "%s | Surat Textile Exhibition 2026",
+    default: "Surat Textile Exhibition (STE) | India's Premier B2B Sourcing Machine",
+    template: "%s | Surat Textile Exhibition",
   },
   description:
     `Official portal for ${EVENT.name} presented by ${EVENT.presenterName} and supported by ${EVENT.organizerName}. ` +
     `${EVENT.stalls}+ stalls, ${formatCount(EVENT.buyers)}+ verified B2B buyers and ${EVENT.agents}+ sourcing agents at ${EVENT.venueShortEn}.`,
   keywords: [
     "Surat Textile Exhibition",
-    "STE 2026",
+    "STE",
     "Textile Exhibition Surat",
     "B2B Textile Sourcing",
     "Surat Sarees Wholesale",
@@ -53,17 +53,17 @@ export const metadata: Metadata = {
     ? { index: true, follow: true }
     : { index: false, follow: false },
   openGraph: {
-    title: "Surat Textile Exhibition 2026 (STE)",
+    title: "Surat Textile Exhibition (STE)",
     description: EVENT_SUMMARY_EN,
     url: "/",
-    siteName: "Surat Textile Exhibition 2026",
+    siteName: "Surat Textile Exhibition",
     type: "website",
     locale: "en_IN",
     // og:image comes from app/opengraph-image.tsx — a real 1200x630 PNG.
   },
   twitter: {
     card: "summary_large_image",
-    title: "Surat Textile Exhibition 2026 (STE)",
+    title: "Surat Textile Exhibition (STE)",
     description: EVENT_SUMMARY_EN,
     // twitter:image comes from app/twitter-image.tsx.
   },

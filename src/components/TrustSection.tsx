@@ -236,7 +236,7 @@ export default function TrustSection() {
                 <Translate en="Supported by " hi="समर्थित " /><span className="text-expo-gold font-bold"><Translate en="AKAS Group" hi="AKAS ग्रुप द्वारा" /></span>
               </h3>
               <p className="font-sans text-xs sm:text-sm text-expo-warm/70 leading-relaxed mb-6">
-                <Translate en="The AKAS Group is Surat's leading alliance of textile weaving, processing, and machinery manufacturers. By partnering with AKAS, STE 2026 ensures that every single exhibitor stall represents genuine manufacturing power, high capital capacity, and verified B2B catalog pipelines." hi="AKAS ग्रुप सूरत के टेक्सटाइल बुनाई, प्रोसेसिंग और मशीनरी निर्माताओं का प्रमुख संगठन है। AKAS के साथ साझेदारी करके, STE 2026 यह सुनिश्चित करता है कि प्रत्येक प्रदर्शक स्टॉल वास्तविक विनिर्माण क्षमता, उच्च पूंजी क्षमता और सत्यापित बी2बी कैटलॉग पाइपलाइनों का प्रतिनिधित्व करे।" />
+                <Translate en="The AKAS Group is Surat's leading alliance of textile weaving, processing, and machinery manufacturers. By partnering with AKAS, STE ensures that every single exhibitor stall represents genuine manufacturing power, high capital capacity, and verified B2B catalog pipelines." hi="AKAS ग्रुप सूरत के टेक्सटाइल बुनाई, प्रोसेसिंग और मशीनरी निर्माताओं का प्रमुख संगठन है। AKAS के साथ साझेदारी करके, STE यह सुनिश्चित करता है कि प्रत्येक प्रदर्शक स्टॉल वास्तविक विनिर्माण क्षमता, उच्च पूंजी क्षमता और सत्यापित बी2बी कैटलॉग पाइपलाइनों का प्रतिनिधित्व करे।" />
               </p>
             </div>
 

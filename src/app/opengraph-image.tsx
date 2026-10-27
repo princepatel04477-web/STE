@@ -69,7 +69,7 @@ export default async function Image() {
             color: '#F0C48A',
           }}
         >
-          {EVENT.dateLabelEn}  ·  {EVENT.venueShortEn}
+          {EVENT.venueShortEn}
         </div>
 
         <div

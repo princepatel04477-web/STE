@@ -122,7 +122,7 @@ export default function BuyerRegistration() {
     }, 1200);
   };
 
-  const buyerWhatsAppText = `Hello STE 2026, I have registered as a B2B Buyer.\n\nBusiness: ${businessName}\nType: ${buyerType}\nCity: ${city}\nInterests: ${selectedCategories.join(", ")}`;
+  const buyerWhatsAppText = `Hello STE, I have registered as a B2B Buyer.\n\nBusiness: ${businessName}\nType: ${buyerType}\nCity: ${city}\nInterests: ${selectedCategories.join(", ")}`;
   const buyerWhatsAppUrl = `https://wa.me/${PHONE_WA}?text=${encodeURIComponent(buyerWhatsAppText)}`;
 
   const handleWhatsAppRedirect = () => {

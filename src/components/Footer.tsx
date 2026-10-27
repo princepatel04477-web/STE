@@ -76,7 +76,7 @@ export default function Footer() {
             </span>
             <p className="text-xs text-expo-warm/50 font-sans leading-relaxed mb-6">
               <Translate 
-                en="The official digital identity of Surat Textile Exhibition (STE 2026) — India's largest textile sourcing ecosystem. A hyper-premium B2B exhibition showcase." 
+                en="The official digital identity of Surat Textile Exhibition (STE) — India's largest textile sourcing ecosystem. A hyper-premium B2B exhibition showcase." 
                 hi="सूरत टेक्सटाइल एग्जीबिशन (STE 2026) की आधिकारिक डिजिटल पहचान — भारत का सबसे बड़ा कपड़ा सोर्सिंग इकोसिस्टम। एक हाइपर-प्रीमियम B2B प्रदर्शनी शोकेस।" 
               />
             </p>

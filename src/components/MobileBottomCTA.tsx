@@ -38,8 +38,8 @@ export default function MobileBottomCTA() {
   }, []);
 
   const whatsappMessage = language === "en"
-    ? "Namaste! I want to know more about STE 2026 stall booking."
-    : "नमस्ते! मैं STE 2026 स्टॉल बुकिंग के बारे में अधिक जानना चाहता हूँ।";
+    ? "Namaste! I want to know more about STE exhibition stall booking."
+    : "नमस्ते! मैं STE प्रदर्शनी स्टॉल बुकिंग के बारे में अधिक जानना चाहता हूँ।";
   const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`;
 
   const handleBookClick = () => {

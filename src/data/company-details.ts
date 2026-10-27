@@ -6,7 +6,7 @@
 export const STE_COMPANY_DETAILS = {
   name: "Surat textile exhibition",
   legalName: "SURAT TEXTILE EXHIBITION",
-  shortName: "STE 2026",
+  shortName: "STE",
   address: "5TH FLOOR SHOP NO.-B/503 TEXTILE MARKET MAGOB Surat",
   phone: "9950787787",
   email: "surattextileexhibition@gmail.com",
@@ -21,14 +21,14 @@ export const STE_COMPANY_DETAILS = {
     branch: "Surat",
   },
   eventDetails: {
-    eventName: "Surat Textile Exhibition (STE) 2026",
-    dates: "September 12-13, 2026",
+    eventName: "Surat Textile Exhibition (STE)",
+    dates: "Dates To Be Announced Soon",
     venue: "Surat International Exhibition and Convention Centre (SIECC), Sarsana Dome, Surat",
   },
   terms: [
     "100% advance payment is mandatory for confirming additional booth requirements.",
     "All extra item rates are per day and exclude 18% GST (CGST 9% + SGST 9% for Gujarat / IGST 18% for other states).",
-    "Bookings are subject to product availability and strict deadline cutoff (5th September 2026, 12:00 PM).",
+    "Bookings are subject to product availability and strict deadline cutoff.",
     "The images in catalog are for booking reference only; final physical product may slightly vary.",
     "Rental items damaged or lost during exhibition period shall be charged at full replacement cost.",
     "All disputes are subject to Surat jurisdiction.",

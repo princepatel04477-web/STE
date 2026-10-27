@@ -34,8 +34,8 @@ export default function FloatingWhatsAppBubble() {
   }, []);
 
   const message = language === "en"
-    ? "Hi, I visited the STE 2026 website and would like more information."
-    : "नमस्ते, मैंने STE 2026 की वेबसाइट देखी और मुझे अधिक जानकारी चाहिए।";
+    ? "Hi, I visited the STE website and would like more information."
+    : "नमस्ते, मैंने STE की वेबसाइट देखी और मुझे अधिक जानकारी चाहिए।";
   const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
 
   if (isPortalOrAdmin) return null;

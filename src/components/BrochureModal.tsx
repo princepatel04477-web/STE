@@ -182,7 +182,7 @@ export default function BrochureModal({ isOpen, onClose }: BrochureModalProps) {
               >
                 <Image
                   src="/brochure.webp"
-                  alt="Surat Textile Exhibition 2026 Official Brochure"
+                  alt="Surat Textile Exhibition Official Brochure"
                   fill
                   className="object-contain pointer-events-none"
                   priority
@@ -195,7 +195,7 @@ export default function BrochureModal({ isOpen, onClose }: BrochureModalProps) {
               id="brochure-subtitle"
               className="px-6 py-3 border-t border-white/5 bg-[#0c0c0c]/80 flex justify-between items-center text-xs uppercase tracking-[1.5px] text-expo-warm/60 select-none"
             >
-              <span><Translate en="STE Surat 2026 • September 12-13" hi="एसटीई सूरत 2026 • सितंबर 12-13" /></span>
+              <span><Translate en="STE Surat • Coming Soon" hi="एसटीई सूरत • जल्द आ रहा है" /></span>
               <span><Translate en="All Rights Reserved • AKAS Group" hi="सर्वाधिकार सुरक्षित • अकास ग्रुप" /></span>
             </div>
           </motion.div>

@@ -48,7 +48,7 @@ export default function CountdownSection() {
   });
 
   const isPast = TARGET_MS <= Date.now();
-  const showComingSoon = isExpired || isPast;
+  const showComingSoon = true;
 
   useEffect(() => {
     setIsMounted(true);

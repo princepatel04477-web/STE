@@ -72,7 +72,7 @@ export default function BilingualSection() {
           </FadeUp>
           <FadeUp delay={0.16}>
             <p className="font-sans text-sm sm:text-base text-expo-warm/60 leading-relaxed mt-6 max-w-xl">
-              Surat is the sourcing heartbeat of India. Discover why hundreds of major manufacturers and thousands of verified retailers align at STE 2026.
+              Surat is the sourcing heartbeat of India. Discover why hundreds of major manufacturers and thousands of verified retailers align at STE.
             </p>
           </FadeUp>
         </div>

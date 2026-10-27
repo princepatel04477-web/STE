@@ -228,7 +228,7 @@ export default function FinalCTA() {
     setShowModal(true);
   };
 
-  const bookingSummaryText = `*STE 2026 Stall Booking Inquiry*
+  const bookingSummaryText = `*STE Stall Booking Inquiry*
 ---------------------------------------
 *Company:* ${formData.companyName}
 *Contact Person:* ${formData.contactPerson}
@@ -325,24 +325,16 @@ export default function FinalCTA() {
             }`}
           >
             <Translate en="Exhibitor Stalls" hi="प्रदर्शक स्टॉल" /> <br />
-            <span className="text-amber-400 font-bold normal-case">
-              <Translate en="100% SOLD OUT" hi="100% सोल्ड आउट" />
+            <span className="text-metallic font-light italic normal-case">
+              <Translate en="Inquiries & Registration" hi="पूछताछ और पंजीकरण" />
             </span>
           </h2>
-          <div className="mb-8 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 max-w-lg">
-            <p className="font-sans text-xs sm:text-sm text-amber-300 font-semibold leading-relaxed mb-3">
-              <Translate
-                en="All exhibition stalls for STE 2026 are officially sold out. Registered exhibitors can log in below to manage booth requirements and extra amenities."
-                hi="STE 2026 के लिए सभी प्रदर्शनी स्टॉल आधिकारिक तौर पर बिक चुके हैं। पंजीकृत प्रदर्शक अपनी आवश्यकताओं और अतिरिक्त सुविधाओं का प्रबंधन करने के लिए नीचे लॉग इन कर सकते हैं।"
-              />
-            </p>
-            <a
-              href="/exhibitor/login"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
-            >
-              <Translate en="Enter Exhibitor's Portal ➔" hi="प्रदर्शक पोर्टल में प्रवेश करें ➔" />
-            </a>
-          </div>
+          <p className="font-sans text-sm sm:text-base text-expo-warm/60 leading-relaxed max-w-lg mb-8">
+            <Translate
+              en="Connect with verified buyers and industry leaders. Register your interest for upcoming exhibition opportunities at SIECC, Surat."
+              hi="सत्यापित खरीदारों और उद्योग के दिग्गजों से जुड़ें। SIECC, सूरत में आगामी प्रदर्शनी के अवसरों के लिए अपनी रुचि दर्ज करें।"
+            />
+          </p>
 
           <div className="flex items-center gap-6 border-t border-white/10 pt-8 mt-4 z-30 select-none">
             {/* STE Logo */}
@@ -395,7 +387,7 @@ export default function FinalCTA() {
                     <Translate en="Stall Registration" hi="स्टॉल पंजीकरण" />
                   </h3>
                   <p className="font-sans text-xs tracking-[1.5px] uppercase text-expo-warm/50 mt-1">
-                    <Translate en="Surat Textile Exhibition 2026" hi="सूरत टेक्सटाइल प्रदर्शनी 2026" />
+                    <Translate en="Surat Textile Exhibition" hi="सूरत टेक्सटाइल प्रदर्शनी" />
                   </p>
                 </div>
                 <span className="font-sans text-xs tracking-[3px] text-expo-gold font-bold uppercase">
