@@ -32,5 +32,15 @@
 		"NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hcXNjZXRpbXpqdWh0enRocXVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2Mzk1MzEsImV4cCI6MjEwMzIxNTUzMX0.HShdMhZ3scoBIFwz4fPvMpu5fkEKhD_2_rL0eZAMr_g",
 		"GOOGLE_DRIVE_PARENT_FOLDER_ID": "1_6t-lfH0ha4BF1MxP2nsry6zmjmUFFcm"
 	},
+	"routes": [
+		{
+			"pattern": "stesurat.com",
+			"custom_domain": true
+		},
+		{
+			"pattern": "www.stesurat.com",
+			"custom_domain": true
+		}
+	],
 	"workers_dev": true
 }
