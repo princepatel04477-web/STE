@@ -2,7 +2,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": ".open-next/worker.js",
 	"name": "surat-expo",
-	"account_id": "0e1accef8ef38c95615ccc2127999037",
+	"account_id": "a62b8d6d16e4cceffa5df4be95d90b4e",
 	"compatibility_date": "2026-09-19",
 	"compatibility_flags": [
 		"nodejs_compat",
