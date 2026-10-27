@@ -68,8 +68,14 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
         ?.saveData
     );
 
-    if (coarse || narrow || reduced || saveData) return; // stay on the poster
+    if (reduced || saveData) return; // stay on the poster only for reduced motion or data saver
+
+    if (coarse || narrow) {
+      // On mobile or touch devices, use native hardware-accelerated video
+      setUseNativeVideo(true);
+    }
     setMode("video");
+    setShouldLoadVideo(true);
   }, []);
 
   // ── Load video bytes only once visible, and only when the main thread is idle ──
@@ -97,7 +103,7 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
 
   // ── CAPTURE PHASE ──
   useEffect(() => {
-    if (!shouldLoadVideo) return;
+    if (!shouldLoadVideo || useNativeVideo) return;
     const el = videoRef.current;
     if (!el) return;
 
@@ -207,11 +213,62 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
       framesRef.current.forEach((bm) => bm.close());
       framesRef.current = [];
     };
-  }, [shouldLoadVideo, src]);
+  }, [shouldLoadVideo, src, useNativeVideo]);
+
+
+  // ── NATIVE VIDEO PLAYBACK (Mobile & Fallback) ──
+  useEffect(() => {
+    if (!shouldLoadVideo || !useNativeVideo) return;
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    vid.muted = true;
+    vid.defaultMuted = true;
+
+    const playVideo = () => {
+      if (vid.paused) {
+        vid.play().catch(() => {});
+      }
+    };
+
+    playVideo();
+    vid.addEventListener("canplay", playVideo);
+    vid.addEventListener("loadeddata", playVideo);
+
+    const onUserInteraction = () => {
+      playVideo();
+      window.removeEventListener("touchstart", onUserInteraction);
+      window.removeEventListener("touchend", onUserInteraction);
+      window.removeEventListener("click", onUserInteraction);
+      window.removeEventListener("scroll", onUserInteraction);
+    };
+
+    window.addEventListener("touchstart", onUserInteraction, { passive: true });
+    window.addEventListener("touchend", onUserInteraction, { passive: true });
+    window.addEventListener("click", onUserInteraction, { passive: true });
+    window.addEventListener("scroll", onUserInteraction, { passive: true });
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) {
+        playVideo();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      vid.removeEventListener("canplay", playVideo);
+      vid.removeEventListener("loadeddata", playVideo);
+      window.removeEventListener("touchstart", onUserInteraction);
+      window.removeEventListener("touchend", onUserInteraction);
+      window.removeEventListener("click", onUserInteraction);
+      window.removeEventListener("scroll", onUserInteraction);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [shouldLoadVideo, useNativeVideo]);
 
   // ── PLAYBACK PHASE via masterRAF ──
   useEffect(() => {
-    if (!shouldLoadVideo) return;
+    if (!shouldLoadVideo || useNativeVideo) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -260,7 +317,7 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
           aria-hidden="true"
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover z-0"
         />
       )}
 
@@ -270,18 +327,20 @@ export const BoomerangVideoBg: React.FC<BoomerangVideoBgProps> = ({
             ref={videoRef}
             src={src}
             poster={fallbackImage || undefined}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover z-[1]"
             style={{ display: useNativeVideo ? "block" : undefined }}
             aria-hidden="true"
+            autoPlay
             loop
             muted
             playsInline
-            preload="none"
+            {...({ "webkit-playsinline": "true" } as any)}
+            preload="auto"
             onError={() => setUseNativeVideo(true)}
           />
           <canvas
             ref={canvasRef}
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none z-[2]"
             aria-hidden="true"
             style={{ display: "none" }}
           />
